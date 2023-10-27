@@ -31,7 +31,7 @@ while i < len(alertsList):
         alertId = alerts[j]["id"]
         parName = alerts[j]["parentName"]
 
-        print(prov, " - ", parName, " - ", alertType, " - ", alertId)
+        # print(prov, " - ", parName, " - ", alertType, " - ", alertId)
 
         if alertId in output:
             # print("++ ", alertType, " already exists, adding new parent region")
@@ -40,9 +40,13 @@ while i < len(alertsList):
                 pass
             else:
                 # print("++ adding", parName)
-                
-                parNames = list(output[alertId]["parentName"])
-                parNames.append(parName)
+
+                if type(output[alertId]["parentName"]) is str:
+                    parNames = list((output[alertId]["parentName"], parName))
+                else:
+                    parNames = list(output[alertId]["parentName"])                
+                    parNames.append(parName)
+
                 output[alertId]["parentName"] = parNames
                     
             
