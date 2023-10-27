@@ -1,0 +1,84 @@
+[
+  {
+    "office"   : "wwg",
+    "products" : [
+      {
+        "label" : "FO45<br>WG",
+        "header" : "FOCN45",
+        "issuer" : "CWWG"
+      },
+      {
+        "label" : "South<br>MB",
+        "header" : "FPCN11",
+        "issuer" : "CWWG"
+      },
+      {
+        "label" : "North<br>MB",
+        "header" : "FPCN12",
+        "issuer" : "CWWG"
+      },
+      {
+        "label" : "South<br>SK",
+        "header" : "FPCN13",
+        "issuer" : "CWWG"
+      },
+      {
+        "label" : "South<br>NU",
+        "header" : "FPCN13",
+        "issuer" : "CWNT"
+      },
+      {
+        "label" : "East<br>NU",
+        "header" : "FPCN16",
+        "issuer" : "CWNT"
+      }
+    ],
+    "warnings" : ["mb","sk","nu"]
+  },
+  {
+    "office"   : "weg",
+    "products" : [
+      {
+        "label" : "FO45<br>WG",
+        "header" : "FOCN45",
+        "issuer" : "CWWG"
+      },
+      {
+        "label" : "North<br>AB",
+        "header" : "FPCN16",
+        "issuer" : "CWWG"
+      },
+      {
+        "label" : "South<br>AB",
+        "header" : "FPCN15",
+        "issuer" : "CWWG"
+      },
+      {
+        "label" : "North<br>SK",
+        "header" : "FPCN14",
+        "issuer" : "CWWG"
+      },
+      {
+        "label" : "South<br>NWT",
+        "header" : "FPCN11",
+        "issuer" : "CWNT"
+      },
+      {
+        "label" : "North<br>NWT",
+        "header" : "FPCN12",
+        "issuer" : "CWNT"
+      },
+      {
+        "label" : "West<br>NU",
+        "header" : "FPCN14",
+        "issuer" : "CWNT"
+      },
+      {
+        "label" : "North<br>NU",
+        "header" : "FPCN15",
+        "issuer" : "CWNT"
+      }
+    ],
+    "warnings" : ["ab","sk","nt","nu"]
+  }
+]

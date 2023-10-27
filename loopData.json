@@ -1,0 +1,64 @@
+[
+  {
+    "product"    : "prairie-vis",
+    "display"    : "Prairie Vis/IR",
+    "productType": "sat",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/prairies_vis_nightmp_0",
+    "startIndex" : 36,
+    "fileType"   : ".jpeg",
+    "loopLength" : 12
+  },
+  {
+    "product"    : "prairie-snow",
+    "display"    : "Prairie Snow/Fog",
+    "productType": "sat",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/prairies_snow_fog_nightmp_0",
+    "startIndex" : 36,
+    "fileType"   : ".jpeg",
+    "loopLength" : 12
+  },
+  {
+    "product"    : "prairie-fire",
+    "display"    : "Prairie Fire",
+    "productType": "sat",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/prairies_fire_temperature_0",
+    "startIndex" : 36,
+    "fileType"   : ".jpeg",
+    "loopLength" : 12
+  },
+  {
+    "product"    : "artic-phase",
+    "display"    : "NU Cloud Phase",
+    "productType": "sat",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/arctic_dayphase_nightmp_0",
+    "startIndex" : 36,
+    "fileType"   : ".jpeg",
+    "loopLength" : 12
+  },
+  {
+    "product"    : "nat-vis",
+    "display"    : "National Vis/IR",
+    "productType": "sat",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/vis_nightmp_0",
+    "startIndex" : 36,
+    "fileType"   : ".jpeg",
+    "loopLength" : 12
+  },
+  {
+    "product"    : "nat-wv",
+    "display"    : "National WV ",
+    "productType": "sat",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/simple_wv_0",
+    "startIndex" : 36,
+    "fileType"   : ".jpeg",
+    "loopLength" : 12
+  },
+  {
+    "product"    : "lightning",
+    "productType": "other",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/PrairieShortN",
+    "startIndex" : 13,
+    "fileType"   : ".jpg",
+    "loopLength" : 12
+  }
+]
