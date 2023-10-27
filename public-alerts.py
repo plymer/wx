@@ -42,7 +42,7 @@ while i < len(alertsList):
                 # print("++ adding", parName)
 
                 if type(output[alertId]["parentName"]) is str:
-                    parNames = list((output[alertId]["parentName"], parName))
+                    parNames = list((output[alertId]["parentName"], parName)) # double brackets here to make sure the 'list' is one element being passed
                 else:
                     parNames = list(output[alertId]["parentName"])                
                     parNames.append(parName)
