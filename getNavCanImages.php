@@ -76,7 +76,8 @@ for ($i = 0; $i < count($json); $i++) {
 
 echo "<pre>\n\n";
     $outJSON = json_encode($output);
-    
+
+    chdir("/var/www/html/wx");
     $cwd = getcwd();
     echo "$cwd\n\n";
     file_put_contents("navcan-images.json", $outJSON);
