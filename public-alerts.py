@@ -4,6 +4,8 @@ import requests as html, re, json, sys, shutil
 
 URL = "https://weather.gc.ca/data/dms/alert_geojson/alerts.en.geojson"
 
+# check out geojson.io for testing output on mapbox static images, including styling of polygons
+
 try:
     raw = html.get(URL).text
 except html.exceptions.Timeout:
