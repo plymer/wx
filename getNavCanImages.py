@@ -53,7 +53,7 @@ while i < len(imageJSON):
             
             # this is either CLDWX or TURBC followed by the list of three image URLs
             tempArr = {
-                    imageInfo["sub_product"] : list((navCan + str(imageInfo["frame_lists"][2]["frames"][0]["images"][0]["id"]) + ".image", navCan + str(imageInfo["frame_lists"][2]["frames"][1]["images"][0]["id"]) + ".image", navCan + str(imageInfo["frame_lists"][2]["frames"][2]["images"][0]["id"]) + ".image"))
+                    imageInfo["sub_product"] : list((navCan + str(imageInfo["frame_lists"][2]["frames"][0]["images"][x]["id"]) + ".image", navCan + str(imageInfo["frame_lists"][2]["frames"][1]["images"][y]["id"]) + ".image", navCan + str(imageInfo["frame_lists"][2]["frames"][2]["images"][z]["id"]) + ".image"))
             }
             
             # append the new data to the pre-existing entry in the output dictionary
@@ -69,7 +69,7 @@ while i < len(imageJSON):
             # we have encountered a 'new' GFA region so we build the full entry, including the GFA region, panel type (CLDWX/TURBC), and the three panel URLs
             tempArr = {
                 imageInfo["geography"] : {
-                    imageInfo["sub_product"] : list((navCan + str(imageInfo["frame_lists"][2]["frames"][0]["images"][0]["id"]) + ".image", navCan + str(imageInfo["frame_lists"][2]["frames"][1]["images"][0]["id"]) + ".image", navCan + str(imageInfo["frame_lists"][2]["frames"][2]["images"][0]["id"]) + ".image"))
+                    imageInfo["sub_product"] : list((navCan + str(imageInfo["frame_lists"][2]["frames"][0]["images"][x]["id"]) + ".image", navCan + str(imageInfo["frame_lists"][2]["frames"][1]["images"][y]["id"]) + ".image", navCan + str(imageInfo["frame_lists"][2]["frames"][2]["images"][z]["id"]) + ".image"))
                 }
             }
             
