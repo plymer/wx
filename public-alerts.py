@@ -34,6 +34,8 @@ while i < len(alertsList):
         alertType = alerts[j]["alertBannerText"]
         alertId = alerts[j]["id"]
         parName = alerts[j]["parentName"]
+        alertText = alerts[j]["text"]
+        issueTime = alerts[j]["issueTime"]
 
         # print(prov, " - ", parName, " - ", alertType, " - ", alertId)
 
@@ -67,8 +69,12 @@ while i < len(alertsList):
                     
             
         else:
-            # print ("++ ", alertType, " not found in the list of alerts, adding it")
-            output[alertId] = {"alertType" : alertType, "prov" : prov , "parentName" : parName}
+            # make sure that a singular name is stored as an iterable array, by first storing it as a set and then converting it to a list
+            # name = set()
+            # name.add(parName)
+            
+            # output[alertId] = {"alertType" : alertType, "prov" : prov , "parentName" : list(name), "issueTime": issueTime, "text" : alertText}
+            output[alertId] = {"alertType" : alertType, "prov" : prov , "parentName" : parName, "issueTime": issueTime, "text" : alertText}
 
 
 
@@ -88,4 +94,4 @@ f = open(filename, "w")
 f.write(formatted)
 f.close()
 
-print("Current Alerts written to ", filename)
+print("Current Alerts written to", filename)

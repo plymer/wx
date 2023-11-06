@@ -1,6 +1,15 @@
-[
-  {
-    "office"   : "wwg",
+{ 
+  "wvr" : {
+    "name" : "Pacfic Storm Prediction Centre",
+    "shortName" : "PSPC",
+    "city" : "Vancouver",
+    "products" : [],
+    "warnings" : []
+  },
+  "wwg" : {
+    "longName" : "Prairie and Arctic Storm Prediction Centre - Winnipeg",
+    "shortName" : "PASPC-Wpg",
+    "city" : "Winnipeg",
     "products" : [
       {
         "label" : "FO45<br>WG",
@@ -33,10 +42,12 @@
         "issuer" : "CWNT"
       }
     ],
-    "warnings" : ["mb","sk","nu"]
+    "warnings" : ["MB","SK","NU"]
   },
-  {
-    "office"   : "weg",
+  "weg" : {
+    "longName" : "Prairie and Arctic Storm Prediction Centre - Edmonton",
+    "shortName" : "PASPC-Edm",
+    "city" : "Edmonton",
     "products" : [
       {
         "label" : "FO45<br>WG",
@@ -79,6 +90,6 @@
         "issuer" : "CWNT"
       }
     ],
-    "warnings" : ["ab","sk","nt","nu"]
+    "warnings" : ["AB","SK","NT","NU"]
   }
-]
+}

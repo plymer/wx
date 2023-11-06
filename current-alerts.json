@@ -3,91 +3,64 @@
     "alertType": "Fog Advisory",
     "prov": "AB",
     "parentName": [
-      "Slave Lake",
-      "Drayton Valley - Devon - Rimbey - Pigeon Lake",
-      "Red Deer - Ponoka - Innisfail - Stettler",
       "Fort Saskatchewan - Vegreville - Redwater - Smoky Lake",
-      "Peace River - Fairview - High Prairie - Manning",
-      "Leduc - Camrose - Wetaskiwin - Tofield",
-      "Grande Prairie - Beaverlodge - Valleyview",
+      "Brooks - Strathmore - Vulcan",
       "Medicine Hat - Bow Island - Suffield",
-      "City of Edmonton - St. Albert - Sherwood Park",
-      "Hanna - Coronation - Oyen",
-      "Westlock - Barrhead - Athabasca",
-      "Lloydminster - Wainwright - Vermilion - Provost",
+      "Bonnyville - St. Paul - Cold Lake - Lac La Biche",
       "Spruce Grove - Morinville - Mayerthorpe - Evansburg",
-      "Bonnyville - St. Paul - Cold Lake - Lac La Biche"
-    ]
+      "Leduc - Camrose - Wetaskiwin - Tofield",
+      "Red Deer - Ponoka - Innisfail - Stettler",
+      "Peace River - Fairview - High Prairie - Manning",
+      "Westlock - Barrhead - Athabasca",
+      "Grande Prairie - Beaverlodge - Valleyview",
+      "Drumheller - Three Hills",
+      "Lloydminster - Wainwright - Vermilion - Provost",
+      "Hanna - Coronation - Oyen",
+      "Whitecourt - Edson - Fox Creek - Swan Hills",
+      "Slave Lake"
+    ],
+    "issueTime": "2023-11-06T16:15:40.516Z",
+    "text": "Patches of dense fog with near zero visibility continue. \n\nConditions will slowly improve through the day, however, some areas will likely see fog redevelop once again tonight.\n\nTravel is expected to be hazardous due to reduced visibility in some locations.\n\nIf visibility is reduced while driving, slow down, watch for tail lights ahead and be prepared to stop.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to ABstorm@ec.gc.ca or tweet reports using #ABStorm."
+  },
+  "161927616134870876202311060501": {
+    "alertType": "Fog Advisory",
+    "prov": "AB",
+    "parentName": "City of Edmonton - St. Albert - Sherwood Park",
+    "issueTime": "2023-11-06T16:23:32.676Z",
+    "text": "Patches of dense fog with near zero visibility continue for outlying areas of Edmonton.\n\nConditions will slowly improve through the day, however, some areas may see fog redevelop again tonight.\n\nTravel is expected to be hazardous due to reduced visibility in some locations.\n\nIf visibility is reduced while driving, slow down, watch for tail lights ahead and be prepared to stop.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to ABstorm@ec.gc.ca or tweet reports using #ABStorm."
   },
   "221307412554901638202311050502": {
     "alertType": "Fog Advisory",
     "prov": "BC",
     "parentName": [
       "B.C. Peace River"
-    ]
+    ],
+    "issueTime": "2023-11-06T17:23:55.856Z",
+    "text": "Near zero visibility in dense fog and freezing fog\n\nWhen: Today and tonight.\n\nWhere: North Peace River District including Fort St. John, Alaskan Highway. South Peace River District including Dawson Creek and Cheywynd.\n\nHazard: Slippery surfaces due to ice accretion in areas of freezing fog.\n\nRemarks: \n\nAtmospheric conditions are favourable for the development of dense fog. While the dense fog may lift temporarily this afternoon, it's expected to redevelop again this evening and persist overnight. For the South Peace River region, the most dense fog is expected mostly over northern sections.\n\nTravel is expected to be hazardous due to reduced visibility.\n\nIf visibility is reduced while driving, slow down, watch for tail lights ahead and be prepared to stop.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to BCstorm@ec.gc.ca or tweet reports using #BCStorm."
   },
-  "427328311632268814202311040501": {
-    "alertType": "Snowfall Warning",
-    "prov": "MB",
-    "parentName": [
-      "Arborg - Hecla - Fisher River - Gypsumville - Ashern",
-      "Bissett - Victoria Beach - Nopiming Prov. Park - Pine Falls"
-    ]
-  },
-  "227384092020698344202311060501": {
+  "819342381555632719202311060502": {
     "alertType": "Fog Advisory",
-    "prov": "MB",
-    "parentName": [
-      "Brandon - Neepawa - Carberry - Treherne"
-    ]
+    "prov": "BC",
+    "parentName": "Bulkley Valley and the Lakes District",
+    "issueTime": "2023-11-06T16:07:40.214Z",
+    "text": "Areas of dense fog are expected or occurring.\n\nWhen: Now through early this morning.\n\nWhere: Houston, Burns Lake, Highway 16.\n\nHazards: Areas of dense fog significantly reducing visibilities. For communities with temperatures dropping below freezing, slippery surfaces may result.\n\nRemarks: Areas of fog have developed throughout the region and are expected to dissipate later this morning.\n\nIf travelling, be prepared for areas of near-zero visibility. If visibility is reduced while driving, slow down, watch for tail lights ahead and be prepared to stop.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to BCstorm@ec.gc.ca or tweet reports using #BCStorm."
   },
-  "2043527652021819895202311040503": {
-    "alertType": "Snowfall Warning",
-    "prov": "ON",
-    "parentName": [
-      "Geraldton - Manitouwadge - Hornepayne",
-      "Lake Nipigon - Wabakimi"
-    ]
+  "63353255317686800202311060502": {
+    "alertType": "Fog Advisory",
+    "prov": "BC",
+    "parentName": "North Columbia",
+    "issueTime": "2023-11-06T16:04:02.133Z",
+    "text": "Near zero visibility in dense fog.\n\nWhen: This morning.\n\nWhere: North Columbia and Highway 5.\n\nRemarks: \n\nAreas of dense fog have formed in low-lying areas and will persist through this morning.\n\nTravel is expected to be hazardous due to reduced visibility in some locations.\n\nFog advisories are issued when near zero visibilities in fog are expected or occurring.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to BCstorm@ec.gc.ca or tweet reports using #BCStorm."
   },
   "2021370772021819895202311040503": {
     "alertType": "Snowfall Warning",
     "prov": "ON",
     "parentName": [
-      "Geraldton - Manitouwadge - Hornepayne",
-      "Lake Nipigon - Wabakimi"
-    ]
-  },
-  "1805405922021819895202311040503": {
-    "alertType": "Special Weather Statement",
-    "prov": "ON",
-    "parentName": [
-      "Chapleau - Gogama",
-      "Kirkland Lake - Temiskaming Shores - Temagami"
-    ]
-  },
-  "1718514582021819895202311050503": {
-    "alertType": "Freezing Rain Warning",
-    "prov": "ON",
-    "parentName": [
-      "Dryden - Ignace"
-    ]
-  },
-  "1807197922021819895202311040503": {
-    "alertType": "Special Weather Statement",
-    "prov": "ON",
-    "parentName": [
-      "Kenora - Nestor Falls",
-      "Dryden - Ignace",
-      "Atikokan - Upsala - Quetico"
-    ]
-  },
-  "1802104902021819895202311040503": {
-    "alertType": "Snowfall Warning",
-    "prov": "ON",
-    "parentName": [
-      "Red Lake - Ear Falls",
-      "Sioux Lookout - Savant Lake"
-    ]
+      "Lake Nipigon - Wabakimi",
+      "Geraldton - Manitouwadge - Hornepayne"
+    ],
+    "issueTime": "2023-11-06T09:54:00.760Z",
+    "text": "Heavy snow today with risk of freezing rain. \n\nHazards: \nSnowfall accumulations near 15 cm.\nReduced visibility at times in heavy snow.\n\nTiming: \nTapering off this afternoon.\n\nDiscussion: \nSnow, heavy at times, may become mixed with or transition to ice pellets or freezing rain this morning. The mixed precipitation or snow will taper to periods of light snow or flurries this afternoon.\n\nRapidly accumulating snow could make travel difficult over some locations. Visibility may be suddenly reduced at times in heavy snow. Surfaces such as highways, roads, walkways and parking lots may become difficult to navigate due to accumulating snow.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to ONstorm@ec.gc.ca or tweet reports using #ONStorm."
   },
   "1155536392021819895202311050503": {
     "alertType": "Snowfall Warning",
@@ -95,51 +68,58 @@
     "parentName": [
       "Timmins - Cochrane",
       "Kapuskasing - Hearst"
-    ]
+    ],
+    "issueTime": "2023-11-06T14:43:36.561Z",
+    "text": "Heavy snowfall expected today.\n\nHazards: \nSnowfall accumulations near 15 cm.\nReduced visibility at times in heavy snow.\n\nTiming: \nEnding tonight.\n\nDiscussion: \nSnow, heavy at times, will taper to periods of light snow or flurries tonight. Snow may also become mixed with or transition to ice pellets or freezing rain late this morning and this afternoon near Highway 11. Areas south of Timmins will likely see a transition to rain this afternoon before a change back to periods of light snow this evening.\n\nRapidly accumulating snow could make travel difficult over some locations. Surfaces such as highways, roads, walkways and parking lots may become difficult to navigate due to accumulating snow.\n\nBe prepared to adjust your driving with changing road conditions.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to ONstorm@ec.gc.ca or tweet reports using #ONStorm."
+  },
+  "945453411395160432202311060503": {
+    "alertType": "Freezing Rain Warning",
+    "prov": "ON",
+    "parentName": [
+      "Timmins - Cochrane",
+      "Kirkland Lake - Temiskaming Shores - Temagami"
+    ],
+    "issueTime": "2023-11-06T15:17:15.228Z",
+    "text": "Freezing rain late this morning.\n\nHazards:\nA period of freezing rain leading to light ice accretion on some surfaces.\n\nTiming:\nEnding early this afternoon.\n\nDiscussion:\nA period of freezing rain is expected late this morning before a changeover to rain early this afternoon.\n\nSurfaces such as highways, roads, walkways and parking lots may become icy and slippery.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to ONstorm@ec.gc.ca or tweet reports using #ONStorm."
+  },
+  "91247633872096566202311060504": {
+    "alertType": "Snowfall Warning",
+    "prov": "QC",
+    "parentName": [
+      "Lac-Saint-Jean"
+    ],
+    "issueTime": "2023-11-06T16:54:25.282Z",
+    "text": "Snowfall with total amounts of 15 to 20 cm is expected.\n\nA low pressure system approaching from Ontario will bring moderate to heavy snow tonight and on Tuesday. Snow may be mixed with rain during the day on Tuesday.\n\nBe prepared to adjust your driving with changing road conditions.\n\nSnowfall warnings are issued when significant snowfall is expected.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to QCstorm@ec.gc.ca or tweet reports using #QCStorm."
   },
   "1959206061393827135202311050504": {
     "alertType": "Snowfall Warning",
     "prov": "QC",
     "parentName": [
-      "Chibougamau",
       "Matagami",
+      "Chibougamau",
       "Parent - Gouin Reservoir",
       "Abitibi"
-    ]
-  },
-  "18063788614366507202311040504": {
-    "alertType": "Wind Warning",
-    "prov": "QC",
-    "parentName": "Kangiqsujuaq - Raglan Lake"
-  },
-  "18095001814366507202311040504": {
-    "alertType": "Blizzard Warning",
-    "prov": "QC",
-    "parentName": "Kangiqsujuaq - Raglan Lake"
-  },
-  "51395041064566401202311060501": {
-    "alertType": "Snowfall Warning",
-    "prov": "SK",
-    "parentName": [
-      "Pelican Narrows - Cumberland House - Creighton",
-      "La Ronge - Prince Albert Nat. Park - Narrow Hills Prov. Park"
-    ]
+    ],
+    "issueTime": "2023-11-06T16:49:55.182Z",
+    "text": "Snowfall with total amounts of 15 to 20 cm is expected.\n\nA low pressure system approaching from Ontario will bring moderate to heavy snow over northwestern Quebec through Tuesday morning. The snow may be mixed with rain overnight tonight and on Tuesday.\n\nBe prepared to adjust your driving with changing road conditions.\n\nSnowfall warnings are issued when significant snowfall is expected.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to QCstorm@ec.gc.ca or tweet reports using #QCStorm."
   },
   "194020554923132923202311050501": {
     "alertType": "Fog Advisory",
     "prov": "SK",
     "parentName": [
+      "Meadow Lake - Big River - Green Lake - Pierceland",
+      "Kindersley - Rosetown - Biggar - Wilkie - Macklin",
       "The Battlefords - Unity - Maidstone - St. Walburg",
-      "Leader - Gull Lake",
-      "Martensville - Warman - Rosthern - Delisle - Wakaw",
-      "Swift Current - Herbert - Cabri - Kyle - Lucky Lake",
-      "City of Saskatoon",
-      "Kindersley - Rosetown - Biggar - Wilkie - Macklin"
-    ]
+      "Leader - Gull Lake"
+    ],
+    "issueTime": "2023-11-06T17:08:38.253Z",
+    "text": "Dense fog to persist tonight into Monday. \n\nFog has settled over parts of southern Saskatchewan overnight.\n\nThe fog is not expected to lift in earnest until late Monday morning to Monday afternoon.\n\nVisibility may be significantly and suddenly reduced to near zero.\n\nIf travelling, be prepared for areas of near-zero visibility. If visibility is reduced while driving, turn on your lights and maintain a safe following distance.\n\nFog advisories are issued when near zero visibilities in fog are expected or occurring.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to SKstorm@ec.gc.ca or tweet reports using #SKStorm."
   },
   "1127356951531934689202311030502": {
     "alertType": "Blizzard Warning",
     "prov": "YT",
-    "parentName": "Dempster"
+    "parentName": "Dempster",
+    "issueTime": "2023-11-06T10:59:26.102Z",
+    "text": "Blizzard conditions with gusty winds and persistent visibility near zero in blowing snow are expected or occurring.\n\nHazards: Periods of strong winds and near-zero visibility in snow and blowing snow. Wind chill near minus 30.\n\nLocation: Dempster Highway.\n\nTimespan: Tonight through Tuesday midday. Possibly re-developing late Wednesday.\n\nRemarks: A ridge of high pressure has shifted and settled along the Yukon/NWT border and lighter winds are now expected today. The ridge will shift to the northeast later today as pressures fall over the southwest Yukon, with strong winds through the Richardson Mountains re-developing this evening. \n\nStrong winds will lead to blizzard conditions with severely reduced visibilities in blowing snow and dangerous wind chill values.\n\nWinds are forecast to ease again near midday on Tuesday and possibly return late in the day on Wednesday.\n\nTravel is expected to be extremely hazardous due to reduced visibility.\n\nPrepare for quickly changing and deteriorating travel conditions.\n\nPlease continue to monitor alerts and forecasts issued by Environment Canada. To report severe weather, send an email to YTstorm@ec.gc.ca or tweet reports using #YTStorm."
   }
 }

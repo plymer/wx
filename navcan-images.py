@@ -45,6 +45,11 @@ while i < len(imageJSON):
             
             # get the previous data we had
             prev = output.get(imageInfo["geography"])
+
+            #find the number of images (regular issues and corrections) and set our search for the 'latest' one
+            x = len(imageInfo["frame_lists"][2]["frames"][0]["images"]) - 1
+            y = len(imageInfo["frame_lists"][2]["frames"][1]["images"]) - 1
+            z = len(imageInfo["frame_lists"][2]["frames"][2]["images"]) - 1
             
             # this is either CLDWX or TURBC followed by the list of three image URLs
             tempArr = {
@@ -55,6 +60,12 @@ while i < len(imageJSON):
             prev.update(tempArr)
             
         else:
+
+            #find the number of images (regular issues and corrections) and set our search for the 'latest' one
+            x = len(imageInfo["frame_lists"][2]["frames"][0]["images"]) - 1
+            y = len(imageInfo["frame_lists"][2]["frames"][1]["images"]) - 1
+            z = len(imageInfo["frame_lists"][2]["frames"][2]["images"]) - 1
+            
             # we have encountered a 'new' GFA region so we build the full entry, including the GFA region, panel type (CLDWX/TURBC), and the three panel URLs
             tempArr = {
                 imageInfo["geography"] : {
@@ -88,7 +99,7 @@ while i < len(imageJSON):
 # we've looped through all of the navcan data
 output = json.dumps(output, indent=4)
 
-filename = path + "/navcan-images.json"
+filename = path + "/current-images.json"
 
 f = open(filename, "w")
 f.write(output)
