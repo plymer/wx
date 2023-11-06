@@ -1,0 +1,145 @@
+{
+  "95727832492070978202311050501": {
+    "alertType": "Fog Advisory",
+    "prov": "AB",
+    "parentName": [
+      "Slave Lake",
+      "Drayton Valley - Devon - Rimbey - Pigeon Lake",
+      "Red Deer - Ponoka - Innisfail - Stettler",
+      "Fort Saskatchewan - Vegreville - Redwater - Smoky Lake",
+      "Peace River - Fairview - High Prairie - Manning",
+      "Leduc - Camrose - Wetaskiwin - Tofield",
+      "Grande Prairie - Beaverlodge - Valleyview",
+      "Medicine Hat - Bow Island - Suffield",
+      "City of Edmonton - St. Albert - Sherwood Park",
+      "Hanna - Coronation - Oyen",
+      "Westlock - Barrhead - Athabasca",
+      "Lloydminster - Wainwright - Vermilion - Provost",
+      "Spruce Grove - Morinville - Mayerthorpe - Evansburg",
+      "Bonnyville - St. Paul - Cold Lake - Lac La Biche"
+    ]
+  },
+  "221307412554901638202311050502": {
+    "alertType": "Fog Advisory",
+    "prov": "BC",
+    "parentName": [
+      "B.C. Peace River"
+    ]
+  },
+  "427328311632268814202311040501": {
+    "alertType": "Snowfall Warning",
+    "prov": "MB",
+    "parentName": [
+      "Arborg - Hecla - Fisher River - Gypsumville - Ashern",
+      "Bissett - Victoria Beach - Nopiming Prov. Park - Pine Falls"
+    ]
+  },
+  "227384092020698344202311060501": {
+    "alertType": "Fog Advisory",
+    "prov": "MB",
+    "parentName": [
+      "Brandon - Neepawa - Carberry - Treherne"
+    ]
+  },
+  "2043527652021819895202311040503": {
+    "alertType": "Snowfall Warning",
+    "prov": "ON",
+    "parentName": [
+      "Geraldton - Manitouwadge - Hornepayne",
+      "Lake Nipigon - Wabakimi"
+    ]
+  },
+  "2021370772021819895202311040503": {
+    "alertType": "Snowfall Warning",
+    "prov": "ON",
+    "parentName": [
+      "Geraldton - Manitouwadge - Hornepayne",
+      "Lake Nipigon - Wabakimi"
+    ]
+  },
+  "1805405922021819895202311040503": {
+    "alertType": "Special Weather Statement",
+    "prov": "ON",
+    "parentName": [
+      "Chapleau - Gogama",
+      "Kirkland Lake - Temiskaming Shores - Temagami"
+    ]
+  },
+  "1718514582021819895202311050503": {
+    "alertType": "Freezing Rain Warning",
+    "prov": "ON",
+    "parentName": [
+      "Dryden - Ignace"
+    ]
+  },
+  "1807197922021819895202311040503": {
+    "alertType": "Special Weather Statement",
+    "prov": "ON",
+    "parentName": [
+      "Kenora - Nestor Falls",
+      "Dryden - Ignace",
+      "Atikokan - Upsala - Quetico"
+    ]
+  },
+  "1802104902021819895202311040503": {
+    "alertType": "Snowfall Warning",
+    "prov": "ON",
+    "parentName": [
+      "Red Lake - Ear Falls",
+      "Sioux Lookout - Savant Lake"
+    ]
+  },
+  "1155536392021819895202311050503": {
+    "alertType": "Snowfall Warning",
+    "prov": "ON",
+    "parentName": [
+      "Timmins - Cochrane",
+      "Kapuskasing - Hearst"
+    ]
+  },
+  "1959206061393827135202311050504": {
+    "alertType": "Snowfall Warning",
+    "prov": "QC",
+    "parentName": [
+      "Chibougamau",
+      "Matagami",
+      "Parent - Gouin Reservoir",
+      "Abitibi"
+    ]
+  },
+  "18063788614366507202311040504": {
+    "alertType": "Wind Warning",
+    "prov": "QC",
+    "parentName": "Kangiqsujuaq - Raglan Lake"
+  },
+  "18095001814366507202311040504": {
+    "alertType": "Blizzard Warning",
+    "prov": "QC",
+    "parentName": "Kangiqsujuaq - Raglan Lake"
+  },
+  "51395041064566401202311060501": {
+    "alertType": "Snowfall Warning",
+    "prov": "SK",
+    "parentName": [
+      "Pelican Narrows - Cumberland House - Creighton",
+      "La Ronge - Prince Albert Nat. Park - Narrow Hills Prov. Park"
+    ]
+  },
+  "194020554923132923202311050501": {
+    "alertType": "Fog Advisory",
+    "prov": "SK",
+    "parentName": [
+      "The Battlefords - Unity - Maidstone - St. Walburg",
+      "Leader - Gull Lake",
+      "Martensville - Warman - Rosthern - Delisle - Wakaw",
+      "Swift Current - Herbert - Cabri - Kyle - Lucky Lake",
+      "City of Saskatoon",
+      "Kindersley - Rosetown - Biggar - Wilkie - Macklin"
+    ]
+  },
+  "1127356951531934689202311030502": {
+    "alertType": "Blizzard Warning",
+    "prov": "YT",
+    "parentName": "Dempster"
+  }
+}
