@@ -46,7 +46,7 @@ function loadPubInfo() {
     }
   }
 
-  xhttp.open("GET", jsonFileName, TRUE);
+  xhttp.open("GET", jsonFileName, true);
   xhttp.send();
 }
 
