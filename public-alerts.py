@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 
-import requests as html, re, json, sys, shutil
+import requests as html, json, os
 
 URL = "https://weather.gc.ca/data/dms/alert_geojson/alerts.en.geojson"
 
 # check out geojson.io for testing output on mapbox static images, including styling of polygons
+
+path = os.path.dirname(os.path.realpath(__file__))
 
 try:
     raw = html.get(URL).text
@@ -18,8 +20,8 @@ except html.exceptions.RequestException as e:
 alertsList = json.loads(raw)
 alertsList = alertsList["features"]
 
-output = {}
-parNames = []
+output = {} # this is a type dict
+parNames = [] # this is a type list
 
 i = 0
 while i < len(alertsList):
@@ -29,41 +31,67 @@ while i < len(alertsList):
 
     j = 0
     while j < len(alerts):
-        alertType = alerts[j]["alertCode"]
+        alertType = alerts[j]["alertBannerText"]
         alertId = alerts[j]["id"]
         parName = alerts[j]["parentName"]
+        alertText = alerts[j]["text"]
+        issueTime = alerts[j]["issueTime"]
 
         # print(prov, " - ", parName, " - ", alertType, " - ", alertId)
 
         if alertId in output:
             # print("++ ", alertType, " already exists, adding new parent region")
             if parName in parNames:
-                # print("  skipping", parName)
+                # we are skipping this parentName
                 pass
+
             else:
-                # print("++ adding", parName)
+                # we are adding this parentName
 
                 if type(output[alertId]["parentName"]) is str:
+                    # this branch is for if there is a single parentName in the list, it will be read in as a type string
                     parNames = list((output[alertId]["parentName"], parName)) # double brackets here to make sure the 'list' is one element being passed
+                    
                 else:
+                    # this branch is for if there is a pre-existing list of parentNames in the list, it will be read in as a type list
                     parNames = list(output[alertId]["parentName"])                
                     parNames.append(parName)
 
-                output[alertId]["parentName"] = parNames
+                # convert the list to a set so we can remove the duplicates
+                noDupes = set()
+                for entry in parNames:
+                    noDupes.add(entry)
+                
+                # now convert back to a list
+                noDupes = list(noDupes)
+
+                output[alertId]["parentName"] = noDupes
                     
             
         else:
-            # print ("++ ", alertType, " not found in the list of alerts, adding it")
-            output[alertId] = {"alertType" : alertType, "parentName" : parName}
+            # make sure that a singular name is stored as an iterable array, by first storing it as a set and then converting it to a list
+            # name = set()
+            # name.add(parName)
+            
+            # output[alertId] = {"alertType" : alertType, "prov" : prov , "parentName" : list(name), "issueTime": issueTime, "text" : alertText}
+            output[alertId] = {"alertType" : alertType, "prov" : prov , "parentName" : parName, "issueTime": issueTime, "text" : alertText}
 
 
 
         j += 1
     
     i += 1
+
+    #clear out the parNames set
     parNames = []
 
 
 formatted = json.dumps(output, indent=2)
 
-print(formatted)
+filename = path + "/current-alerts.json"
+
+f = open(filename, "w")
+f.write(formatted)
+f.close()
+
+print("Current Alerts written to", filename)

@@ -99,10 +99,11 @@ while i < len(imageJSON):
 # we've looped through all of the navcan data
 output = json.dumps(output, indent=4)
 
-filename = path + "/navcan-images.json"
+filename = path + "/current-images.json"
 
 f = open(filename, "w")
 f.write(output)
 f.close()
 
-print("NOTAMs written to", filename)
+print("Image links written to", filename)
+

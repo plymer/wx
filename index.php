@@ -20,7 +20,7 @@
 
   <script src="js/jquery-3.3.1.min.js"></script>
   <script src="js/GFAscripts.js"></script>
-  <script src="js/pubScripts.js"></script>
+  <script src="js/public-scripts.js"></script>
   <script src="js/metars.js"></script>
   <script src="js/player.js"></script>
   <script src="js/siteFunctions.js"></script>
