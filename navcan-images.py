@@ -105,4 +105,5 @@ f = open(filename, "w")
 f.write(output)
 f.close()
 
-print("NOTAMs written to", filename)
+print("Image links written to", filename)
+

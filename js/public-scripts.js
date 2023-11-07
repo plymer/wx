@@ -1,5 +1,7 @@
 var currOffice = "weg";
 var officeDetails;
+var currentAlerts;
+var filteredAlerts;
 
 function togglePubOffice() {
   if (currOffice == "weg") {
@@ -15,48 +17,32 @@ function togglePubOffice() {
 
 function loadPubInfo() {
   var timeStamp = (new Date()).getTime();
-  var jsonFileName = "pubRegions.json?" + timeStamp;
+  var jsonFileName = "public-config.json?" + timeStamp;
   console.log("Loading", jsonFileName, "...");
-  jsonData = $.get(jsonFileName)
-    .done(function(jsonData){
 
+  var xhttp = new XMLHttpRequest;
+
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
       $("#battleboard").empty();
       $("#pub-fx-list").empty();
 
-      officeDetails = jsonData;
+      officeDetails = jsonData[currOffice];
 
-      // loop through the offices and set their details to what we want to deal with
-      for (i=0; i<officeDetails.length; i++) {
-        if (officeDetails[i].office == currOffice) {
-          officeDetails = officeDetails[i];
+      // fill out the buttons to choose which forecast products are available
 
-          // we have found our requested office, now we fill out the buttons to choose from
-
-          for (i=0; i<officeDetails.warnings.length; i++) {
-            var linkURL = "https://weather.gc.ca/warnings/index_e.html?prov=" + officeDetails.warnings[i];
-            var imgURL = "https://weather.gc.ca/data/warningmap/" + officeDetails.warnings[i] +"_e.png?" + timeStamp;
-            $("#battleboard").append("<a href='" + linkURL + "'><img class='warn-map' src='" + imgURL + "'></a>");
-          }
-
-          for (i=0; i<officeDetails.products.length; i++) {
-            var header = officeDetails.products[i].header;
-            var issuer = officeDetails.products[i].issuer;
-            var label = officeDetails.products[i].label;
-            var id = header + "-" + issuer;
-            $("#pub-fx-list").append("<li id='" + id + "' class='public-fx option-unselected show-pointer' onclick='getFx(\"" + header + "\", \"" + issuer + "\")'>" + label + "</li>");
-          }
-
-        }
+      for (i=0; i<officeDetails.products.length; i++) {
+        var header = officeDetails.products[i].header;
+        var issuer = officeDetails.products[i].issuer;
+        var label = officeDetails.products[i].label;
+        var id = header + "-" + issuer;
+        $("#pub-fx-list").append("<li id='" + id + "' class='public-fx option-unselected show-pointer' onclick='getFx(\"" + header + "\", \"" + issuer + "\")'>" + label + "</li>");
       }
 
       getFx("FOCN45", "CWWG");
-
       return;
-
-    })
-    .fail(function(){
-      console.log("Unable to open pubRegions.json");
-    });
+    }
+  }
 }
 
 function getFx(bulletin, office) {
@@ -105,19 +91,34 @@ function updateStormData(dataType, baseURL, satChannel) {
       })
 }
 
-function updateWarnings() {
+function getAlerts(p) {
 
-	var randNum = parseInt(Math.random() * 100000000000000000);
-	var warningImgs = document.getElementsByClassName("warn-map");
-	var prov = ["ab","sk","nt","nu"];
-	var warnURL = "https://weather.gc.ca/data/warningmap/";
+  // first empty the array holding the filtered results
+  filteredAlerts = [];
+  
+  // now start pulling the latest results from the alert list
+  var xhttp = new XMLHttpRequest();
 
-	for (i = 0; i <=3; i ++) {
-		warningImgs[i].src = warnURL + prov[i] + "_e.png?" + randNum;
-	}
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      console.log("Getting alerts for", p);
+      currentAlerts = JSON.parse(this.responseText);
+      
+      for (var id in currentAlerts) {
+        if (currentAlerts.hasOwnProperty(id)) {
+          if (currentAlerts[id]["prov"] == p) {
 
-}
+            console.log(currentAlerts[id]["issueTime"], currentAlerts[id]["alertType"], currentAlerts[id]["parentName"]);
+            console.log(currentAlerts[id]["text"]);
 
-function refreshAllPublicData() {
-	updateWarnings();
+          }
+        }
+      }
+
+    }
+  };
+
+  xhttp.open("GET", "current-alerts.json");
+  xhttp.send();
+
 }
