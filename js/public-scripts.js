@@ -29,6 +29,8 @@ function loadPubInfo() {
 
       officeDetails = jsonData[currOffice];
 
+      
+
       // fill out the buttons to choose which forecast products are available
 
       for (i=0; i<officeDetails.products.length; i++) {
@@ -43,6 +45,9 @@ function loadPubInfo() {
       return;
     }
   }
+
+  xhttp.open("GET", jsonFileName, TRUE);
+  xhttp.send();
 }
 
 function getFx(bulletin, office) {
