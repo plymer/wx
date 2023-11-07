@@ -4,16 +4,6 @@ $office = strtolower($_GET["office"]);
 $bulletin = strtolower($_GET["bulletin"]);
 
 $referencePattern = "/(\n[-]{2,})\n?((.+)\n){1,}([-]{2,})/";
-$regionNamesPattern = "((.+\.)\n)(?:((TODAY|TONIGHT)\.\.(.+\n?){1,}\n))"; //also picks up the "remainder unchanged" in AMDs
-$amendmentTimePattern = "(\d{6}\s)(?:\w{3}\n)";
-$fxHeaderPattern = ".{6}\s\w{4}\s\d{6}\n(.+\s){1,}";
-
-$fxSectionPattern = "(.+\.)\n(TODAY|TONIGHT)\.\.(.+\n?){1,}\n"; //WORK IN PROGRESS
-
-$endOfAmend = "REMAINDER UNCHANGED.
-
-END
-$$$$^^";
 
 $ch = curl_init();
 

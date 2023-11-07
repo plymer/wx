@@ -133,7 +133,7 @@
 
 </div>
 
-	<div id="data-section" class="content-section data-colour bg-pattern hidden">
+<div id="data-section" class="content-section data-colour bg-pattern hidden">
 	<!-- include satellite, radar from wunderground, and nwp links -->
 	<!-- satellite/lightning source: http://www.atmos.washington.edu/images/ltng_common_full/YYYYMMDDhhmm_ir_ltng.gif -->
 	<!-- satellite source: http://www.ssec.wisc.edu/data/geo/west/latest_west_vis_nh.gif (ir4 - 10.8nm/ir2 - 3.7nm)-->
