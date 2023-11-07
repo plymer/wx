@@ -27,6 +27,7 @@ function loadPubInfo() {
       $("#battleboard").empty();
       $("#pub-fx-list").empty();
 
+      jsonData = JSON.parse(this.responseText);
       officeDetails = jsonData[currOffice];
 
       
