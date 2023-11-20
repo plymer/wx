@@ -24,22 +24,30 @@ function loadPubInfo() {
 
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      $("#battleboard").empty();
-      $("#pub-fx-list").empty();
+
+      var fxList = document.getElementById("pub-fx-list");
+      
+      // clear out the fxList element and remove all existing buttons
+      while (fxList.firstChild) {
+        fxList.removeChild(fxList.firstChild);
+      }      
 
       jsonData = JSON.parse(this.responseText);
-      officeDetails = jsonData[currOffice];
-
-      
+      officeDetails = jsonData[currOffice];     
 
       // fill out the buttons to choose which forecast products are available
 
       for (i=0; i<officeDetails.products.length; i++) {
-        var header = officeDetails.products[i].header;
-        var issuer = officeDetails.products[i].issuer;
-        var label = officeDetails.products[i].label;
-        var id = header + "-" + issuer;
-        $("#pub-fx-list").append("<li id='" + id + "' class='public-fx option-unselected show-pointer' onclick='getFx(\"" + header + "\", \"" + issuer + "\")'>" + label + "</li>");
+
+        var fxItem = document.createElement("li");
+        fxItem.setAttribute("id", officeDetails.products[i].header + "-" + officeDetails.products[i].issuer);
+        fxItem.setAttribute("class", "public-fx option-unselected show-pointer");
+        fxItem.addEventListener("click", getFx(officeDetails.products[i].header, officeDetails.products[i].issuer));
+        console.log("listener added");
+        fxItem.innerHTML = officeDetails.products[i].label;
+
+        fxList.appendChild(fxItem);
+        
       }
 
       getFx("FOCN45", "CWWG");
@@ -52,6 +60,8 @@ function loadPubInfo() {
 }
 
 function getFx(bulletin, office) {
+
+  console.log("calling", bulletin, office);
 
   // build the id string for the jQuery search below
   var selectedForecast = "#" + bulletin + "-" + office;
