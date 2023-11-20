@@ -63,7 +63,7 @@ function loadPubInfo() {
 
 function getFx(data) {
 
-  console.log("calling", data.dateset.header, data.dataset.issuer);
+  console.log("calling", data.dataset.header, data.dataset.issuer);
   return;
 
   // build the id string for the jQuery search below
