@@ -42,7 +42,7 @@ function loadPubInfo() {
         var fxItem = document.createElement("li");
         fxItem.setAttribute("id", officeDetails.products[i].header + "-" + officeDetails.products[i].issuer);
         fxItem.setAttribute("class", "public-fx option-unselected show-pointer");
-        fxItem.addEventListener("click", getFx(officeDetails.products[i].header, officeDetails.products[i].issuer));
+        fxItem.addEventListener("click", function(){getFx(officeDetails.products[i].header, officeDetails.products[i].issuer);});
         console.log("listener added");
         fxItem.innerHTML = officeDetails.products[i].label;
 
