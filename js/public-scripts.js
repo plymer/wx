@@ -42,7 +42,9 @@ function loadPubInfo() {
         var fxItem = document.createElement("li");
         fxItem.setAttribute("id", officeDetails.products[i].header + "-" + officeDetails.products[i].issuer);
         fxItem.setAttribute("class", "public-fx option-unselected show-pointer");
-        fxItem.addEventListener("click", function(){getFx("'" + officeDetails.products[i].header + "'", "'" + officeDetails.products[i].issuer + "'");});
+        fxItem.setAttribute("data-header", officeDetails.products[i].header);
+        fxItem.setAttribute("data-issuer", officeDetails.products[i].issuer);
+        fxItem.addEventListener("click", function(){getFx(this);});
         console.log("listener added");
         fxItem.innerHTML = officeDetails.products[i].label;
 
@@ -59,9 +61,10 @@ function loadPubInfo() {
   xhttp.send();
 }
 
-function getFx(bulletin, office) {
+function getFx(data) {
 
-  console.log("calling", bulletin, office);
+  console.log("calling", data.dateset.header, data.dataset.issuer);
+  return;
 
   // build the id string for the jQuery search below
   var selectedForecast = "#" + bulletin + "-" + office;
