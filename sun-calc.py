@@ -1,4 +1,4 @@
-#!/opt/alt/python37/bin/python3 -bb
+#!/bin/python3
 
 import datetime, sys
 from suntime import Sun, SunTimeException
