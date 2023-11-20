@@ -3,3 +3,5 @@ Lib/
 deprecated/
 Include/
 Scripts/
+current-alerts.json
+current-images.json

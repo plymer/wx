@@ -67,7 +67,6 @@ $siteElevM = $metaJSON["elev"];
 
 ob_start();
 $command = "/bin/python3 www/wx/sun-calc.py " . $siteLat . " " . $siteLon;
-echo "\n\n" . $command;
 passthru($command);
 $sunTimes = ob_get_contents();
 ob_end_clean();
