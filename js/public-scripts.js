@@ -63,8 +63,8 @@ function loadPubInfo() {
 
 function getFx(data) {
 
-  console.log("calling", data.dataset.header, data.dataset.issuer);
-  return;
+  var bulletin = data.dataset.header;
+  var office = data.dataset.issuer;
 
   // build the id string for the jQuery search below
   var selectedForecast = "#" + bulletin + "-" + office;
