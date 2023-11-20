@@ -1,5 +1,5 @@
 #----------------------------------------------------------------------------#
-# getNavCanImages.py                                                         #
+# navcan-images.py                                                         #
 # interrogates the NavCan CFPS website to retrieve the URLs for GFA images   #
 #                                                                            #
 # Ryan Pimiskern                                                             #
