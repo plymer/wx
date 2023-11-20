@@ -45,14 +45,14 @@ function loadPubInfo() {
         fxItem.setAttribute("data-header", officeDetails.products[i].header);
         fxItem.setAttribute("data-issuer", officeDetails.products[i].issuer);
         fxItem.addEventListener("click", function(){getFx(this);});
-        console.log("listener added");
         fxItem.innerHTML = officeDetails.products[i].label;
 
         fxList.appendChild(fxItem);
         
       }
 
-      getFx("FOCN45", "CWWG");
+      // now auto-fill the text forecast display with the first product in the list
+      getFx(fxList.firstChild);
       return;
     }
   }
