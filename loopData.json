@@ -1,64 +1,74 @@
 [
   {
-    "product"    : "prairie-vis",
-    "display"    : "Prairie Vis/IR",
+    "product"    : "prairies-phase-micro",
+    "display"    : "Prairies Phase/Microphysics",
     "productType": "sat",
-    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/prairies_vis_nightmp_0",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_Prairies_dayphase_nightmp_0",
     "startIndex" : 36,
     "fileType"   : ".jpeg",
     "loopLength" : 12
   },
   {
-    "product"    : "prairie-snow",
-    "display"    : "Prairie Snow/Fog",
+    "product"    : "prairies-snow-fog-micro",
+    "display"    : "Prairies Snow-Fog/Microphysics",
     "productType": "sat",
-    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/prairies_snow_fog_nightmp_0",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_Prairies_snow_fog_nightmp_0",
     "startIndex" : 36,
     "fileType"   : ".jpeg",
     "loopLength" : 12
   },
   {
-    "product"    : "prairie-fire",
-    "display"    : "Prairie Fire",
+    "product"    : "prairies-vis-micro",
+    "display"    : "Prairies IR Sandwich/Microphysics",
     "productType": "sat",
-    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/prairies_fire_temperature_0",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_Prairies_vis_nightmp_0",
     "startIndex" : 36,
     "fileType"   : ".jpeg",
     "loopLength" : 12
   },
   {
-    "product"    : "artic-phase",
-    "display"    : "NU Cloud Phase",
+    "product"    : "east-arctic-phase-micro",
+    "display"    : "East Arctic Phase/Microphysics",
     "productType": "sat",
-    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/arctic_dayphase_nightmp_0",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_Eastern_Arctic_dayphase_nightmp_0",
     "startIndex" : 36,
     "fileType"   : ".jpeg",
     "loopLength" : 12
   },
   {
-    "product"    : "nat-vis",
-    "display"    : "National Vis/IR",
+    "product"    : "east-arctic-snow-fog-micro",
+    "display"    : "East Arctic Snow-Fog/Microphysics",
     "productType": "sat",
-    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/vis_nightmp_0",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_Eastern_Arctic_snow_fog_nightmp_0",
     "startIndex" : 36,
     "fileType"   : ".jpeg",
     "loopLength" : 12
   },
   {
-    "product"    : "nat-wv",
-    "display"    : "National WV ",
+    "product"    : "national-phase-micro",
+    "display"    : "National Phase/Microphysics",
     "productType": "sat",
-    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/simple_wv_0",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_National_dayphase_nightmp_0",
     "startIndex" : 36,
     "fileType"   : ".jpeg",
     "loopLength" : 12
   },
   {
-    "product"    : "lightning",
-    "productType": "other",
-    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/PrairieShortN",
-    "startIndex" : 13,
-    "fileType"   : ".jpg",
+    "product"    : "national-wv",
+    "display"    : "National Water Vapour",
+    "productType": "sat",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_National_simple_wv_0",
+    "startIndex" : 36,
+    "fileType"   : ".jpeg",
+    "loopLength" : 12
+  },
+  {
+    "product"    : "national-vis-micro",
+    "display"    : "National IR Sandwich/Microphysics",
+    "productType": "sat",
+    "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_National_vis_nightmp_0",
+    "startIndex" : 36,
+    "fileType"   : ".jpeg",
     "loopLength" : 12
   }
 ]
