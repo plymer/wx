@@ -65,6 +65,8 @@ $siteLon = round($metaJSON["lon"], 1);
 $siteElevF = round($metaJSON["elev"] * 3.281);
 $siteElevM = $metaJSON["elev"];
 
+//TODO: this is not working on the AWS EC2 instance -- need to investigate permissions or something has changed in php8 for passthru
+
 ob_start();
 $command = "/bin/python3 www/wx/sun-calc.py " . $siteLat . " " . $siteLon;
 passthru($command);
