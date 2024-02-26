@@ -1,7 +1,8 @@
-var gfaSelected = "32";
-var panSelected = "cldwx";
-var timeSelected = "000";
+var gfaSelected = "GFACN32";
+var panSelected = "CLDWX";
+var timeSelected = 0;
 var showPIREPs = 0;
+var GFAList;
 
 function initializeGFAs() {
 	// this will load the json file "current-gfas.json" in order to know where to retrieve the GFA images from
@@ -12,7 +13,7 @@ function initializeGFAs() {
 		console.log("loading GFA data");
 		GFAs = JSON.parse(this.responseText);
 
-		console.log(GFAs);
+		GFAList = GFAs;
   
 	  }
 	};
@@ -35,7 +36,7 @@ function changeGFA (gfaRgn, panType, panTime) {
 	var selectedRegion = "#" + gfaRgn;
 
 	// update the source of the GFA image and check for new images	
-	$("#gfa-image").attr("src", urlBase + "gfacn" + gfaRgn + "/Latest-gfacn" + gfaRgn + "_" + panType + "_" + panTime + ".png?" + randNum);
+	$("#gfa-image").attr("src", GFAList[gfaSelected][panSelected][timeSelected]);
 
 	// update the colouring of the selected panels
 	// first we clear the selected colours and re-add the deselected colours
@@ -47,7 +48,6 @@ function changeGFA (gfaRgn, panType, panTime) {
 	$(selectedPanel).addClass("option-selected");
 
 	// lastly, let's display the SIGMETs/AIRMETs/PIREPs valid for the GFA region selected
-	// for now, PIREPs will default to always-shown
 	getSIGMET(gfaRgn, showPIREPs);
 
 }

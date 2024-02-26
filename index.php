@@ -69,21 +69,21 @@
 
 <div id="cmac-section" class="content-section cmac-colour bg-pattern flex-around hidden">
   <div class="gfa-regions flex-between">
-    <button id="31" onclick="gfaSelection('31','noChange','noChange')"><span class="hide-for-portrait">GFA </span>31</button>
-    <button id="32" onclick="gfaSelection('32','noChange','noChange')"><span class="hide-for-portrait">GFA </span>32</button>
-    <button id="33" onclick="gfaSelection('33','noChange','noChange')"><span class="hide-for-portrait">GFA </span>33</button>
-    <button id="34" onclick="gfaSelection('34','noChange','noChange')"><span class="hide-for-portrait">GFA </span>34</button>
-    <button id="35" onclick="gfaSelection('35','noChange','noChange')"><span class="hide-for-portrait">GFA </span>35</button>
-    <button id="36" onclick="gfaSelection('36','noChange','noChange')"><span class="hide-for-portrait">GFA </span>36</button>
-    <button id="37" onclick="gfaSelection('37','noChange','noChange')"><span class="hide-for-portrait">GFA </span>37</button>
+    <button id="GFACN31" onclick="gfaSelection('GFACN31','noChange','noChange')"><span class="hide-for-portrait">GFA </span>31</button>
+    <button id="GFACN32" onclick="gfaSelection('GFACN32','noChange','noChange')"><span class="hide-for-portrait">GFA </span>32</button>
+    <button id="GFACN33" onclick="gfaSelection('GFACN33','noChange','noChange')"><span class="hide-for-portrait">GFA </span>33</button>
+    <button id="GFACN34" onclick="gfaSelection('GFACN34','noChange','noChange')"><span class="hide-for-portrait">GFA </span>34</button>
+    <button id="GFACN35" onclick="gfaSelection('GFACN35','noChange','noChange')"><span class="hide-for-portrait">GFA </span>35</button>
+    <button id="GFACN36" onclick="gfaSelection('GFACN36','noChange','noChange')"><span class="hide-for-portrait">GFA </span>36</button>
+    <button id="GFACN37" onclick="gfaSelection('GFACN37','noChange','noChange')"><span class="hide-for-portrait">GFA </span>37</button>
   </div>
   <div class="gfa-panels flex-between">
-    <button id="cldwx000" onclick="gfaSelection('noChange','cldwx','000')"><?php svgIcon("cldwx","T+00"); ?></button>
-    <button id="cldwx006" onclick="gfaSelection('noChange','cldwx','006')"><?php svgIcon("cldwx","T+06"); ?></button>
-    <button id="cldwx012" onclick="gfaSelection('noChange','cldwx','012')"><?php svgIcon("cldwx","T+12"); ?></button>
-    <button id="turbc000" onclick="gfaSelection('noChange','turbc','000')"><?php svgIcon("turbc","T+00"); ?></button>
-    <button id="turbc006" onclick="gfaSelection('noChange','turbc','006')"><?php svgIcon("turbc","T+06"); ?></button>
-    <button id="turbc012" onclick="gfaSelection('noChange','turbc','012')"><?php svgIcon("turbc","T+12"); ?></button>
+    <button id="CLDWX0" onclick="gfaSelection('noChange','CLDWX','0')"><?php svgIcon("cldwx","T+00"); ?></button>
+    <button id="CLDWX1" onclick="gfaSelection('noChange','CLDWX','1')"><?php svgIcon("cldwx","T+06"); ?></button>
+    <button id="CLDWX2" onclick="gfaSelection('noChange','CLDWX','2')"><?php svgIcon("cldwx","T+12"); ?></button>
+    <button id="TURBC0" onclick="gfaSelection('noChange','TURBC','0')"><?php svgIcon("turbc","T+00"); ?></button>
+    <button id="TURBC1" onclick="gfaSelection('noChange','TURBC','1')"><?php svgIcon("turbc","T+06"); ?></button>
+    <button id="TURBC2" onclick="gfaSelection('noChange','TURBC','2')"><?php svgIcon("turbc","T+12"); ?></button>
   </div>
 
 	<img id="gfa-image" src="">
