@@ -1,7 +1,18 @@
 <?php
-// input variables passed through the URL request from getObs function
-$ident = strtoupper($_GET['siteID']);
-$numHrs = $_GET['hrs'];
+
+// allows the script to be run via CLI or invoked via URL
+
+if ($argc == 2) {
+	$ident = strtoupper($argv[0]);
+	$numHrs = $argv[1];
+} elseif ($argc != 0) {
+	echo "error: invalid arguments. this function requires two arguments - IDENT and NUMHRS";
+} else {
+	// input variables passed through the URL request from getObs function
+	$ident = strtoupper($_GET['siteID']);
+	$numHrs = $_GET['hrs'];
+}
+
 $tafWrapPattern = "/(TEMPO|PROB30|PROB40|BECMG)/";
 
 if ($ident === "ILY") {
