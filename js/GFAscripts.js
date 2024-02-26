@@ -3,6 +3,24 @@ var panSelected = "cldwx";
 var timeSelected = "000";
 var showPIREPs = 0;
 
+function initializeGFAs() {
+	// this will load the json file "current-gfas.json" in order to know where to retrieve the GFA images from
+	var xhttp = new XMLHttpRequest();
+
+	xhttp.onreadystatechange = function() {
+	  if (this.readyState == 4 && this.status == 200) {
+		console.log("loading GFA data");
+		GFAs = JSON.parse(this.responseText);
+
+		console.log(GFAs);
+  
+	  }
+	};
+  
+	xhttp.open("GET", "current-gfas.json");
+	xhttp.send();
+}
+
 function changeGFA (gfaRgn, panType, panTime) {
 	var randNum = parseInt(Math.random() * 10000000000000);
 	var urlBase = "https://flightplanning.navcanada.ca/Latest/gfa/anglais/produits/uprair/gfa/";
@@ -16,10 +34,7 @@ function changeGFA (gfaRgn, panType, panTime) {
 	var selectedPanel = "#" + panType + panTime;
 	var selectedRegion = "#" + gfaRgn;
 
-	// update the source of the GFA image and check for new images
-
-	// method of saving GFAs to a local directory isn't currently working (2016.01.31) so using hotlinking method
-	// $("#gfaImage").attr("src", "images/gfa/" + gfaRgn + "_" + panType + "_" + panTime + ".png?" + randNum);
+	// update the source of the GFA image and check for new images	
 	$("#gfa-image").attr("src", urlBase + "gfacn" + gfaRgn + "/Latest-gfacn" + gfaRgn + "_" + panType + "_" + panTime + ".png?" + randNum);
 
 	// update the colouring of the selected panels
