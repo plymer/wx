@@ -43,7 +43,6 @@ function changeDisplay (button) {
 			var randNum = parseInt(Math.random() * 10000000000000);
 			document.getElementById("radar-image").setAttribute("src", "https://www.ryanpimiskern.com/wx/images/latest.gif?" + randNum)
 			updateStormData("lightning", "https://weather.gc.ca/data/lightning_images/");
-			updateStormData("satellite", "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/", "prairie-vis");
 			break;
 		case "#cmac-section":
 			changeGFA("32","cldwx","000");
