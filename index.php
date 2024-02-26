@@ -32,7 +32,8 @@
     $(document).ready(function(){
       productType = "sat";
       container = $("#satellite-image");
-      getJSONData();
+      getJSONData(); // this is just for the satellite data, we'll re-do this whole section -- 2024.02.26
+      initializeGFAs();
       playButtonVal = $("#play").attr("value");
     });
   </script>
