@@ -80,7 +80,7 @@ $siteElevM = $metaJSON["elev"];
 //TODO: this is not working on the AWS EC2 instance -- need to investigate permissions or something has changed in php8 for passthru
 
 ob_start();
-$command = "/bin/python3 www/sun-calc.py " . $siteLat . " " . $siteLon;
+$command = "python3 sun-calc.py " . $siteLat . " " . $siteLon;
 passthru($command);
 $sunTimes = ob_get_contents();
 ob_end_clean();
