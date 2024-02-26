@@ -7,6 +7,7 @@ if ($argc == 2) {
 	$numHrs = $argv[1];
 } elseif ($argc != 0) {
 	echo "error: invalid arguments. this function requires two arguments - IDENT and NUMHRS";
+	return;
 } else {
 	// input variables passed through the URL request from getObs function
 	$ident = strtoupper($_GET['siteID']);
