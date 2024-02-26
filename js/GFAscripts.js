@@ -14,6 +14,8 @@ function initializeGFAs() {
 		GFAs = JSON.parse(this.responseText);
 
 		GFAList = GFAs;
+
+		console.log("GFAList is loaded");
   
 	  }
 	};
@@ -23,8 +25,6 @@ function initializeGFAs() {
 }
 
 function changeGFA (gfaRgn, panType, panTime) {
-	var randNum = parseInt(Math.random() * 10000000000000);
-	var urlBase = "https://flightplanning.navcanada.ca/Latest/gfa/anglais/produits/uprair/gfa/";
 
 	// push selected GFA panel to global variables
 	gfaSelected = gfaRgn;
@@ -34,6 +34,10 @@ function changeGFA (gfaRgn, panType, panTime) {
 	// build the id string for the jQuery search below
 	var selectedPanel = "#" + panType + panTime;
 	var selectedRegion = "#" + gfaRgn;
+
+	if (!GFAList) {
+		console.log("GFAList is not ready!");
+	}
 
 	// update the source of the GFA image and check for new images	
 	$("#gfa-image").attr("src", GFAList[gfaSelected][panSelected][timeSelected]);
