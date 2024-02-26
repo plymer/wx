@@ -52,7 +52,7 @@ function changeGFA (gfaRgn, panType, panTime) {
 	$(selectedPanel).addClass("option-selected");
 
 	// lastly, let's display the SIGMETs/AIRMETs/PIREPs valid for the GFA region selected
-	getSIGMET(gfaRgn, showPIREPs);
+	//getSIGMET(gfaRgn, showPIREPs);
 
 }
 
