@@ -45,7 +45,7 @@ function changeDisplay (button) {
 			updateStormData("lightning", "https://weather.gc.ca/data/lightning_images/");
 			break;
 		case "#cmac-section":
-			changeGFA("32","cldwx","000");
+			changeGFA("GFACN32","CLDWX",0);
 			break;
 	}
 }
