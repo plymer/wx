@@ -90,7 +90,7 @@
 
   <section class="taf-plus-container full-width flex-around">
     <h2>SIGMETs/AIRMETs</h2>
-    <div id="sigmet-airmet-output" class="full-width align-left text-product-container"></div>
+    <div id="sigmet-airmet-output" class="full-width align-left text-product-container">This functionality has been disabled until further notice - RP 2024.02.26</div>
   </section>
 
 </div>
