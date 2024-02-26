@@ -10,7 +10,7 @@
 import requests as html, json, os
 
 # boilerplate URL to request all of the imagery data for the whole country's airspace
-URL = "https://plan.navcanada.ca/weather/api/alpha/?polygon=CZEG|fir|-107.908,71.977&polygon=CZYZ|fir|-81.478,47.525&polygon=CZQX|fir|-46.479,53.645&polygon=CZUL|fir|-71.114,55.435&polygon=CZWG|fir|-93.048,54.717&polygon=CZQM|fir|-62.875,45.425&polygon=CZVR|fir|-125.768,52.205&image=GFA/CLDWX&image=GFA/TURBC&image=LGF&image=SIG_WX//MID_LEVEL/*&image=TURBULENCE&_=1670956986347"
+URL = "https://plan.navcanada.ca/weather/api/alpha/?site=CZEG&site=CZVR&site=CZWG&site=CZYZ&site=CZUL&site=CZQM&site=CZQX&image=GFA/CLDWX&image=GFA/TURBC&image=SIG_WX//MID_LEVEL/"
 
 # the default base image URL for all the returned images
 navCan = "https://plan.navcanada.ca/weather/images/"
