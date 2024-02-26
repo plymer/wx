@@ -2,9 +2,9 @@
 
 // allows the script to be run via CLI or invoked via URL
 
-if ($argc == 2) {
-	$ident = strtoupper($argv[0]);
-	$numHrs = $argv[1];
+if ($argc == 3) {
+	$ident = strtoupper($argv[1]);
+	$numHrs = $argv[2];
 } elseif ($argc != 0) {
 	echo "error: invalid arguments. this function requires two arguments - IDENT and NUMHRS";
 	return;
