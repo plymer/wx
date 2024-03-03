@@ -17,6 +17,8 @@ function initializeGFAs() {
 
 		console.log("GFAList is loaded");
   
+	  } else {
+		console.log("unable to load GFA List - JSON missing or corrupted");
 	  }
 	};
   

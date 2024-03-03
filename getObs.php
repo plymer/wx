@@ -77,10 +77,9 @@ $siteLon = round($metaJSON["lon"], 1);
 $siteElevF = round($metaJSON["elev"] * 3.281);
 $siteElevM = $metaJSON["elev"];
 
-//TODO: this is not working on the AWS EC2 instance -- need to investigate permissions or something has changed in php8 for passthru
-
 ob_start();
-$command = "/usr/bin/python3 /var/www/html/wx/sun-calc.py " . $siteLat . " " . $siteLon;
+//$command = "/usr/bin/python3 /var/www/html/wx/sun-calc.py " . $siteLat . " " . $siteLon; // for EC2 version
+$command = "/opt/alt/python311/bin/python3 /www/wx/sun-calc.py " . $siteLat . " " . $siteLon; // for FullHost version
 passthru($command);
 $sunTimes = ob_get_contents();
 ob_end_clean();
