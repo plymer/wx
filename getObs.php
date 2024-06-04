@@ -78,8 +78,7 @@ $siteElevF = round($metaJSON["elev"] * 3.281);
 $siteElevM = $metaJSON["elev"];
 
 ob_start();
-//$command = "/usr/bin/python3 /var/www/html/wx/sun-calc.py " . $siteLat . " " . $siteLon; // for EC2 version
-$command = "/opt/alt/python38/bin/python3 /home/ryanpimi/public_html/wx/sun-calc.py " . $siteLat . " " . $siteLon; // for FullHost version
+$command = "/home/ryanpimi/virtual_env/bin/python3 /home/ryanpimi/public_html/wx/sun-calc.py " . $siteLat . " " . $siteLon;
 passthru($command);
 $sunTimes = ob_get_contents();
 ob_end_clean();
