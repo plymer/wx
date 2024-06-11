@@ -1,7 +1,7 @@
 # Readme
 
 ## To Do:
-- TAF Plus: https://metaviation.ec.gc.ca/hubwx/scripts/getForecasterNotes.php?site0=CYYZ&dtLastModified0=0&site1=CYUL&dtLastModified1=0&site2=CYYC&dtLastModified2=0&site3=CYVR&dtLastModified3=0
+- TAF Plus: https://metaviation.ec.gc.ca/hubwx/scripts/getForecasterNotes.php?site0=CYYZ&site1=CYUL&site2=CYYC&site3=CYVR
 - NOTAM Viewer code
 - PIREPs, SIGMETs, AIRMETs (using dd.weather.gc.ca/)
 - extra product charts (HLTs, SIGWXs, etc)
