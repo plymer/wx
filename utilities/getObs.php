@@ -78,7 +78,7 @@ $siteElevF = round($metaJSON["elev"] * 3.281);
 $siteElevM = $metaJSON["elev"];
 
 ob_start();
-$command = "/home/ryanpimi/virtual_env/bin/python3 /home/ryanpimi/public_html/wx/sun-calc.py " . $siteLat . " " . $siteLon;
+$command = "/home/ryanpimi/virtual_env/bin/python3 /home/ryanpimi/public_html/wx/utilities/sun-calc.py " . $siteLat . " " . $siteLon;
 passthru($command);
 $sunTimes = ob_get_contents();
 ob_end_clean();
