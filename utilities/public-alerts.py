@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import requests as html, json, os
 
 URL = "https://weather.gc.ca/data/dms/alert_geojson/alerts.en.geojson"

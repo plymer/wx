@@ -1,5 +1,3 @@
-#!/home/ryanpimi/virtual_env/bin/python3
-
 import datetime, sys
 from suntime import Sun, SunTimeException
 

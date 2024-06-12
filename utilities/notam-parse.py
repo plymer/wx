@@ -10,7 +10,7 @@
 #------------------------------------------------------------------#
 
 import os, re, json
-import requests as html --- we can use this if we ever get to install libraries on the server
+import requests as html
 from subprocess import Popen, PIPE
 
 path = os.path.dirname(os.path.realpath(__file__))
