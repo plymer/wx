@@ -1,6 +1,4 @@
-#!/usr/bin/python3
-
-import requests as html, re, json, sys, shutil
+import requests as html, os, re
 
 URL = "https://dd.weather.gc.ca/radar/CAPPI/GIF/PNR/"
 
@@ -37,9 +35,17 @@ except html.exceptions.TooManyRedirects:
 except html.exceptions.RequestException as e:
     raise SystemExit(e)
 
-with open("/home/ryanpimi/public_html/wx/images/latest.gif", "wb") as outFile:
-    shutil.copyfileobj(response.raw, outFile)
+# set up the output path for when we write the formatted data to a file
+path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(path)
+os.chdir("../images/")
+path = os.getcwd()
+
+filename = path + "/latest.gif"
+
+with open(filename, "wb") as handler:
+    handler.write(response.content)
+
+print("current radar image written to", filename)
 
 del response
-
-# exit = input()
