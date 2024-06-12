@@ -3,6 +3,9 @@
 import requests as html, json, os
 
 path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(path)
+os.chdir("../data/")
+path = os.getcwd()
 
 # URLs for satellite images are set up like this:
 # https://weather.cod.edu/data/satellite/regional/ca_reg_west/ntmicro/ca_reg_west.ntmicro.20231130.155020.jpg
