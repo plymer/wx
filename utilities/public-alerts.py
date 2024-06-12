@@ -5,6 +5,9 @@ URL = "https://weather.gc.ca/data/dms/alert_geojson/alerts.en.geojson"
 # check out geojson.io for testing output on mapbox static images, including styling of polygons
 
 path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(path)
+os.chdir("../data/")
+path = os.getcwd()
 
 try:
     raw = html.get(URL).text

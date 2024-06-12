@@ -17,6 +17,9 @@ navCan = "https://plan.navcanada.ca/weather/images/"
 
 # set up the output path for when we write the formatted data to a file
 path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(path)
+os.chdir("../data/")
+path = os.getcwd()
 
 # load and normalize the JSON returned from our request string
 imageJSON = html.get(URL)

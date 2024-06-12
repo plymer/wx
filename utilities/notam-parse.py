@@ -11,9 +11,11 @@
 
 import os, re, json
 import requests as html
-from subprocess import Popen, PIPE
 
 path = os.path.dirname(os.path.realpath(__file__))
+os.chdir(path)
+os.chdir("../data/")
+path = os.getcwd()
 
 # we are importing the subclass, regular expressions, system, and json libraries
 #   subprocess will allow us to do http data requests via running a php script
