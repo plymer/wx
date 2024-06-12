@@ -1,9 +1,3 @@
-pyevn.cfg
-Lib/
-deprecated/
-Include/
-Scripts/
-current-alerts.json
-current-gfas.json
-js/jquery-3.3.1.min.js
-maps/
+data/current-alerts.json
+data/current-gfas.json
+maps/*
