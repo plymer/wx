@@ -2,7 +2,7 @@ function getObs() {
 	var siteID = $("#siteID").val();
 	var obHrs = $("#hrs").val();
 
-	var url = "getObs.php?siteID=" + siteID + "&hrs=" + obHrs;
+	var url = "utilities/getObs.php?siteID=" + siteID + "&hrs=" + obHrs;
 
 	//"working" message for DIV
 	$("#metar-taf-output").html("<p>Loading METARs/TAFs...</p>");

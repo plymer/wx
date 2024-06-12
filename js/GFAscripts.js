@@ -22,7 +22,7 @@ function initializeGFAs() {
 	  }
 	};
   
-	xhttp.open("GET", "current-gfas.json");
+	xhttp.open("GET", "data/current-gfas.json");
 	xhttp.send();
 }
 
@@ -67,18 +67,4 @@ function gfaSelection(gfa,type,time){
 
 	//grab the new GFA and draw it
 	changeGFA(gfaSelected,panSelected,timeSelected);
-}
-
-function getSIGMET(gfaRgn) {
-  var url = "siteModules.php?gfaRgn=" + gfaRgn;
-  var outputElementId = "#sigmet-airmet-output";
-
-  var htmlStream = $.get (url)
-      .done (function(htmlStream) {
-        //ouput the content to the container
-        $(outputElementId).html(htmlStream);
-      })
-      .fail (function() {
-        $(outputElementId).html("SIGMETs/AIRMETs unavailable at this time");
-      })
 }

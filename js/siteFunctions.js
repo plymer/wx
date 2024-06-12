@@ -41,7 +41,7 @@ function changeDisplay (button) {
 			break;
 		case "#data-section":
 			var randNum = parseInt(Math.random() * 10000000000000);
-			document.getElementById("radar-image").setAttribute("src", "https://www.ryanpimiskern.com/wx/images/latest.gif?" + randNum)
+			document.getElementById("radar-image").setAttribute("src", "../images/latest.gif?" + randNum)
 			updateStormData("lightning", "https://weather.gc.ca/data/lightning_images/");
 			break;
 		case "#cmac-section":

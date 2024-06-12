@@ -134,7 +134,7 @@ function updateProgressBar() {
 }
 
 function getJSONData() {
-  var jsonFileName = "loopData.json?" + (new Date()).getTime();
+  var jsonFileName = "data/satellite-sources.json?" + (new Date()).getTime();
   console.log("Loading", jsonFileName, "...");
   jsonData = $.get(jsonFileName)
     .done(function(jsonData){

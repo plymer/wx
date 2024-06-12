@@ -17,7 +17,7 @@ function togglePubOffice() {
 
 function loadPubInfo() {
   var timeStamp = (new Date()).getTime();
-  var jsonFileName = "public-config.json?" + timeStamp;
+  var jsonFileName = "data/public-config.json?" + timeStamp;
   console.log("Loading", jsonFileName, "...");
 
   var xhttp = new XMLHttpRequest;
@@ -81,7 +81,7 @@ function getFx(data) {
   // write out the 'working message'
   $("#public-fx-output").html("Loading " + bulletin + " " + office + "...");
 
-  var url = "getFX.php?bulletin=" + bulletin + "&office=" + office;
+  var url = "utilities/getFX.php?bulletin=" + bulletin + "&office=" + office;
 
 	var htmlStream = $.get (url)
 			.done (function(htmlStream) {
@@ -137,7 +137,7 @@ function getAlerts(p) {
     }
   };
 
-  xhttp.open("GET", "current-alerts.json");
+  xhttp.open("GET", "data/current-alerts.json");
   xhttp.send();
 
 }
