@@ -87,7 +87,7 @@ while i < len(alertsList):
     parNames = []
 
 
-formatted = json.dumps(output, indent=2)
+formatted = json.dumps(output, indent=4)
 
 filename = path + "/current-alerts.json"
 
