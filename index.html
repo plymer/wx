@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html lang="en-CA">
+
+<head>
+    <title>PrairieWx</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="images/pubavnwx.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100..700&display=swap');</style>
+    <script src="js/scripts.js"></script>
+
+    <script>
+
+    let app; // contains the UI controller, but we will create that once we have loaded the DOM elements we need
+
+    const dataSources = {
+        "gfa" : {
+            "name" : "gfaList",
+            "url" : "./data/current-gfas.json",
+            "dc" : new DataController("gfa", "./data/current-gfas.json")
+        },
+        "sat" : {
+            "name" : "satList",
+            "url" : "./data/satellite-sources.json",
+            "dc" : new DataController("sat", "./data/satellite-sources.json")
+        },
+        "alerts" : {
+            "name" : "alertList",
+            "url" : "./data/current-alerts.json",
+            "dc" : new DataController("alerts", "./data/current-alerts.json")
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function(){
+
+        console.log("loaded!");
+
+        if (localStorage.getItem("mode")) {
+            console.log(localStorage.getItem("mode"));
+            app = new UI(localStorage.getItem("mode"));
+        } else {
+            localStorage.setItem("mode", "taf");
+            app = new UI(localStorage.getItem("mode"));
+        }
+
+        setActiveData(dataSources[localStorage.getItem("mode")]);
+
+        document.getElementById("burger").addEventListener("click", function(){
+            this.classList.toggle("clicked");
+        });
+
+    });
+
+    </script>
+
+</head>
+
+<body>
+
+    <nav>
+        <img id="site-icon" class="grey-invert" src="images/site-icon.png">
+        <button id="public" data-longtext="Public&#x0a;Products" data-shorttext="PUB"></button>
+        <button id="aviation" data-longtext="CMAC&#x0a;Products" data-shorttext="AVN"></button>
+        <button id="obs" data-longtext="METAR/&#x0a;TAF" data-shorttext="OBS"></button>
+        <button id="data" data-longtext="Weather&#x0a;Data" data-shorttext="DATA"></button>
+        <button id="burger"></button>
+    </nav>
+
+    <main>
+
+    </main>
+
+
+</body>
+
+</html>

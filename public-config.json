@@ -1,43 +1,43 @@
 { 
   "wvr" : {
-    "name" : "Pacfic Storm Prediction Centre",
-    "shortName" : "PSPC",
+    "longname" : "Pacfic Storm Prediction Centre",
+    "shortname" : "PSPC",
     "city" : "Vancouver",
     "products" : [],
     "warnings" : []
   },
   "wwg" : {
-    "longName" : "Prairie and Arctic Storm Prediction Centre - Winnipeg",
-    "shortName" : "PASPC-Wpg",
+    "longname" : "Prairie and Arctic Storm Prediction Centre - Winnipeg",
+    "shortname" : "PASPC-Wpg",
     "city" : "Winnipeg",
     "products" : [
       {
-        "label" : "FO45<br>WG",
+        "label" : "FO45 WG",
         "header" : "FOCN45",
         "issuer" : "CWWG"
       },
       {
-        "label" : "South<br>MB",
+        "label" : "South MB",
         "header" : "FPCN11",
         "issuer" : "CWWG"
       },
       {
-        "label" : "North<br>MB",
+        "label" : "North MB",
         "header" : "FPCN12",
         "issuer" : "CWWG"
       },
       {
-        "label" : "South<br>SK",
+        "label" : "South SK",
         "header" : "FPCN13",
         "issuer" : "CWWG"
       },
       {
-        "label" : "South<br>NU",
+        "label" : "South NU",
         "header" : "FPCN13",
         "issuer" : "CWNT"
       },
       {
-        "label" : "East<br>NU",
+        "label" : "East NU",
         "header" : "FPCN16",
         "issuer" : "CWNT"
       }
@@ -45,47 +45,47 @@
     "warnings" : ["MB","SK","NU"]
   },
   "weg" : {
-    "longName" : "Prairie and Arctic Storm Prediction Centre - Edmonton",
-    "shortName" : "PASPC-Edm",
+    "longname" : "Prairie and Arctic Storm Prediction Centre - Edmonton",
+    "shortname" : "PASPC-Edm",
     "city" : "Edmonton",
     "products" : [
       {
-        "label" : "FO45<br>WG",
+        "label" : "FO45 WG",
         "header" : "FOCN45",
         "issuer" : "CWWG"
       },
       {
-        "label" : "North<br>AB",
+        "label" : "North AB",
         "header" : "FPCN16",
         "issuer" : "CWWG"
       },
       {
-        "label" : "South<br>AB",
+        "label" : "South AB",
         "header" : "FPCN15",
         "issuer" : "CWWG"
       },
       {
-        "label" : "North<br>SK",
+        "label" : "North SK",
         "header" : "FPCN14",
         "issuer" : "CWWG"
       },
       {
-        "label" : "South<br>NWT",
+        "label" : "South NWT",
         "header" : "FPCN11",
         "issuer" : "CWNT"
       },
       {
-        "label" : "North<br>NWT",
+        "label" : "North NWT",
         "header" : "FPCN12",
         "issuer" : "CWNT"
       },
       {
-        "label" : "West<br>NU",
+        "label" : "West NU",
         "header" : "FPCN14",
         "issuer" : "CWNT"
       },
       {
-        "label" : "North<br>NU",
+        "label" : "North NU",
         "header" : "FPCN15",
         "issuer" : "CWNT"
       }

@@ -92,23 +92,6 @@ function getFx(data) {
 			})
 }
 
-function updateStormData(dataType, baseURL, satChannel) {
-  var url = "siteModules.php?request=" + dataType;
-  if (satChannel != null) {
-    url += "&channel=" + satChannel;
-  }
-  var elementId = "#" + dataType + "-image";
-
-  var htmlStream = $.get (url)
-      .done (function(htmlStream) {
-        //update the source of the element
-        baseURL += htmlStream;
-        $(elementId).attr("src",baseURL);
-      })
-      .fail (function() {
-        // do nothing
-      })
-}
 
 function getAlerts(p) {
 
