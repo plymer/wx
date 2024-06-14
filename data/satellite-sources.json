@@ -2,7 +2,7 @@
     "prairies-phase-micro" : {
         "name"    : "Prairies Phase/Microphysics",
         "productType": "sat",
-        "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_Prairies_dayphase_nightmp_0",
+        "baseURL"    : "https://www.umanitoba.ca/faculties/environment/envirogeog/weather/images/sat/GOES_E_Prairies_dayphase_nightmp_0",
         "startIndex" : 36,
         "fileType"   : ".jpeg",
         "loopLength" : 12
@@ -10,7 +10,7 @@
     "prairies-snow-fog-micro" : {
         "name"    : "Prairies Snow-Fog/Microphysics",
         "productType": "sat",
-        "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_Prairies_snow_fog_nightmp_0",
+        "baseURL"    : "https://www.umanitoba.ca/faculties/environment/envirogeog/weather/images/sat/GOES_E_Prairies_snow_fog_nightmp_0",
         "startIndex" : 36,
         "fileType"   : ".jpeg",
         "loopLength" : 12
@@ -18,7 +18,7 @@
     "prairies-vis-micro" : {
         "name"    : "Prairies IR Sandwich/Microphysics",
         "productType": "sat",
-        "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_Prairies_vis_nightmp_0",
+        "baseURL"    : "https://www.umanitoba.ca/faculties/environment/envirogeog/weather/images/sat/GOES_E_Prairies_vis_nightmp_0",
         "startIndex" : 36,
         "fileType"   : ".jpeg",
         "loopLength" : 12
@@ -26,7 +26,7 @@
     "east-arctic-phase-micro" : {
         "name"    : "East Arctic Phase/Microphysics",
         "productType": "sat",
-        "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_Eastern_Arctic_dayphase_nightmp_0",
+        "baseURL"    : "https://www.umanitoba.ca/faculties/environment/envirogeog/weather/images/sat/GOES_E_Eastern_Arctic_dayphase_nightmp_0",
         "startIndex" : 36,
         "fileType"   : ".jpeg",
         "loopLength" : 12
@@ -34,7 +34,7 @@
     "east-arctic-snow-fog-micro" : {
         "name"    : "East Arctic Snow-Fog/Microphysics",
         "productType": "sat",
-        "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_Eastern_Arctic_snow_fog_nightmp_0",
+        "baseURL"    : "https://www.umanitoba.ca/faculties/environment/envirogeog/weather/images/sat/GOES_E_Eastern_Arctic_snow_fog_nightmp_0",
         "startIndex" : 36,
         "fileType"   : ".jpeg",
         "loopLength" : 12
@@ -42,7 +42,7 @@
     "national-phase-micro" : {
         "name"    : "National Phase/Microphysics",
         "productType": "sat",
-        "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_National_dayphase_nightmp_0",
+        "baseURL"    : "https://www.umanitoba.ca/faculties/environment/envirogeog/weather/images/sat/GOES_E_National_dayphase_nightmp_0",
         "startIndex" : 36,
         "fileType"   : ".jpeg",
         "loopLength" : 12
@@ -50,7 +50,7 @@
     "national-wv" : {
         "name"    : "National Water Vapour",
         "productType": "sat",
-        "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_National_simple_wv_0",
+        "baseURL"    : "https://www.umanitoba.ca/faculties/environment/envirogeog/weather/images/sat/GOES_E_National_simple_wv_0",
         "startIndex" : 36,
         "fileType"   : ".jpeg",
         "loopLength" : 12
@@ -58,7 +58,7 @@
     "national-vis-micro" : {
         "name"    : "National IR Sandwich/Microphysics",
         "productType": "sat",
-        "baseURL"    : "https://www.umanitoba.ca/environment/envirogeog/weather/images/sat/GOES_E_National_vis_nightmp_0",
+        "baseURL"    : "https://www.umanitoba.ca/faculties/environment/envirogeog/weather/images/sat/GOES_E_National_vis_nightmp_0",
         "startIndex" : 36,
         "fileType"   : ".jpeg",
         "loopLength" : 12
