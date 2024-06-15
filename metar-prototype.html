@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 
-<html>
+<html class="avmode">
 
 <head>
 <title>metar display test</title>
 
 <script>
 
-    function toggleAvn(){
-        document.documentElement.classList.toggle("avmode");
-        document.documentElement.classList.toggle("pubmode");
+    function toggleAvn(mode){
+        document.documentElement.className = "";
+        document.documentElement.classList.add(mode);
     }
 
 </script>
@@ -49,9 +49,15 @@
     
     #site-meta { border-top: 2px solid black; margin: 0; text-align: center; }
     
-    nav > input, nav > select { font-family: inherit; }
+    nav > input, nav > button, nav > select, #taf-notam > button { font-family: inherit; }
+    nav > input, nav > button, nav > select {
+        border: 1px solid black;
+        background-color: #eeeeee;
+        padding: 4px;
+        border-radius: 4px;
+    }
     
-    .metar-string, #taf {
+    .metar-string, #taf-notam > p {
         white-space: pre-wrap;
         font-family: "Sometype Mono", monospace;
         margin: 0;
@@ -70,24 +76,35 @@
     .metar-sigwx:not(.aviation) { font-weight: bold; color: black; background: white; padding: 0 2px; border-radius: 4px; }
     :root.avmode > body > section > p > .metar-sigwx.aviation { font-weight: bold; color: black; background: white; padding: 0 2px; border-radius: 4px; }
     
-    #taf > span { display: block; }
+    #taf-notam > p > span { display: block; }
     
-    #site-meta > *::before {
+    #site-meta > *::before, label[for="site-id"]::before, #load-button::before, #hrs::before {
         content: "";
         background-size: 100% 100%;
         padding-right: 16px;
         margin-right: 4px;
         filter: invert();
     }
+
+    
+    
+    
+    #load-button::before {
+        filter: none;
+        background-size: 80% 100%;
+        background-repeat: no-repeat;
+        background-image: url("images/icons/load.png")
+    }
     
     #site-name { display: block; font-weight: 700; }
-    #site-name::before { background-image:url("images/icons/plane.png"); }
+    #site-name::before, label[for="site-id"]::before { background-image:url("images/icons/plane.png"); }
     #elevation::before { background-image:url("images/icons/mountains.png"); }
     #sun-times::before { background-image:url("images/icons/sun.png"); }
     #lat-lon::before   { background-image:url("images/icons/map.png"); }
     
+    #taf-notam > p { margin: 0; }
     
-    #taf { padding: 8px; }
+    #taf-notam > button { margin: 0; width: 49%; border: 0; background: #333333; color: white; }
     .taf-meta { font-weight: bold; border-bottom: 1px dashed white; }
     .taf-fm-group { text-indent: 16px ; }
     .taf-part-period { text-indent: 32px ; }
@@ -102,7 +119,7 @@
 <nav>
     <label for="site-id">Site ID:</label>
     <input type="text" name="site-id" autofocus="" maxlength="4" id="site-id">
-    <input type="submit" name="submit" value="Load">
+    <button id="load-button">Load</button>
     <select id="hrs">
         <option value="7">6 hrs</option>
         <option value="13">12 hrs</option>
@@ -112,19 +129,16 @@
         <option value="49">48 hrs</option>
         <option value="97">96 hrs</option>
     </select>
-    <label for="standard">METAR/TAF</label>
-    <input type="checkbox" id="standard" checked>
-    <label for="notam">NOTAMs</label>
-    <input type="checkbox" id="notam">
     
-    <label for="avn">AVN</label>
-    <input type="radio" value="avmode" name="mode" id="avn" onclick="toggleAvn()">
-    <label for="pub">PUB</label>
-    <input type="radio" value="pubmode" name="mode" id="pub" onclick="toggleAvn()" checked>
+    <button id="avn" checked onclick="toggleAvn('avmode')">AVN</button>
+    
+    <button id="pub" onclick="toggleAvn('pubmode')">PUB</button>
+    
+    
     
 </nav>
 
-<section id="metar-taf-output">
+<section id="metar-output">
     <p class="metar-string" data-tt="22" data-td="6" data-dd="24" data-ff="3" data-gg="">CYEG 142100Z 24003KT 160V260 20SM FEW060TCU SCT110 BKN220 22/06 A2968 RMK TCU2AC2CI3 TCU SH DIST SW-W SLP054 DENSITY ALT 4000FT</p>
     <p class="metar-string" data-tt="22" data-td="6" data-dd="36" data-ff="5" data-gg="">CYEG 142145Z CCB 36005KT 350V060 20SM <span class="metar-sigwx">TS</span> <span class="metar-sigwx aviation">SCT060CB</span> BKN090 BKN220 21/10 A2967 RMK CB3AC3CI1 CB SW-W MOV NE OCNL LTGIC SLP051 DENSITY ALT 3900FT</p>
     <p class="metar-string" data-tt="22" data-td="6" data-dd="30" data-ff="8" data-gg="">CYEG 142200Z 30008KT 20SM <span class="metar-sigwx">-TSRA</span> <span class="metar-sigwx aviation">SCT060CB</span> BKN080 BKN220 20/08 A2968 RMK CB4AC3CI1 CI TR CB SW-W MOV NE OCNL LTGIC SLP056 DENSITY ALT 3800FT</p>
@@ -138,13 +152,17 @@
     <p class="metar-string" data-tt="22" data-td="6" data-dd="29" data-ff="9" data-gg="15">CYEG 150100Z 29009G15KT 20SM FEW060 FEW085 BKN250 16/09 A2972 RMK CU1AC1CI5 CU TR TCU TOPS DIST S-SW SLP070 DENSITY ALT 3300FT</p>
     <p class="metar-string" data-tt="22" data-td="6" data-dd="28" data-ff="5" data-gg="">CYEG 150200Z 28005KT 20SM FEW060TCU FEW085 FEW250 17/09 A2973 RMK TCU1AC1CI2 TCU TR AC TR CONTRAILS SLP073 DENSITY ALT 3400FT</p>
     <p class="metar-string" data-tt="16" data-td="9" data-dd="31" data-ff="6" data-gg="">CYEG 150300Z 31006KT 20SM FEW040TCU FEW085 FEW150 SCT250 16/09 A2975 RMK TCU1AC1AC1CI1 TCU TR TCU N SLP083 DENSITY ALT 3200FT</p>
-    <p id="site-meta">
-        <span id="site-name">Edmonton Intl Arpt</span>
-        <span id="lat-lon">53.3°N 113.6°W</span>
-        <span id="elevation">2330 ft / 710 m</span>
-        <span id="sun-times">↑11:06Z ↓04:04Z</span>
-    </p>
-    <p id="taf"><span class="taf-main"><span class="taf-meta">TAF CYEG 151140Z 1512/1612</span> 26005KT P6SM FEW120</span><span class="taf-fm-group">FM151700 28008KT P6SM FEW050 SCT120</span><span class="taf-fm-group">FM152000 32012KT P6SM SCT060 BKN100</span><span class="taf-part-period">TEMPO 1520/1524 P6SM -SHRA BKN060</span><span class="taf-fm-group">FM160000 30008KT P6SM BKN060 BKN100</span><span class="taf-part-period">TEMPO 1600/1606 P6SM -SHRA <span class="metar-sigwx">VCTS</span> <span class="metar-sigwx">BKN050CB</span></span><span class="taf-fm-group">FM160600 30010KT P6SM -SHRA BKN030 OVC050</span><span class="taf-rmk">RMK NXT FCST BY 151500Z</span></p>
+</section>
+<section id="site-meta">
+    <span id="site-name">Edmonton Intl Arpt</span>
+    <span id="lat-lon">53.3°N 113.6°W</span>
+    <span id="elevation">2330 ft / 710 m</span>
+    <span id="sun-times">↑11:06Z ↓04:04Z</span>
+</section>
+<section id="taf-notam">
+    <button id="taf-toggle">TAF</button>
+    <button id="notam-toggle">NOTAMs</button>
+    <p><span class="taf-main"><span class="taf-meta">TAF CYEG 151140Z 1512/1612</span> 26005KT P6SM FEW120</span><span class="taf-fm-group">FM151700 28008KT P6SM FEW050 SCT120</span><span class="taf-fm-group">FM152000 32012KT P6SM SCT060 BKN100</span><span class="taf-part-period">TEMPO 1520/1524 P6SM -SHRA BKN060</span><span class="taf-fm-group">FM160000 30008KT P6SM BKN060 BKN100</span><span class="taf-part-period">TEMPO 1600/1606 P6SM -SHRA <span class="metar-sigwx">VCTS</span> <span class="metar-sigwx">BKN050CB</span></span><span class="taf-fm-group">FM160600 30010KT P6SM -SHRA BKN030 OVC050</span><span class="taf-rmk">RMK NXT FCST BY 151500Z</span></p>
 </section>
 
 
