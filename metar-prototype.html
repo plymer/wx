@@ -35,10 +35,11 @@
     *:focus { outline: none; }
 
     :root {
-        /*--bgc: #ff7c70;*/ /* OG colour */
-        /*--bgc: #000000;*/ /* monochrome */
-        --bgc: #800b00;
-        /*--bgc: #600900;*/ /* too dark */
+        --bgc: #007399;
+/*         --bgc: #000000;  */
+/*         --bgc: #800b00; */
+/*         --bgc: #ff4433; */
+/*         --bgc: #008000; */
         
     }
     
@@ -91,7 +92,9 @@
     
     #taf-notam > p > span { display: block; }
     
-    #site-meta > *::before, label[for="site-id"]::before, #load-button::before, #hrs::before {
+    #taf-notam > p .metar-sigwx { color: white; background: black; }
+    
+    #site-meta > *::before, label[for="site-id"]::before, #load-button::before, #hrs::before, #avn-toggle::before, #ca-pub-toggle::before, #us-pub-toggle::before, #taf-notam > button::before {
         content: "";
         background-size: 100% 100%;
         padding-right: 16px;
@@ -103,27 +106,42 @@
         filter: none;
         background-size: 80% 100%;
         background-repeat: no-repeat;
-        background-image: url("images/icons/load.png")
+        background-image: url("images/icons/load.png");
     }
+    
+    #avn-toggle::before, #ca-pub-toggle::before, #us-pub-toggle::before, #taf-notam > button::before {
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        padding-right: 12px;
+    }
+    
+    #avn-toggle.selected::before, #ca-pub-toggle.selected::before, #us-pub-toggle.selected::before, #taf-notam > button.selected::before { filter: none; }
     
     #avn-toggle { border-radius: 4px 0 0 4px; border-right: none; }
     #ca-pub-toggle { border-radius: 0; }
     #us-pub-toggle { border-radius: 0 4px 4px 0; border-left: none; }
     
-    #avn-toggle, #ca-pub-toggle, #us-pub-toggle, #taf-notam > button { background: #333333; color: white; }
+    #avn-toggle, #ca-pub-toggle, #us-pub-toggle, #taf-notam > button { background: #444444; color: white; }
     #avn-toggle.selected, #ca-pub-toggle.selected, #us-pub-toggle.selected, #taf-notam > button.selected { background: #eeeeee; color: black; }
     
     #site-name { display: block; font-weight: 700; }
-    #site-name::before, label[for="site-id"]::before { background-image:url("images/icons/plane.png"); }
+    #site-name::before { background-image:url("images/icons/airport.png");  }
+    label[for="site-id"]::before { background-image:url("images/icons/search.png");  } 
+    #avn-toggle::before { background-image:url("images/icons/plane.png"); }
     #elevation::before { background-image:url("images/icons/mountains.png"); }
     #sun-times::before { background-image:url("images/icons/sun.png"); }
     #lat-lon::before   { background-image:url("images/icons/map.png"); }
+    #ca-pub-toggle::before { background-image:url("images/icons/can.png"); }
+    #us-pub-toggle::before { background-image:url("images/icons/usa.png"); }
+    #taf-toggle::before { background-image:url("images/icons/taf.png"); }
+    #notam-toggle::before { background-image:url("images/icons/notam.png"); }
     
-    #taf-notam > p { margin: 0; padding: 4px 8px; }
+    #taf-notam > p { margin: 0; padding: 4px 8px; color: black; background-color: #eeeeee; }
+ /*   #taf-notam > p > span { margin: 4px 0; }*/
     
-    #taf-notam > button { margin: 0; padding: 4px; width: 50%; border: none; border-top: 1px solid black; border-bottom: 1px solid black; background: #333333; color: white; cursor: pointer; }
+    #taf-notam > button { margin: 0; padding: 4px; width: 50%; border: none; border-top: 1px solid black; border-bottom: 1px solid black; cursor: pointer; }
     #taf-notam > button:first-of-type { border-right: 1px solid black; }
-    .taf-meta { font-weight: bold; border-bottom: 1px dashed white; }
+    .taf-meta { font-weight: bold; border-bottom: 1px dashed black; }
     .taf-fm-group { text-indent: 16px ; }
     .taf-part-period { text-indent: 32px ; }
     .taf-rmk { text-indent: 16px ; }
@@ -147,6 +165,7 @@
         <option value="49">48 hrs</option>
         <option value="97">96 hrs</option>
     </select>
+    <label>Units:</label>
     <button id="avn-toggle" class="selected" onclick="toggleDisplayMode('avn')">AVN</button><button id="ca-pub-toggle" onclick="toggleDisplayMode('ca-pub')">CAN</button><button id="us-pub-toggle" onclick="toggleDisplayMode('us-pub')">USA</button>
 </nav>
 
