@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<title>metar display prototype</title>
+
+<style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100..700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Sometype+Mono&display=swap');
+    
+    *, *::after, *::before { box-sizing: border-box; }
+    *:focus { outline: none; }
+
+    :root {
+        /*--bgc: #ff7c70;*/ /* OG colour */
+        /*--bgc: #000000;*/ /* monochrome */
+        --bgc: #800b00;
+        /*--bgc: #600900;*/ /* too dark */
+    }
+    
+    body {
+        max-width: 960px;
+        margin: 0 auto;
+        background: var(--bgc);
+        font-family: "Josefin Sans", sans-serif;
+        color: white;
+    }
+    
+    nav, #site-meta {
+        background-color: #333333;
+        color: white;
+        padding: 8px;
+        border-bottom: 2px solid black;
+    }
+    
+    #site-id { text-transform: uppercase; font-family: "Sometype Mono", monospace; text-align: center; }
+    
+    #site-meta { border-top: 2px solid black; margin: 0; text-align: center; }
+    
+    nav > input, nav > select { font-family: inherit; }
+    
+    .metar-string, #taf {
+        white-space: pre-wrap;
+        font-family: "Sometype Mono", monospace;
+        margin: 0;
+        padding: 0 8px;
+        background: rgba(255,255,255,0.3);
+    }
+    
+    .metar-string:nth-of-type(2n) {
+        background: rgba(255,255,255,0.6);
+        color: black;
+    }
+    .metar-string { padding: 4px 8px; }
+    
+    .metar-sigwx { font-weight: bold; color: black; background: white; padding: 0 2px; border-radius: 4px;}
+    
+    #taf > span { display: block; }
+    
+    #site-meta > *::before {
+        content: "";
+        background-size: 100% 100%;
+        padding-right: 16px;
+        margin-right: 4px;
+        filter: invert();
+    }
+    
+    #site-name { display: block; font-weight: 700; }
+    #site-name::before { background-image:url("images/icons/plane.png"); }
+    #elevation::before { background-image:url("images/icons/mountains.png"); }
+    #sun-times::before { background-image:url("images/icons/sun.png"); }
+    #lat-lon::before   { background-image:url("images/icons/map.png"); }
+    
+    
+    #taf { padding: 8px; } 
+    .taf-fm-group { text-indent: 16px ; }
+    .taf-part-period { text-indent: 32px ; }
+    .taf-rmk { text-indent: 16px ; }
+
+</style>
+</head>
+
+<body>
+
+
+<nav>
+    <label for="site-id">Site ID:</label>
+    <input type="text" name="site-id" autofocus="" maxlength="4" id="site-id">
+    <input type="submit" name="submit" value="Load">
+    <select id="hrs">
+        <option value="7">6 hrs</option>
+        <option value="13">12 hrs</option>
+        <option value="19">18 hrs</option>
+        <option value="25" selected="">24 hrs</option>
+        <option value="37">36 hrs</option>
+        <option value="49">48 hrs</option>
+        <option value="97">96 hrs</option>
+    </select>
+    <label for="standard">METAR/TAF</label>
+    <input type="checkbox" id="standard" checked>
+    <label for="notam">NOTAMs</label>
+    <input type="checkbox" id="notam">
+</nav>
+
+<section id="metar-taf-output">
+    <p class="metar-string">CYEG 142100Z 24003KT 160V260 20SM FEW060TCU SCT110 BKN220 22/06 A2968 RMK TCU2AC2CI3 TCU SH DIST SW-W SLP054 DENSITY ALT 4000FT</p>
+    <p class="metar-string">CYEG 142145Z CCB 36005KT 350V060 20SM <span class="metar-sigwx">TS</span> <span class="metar-sigwx">SCT060CB</span> BKN090 BKN220 21/10 A2967 RMK CB3AC3CI1 CB SW-W MOV NE OCNL LTGIC SLP051 DENSITY ALT 3900FT</p>
+    <p class="metar-string">CYEG 142200Z 30008KT 20SM <span class="metar-sigwx">-TSRA</span> <span class="metar-sigwx">SCT060CB</span> BKN080 BKN220 20/08 A2968 RMK CB4AC3CI1 CI TR CB SW-W MOV NE OCNL LTGIC SLP056 DENSITY ALT 3800FT</p>
+    <p class="metar-string">CYEG 142214Z 27021KT 20SM <span class="metar-sigwx">TSRA</span> <span class="metar-sigwx">BKN060CB</span> BKN080 17/08 A2970 RMK CB5AC2 CB OHD S-W MOV NE OCNL LTGIC OHD SW VIS SW 10 SLP064 DENSITY ALT 3500FT</p>
+    <p class="metar-string">CYEG 142236Z <span class="metar-sigwx">26021G30KT</span> 15SM <span class="metar-sigwx">-TSRA</span> <span class="metar-sigwx">BKN062CB</span> OVC080 14/08 A2975 RMK CB6AC2 CB OHD E-S OCNL LTGICCG SE MOV NE VIS SE 6 PRESRR SLP083 DENSITY ALT 3000FT</p>
+    <p class="metar-string">CYEG 142251Z 26011G23KT 8SM SHRA <span class="metar-sigwx">BKN062CB</span> BKN080 BKN220 13/09 A2974 RMK CB5AC2CI1 CI TR CB OHD NE-SE MOV NE SLP082 DENSITY ALT 3000FT</p>
+    <p class="metar-string">CYEG 142258Z 34015KT 250V350 10SM -SHRA FEW023 <span class="metar-sigwx">BKN062CB</span> BKN080 BKN220 13/09 A2971 RMK SC2CB3AC2CI1 CI TR CB E MOV NE PRESFR SLP070 DENSITY ALT 3000FT</p>
+    <p class="metar-string">CYEG 142300Z CCA 32012G18KT 260V350 15SM -SHRA FEW020 <span class="metar-sigwx">BKN062CB</span> BKN080 BKN220 13/09 A2972 RMK SC2CB3AC2CI1 CI TR CB E MOV NE PRESFR SLP075 DENSITY ALT 3000FT</p>
+    <p class="metar-string">CYEG 142315Z 28012KT 20SM FEW020 <span class="metar-sigwx">SCT062CB</span> BKN088 BKN220 15/10 A2976 RMK SC1CB4AC3CI1 SC TR CI TR CB SH N-E MOV NE SH ALQDS PRESRR SLP088 DENSITY ALT 3200FT</p>
+    <p class="metar-string">CYEG 150000Z 33015G20KT 20SM <span class="metar-sigwx">FEW062CB</span> BKN083 BKN120 BKN250 14/09 A2972 RMK CB2AC3AC1CI1 CB SH DIST N QUAD MOV NE PRESFR SLP075 DENSITY ALT 3100FT</p>
+    <p class="metar-string">CYEG 150100Z 29009G15KT 20SM FEW060 FEW085 BKN250 16/09 A2972 RMK CU1AC1CI5 CU TR TCU TOPS DIST S-SW SLP070 DENSITY ALT 3300FT</p>
+    <p class="metar-string">CYEG 150200Z 28005KT 20SM FEW060TCU FEW085 FEW250 17/09 A2973 RMK TCU1AC1CI2 TCU TR AC TR CONTRAILS SLP073 DENSITY ALT 3400FT</p>
+    <p class="metar-string">CYEG 150300Z 31006KT 20SM FEW040TCU FEW085 FEW150 SCT250 16/09 A2975 RMK TCU1AC1AC1CI1 TCU TR TCU N SLP083 DENSITY ALT 3200FT</p>
+    <p id="site-meta">
+        <span id="site-name">Edmonton Intl Arpt</span>
+        <span id="lat-lon">53.3°N 113.6°W</span>
+        <span id="elevation">2330 ft / 710 m</span>
+        <span id="sun-times">↑11:06Z ↓04:04Z</span>
+    </p>
+    <p id="taf"><span class="taf-main">TAF CYEG 151140Z 1512/1612 26005KT P6SM FEW120</span><span class="taf-fm-group">FM151700 28008KT P6SM FEW050 SCT120</span><span class="taf-fm-group">FM152000 32012KT P6SM SCT060 BKN100</span><span class="taf-part-period">TEMPO 1520/1524 P6SM -SHRA BKN060</span><span class="taf-fm-group">FM160000 30008KT P6SM BKN060 BKN100</span><span class="taf-part-period">TEMPO 1600/1606 P6SM -SHRA VCTS BKN050CB</span><span class="taf-fm-group">FM160600 30010KT P6SM -SHRA BKN030 OVC050</span><span class="taf-rmk">RMK NXT FCST BY 151500Z</span></p>
+</section>
+
+
+</body>
+
+</html>
