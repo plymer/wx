@@ -1,15 +1,27 @@
 <!DOCTYPE html>
 
-<html class="avmode">
+<html class="avn">
 
 <head>
 <title>metar display test</title>
 
 <script>
 
-    function toggleAvn(mode){
+    function toggleDisplayMode(mode){
+        console.log(mode);
         document.documentElement.className = "";
         document.documentElement.classList.add(mode);
+        document.getElementById("avn-toggle").className = "";
+        document.getElementById("ca-pub-toggle").className = "";
+        document.getElementById("us-pub-toggle").className = "";
+        
+        if (mode == "ca-pub") {
+            document.getElementById("ca-pub-toggle").classList.add("selected");
+        } else if (mode == "avn") {
+            document.getElementById("avn-toggle").classList.add("selected");
+        } else if (mode == "us-pub") {
+            document.getElementById("us-pub-toggle").classList.add("selected");
+        }
     }
 
 </script>
@@ -47,9 +59,10 @@
     
     #site-id { text-transform: uppercase; font-family: "Sometype Mono", monospace; text-align: center; }
     
-    #site-meta { border-top: 2px solid black; margin: 0; text-align: center; }
+    #site-meta { border-top: 2px solid black; margin: 0; text-align: center; border-bottom: none;}
     
     nav > input, nav > button, nav > select, #taf-notam > button { font-family: inherit; }
+    nav > button, nav > select { cursor: pointer; }
     nav > input, nav > button, nav > select {
         border: 1px solid black;
         background-color: #eeeeee;
@@ -74,7 +87,7 @@
     
     
     .metar-sigwx:not(.aviation) { font-weight: bold; color: black; background: white; padding: 0 2px; border-radius: 4px; }
-    :root.avmode > body > section > p > .metar-sigwx.aviation { font-weight: bold; color: black; background: white; padding: 0 2px; border-radius: 4px; }
+    :root.avn > body > section > p > .metar-sigwx.aviation { font-weight: bold; color: black; background: white; padding: 0 2px; border-radius: 4px; }
     
     #taf-notam > p > span { display: block; }
     
@@ -86,9 +99,6 @@
         filter: invert();
     }
 
-    
-    
-    
     #load-button::before {
         filter: none;
         background-size: 80% 100%;
@@ -96,15 +106,23 @@
         background-image: url("images/icons/load.png")
     }
     
+    #avn-toggle { border-radius: 4px 0 0 4px; border-right: none; }
+    #ca-pub-toggle { border-radius: 0; }
+    #us-pub-toggle { border-radius: 0 4px 4px 0; border-left: none; }
+    
+    #avn-toggle, #ca-pub-toggle, #us-pub-toggle, #taf-notam > button { background: #333333; color: white; }
+    #avn-toggle.selected, #ca-pub-toggle.selected, #us-pub-toggle.selected, #taf-notam > button.selected { background: #eeeeee; color: black; }
+    
     #site-name { display: block; font-weight: 700; }
     #site-name::before, label[for="site-id"]::before { background-image:url("images/icons/plane.png"); }
     #elevation::before { background-image:url("images/icons/mountains.png"); }
     #sun-times::before { background-image:url("images/icons/sun.png"); }
     #lat-lon::before   { background-image:url("images/icons/map.png"); }
     
-    #taf-notam > p { margin: 0; }
+    #taf-notam > p { margin: 0; padding: 4px 8px; }
     
-    #taf-notam > button { margin: 0; width: 49%; border: 0; background: #333333; color: white; }
+    #taf-notam > button { margin: 0; padding: 4px; width: 50%; border: none; border-top: 1px solid black; border-bottom: 1px solid black; background: #333333; color: white; cursor: pointer; }
+    #taf-notam > button:first-of-type { border-right: 1px solid black; }
     .taf-meta { font-weight: bold; border-bottom: 1px dashed white; }
     .taf-fm-group { text-indent: 16px ; }
     .taf-part-period { text-indent: 32px ; }
@@ -129,13 +147,7 @@
         <option value="49">48 hrs</option>
         <option value="97">96 hrs</option>
     </select>
-    
-    <button id="avn" checked onclick="toggleAvn('avmode')">AVN</button>
-    
-    <button id="pub" onclick="toggleAvn('pubmode')">PUB</button>
-    
-    
-    
+    <button id="avn-toggle" class="selected" onclick="toggleDisplayMode('avn')">AVN</button><button id="ca-pub-toggle" onclick="toggleDisplayMode('ca-pub')">CAN</button><button id="us-pub-toggle" onclick="toggleDisplayMode('us-pub')">USA</button>
 </nav>
 
 <section id="metar-output">
@@ -160,8 +172,7 @@
     <span id="sun-times">↑11:06Z ↓04:04Z</span>
 </section>
 <section id="taf-notam">
-    <button id="taf-toggle">TAF</button>
-    <button id="notam-toggle">NOTAMs</button>
+    <button id="taf-toggle" class="selected">TAF</button><button id="notam-toggle">NOTAMs</button>
     <p><span class="taf-main"><span class="taf-meta">TAF CYEG 151140Z 1512/1612</span> 26005KT P6SM FEW120</span><span class="taf-fm-group">FM151700 28008KT P6SM FEW050 SCT120</span><span class="taf-fm-group">FM152000 32012KT P6SM SCT060 BKN100</span><span class="taf-part-period">TEMPO 1520/1524 P6SM -SHRA BKN060</span><span class="taf-fm-group">FM160000 30008KT P6SM BKN060 BKN100</span><span class="taf-part-period">TEMPO 1600/1606 P6SM -SHRA <span class="metar-sigwx">VCTS</span> <span class="metar-sigwx">BKN050CB</span></span><span class="taf-fm-group">FM160600 30010KT P6SM -SHRA BKN030 OVC050</span><span class="taf-rmk">RMK NXT FCST BY 151500Z</span></p>
 </section>
 
