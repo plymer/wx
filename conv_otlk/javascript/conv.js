@@ -22,14 +22,6 @@ function changeSector (sectorID) {
 
 	changeOffice(sectorID);
 	changePane(activePane);
-
-/*
-	if ((sectorID == 'prairies') || (sectorID == 'mk-mk')) {
-		document.getElementById('orient').style.display = "block";
-	} else {
-		document.getElementById('orient').style.display = "none";
-	}
-*/
 }
 
 
