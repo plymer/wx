@@ -19,45 +19,25 @@
 
     <script>
 
-    let app; // contains the UI controller, but we will create that once we have loaded the DOM elements we need
-
     const dataSources = {
         "gfa" : {
             "name" : "gfaList",
-            "url" : "./data/current-gfas.json",
-            "dc" : new DataController("gfa", "./data/current-gfas.json")
+            "loadString" : "NavCanada",  // this should be what can be displayed in the UI if we need to
+            "url" : "./data/current-gfas.json"
         },
         "sat" : {
             "name" : "satList",
-            "url" : "./data/satellite-sources.json",
-            "dc" : new DataController("sat", "./data/satellite-sources.json")
+            "loadString" : "Satellite",
+            "url" : "./data/satellite-sources.json"
         },
         "alerts" : {
             "name" : "alertList",
-            "url" : "./data/current-alerts.json",
-            "dc" : new DataController("alerts", "./data/current-alerts.json")
+            "loadString" : "Public Alerts",
+            "url" : "./data/current-alerts.json"
         }
     }
 
-    document.addEventListener("DOMContentLoaded", function(){
-
-        console.log("loaded!");
-
-        if (localStorage.getItem("mode")) {
-            console.log(localStorage.getItem("mode"));
-            app = new UI(localStorage.getItem("mode"));
-        } else {
-            localStorage.setItem("mode", "taf");
-            app = new UI(localStorage.getItem("mode"));
-        }
-
-        setActiveData(dataSources[localStorage.getItem("mode")]);
-
-        document.getElementById("burger").addEventListener("click", function(){
-            this.classList.toggle("clicked");
-        });
-
-    });
+    let siteData = new DataController(dataSources);
 
     </script>
 
