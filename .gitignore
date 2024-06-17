@@ -1,3 +1,6 @@
 data/current-alerts.json
 data/current-gfas.json
 maps/*
+conv_otlk/images/
+images/b737.png
+images/paspc.jpg
