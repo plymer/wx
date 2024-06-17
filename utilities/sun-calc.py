@@ -11,9 +11,12 @@ def getTimes(latitude, longitude):
 
   sun = Sun(latitude, longitude)
 
-  riseTime = sun.get_sunrise_time()
-  setTime = sun.get_sunset_time()
+  try:
+    riseTime = sun.get_sunrise_time()
+    setTime = sun.get_sunset_time()
 
-  return "&uarr;" + riseTime.strftime('%H:%M') + "Z &darr;" + setTime.strftime('%H:%M') + "Z"
+    return "&uarr;" + riseTime.strftime('%H:%M') + "Z &darr;" + setTime.strftime('%H:%M') + "Z"
+  except SunTimeException as e:
+    return format(e)
 
 print(getTimes(lat, lon))
