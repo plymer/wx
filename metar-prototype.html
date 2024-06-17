@@ -36,10 +36,17 @@
 
     :root {
         --bgc: #007399;
-/*         --bgc: #000000;  */
-/*         --bgc: #800b00; */
-/*         --bgc: #ff4433; */
-/*         --bgc: #008000; */
+        /* --bgc: #000000; */
+        /* --bgc: #800b00; */
+        /* --bgc: #ff4433; */
+        /* --bgc: #008000; */
+
+        --infobgc: #333333;
+        --btnbgc: #eeeeee;
+        --btninactivec: #444444;
+        --txtc: #ffffff;
+        --txtinvc: #000000;
+        --txtbgc: #eeeeee;
         
     }
     
@@ -48,11 +55,11 @@
         margin: 0 auto;
         background: var(--bgc);
         font-family: "Josefin Sans", sans-serif;
-        color: white;
+        color: var(--txtc);
     }
     
     nav, #site-meta {
-        background-color: #333333;
+        background-color: var(--infobgc);
         color: white;
         padding: 8px;
         border-bottom: 2px solid black;
@@ -66,7 +73,7 @@
     nav > button, nav > select { cursor: pointer; }
     nav > input, nav > button, nav > select {
         border: 1px solid black;
-        background-color: #eeeeee;
+        background-color: var(--btnbgc);
         padding: 4px;
         border-radius: 4px;
     }
@@ -81,18 +88,18 @@
     
     .metar-string:nth-of-type(2n) {
         background: rgba(255,255,255,0.6);
-        color: black;
+        color: var(--txtinvc);
     }
     .metar-string { padding: 4px 8px; }
     
     
     
     .metar-sigwx:not(.aviation) { font-weight: bold; color: black; background: white; padding: 0 2px; border-radius: 4px; }
-    :root.avn > body > section > p > .metar-sigwx.aviation { font-weight: bold; color: black; background: white; padding: 0 2px; border-radius: 4px; }
+    :root.avn > body > section > p > .metar-sigwx.aviation { font-weight: bold; color: var(--txtinvc); background: white; padding: 0 2px; border-radius: 4px; }
     
     #taf-notam > p > span { display: block; }
     
-    #taf-notam > p .metar-sigwx { color: white; background: black; }
+    #taf-notam > p .metar-sigwx { color: var(--txtc); background: black; }
     
     #site-meta > *::before, label[for="site-id"]::before, #load-button::before, #hrs::before, #avn-toggle::before, #ca-pub-toggle::before, #us-pub-toggle::before, #taf-notam > button::before {
         content: "";
@@ -121,8 +128,8 @@
     #ca-pub-toggle { border-radius: 0; }
     #us-pub-toggle { border-radius: 0 4px 4px 0; border-left: none; }
     
-    #avn-toggle, #ca-pub-toggle, #us-pub-toggle, #taf-notam > button { background: #444444; color: white; }
-    #avn-toggle.selected, #ca-pub-toggle.selected, #us-pub-toggle.selected, #taf-notam > button.selected { background: #eeeeee; color: black; }
+    #avn-toggle, #ca-pub-toggle, #us-pub-toggle, #taf-notam > button { background: var(--btninactivec); color: var(--txtc); }
+    #avn-toggle.selected, #ca-pub-toggle.selected, #us-pub-toggle.selected, #taf-notam > button.selected { background: var(--btnbgc); color: var(--txtinvc); }
     
     #site-name { display: block; font-weight: 700; }
     #site-name::before { background-image:url("images/icons/airport.png");  }
@@ -136,12 +143,12 @@
     #taf-toggle::before { background-image:url("images/icons/taf.png"); }
     #notam-toggle::before { background-image:url("images/icons/notam.png"); }
     
-    #taf-notam > p { margin: 0; padding: 4px 8px; color: black; background-color: #eeeeee; }
+    #taf-notam > p { margin: 0; padding: 4px 8px; color: var(--txtinvc); background-color: var(--btnbgc); }
  /*   #taf-notam > p > span { margin: 4px 0; }*/
     
     #taf-notam > button { margin: 0; padding: 4px; width: 50%; border: none; border-top: 1px solid black; border-bottom: 1px solid black; cursor: pointer; }
     #taf-notam > button:first-of-type { border-right: 1px solid black; }
-    .taf-meta { font-weight: bold; border-bottom: 1px dashed black; }
+    .taf-meta { font-weight: bold; border-bottom: 1px dashed var(--txtinvc); }
     .taf-fm-group { text-indent: 16px ; }
     .taf-part-period { text-indent: 32px ; }
     .taf-rmk { text-indent: 16px ; }
