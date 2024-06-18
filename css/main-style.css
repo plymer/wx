@@ -6,28 +6,31 @@
     --public-c: #5CAE78;
     --obs-c:    #FF7C70;
     --data-c:   #FFB958;
-    --bg-c:     #5F5F5F;
+    --body-bg-c: #5F5F5F;
     --selected: #FFC763;
     --icon-size: 56px;
+
+
+
 }
 
 body {
-    background: var(--bg-c);
+    background: var(--body-bg-c);
     font-family: "Josefin Sans", sans-serif;
     font-optical-sizing: auto;
     color: white;
-    max-width: 960px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
-nav {
+body > nav {
     display: flex;
     align-items: baseline;
     justify-content: space-around;
     padding: 8px 0;
 }
 
-nav > button {
+body > nav > button {
     background: none;
     border: none;
     font-family: inherit;
@@ -40,7 +43,7 @@ nav > button {
     cursor: pointer;
 }
 
-nav > button::after {
+body > nav > button::after {
     content:attr(data-longtext);
 }
 
