@@ -1,0 +1,15 @@
+{
+    "gfa" : {
+        "gfaMode" : {
+            "elements" : {
+                "regionSelect" : { "type" : "button", "count" : 7 },
+                "cloudSelect" : { "type" : "button", "count" : 3 },
+                "turbcSelect" : { "type" : "button", "count" : 3 },
+                "image" : { "type" : "img", "count" : 1 }
+            }
+
+            
+            
+        }
+    }
+}
