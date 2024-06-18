@@ -3,6 +3,7 @@
 $metarOutput;
 $tafOutput;
 $siteMetaOutput;
+$jsonOutput = array();
 
 // allows the script to be run via CLI or invoked via URL
 
@@ -49,7 +50,7 @@ $metaURL = "https://aviationweather.gov/cgi-bin/data/location.php?id={$ident}";
 
 // check if metars exist
 if (file_get_contents($metarURL) == false) {
-    $metarOutput = array("metars" => "No METARs available for {$ident}.");
+    $metarOutput = "No METARs available for {$ident}.";
 } else {
     // grab the METARs
     $metars = file_get_contents($metarURL);
@@ -58,14 +59,14 @@ if (file_get_contents($metarURL) == false) {
     $temp = array();
 
     for ($i = $numOfMETARS; $i > 0; $i--) {
-        $temp[] =  $ident . " " . trim($metars[$i]);
+        $temp[] = $ident . " " . trim($metars[$i]) . "\n";
     }
 
-    $metarOutput = array("metars" => $temp);
+    $metarOutput = $temp;
 }
 
 if (file_get_contents($metaURL) == false) {
-    $metaOutput = array("metadata" => "No metadata availavle for {$ident}.");
+    $metaOutput = "No metadata availavle for {$ident}.";
     } else {
     // grab the json file for the station list and nab the metadata for the site
     $metaJSON = file_get_contents($metaURL);
@@ -86,18 +87,25 @@ if (file_get_contents($metaURL) == false) {
     $siteLat = ($siteLat > 0) ? $siteLat . "&#176;N" : ($siteLat * -1) . "&#176;S";
     $siteLon = ($siteLon > 0) ? $siteLon . "&#176;E" : ($siteLon * -1) . "&#176;W";
 
+    // $metaOutput = array(
+    //     "metadata" => array(
+    //         "site-name" => $siteName,
+    //         "lat-lon" => "{$siteLat} {$siteLon}",
+    //         "elevation" => "{$siteElevF} ft  / {$siteElevM} m",
+    //         "sun-times" => $sunTimes
+    //     )
+    // );
+
     $metaOutput = array(
-        "metadata" => array(
-            "site-name" => $siteName,
-            "lat-lon" => "{$siteLat} {$siteLon}",
-            "elevation" => "{$siteElevF} ft  / {$siteElevM} m",
-            "sun-times" => $sunTimes
-        )
+        "site-name" => $siteName,
+        "lat-lon" => "{$siteLat} {$siteLon}",
+        "elevation" => "{$siteElevF} ft  / {$siteElevM} m",
+        "sun-times" => $sunTimes        
     );
 }
 
 if (file_get_contents($tafURL) == false) {
-    $tafOutput = array("taf" => "No TAF available for {$ident}.");
+    $tafOutput = "No TAF available for {$ident}.";
 } else {
 // grab the TAF (if it exists)
     $taf = file_get_contents($tafURL);
@@ -151,40 +159,24 @@ if (file_get_contents($tafURL) == false) {
         $parperType = $pp[0];
         $parperText = trim($matches[0][$i]);
 
-        $partPeriod = array($parperType => $parperText);
+        $partPeriod = array("raw" => $parperText, "type" => $parperType);
 
         array_push($partPeriods, $partPeriod);
         
     }
-    
 
-
-
-
-    $tafString = array("meta" => $tafMeta, "main" => $tafMainRaw, "part-periods" => $partPeriods, "rmk" => $rmk);
-    
-
-    $tafOutput = array("taf" => $tafString);
-       
+    $tafOutput = array("meta" => $tafMeta, "main" => $tafMainRaw, "part-periods" => $partPeriods, "rmk" => $rmk);
 }
 
-// this output is not 100% valid, the metars are not in the correct format
+// add all output into the output array
+$jsonOutput["metars"] = $metarOutput;
+$jsonOutput["metadata"] = $metaOutput;
+$jsonOutput["taf"] = $tafOutput;
 
-/*
+// encode the output as JSON
+$jsonOutput = json_encode($jsonOutput, JSON_PRETTY_PRINT);
 
-{
-    metars : []
-},{   <--- this is the issue here
-    metadata ...
-}...
-
-
-*/
-
-$jsonOutput = json_encode($metarOutput, JSON_PRETTY_PRINT) . ","
-    .json_encode($metaOutput, JSON_PRETTY_PRINT) . ","
-    .json_encode($tafOutput, JSON_PRETTY_PRINT);
-
+// output the resulting JSON string
 echo $jsonOutput;
 
 ?>
