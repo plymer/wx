@@ -43,7 +43,7 @@ body > nav > button {
     cursor: pointer;
 }
 
-body > nav > button::after {
+.text-changes::after {
     content:attr(data-longtext);
 }
 
@@ -82,7 +82,7 @@ pre {
 #site-icon { width: var(--icon-size); }
 
 @media screen and (max-width: 600px) {
-    nav > button::after {
+    .text-changes::after {
         content:attr(data-shorttext);
     }
 
