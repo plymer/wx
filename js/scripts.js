@@ -90,16 +90,20 @@ class DataController {
 class UI {
 
     #mode;
+    #submode;
     #parent;
     #dataController;
     #elementList;
+    #configController;
 
     constructor(mode, data) {
         console.log("initializing the UI running", mode, "mode...");
         this.#mode = mode;
+        this.#submode = localStorage.getItem("submode");
         this.#parent = document.getElementsByTagName("main")[0];
         this.#dataController = data;
         this.#elementList = {};
+        this.#configController = {};
 
         this.init();
         
@@ -117,15 +121,50 @@ class UI {
         return this.#elementList;
     }
 
-    init() {
+    get config() {
+        return this.#configController;
+    }
+
+    async init() {
+
+        this.#configController = await this.readUIConfig("./data/config/ui-config.json");
 
         this.addElements();
 
+        // bind all of our UI buttons (mode selections) with eventHandlers
+        let p = document.getElementById("public");
+        p.addEventListener("click", function(){ app.changeMode("pub"); });
+
+        let a = document.getElementById("aviation");
+        a.addEventListener("click", function(){ app.changeMode("avn")});
+
+        let o = document.getElementById("obs");
+        o.addEventListener("click", function(){ app.changeMode("obs")});
+
+        let d = document.getElementById("data");
+        d.addEventListener("click", function(){ app.changeMode("sat")});
+
+        let l = document.getElementById("outlook");
+        //l.addEventListener("click", function(){ app.changeMode("otlk")});
+        l.addEventListener("click", function(){ window.open("/conv_otlk/", "_self"); });
+    }
+
+    async readUIConfig(url) {
+        console.log("reading UI config from file...");
+        let configFile = await fetch(url);
+        return await configFile.json();
     }
 
     changeMode(mode){
         this.#mode = mode;
         localStorage.setItem("mode", this.#mode);
+        this.clearScreen();
+        this.addElements();
+    }
+
+    changeSubMode(submode) {
+        this.#submode = submode;
+        localStorage.setItem("submode", this.#submode);
         this.clearScreen();
         this.addElements();
     }
@@ -281,11 +320,37 @@ class UI {
     }
 
     async buildUIFromConfig() {
-        console.log("reading UI config from file...");
-        let configFile = await fetch("./data/ui-config.json");
-        let config = await configFile.json();
 
-        console.log(config);
+        let config = this.#configController[this.#mode];
+
+        let n = document.createElement("nav");
+
+        if (this.#mode == "avn") {
+
+            if (this.#submode == "gfa") {
+                for (const product in config["gfa"]) {
+                    let b = document.createElement("button");
+                    b.dataset.shorttext = config["gfa"][product]["shorttext"];
+                    b.dataset.longtext = config["gfa"][product]["longtext"];
+                    b.setAttribute("id", config["gfa"][product]["id"]);
+                    b.setAttribute("class", "text-changes");
+                    b.addEventListener("click", function(){ console.log("changing to", this.getAttribute("id"))});
+    
+                    n.appendChild(b);
+                }
+            } else if (this.#submode == "upper") {
+                // do other
+            }
+
+        this.#parent.appendChild(n);
+            
+
+
+
+
+        }
+
+
     }
 
     populateTAFData(){
