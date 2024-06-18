@@ -10,7 +10,7 @@
 import requests as html, json, os
 
 # boilerplate URL to request all of the imagery data for the whole country's airspace
-URL = "https://plan.navcanada.ca/weather/api/alpha/?site=CZEG&site=CZVR&site=CZWG&site=CZYZ&site=CZUL&site=CZQM&site=CZQX&image=GFA/CLDWX&image=GFA/TURBC&image=SIG_WX//MID_LEVEL/"
+URL = "https://plan.navcanada.ca/weather/api/alpha/?site=CZVR&site=CZEG&site=CZWG&site=CZYZ&site=CZUL&site=CZQM&site=CZQX&image=GFA/CLDWX&image=GFA/TURBC&image=SIG_WX//MID_LEVEL/*&image=TURBULENCE"
 
 # the default base image URL for all the returned images
 navCan = "https://plan.navcanada.ca/weather/images/"
@@ -79,21 +79,37 @@ while i < len(imageJSON):
             # add the new data to the output
             output.update(tempArr)
         
-    # now we grab the latest CanSigWx chart
+    # now we grab the latest SigWx charts
     elif imageInfo["product"] == "SIG_WX":
         if imageInfo["sub_geography"] == "CANADA":
             tempArr = {
-                    imageInfo["product"] : navCan + str(imageInfo["frame_lists"][0]["frames"][3]["images"][0]["id"]) + ".image"                        
+                    imageInfo["product"] + "_CANADA" : navCan + str(imageInfo["frame_lists"][0]["frames"][3]["images"][0]["id"]) + ".image"                        
+            }
+
+            output.update(tempArr)
+
+        elif imageInfo["sub_geography"] == "ATLANTIC":
+            tempArr = {
+                    imageInfo["product"] + "_ATLANTIC" : navCan + str(imageInfo["frame_lists"][0]["frames"][1]["images"][0]["id"]) + ".image"                        
             }
             
             output.update(tempArr)
+
     # finally we grab the latest CanHLT chart
     elif imageInfo["product"] == "TURBULENCE":
-        tempArr = {
-                imageInfo["product"] : navCan + str(imageInfo["frame_lists"][0]["frames"][1]["images"][0]["id"]) + ".image"                        
-        }
+        if imageInfo["geography"] == "CANADA":
+            tempArr = {
+                    imageInfo["product"] + "_CANADA" : navCan + str(imageInfo["frame_lists"][0]["frames"][1]["images"][0]["id"]) + ".image"                        
+            }
         
-        output.update(tempArr)
+            output.update(tempArr)
+            
+        elif imageInfo["geography"] == "NORTH_ATLANTIC":
+            tempArr = {
+                    imageInfo["product"] + "_ATLANTIC" : navCan + str(imageInfo["frame_lists"][0]["frames"][1]["images"][0]["id"]) + ".image"                        
+            }
+        
+            output.update(tempArr)
     
     # get ready to move to the next item in the navcan list
     i += 1
