@@ -51,7 +51,7 @@ class DataController {
 
 
         // instantiate the UI in the selected mode
-        app = new UI(mode);
+        app = new UI(mode, this);
 
 
     }
@@ -81,17 +81,25 @@ class DataController {
 
         this.#data[name] = sorted;   
     }
+
+    storeTAFSite(json){
+        this.#data["taf-site"] = json;
+    }
 }
 
 class UI {
 
     #mode;
     #parent;
+    #dataController;
+    #elementList;
 
-    constructor(mode) {
+    constructor(mode, data) {
         console.log("initializing the UI running", mode, "mode...");
         this.#mode = mode;
         this.#parent = document.getElementsByTagName("main")[0];
+        this.#dataController = data;
+        this.#elementList = {};
 
         this.init();
         
@@ -99,6 +107,14 @@ class UI {
 
     get mode() {
         return this.#mode;
+    }
+
+    get dc() {
+        return this.#dataController;
+    }
+
+    get elementList(){
+        return this.#elementList;
     }
 
     init() {
@@ -120,9 +136,11 @@ class UI {
 
         console.log("parent has", p.childElementCount, "children to delete...");
         
-        while(p.childElementCount > 0){
-            p.removeChild[0];
+        while(p.firstChild){
+            p.removeChild(p.firstChild);
         }
+
+        this.#elementList = {};
 
         console.log("screen cleared!")
     }
@@ -215,11 +233,13 @@ class UI {
             output.setAttribute("id", "metar-output");
 
             this.#parent.appendChild(output);
+            this.#elementList["metars"] = output;
 
             let meta = document.createElement("section");
             meta.setAttribute("id", "site-meta");
 
             this.#parent.appendChild(meta);
+            this.#elementList["metadata"] = meta;
 
             let tafNotam = document.createElement("section");
             tafNotam.setAttribute("id", "taf-notam");
@@ -240,12 +260,13 @@ class UI {
             });
 
             ntmBtn.addEventListener("click", function(){ toggleTAFNOTAM("notam")});
-            ntmBtn.innerHTML = "NOTAM";
+            ntmBtn.innerHTML = "NOTAM (coming soon)";
 
             tafNotam.appendChild(tafbtn);
             tafNotam.appendChild(ntmBtn);
 
             this.#parent.appendChild(tafNotam);
+            this.#elementList["taf-notam"] = tafNotam;
 
 
 
@@ -265,6 +286,87 @@ class UI {
         let config = await configFile.json();
 
         console.log(config);
+    }
+
+    populateTAFData(){
+
+        let dc = this.#dataController.data["taf-site"]; 
+
+        let m = dc["metars"];
+        let d = dc["metadata"];
+        let t = dc["taf"];
+
+        for (let i = 0; i<m.length; i++) {
+            let o = document.createElement("p");
+            o.setAttribute("class", "metar-string");
+            o.innerHTML = m[i];
+            this.#elementList["metars"].appendChild(o);
+        }
+
+        /*
+
+        // this is for when we have parsed the metars into objects, for now they are strings in an array
+        for (const ob in m) {
+            let o = document.createElement("p");
+            o.setAttribute("class", "metar-string");
+            // we will add the data for the temp and wind later using
+            // o.dataset.<tt|td|ff|gg> and anything else we might want to tag
+            // we may programatically create spans throughout the <p>
+            // since we will probably parse the entirety of the METAR at some point
+            o.innerHTML = ob;
+            this.#elementList["metars"].appendChild(o);
+        }
+
+        */
+
+        for (const md in d) {
+            let o = document.createElement("span"); // not really sure why we're using a span
+            o.setAttribute("id", md);
+            o.setAttribute("class", "has-icon");
+            o.innerHTML = d[md];
+            this.#elementList["metadata"].appendChild(o);
+        }
+
+        let taf = document.createElement("p");
+        let tafMeta = document.createElement("span");
+        tafMeta.setAttribute("class", "taf-meta");
+        tafMeta.innerHTML = t["meta"];
+
+        let tafMain = document.createElement("span");
+        tafMain.setAttribute("class", "taf-main");
+        tafMain.innerHTML = t["main"];
+
+        taf.appendChild(tafMeta);
+        taf.appendChild(tafMain);
+
+        // now loop through all of the part periods and append those to the taf
+
+        for (let i = 0; i < t["part-periods"].length; i++){
+            let o = document.createElement("span");
+            if (t["part-periods"][i]["type"] == "FM"){
+                o.setAttribute("class", "taf-fm-group");
+            } else {
+                o.setAttribute("class", "taf-part-period");
+            }
+            
+            o.innerHTML = t["part-periods"][i]["raw"];
+            taf.appendChild(o);
+        }
+
+        // grab the remark if it exists
+        if (t["rmk"]) {
+            let o = document.createElement("span");
+            o.setAttribute("class", "taf-rmk");
+            o.innerHTML = t["rmk"]
+            taf.appendChild(o);
+        }
+
+        // all elements of the TAF have been added, now add the TAF to the DOM
+        app.elementList["taf-notam"].appendChild(taf);
+
+
+        
+
     }
 }
 
@@ -294,15 +396,21 @@ async function getObs() {
     let hrs = document.getElementById("hrs");
 
     site = site.value.toUpperCase();
-    hrs = hrs.value();
+    hrs = hrs.value;
     console.log("getting obs for", hrs, "hrs at", site);
 
-    let url = "/utilties/getObs.php?siteID=" + site + "&hrs=" + hrs;
+    // let url = "/utilties/getObs.php?siteID=" + site + "&hrs=" + hrs;
+
+    let url = "./data/dummy-site.json";
 
     let siteJSON = await fetch(url);
     let data = await siteJSON.json();
 
-    console.log(data);
+    app.dc.storeTAFSite(data);  // app.dc.data["taf-site"][<"metars"|"metadata"|"[taf"]>]
+    app.populateTAFData();
+
+
+    
 
 }
 
