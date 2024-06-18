@@ -12,15 +12,15 @@
         document.documentElement.className = "";
         document.documentElement.classList.add(mode);
         document.getElementById("avn-toggle").className = "";
-        document.getElementById("ca-pub-toggle").className = "";
-        document.getElementById("us-pub-toggle").className = "";
+        document.getElementById("can-toggle").className = "";
+        document.getElementById("usa-toggle").className = "";
         
-        if (mode == "ca-pub") {
-            document.getElementById("ca-pub-toggle").classList.add("selected");
+        if (mode == "can") {
+            document.getElementById("can-toggle").classList.add("selected");
         } else if (mode == "avn") {
             document.getElementById("avn-toggle").classList.add("selected");
-        } else if (mode == "us-pub") {
-            document.getElementById("us-pub-toggle").classList.add("selected");
+        } else if (mode == "usa") {
+            document.getElementById("usa-toggle").classList.add("selected");
         }
     }
 
@@ -101,7 +101,14 @@
     
     #taf-notam > p .metar-sigwx { color: var(--txtc); background: black; }
     
-    #site-meta > *::before, label[for="site-id"]::before, #load-button::before, #hrs::before, #avn-toggle::before, #ca-pub-toggle::before, #us-pub-toggle::before, #taf-notam > button::before {
+    #site-meta > *::before,
+    label[for="site-id"]::before,
+    #load-button::before,
+    #hrs::before,
+    #avn-toggle::before,
+    #can-toggle::before,
+    #usa-toggle::before,
+    #taf-notam > button::before {
         content: "";
         background-size: 100% 100%;
         padding-right: 16px;
@@ -116,20 +123,39 @@
         background-image: url("images/icons/load.png");
     }
     
-    #avn-toggle::before, #ca-pub-toggle::before, #us-pub-toggle::before, #taf-notam > button::before {
+    #avn-toggle::before,
+    #can-toggle::before,
+    #usa-toggle::before,
+    #taf-notam > button::before {
         background-size: 100% 100%;
         background-repeat: no-repeat;
         padding-right: 12px;
     }
     
-    #avn-toggle.selected::before, #ca-pub-toggle.selected::before, #us-pub-toggle.selected::before, #taf-notam > button.selected::before { filter: none; }
+    #avn-toggle.selected::before,
+    #can-toggle.selected::before,
+    #usa-toggle.selected::before,
+    #taf-notam > button.selected::before { filter: none; }
     
     #avn-toggle { border-radius: 4px 0 0 4px; border-right: none; }
-    #ca-pub-toggle { border-radius: 0; }
-    #us-pub-toggle { border-radius: 0 4px 4px 0; border-left: none; }
+    #can-toggle { border-radius: 0; }
+    #usa-toggle { border-radius: 0 4px 4px 0; border-left: none; }
     
-    #avn-toggle, #ca-pub-toggle, #us-pub-toggle, #taf-notam > button { background: var(--btninactivec); color: var(--txtc); }
-    #avn-toggle.selected, #ca-pub-toggle.selected, #us-pub-toggle.selected, #taf-notam > button.selected { background: var(--btnbgc); color: var(--txtinvc); }
+    #avn-toggle,
+    #can-toggle,
+    #usa-toggle,
+    #taf-notam > button {
+        background: var(--btninactivec);
+        color: var(--txtc);
+    }
+
+    #avn-toggle.selected,
+    #can-toggle.selected,
+    #usa-toggle.selected,
+    #taf-notam > button.selected {
+        background: var(--btnbgc);
+        color: var(--txtinvc);
+    }
     
     #site-name { display: block; font-weight: 700; }
     #site-name::before { background-image:url("images/icons/airport.png");  }
@@ -138,15 +164,28 @@
     #elevation::before { background-image:url("images/icons/mountains.png"); }
     #sun-times::before { background-image:url("images/icons/sun.png"); }
     #lat-lon::before   { background-image:url("images/icons/map.png"); }
-    #ca-pub-toggle::before { background-image:url("images/icons/can.png"); }
-    #us-pub-toggle::before { background-image:url("images/icons/usa.png"); }
+    #can-toggle::before { background-image:url("images/icons/can.png"); }
+    #usa-toggle::before { background-image:url("images/icons/usa.png"); }
     #taf-toggle::before { background-image:url("images/icons/taf.png"); }
     #notam-toggle::before { background-image:url("images/icons/notam.png"); }
     
-    #taf-notam > p { margin: 0; padding: 4px 8px; color: var(--txtinvc); background-color: var(--btnbgc); }
- /*   #taf-notam > p > span { margin: 4px 0; }*/
+    #taf-notam > p {
+        margin: 0;
+        padding: 4px 8px;
+        color: var(--txtinvc);
+        background-color: var(--btnbgc);
+    }
     
-    #taf-notam > button { margin: 0; padding: 4px; width: 50%; border: none; border-top: 1px solid black; border-bottom: 1px solid black; cursor: pointer; }
+    #taf-notam > button {
+        margin: 0;
+        padding: 4px;
+        width: 50%;
+        border: none;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        cursor: pointer;
+    }
+
     #taf-notam > button:first-of-type { border-right: 1px solid black; }
     .taf-meta { font-weight: bold; border-bottom: 1px dashed var(--txtinvc); }
     .taf-fm-group { text-indent: 16px ; }
@@ -173,7 +212,7 @@
         <option value="97">96 hrs</option>
     </select>
     <label>Units:</label>
-    <button id="avn-toggle" class="selected" onclick="toggleDisplayMode('avn')">AVN</button><button id="ca-pub-toggle" onclick="toggleDisplayMode('ca-pub')">CAN</button><button id="us-pub-toggle" onclick="toggleDisplayMode('us-pub')">USA</button>
+    <button id="avn-toggle" class="selected" onclick="toggleDisplayMode('avn')">AVN</button><button id="can-toggle" onclick="toggleDisplayMode('can')">CAN</button><button id="usa-toggle" onclick="toggleDisplayMode('usa')">USA</button>
 </nav>
 
 <section id="metar-output">
