@@ -87,7 +87,8 @@ button::before {
     padding-right: 12px;
 }
 
-button:not(.selected)::before { filter: invert(); }
+button:not(.selected)::before,
+#site-meta > *::before { filter: invert(); }
 
 #load-button::before,
 button.selected::before { filter: none; }  
@@ -172,7 +173,7 @@ section > p {
 #taf-toggle::before { background-image:url("/images/icons/taf.png"); }
 #notam-toggle::before { background-image:url("/images/icons/notam.png"); }
 
-#taf-notam > p > span { display: block; }
+#taf-notam > p > span:not(.taf-main, .taf-meta) { display: block; }
 #taf-notam > p .metar-sigwx {
     color: var(--txt-c);
     background: black;
@@ -180,8 +181,10 @@ section > p {
 #taf-notam > p {
     margin: 0;
     padding: 4px 8px;
+    /* font-size: 20px; */
 }
 
+.taf-main { margin-left: 8px; }
 .taf-meta { font-weight: bold; border-bottom: 1px dashed var(--txtinv-c); }
 .taf-fm-group { text-indent: 16px ; }
 .taf-part-period { text-indent: 32px ; }
