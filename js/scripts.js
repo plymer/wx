@@ -135,16 +135,11 @@ class UI {
         if (this.#mode == "obs") {
             // hard code this stuff, because it won't change
 
-            let f = document.createElement("form");
-            Object.assign(f, {
-                autocomplete: "off",
-                action: getObs()
-            });
-
             let n = document.createElement("nav");
 
             let lsite = document.createElement("label");
-            lsite.setAttribute("for", "side-id");
+            lsite.setAttribute("for", "site-id");
+            lsite.setAttribute("class", "has-icon");
             lsite.innerHTML = "Site ID:";
 
             n.appendChild(lsite);
@@ -158,11 +153,23 @@ class UI {
                 id: "site-id"
             });
 
+            i.addEventListener("keyup", function(e){
+                if (e.key === "Enter") {
+                    getObs();
+                }
+            });
+
             n.appendChild(i);
 
             let load = document.createElement("button");
-            load.setAttribute("type", "submit");
-            load.setAttribute("id", "load-button");
+            Object.assign(load, {
+                type: "submit",
+                id: "load-button",
+                classList: "has-icon"
+            });
+            load.addEventListener("click", function(){ getObs(); });
+
+            load.innerHTML = "Load"
 
             n.appendChild(load);
 
@@ -193,14 +200,16 @@ class UI {
             modes.forEach(m => {
                 let btog = document.createElement("button");
                 btog.setAttribute("id", m + "-toggle");
-                btog.innerHTML = m;
+                btog.setAttribute("class", "has-icon");
+                if (m == "avn") {
+                    btog.setAttribute("class", "has-icon selected");
+                }
+                btog.innerHTML = m.toUpperCase();
                 btog.addEventListener("click", function(){toggleObsDecode(m)});
                 n.appendChild(btog);
             });
 
-            f.appendChild(n);
-
-            this.#parent.appendChild(f);
+            this.#parent.appendChild(n);
 
             let output = document.createElement("section");
             output.setAttribute("id", "metar-output");
@@ -218,7 +227,7 @@ class UI {
             let tafbtn = document.createElement("button");
             Object.assign(tafbtn, {
                 id: "taf-toggle",
-                class: "selected"
+                classList: "has-icon selected"
             });
 
             tafbtn.addEventListener("click", function(){ toggleTAFNOTAM("taf")});
@@ -226,8 +235,8 @@ class UI {
             
             let ntmBtn = document.createElement("button");
             Object.assign(ntmBtn, {
-                id: "taf-toggle",
-                class: "selected"
+                id: "notam-toggle",
+                classList: "has-icon"
             });
 
             ntmBtn.addEventListener("click", function(){ toggleTAFNOTAM("notam")});
@@ -261,12 +270,45 @@ class UI {
 
 function toggleObsDecode(mode) {
     console.log("changing obs decode mode to", mode);
+
+    document.documentElement.classList.remove("can");
+    document.documentElement.classList.remove("avn");
+    document.documentElement.classList.remove("usa");
+    document.documentElement.classList.add(mode);
+    document.getElementById("avn-toggle").classList.remove("selected");
+    document.getElementById("can-toggle").classList.remove("selected");
+    document.getElementById("usa-toggle").classList.remove("selected");
+    
+    if (mode == "can") {
+        document.getElementById("can-toggle").classList.add("selected");
+    } else if (mode == "avn") {
+        document.getElementById("avn-toggle").classList.add("selected");
+    } else if (mode == "usa") {
+        document.getElementById("usa-toggle").classList.add("selected");
+    }
+    
 }
 
-function getObs() {
+async function getObs() {
+    let site = document.getElementById("site-id");
+    let hrs = document.getElementById("hrs");
+
+    site = site.value.toUpperCase();
+    hrs = hrs.value();
+    console.log("getting obs for", hrs, "hrs at", site);
+
+    let url = "/utilties/getObs.php?siteID=" + site + "&hrs=" + hrs;
+
+    let siteJSON = await fetch(url);
+    let data = await siteJSON.json();
+
+    console.log(data);
 
 }
 
 function toggleTAFNOTAM(mode) {
     console.log(mode);
+
+    
+
 }

@@ -1,0 +1,197 @@
+:root {
+    --bg-c: #007399;
+    /* --bgc: #000000; */
+    /* --bgc: #800b00; */
+    /* --bgc: #ff4433; */
+    /* --bgc: #008000; */
+
+    --infobg-c: #333333;
+    --btnbg-c: #eeeeee;
+    --btninactive-c: #444444;
+    --txt-c: #ffffff;
+    --txtinv-c: #000000;
+    --txtbg-c: #eeeeee;
+
+    --px1border: 1px solid black;
+}
+
+body > main { background: var(--bg-c); }
+
+main > nav, #site-meta {
+    background-color: var(--infobg-c);
+    color: white;
+    padding: 8px;
+    border-bottom: 2px solid black;
+}
+
+.has-icon::before {
+    content: "";
+    background-size: 100% 100%;
+    padding-right: 16px;
+    margin-right: 4px;
+}
+
+nav > input {
+    text-transform: uppercase;
+    font-family: "Sometype Mono", monospace;
+    text-align: center;
+    background-color: var(--txtbg-c);
+}
+
+nav > input, nav > select, nav > label { margin-left: 4px; margin-right: 4px; }
+nav > label:last-of-type { margin-right: 8px; }
+    
+
+
+nav > button,
+nav > select,
+section > button { 
+    font-family: inherit;
+}
+
+nav > button,
+nav > select,
+section > button {
+    cursor: pointer;
+}
+
+nav > input,
+nav > button,
+nav > select,
+section > button {
+    border: var(--px1border);
+    padding: 4px;
+    border-radius: 4px;
+}
+
+nav > button,
+section > button {
+    background-color: var(--btninactive-c);
+}
+
+nav > button,
+section > button {
+    color: var(--txt-c);
+    background-color: var(--btninactive-c);
+}
+
+#load-button,
+button.selected {
+    background: var(--btnbg-c);
+    color: var(--txtinv-c);
+}
+
+button::before {
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    padding-right: 12px;
+}
+
+button:not(.selected)::before { filter: invert(); }
+
+#load-button::before,
+button.selected::before { filter: none; }  
+
+label[for="site-id"]::before { background-image:url("/images/icons/search.png"); filter: invert();}
+#load-button::before {
+    background-size: 80% 100%;
+    background-repeat: no-repeat;
+    background-image: url("/images/icons/load.png");
+}
+
+#avn-toggle::before { background-image:url("/images/icons/plane.png"); }
+#can-toggle::before { background-image:url("/images/icons/can.png"); }
+#usa-toggle::before { background-image:url("/images/icons/usa.png"); }
+
+
+#metar-output { min-height: 240px; }
+
+
+section > p {
+    white-space: pre-wrap;
+    font-family: "Sometype Mono", monospace;
+    margin: 0;
+    padding: 0 8px;
+}
+
+.metar-string:nth-of-type(2n) {
+    background: rgba(255,255,255,0.6);
+    color: var(--txtinv-c);
+}
+.metar-string { padding: 4px 8px; background: rgba(255,255,255,0.3); }
+
+.metar-sigwx:not(.aviation) {
+    font-weight: bold;
+    color: black;
+    background: white;
+    padding: 0 2px;
+    border-radius: 4px;
+}
+
+:root.avn > body > section > p > .metar-sigwx.aviation {
+    font-weight: bold;
+    color: var(--txtinv-c);
+    background: white;
+    padding: 0 2px;
+    border-radius: 4px;
+}
+
+
+
+#site-meta {
+    border-top: 2px solid black;
+    margin: 0;
+    text-align: center;
+    border-bottom: none;
+}
+
+#site-name { display: block; font-weight: 700; }
+#site-name::before { background-image:url("/images/icons/airport.png");  }
+#lat-lon::before   { background-image:url("/images/icons/map.png"); }
+#elevation::before { background-image:url("/images/icons/mountains.png"); }
+#sun-times::before { background-image:url("/images/icons/sun.png"); }
+
+
+
+
+#taf-notam {
+    min-height: 120px;
+    color: var(--txtinv-c);
+    background-color: var(--btnbg-c);
+}
+
+#taf-notam > button {
+    width: 50%;
+    border-radius: 0;
+    border: none;
+    border-top: var(--px1border);
+    border-bottom: var(--px1border);
+}
+
+#taf-notam > button:first-of-type { border-right: var(--px1border); }
+#taf-toggle::before { background-image:url("/images/icons/taf.png"); }
+#notam-toggle::before { background-image:url("/images/icons/notam.png"); }
+
+#taf-notam > p > span { display: block; }
+#taf-notam > p .metar-sigwx {
+    color: var(--txt-c);
+    background: black;
+}
+#taf-notam > p {
+    margin: 0;
+    padding: 4px 8px;
+}
+
+.taf-meta { font-weight: bold; border-bottom: 1px dashed var(--txtinv-c); }
+.taf-fm-group { text-indent: 16px ; }
+.taf-part-period { text-indent: 32px ; }
+.taf-rmk { text-indent: 16px ; }
+
+
+
+
+
+#avn-toggle { border-radius: 4px 0 0 4px; border-right: none; }
+#can-toggle { border-radius: 0; }
+#usa-toggle { border-radius: 0 4px 4px 0; border-left: none; }
+
