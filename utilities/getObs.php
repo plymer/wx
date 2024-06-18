@@ -1,129 +1,190 @@
 <?php
 
+$metarOutput;
+$tafOutput;
+$siteMetaOutput;
+
 // allows the script to be run via CLI or invoked via URL
 
 if (@$argc == 3) {
-	$ident = strtoupper($argv[1]);
-	$numHrs = $argv[2];
+    $ident = strtoupper($argv[1]);
+    $numHrs = $argv[2];
 } elseif (@$argc != 0) {
-	echo "error: invalid arguments. this function requires two arguments - IDENT and NUMHRS";
-	return;
+    echo "error: invalid arguments. this function requires two arguments - IDENT and NUMHRS";
+    return;
 } else {
-	// input variables passed through the URL request from getObs function
-	$ident = strtoupper($_GET['siteID']);
-	$numHrs = $_GET['hrs'];
+    // input variables passed through the URL request from getObs function
+    $ident = strtoupper($_GET['siteID']);
+    $numHrs = $_GET['hrs'];
 }
 
-$tafWrapPattern = "/(TEMPO|PROB30|PROB40|BECMG)/";
 
-if ($ident === "ILY") {
-	$randNum = rand(0,6);
-	if ($randNum == 0) {
-		echo "<h2>I love you too, Heather Lynn &lt;3</h2>";
-		return;
-	} else if ($randNum == 1) {
-		echo "<h2>You are my sunshine - I love you!</h2>";
-		return;
-	}	else if ($randNum == 2) {
-		echo "<h2>Je t'aime, ma belle &lt;3</h2>";
-		return;
-	} else if ($randNum == 3) {
-		echo "<h2>IFLYRB!</h2>";
-		return;
-	} else if ($randNum == 4) {
-		echo "<h2>You are my wife, my best friend, my partner in crime, and the absolute love of my life &lt;3</h2>";
-		return;
-	} else if ($randNum == 5) {
-		echo "<h2>I love you right back... have an amazing day babu &lt;3</h2>";
-		return;
-	} else if ($randNum == 6) {
-		echo "<h2>Babu, you are the freaking best &lt;3 I'll love you until the end of time!</h2>";
-		return;
-	}
-
-
-}
 
 if (strlen($ident) == 3) {
-	// guesses that you're looking for a Canadian site
-	$ident = "C" . $ident;
+    // guesses that you're looking for a Canadian site
+    $ident = "C" . $ident;
 } else if ((strlen($ident) < 3) || (strlen($ident) > 4)) {
-	// need a 3- or 4-character Ident
-	echo "Unable to retrieve data. Please enter a valid 3- or 4-character Identifier.";
-	return;
+    // need a 3- or 4-character Ident
+    echo "Unable to retrieve data. Please enter a valid 3- or 4-character Identifier.";
+    return;
 }
 
 // build the URL
 // avwx.gov updated on 2023-10-16 to a new retrieval method
-$metarURL = "https://aviationweather.gov/cgi-bin/data/metar.php?ids={$ident}&hours={$numHrs}";
+
+// we tweak the ident here for Eureka, NU since the ob is WEU and TAF is YEU
+if ($ident == "CWEU") {
+    $ident = "CYEU";
+}
+
 $tafURL = "https://aviationweather.gov/cgi-bin/data/taf.php?ids={$ident}";
 
+if ($ident == "CYEU") {
+    $ident = "CWEU";
+}
+
+$metarURL = "https://aviationweather.gov/cgi-bin/data/metar.php?ids={$ident}&hours={$numHrs}";
+
+$metaURL = "https://aviationweather.gov/cgi-bin/data/location.php?id={$ident}";
+
+// check if metars exist
 if (file_get_contents($metarURL) == false) {
-	// we probably don't have a good internet connection, or something got borked along the way
-	// get out now, while we still can
-	echo "<strong>Something went wrong - we can't contact the ADDS.</strong>";
-	return;
-}
-
-// if we've made it this far, everything is working as intended
-
-// grab the json file for the station list and nab the metadata for the site
-$metaJSON = file_get_contents("https://aviationweather.gov/cgi-bin/data/location.php?id={$ident}");
-$metaJSON = json_decode($metaJSON, true);
-
-$siteName = $metaJSON["site"];
-$siteLat = round($metaJSON["lat"], 1);
-$siteLon = round($metaJSON["lon"], 1);
-$siteElevF = round($metaJSON["elev"] * 3.281);
-$siteElevM = $metaJSON["elev"];
-
-ob_start();
-$command = "/home/ryanpimi/virtual_env/bin/python3 /home/ryanpimi/public_html/wx/utilities/sun-calc.py " . $siteLat . " " . $siteLon;
-passthru($command);
-$sunTimes = ob_get_contents();
-ob_end_clean();
-
-$siteLat = ($siteLat > 0) ? $siteLat . "&#176;N" : ($siteLat * -1) . "&#176;S";
-$siteLon = ($siteLon > 0) ? $siteLon . "&#176;E" : ($siteLon * -1) . "&#176;W";
-
-// grab the TAF (if it exists)
-$taf = file_get_contents($tafURL);
-$tafString = "";
-$delta = 0;
-
-if ($taf) {
-	$taf = strip_tags($taf);
-	$tafString =  "<div class=\"taf-content\"><span class=\"taf-main\">";
-	$taf = preg_replace($tafWrapPattern, "</span><span class=\"taf-part-period\">$0", $taf);
-	$taf = preg_replace("/FM\d{6}/", "</span><span class=\"taf-fm-group\">$0", $taf);
-	$taf = preg_replace("/RMK/", "</span><span class=\"taf-rmk\">$0", $taf);
-	$taf = preg_replace("/ TAF/", "", $taf);
-	$tafString = $tafString . trim($taf) . "</span></div>";
-	$delta = 1;
+    $metarOutput = array("metars" => "No METARs available for {$ident}.");
 } else {
-	$taf = "No TAF found for {$ident}.";
-	$delta = 0;
+    // grab the METARs
+    $metars = file_get_contents($metarURL);
+    $metars = explode($ident, $metars);
+    $numOfMETARS = count($metars)-1;
+    $temp = array();
+
+    for ($i = $numOfMETARS; $i > 0; $i--) {
+        $temp[] =  $ident . " " . trim($metars[$i]);
+    }
+
+    $metarOutput = array("metars" => $temp);
 }
 
-// grab the METARs
-$metars = file_get_contents($metarURL);
-$metars = explode($ident, $metars);
-$numOfMETARS = count($metars);
+if (file_get_contents($metaURL) == false) {
+    $metaOutput = array("metadata" => "No metadata availavle for {$ident}.");
+    } else {
+    // grab the json file for the station list and nab the metadata for the site
+    $metaJSON = file_get_contents($metaURL);
+    $metaJSON = json_decode($metaJSON, true);
 
-echo "<div class=\"metar-list\">";  // start the METAR list
-for ($i = $numOfMETARS; $i > $delta; $i--) {
-	$metars[$i-$delta] = preg_replace("/ TAF/", "", $metars[$i-$delta]);
-	echo "  <span class=\"metar-string\">" . $ident . " " . trim($metars[$i-$delta]) . "</span>";
+    $siteName = $metaJSON["site"];
+    $siteLat = round($metaJSON["lat"], 2);
+    $siteLon = round($metaJSON["lon"], 2);
+    $siteElevF = round($metaJSON["elev"] * 3.281);
+    $siteElevM = $metaJSON["elev"];
+
+    ob_start();
+    $command = "/home/ryanpimi/virtual_env/bin/python3 /home/ryanpimi/public_html/wx/utilities/sun-calc.py " . $siteLat . " " . $siteLon;
+    passthru($command);
+    $sunTimes = ob_get_contents();
+    ob_end_clean();
+
+    $siteLat = ($siteLat > 0) ? $siteLat . "&#176;N" : ($siteLat * -1) . "&#176;S";
+    $siteLon = ($siteLon > 0) ? $siteLon . "&#176;E" : ($siteLon * -1) . "&#176;W";
+
+    $metaOutput = array(
+        "metadata" => array(
+            "site-name" => $siteName,
+            "lat-lon" => "{$siteLat} {$siteLon}",
+            "elevation" => "{$siteElevF} ft  / {$siteElevM} m",
+            "sun-times" => $sunTimes
+        )
+    );
 }
-echo "</div>";                      // close the METAR list
 
-// output the metadata
-echo "<div class=\"site-meta\"><span id=\"site-name\">{$siteName}</span><span id=\"lat-lon\">{$siteLat} {$siteLon}</span><span 
-id=\"elevation\">{$siteElevF}ft / {$siteElevM}m</span><span id=\"sun-times\">{$sunTimes}</span></div>";
+if (file_get_contents($tafURL) == false) {
+    $tafOutput = array("taf" => "No TAF available for {$ident}.");
+} else {
+// grab the TAF (if it exists)
+    $taf = file_get_contents($tafURL);
+    $tafString = "";
 
-// print the TAF (if necessary)
-echo $tafString;
+    $partPeriodPattern = "/(TEMPO.+|PROB30.+|PROB40.+|BECMG.+|FM\d{6}.+)/";
+    $tafMetaPattern = "/((?:TAF\s)?(?:AMD\s)?(\w{4}\s\d{6}Z\s\d{4}\/\d{4}))/";
+    $tafMainPattern = "/(((\d{5}|VRB\d{2})(G\d{2})?(KT.+)))/";
+    $windDecode = "(((\d{3}|VRB)(\d{2})(G\d{2})?(KT)))";
+    $visDecode = "((P?\d\s?\d?\/?\d?)(SM))";
+    // we will deal with the cigs & cb decode later
+    // $cigDecode = "((BKN|OVC|VV)([0]{2}\d))";
+    // $cbCloudDecode = "(\w{2,3}\d{3}CB)";
+    $fzPcpnDecode = "((-|\+|\s)(FZRA|PL|SNPL|FZRASN|FZDZ))";
+    $tsDecode = "((-|\+)?(TSFZRAPL|TSFZRA|TSRAGR|TSRASN|TSRA|TSSN|TSGR|VCTS|TS))";
+
+    $sigWxDecode = "/{$windDecode}{$visDecode}{$fzPcpnDecode}{$tsDecode}/";
+
+    
+    $taf = strip_tags($taf);
+
+    // save and then strip the remark out first
+    if(preg_match("/RMK.+/", $taf)) {
+        preg_match("/RMK.+/", $taf, $matches);
+        $rmk = $matches[0];
+        $taf = preg_replace("/RMK.+/", "", $taf);
+    } else {
+        $rmk = null;
+    }
+
+    preg_match($tafMetaPattern, $taf, $matches);
+    $tafMeta = trim($matches[2]);
+
+    // match and decode the main condition
+    preg_match($tafMainPattern, $taf, $matches);
+    $tafMainRaw = trim($matches[2]);
+
+    // echo $sigWxDecode;
+    // preg_match_all($sigWxDecode, $tafMainRaw, $matches);
+    // print_r($matches);
+
+    
+    
+    $partPeriods = [];
+    preg_match_all($partPeriodPattern, $taf, $matches);    
+
+    for ($i = 0; $i < count($matches[0]); $i++) {
+        
+        preg_match("/(TEMPO|PROB30|PROB40|BECMG|FM)/", $matches[0][$i], $pp);
+
+        $parperType = $pp[0];
+        $parperText = trim($matches[0][$i]);
+
+        $partPeriod = array($parperType => $parperText);
+
+        array_push($partPeriods, $partPeriod);
+        
+    }
+    
 
 
+
+
+    $tafString = array("meta" => $tafMeta, "main" => $tafMainRaw, "part-periods" => $partPeriods, "rmk" => $rmk);
+    
+
+    $tafOutput = array("taf" => $tafString);
+       
+}
+
+// this output is not 100% valid, the metars are not in the correct format
+
+/*
+
+{
+    metars : []
+},{   <--- this is the issue here
+    metadata ...
+}...
+
+
+*/
+
+$jsonOutput = json_encode($metarOutput, JSON_PRETTY_PRINT) . ","
+    .json_encode($metaOutput, JSON_PRETTY_PRINT) . ","
+    .json_encode($tafOutput, JSON_PRETTY_PRINT);
+
+echo $jsonOutput;
 
 ?>
