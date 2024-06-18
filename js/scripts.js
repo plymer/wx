@@ -399,9 +399,9 @@ async function getObs() {
     hrs = hrs.value;
     console.log("getting obs for", hrs, "hrs at", site);
 
-    // let url = "/utilties/getObs.php?siteID=" + site + "&hrs=" + hrs;
+    let url = "/utilties/getObs.php?siteID=" + site + "&hrs=" + hrs;
 
-    let url = "./data/dummy-site.json";
+    // let url = "./data/dummy-site.json";
 
     let siteJSON = await fetch(url);
     let data = await siteJSON.json();
