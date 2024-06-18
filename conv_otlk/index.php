@@ -41,7 +41,7 @@
         </section>
       </div><!--paneLink-->
       <div class="paneContent">
-        <img class="bc-yt" src="images/today/pspc/bc-yt-day_1.png" />
+        <img class="bc-yt" src="images/today/pspc/bc-yt-day_1.png?<?php echo time(); ?>" />
       </div><!--paneContent"-->
   </div><!--bc-yt-->
     <div class="mk-mk hidden">
@@ -56,7 +56,7 @@
       <div class="paneContent">
         <div class="flex-container">
           <div class="graphic flex-item">
-            <img class="mk-mk" src="images/today/paspc/mk-mk-day_1.png" />
+            <img class="mk-mk" src="images/today/paspc/mk-mk-day_1.png?<?php echo time(); ?>" />
           </div><!--graphic-->
           <div class="text-area flex-item">
               <div class="textlinks">
@@ -81,7 +81,7 @@
       <div class="paneContent">
         <div class="flex-container">
           <div class="graphic flex-item">
-            <img class="prairies" src="images/today/paspc/prairies-day_1.png" />
+            <img class="prairies" src="images/today/paspc/prairies-day_1.png?<?php echo time(); ?>" />
           </div><!--graphic-->
           <div class="text-area flex-item">
               <div class="textlinks">
@@ -104,7 +104,7 @@
         </section>
       </div><!--paneLink-->
       <div class="paneContent">
-        <img class="on" src="images/today/ospc/on-day_1.png" />
+        <img class="on" src="images/today/ospc/on-day_1.png?<?php echo time(); ?>" />
       </div><!--paneContent"-->
     </div><!--on-->
     <div class="qc hidden">
@@ -116,7 +116,7 @@
         </section>
       </div><!--paneLink-->
       <div class="paneContent">
-        <img class="qc" src="images/today/qspc/qc-day_1.png" />
+        <img class="qc" src="images/today/qspc/qc-day_1.png?<?php echo time(); ?>" />
       </div><!--paneContent"-->
   </div><!--qc-->
     <div class="atlantic hidden">
@@ -129,7 +129,7 @@
         </section>
       </div><!--paneLink-->
       <div class="paneContent">
-        <img class="atlantic" src="images/today/aspc/atlantic-day_1.png" />
+        <img class="atlantic" src="images/today/aspc/atlantic-day_1.png?<?php echo time(); ?>" />
       </div><!--paneContent"-->
   </div><!--atlantic-->
         <div class="user">

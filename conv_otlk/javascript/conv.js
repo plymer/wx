@@ -34,6 +34,8 @@ function changeSector (sectorID) {
 
 
 function changePane (paneTime) {
+	var d = new Date();
+	var t = d.getTime();
 	var currSector = document.getElementsByClassName(activeSector);
 	var currTime = document.getElementsByClassName('subnav');
 
@@ -45,7 +47,7 @@ function changePane (paneTime) {
 		}
 	}
 
-	currSector[img].src = "images/today/" + activeOffice + "/" + activeSector + "-" + paneTime + ".png";
+	currSector[img].src = "images/today/" + activeOffice + "/" + activeSector + "-" + paneTime + ".png?" + t;
 	activePane = paneTime;
 	if ((activeSector == 'prairies') || (activeSector == 'mk-mk')) {
 		changeText(activeText);
