@@ -1,14 +1,14 @@
 { 
   "wvr" : {
-    "longname" : "Pacfic Storm Prediction Centre",
-    "shortname" : "PSPC",
+    "longtext" : "Pacfic Storm Prediction Centre",
+    "shorttext" : "PSPC",
     "city" : "Vancouver",
     "products" : [],
     "warnings" : []
   },
   "wwg" : {
-    "longname" : "Prairie and Arctic Storm Prediction Centre - Winnipeg",
-    "shortname" : "PASPC-Wpg",
+    "longtext" : "Prairie and Arctic Storm Prediction Centre - Winnipeg",
+    "shorttext" : "PASPC-Wpg",
     "city" : "Winnipeg",
     "products" : [
       {
@@ -45,8 +45,8 @@
     "warnings" : ["MB","SK","NU"]
   },
   "weg" : {
-    "longname" : "Prairie and Arctic Storm Prediction Centre - Edmonton",
-    "shortname" : "PASPC-Edm",
+    "longtext" : "Prairie and Arctic Storm Prediction Centre - Edmonton",
+    "shorttext" : "PASPC-Edm",
     "city" : "Edmonton",
     "products" : [
       {
