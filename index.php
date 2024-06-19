@@ -58,12 +58,6 @@
 <div id="burger-menu-container" class="hidden">
   <ul>
     <li class="show-pointer" onclick="togglePubOffice()">&#187; Switch Public Office</li>
-    <li class="show-pointer" onclick="toggleOverlay('<?php getChartURL(0); ?>')">&#187; CanSigWx</li>
-    <li class="show-pointer" onclick="toggleOverlay('<?php getChartURL(1); ?>')">&#187; Canadian HLT</li>
-    <li class="show-pointer" onclick="toggleOverlay('<?php getChartURL(2); ?>')">&#187; N. Atl SigWx</li>
-    <li class="show-pointer" onclick="toggleOverlay('<?php getChartURL(3); ?>')">&#187; 11Z N. Atl HLT</li>
-    <li class="show-pointer" onclick="toggleOverlay('<?php getChartURL(4); ?>')">&#187; 00Z N. Atl HLT</li>
-    <li>&#187; Options</li>
   </ul>
 </div>
 
