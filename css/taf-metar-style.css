@@ -17,7 +17,7 @@
 
 body > main { background: var(--bg-c); }
 
-main > nav, #site-meta {
+main > nav, main > section > nav, #site-meta {
     background-color: var(--infobg-c);
     color: white;
     padding: 8px;

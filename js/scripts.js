@@ -323,34 +323,164 @@ class UI {
 
         let config = this.#configController[this.#mode];
 
+        // set up the section that will contain all of the nav elements for the navigation of products
+        let s = document.createElement("section");
+        s.setAttribute("id", "product-nav");
+
         let n = document.createElement("nav");
 
         if (this.#mode == "avn") {
 
             if (this.#submode == "gfa") {
+
+                n.setAttribute("id", "gfa-region-controller");
+
+                // set some default values if the user has never accessed the GFAs before
+                if(!localStorage.getItem("gfaRegion")) {
+                    localStorage.setItem("gfaRegion", "GFACN31");
+                }
+
+                if (!localStorage.getItem("avnTimeStep")) {
+                    localStorage.setItem("avnTimeStep", "0");
+                }
+
+                if (!localStorage.getItem("avnProdType")) {
+                    localStorage.setItem("avnProdType", "cldwx");
+                }
+                
                 for (const product in config["gfa"]) {
                     let b = document.createElement("button");
                     b.dataset.shorttext = config["gfa"][product]["shorttext"];
                     b.dataset.longtext = config["gfa"][product]["longtext"];
                     b.setAttribute("id", config["gfa"][product]["id"]);
-                    b.setAttribute("class", "text-changes");
-                    b.addEventListener("click", function(){ console.log("changing to", this.getAttribute("id"))});
+                    b.setAttribute("class", "text-changes region-control");
+
+                    if (b.getAttribute("id") == localStorage.getItem("gfaRegion")) {
+                        b.classList.add("selected");
+                    }
+
+                    b.addEventListener("click", function(){
+                        console.log("changing to", this.getAttribute("id"));
+                        
+                        localStorage.setItem("gfaRegion", this.getAttribute("id"));
+                        
+                        let rb = document.querySelectorAll(".region-control");
+                        rb.forEach(rbtn => { rbtn.classList.remove("selected"); });
+                        this.classList.add("selected");
+
+                        // add function to change the UI to show the buttons for time & type, and update the image
+
+                        app.buildProductSelectors();
+
+                        let t = document.getElementById(localStorage.getItem("avnProdType") + "-" + localStorage.getItem("avnTimeStep"));
+                        app.updateCMACGraphic(t.dataset.url);
+
+                    });
     
                     n.appendChild(b);
+
                 }
+
+                
+
+
+                // end of gfa mode
             } else if (this.#submode == "upper") {
                 // do other
             }
 
-        this.#parent.appendChild(n);
-            
+            s.appendChild(n);
+            this.#parent.appendChild(s);
+            // now we build the product selectors and append them to the section
+            this.buildProductSelectors();
+                            
+            const img = document.createElement("img");
+            img.setAttribute("id", "cmac-graphic");
+            this.#parent.appendChild(img);
+
+            // get the URL for the selected panel and build the img src
+            let t = document.getElementById(localStorage.getItem("avnProdType") + "-" + localStorage.getItem("avnTimeStep"));
+            this.updateCMACGraphic(t.dataset.url);
 
 
-
-
+            // end of aviation mode ui setup
         }
 
 
+
+
+    }
+
+    buildProductSelectors() {
+
+        let s = document.getElementById("product-nav");
+
+        // remove the nav element we may have built previously
+        const oldn = document.querySelectorAll(".time-type-control");
+
+        oldn.forEach(o => {
+            s.removeChild(o);
+        });
+        
+
+        let selectedRegion = localStorage.getItem("gfaRegion");
+        let selectedTime = localStorage.getItem("avnTimeStep");
+        let selectedType = localStorage.getItem("avnProdType");
+
+
+
+        console.log("building product selectors for", selectedRegion + "...");
+        
+        const products = app.dc.data[this.#submode][selectedRegion];
+        
+        for (const panel in products) {
+            const n = document.createElement("nav");
+            n.setAttribute("class", "time-type-control");
+
+            for (let i = 0; i < products[panel].length; i++) {
+                let rb = document.createElement("button");
+                rb.setAttribute("id", panel.toLowerCase() +"-" + i);
+                rb.dataset.timestep = i;
+                rb.dataset.product = panel.toLowerCase();
+
+                rb.setAttribute("class", "product-control " + panel.toLowerCase());
+                rb.dataset.url = products[panel][i];
+
+                if (rb.dataset.timestep == selectedTime && rb.dataset.product == selectedType) {
+                    rb.classList.add("selected");
+                }
+                rb.addEventListener("click", function(){
+                    console.log("changing product to", selectedRegion, panel, i*6);
+
+                    localStorage.setItem("avnProdType", this.dataset.product);
+                    selectedType = localStorage.getItem("avnProdType");
+                    localStorage.setItem("avnTimeStep", this.dataset.timestep);
+                    selectedTime = localStorage.getItem("avnTimeStep");
+
+                    let tb = document.querySelectorAll(".product-control");
+                    tb.forEach(tbtn => { tbtn.classList.remove("selected") });
+                    this.classList.add("selected");
+                    
+                    // add function to change the UI to update the image
+                    app.updateCMACGraphic(rb.dataset.url);
+                    
+                });
+                rb.innerHTML = "T+" + i*6;
+
+                n.appendChild(rb);
+
+            }
+            
+            s.appendChild(n);    
+            
+        }
+        
+
+    }
+
+    updateCMACGraphic(url){
+        const img = document.getElementById("cmac-graphic");
+        img.setAttribute("src", url);
     }
 
     populateTAFData(){
