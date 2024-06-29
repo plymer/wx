@@ -28,6 +28,8 @@ if ($bulletin == "focn45") {
 
 
 } else {
+	// API Link -----
+	// https://api.weather.gc.ca/collections/bulletins-realtime/items?f=json&lang=en-CA&limit=50&properties=datetime,identifier,issuer_code,issuing_office,type,url&issuer_code=CWTO&type=FP&datetime=2024-06-20
 	$fxURL = "https://weather.gc.ca/forecast/public_bulletins_e.html?Bulletin=" . $bulletin . "." . $office;
 	curl_setopt($ch, CURLOPT_URL, $fxURL);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

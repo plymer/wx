@@ -369,6 +369,10 @@ class UI {
         }
 
         /*
+        // THIS IS HUUUUUUUUUUUUUUUUUGE!!!!!
+        // https://aviationweather.gov/api/data/metar?ids=cyeg&format=json&taf=false&hours=24
+        // https://aviationweather.gov/api/data/taf?ids=cyeg&format=json
+        // this is fully decoded METARs/TAFs !!!!!!!!!!!!!!!!!
 
         // this is for when we have parsed the metars into objects, for now they are strings in an array
         for (const ob in m) {
