@@ -153,21 +153,22 @@ section > p {
 #sun-times::before { background-image:url("/images/icons/sun.png"); }
 
 
+#taf-notam { min-height: 120px; }
 
-
-#taf-notam {
-    min-height: 120px;
+#taf-notam, #tafplus > p {
     color: var(--txtinv-c);
     background-color: var(--btnbg-c);
 }
 
-#taf-notam > button {
+#taf-notam > button, #tafplus > button {
     width: 50%;
     border-radius: 0;
     border: none;
     border-top: var(--px1border);
     border-bottom: var(--px1border);
 }
+
+#tafplus > button { width: 25%; }
 
 #taf-notam > button:first-of-type { border-right: var(--px1border); }
 #taf-toggle::before { background-image:url("/images/icons/taf.png"); }

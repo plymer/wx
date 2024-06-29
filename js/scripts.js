@@ -331,6 +331,10 @@ class UI {
 
         if (this.#mode == "avn") {
 
+            if(!localStorage.getItem("hub")) {
+                localStorage.setItem("hub", "CYYC");
+            }
+
             if (this.#submode == "gfa") {
 
                 n.setAttribute("id", "gfa-region-controller");
@@ -391,16 +395,96 @@ class UI {
 
             s.appendChild(n);
             this.#parent.appendChild(s);
+            this.#elementList["product-nav"] = s;
             // now we build the product selectors and append them to the section
             this.buildProductSelectors();
                             
             const img = document.createElement("img");
             img.setAttribute("id", "cmac-graphic");
             this.#parent.appendChild(img);
+            this.#elementList["cmac-graphic"] = img;
 
             // get the URL for the selected panel and build the img src
             let t = document.getElementById(localStorage.getItem("avnProdType") + "-" + localStorage.getItem("avnTimeStep"));
             this.updateCMACGraphic(t.dataset.url);
+            
+
+            // now we want to add the taf discussions to the UI
+
+            let td = document.createElement("section");
+            td.setAttribute("id", "tafplus");
+
+            let title = document.createElement("h1");
+            title.innerHTML = "Hub TAF Discussions";
+            title.setAttribute("class", "has-icon")
+
+            td.appendChild(title);
+
+
+            // now lets create all the buttons what we can click to select one of the hubs
+            let hubs = app.dc.data["tafplus"];
+
+            for (const h in hubs) {
+
+                const b = document.createElement("button");
+                b.innerHTML = h;
+                b.setAttribute("id", h+"-plus");
+                b.setAttribute("class", "tafplus-hub")
+                b.dataset.hub = h;
+
+                if (b.dataset.hub == localStorage.getItem("hub")){
+                    b.classList.add("selected");
+                }
+
+                b.addEventListener("click", function(){
+                    localStorage.setItem("hub", this.dataset.hub);
+
+                    let tb = document.querySelectorAll(".tafplus-hub");
+                    tb.forEach(tbtn => { tbtn.classList.remove("selected"); });
+                    this.classList.add("selected");
+
+                    app.parseTAFPlus(this.dataset.hub);
+                });
+
+                td.appendChild(b);
+
+            }
+
+            let header = document.createElement("h2");
+            header.innerHTML = "Header:";
+            td.appendChild(header);
+
+            let headerText = document.createElement("p");
+            headerText.setAttribute("id", "tafplus-header-text");
+            headerText.setAttribute("class", "tafplus-content");
+            this.#elementList["tafplus-header"] = headerText;
+            td.appendChild(headerText);
+
+            let discuss = document.createElement("h2");
+            discuss.innerHTML = "Discussion:";
+            td.appendChild(discuss);
+
+            let discussText = document.createElement("p");
+            discussText.setAttribute("id", "tafplus-discussion-text");
+            discussText.setAttribute("class", "tafplus-content");
+            this.#elementList["tafplus-discussion"] = discussText;
+            td.appendChild(discussText);
+
+            let forecaster = document.createElement("h2");
+            forecaster.innerHTML = "Forecaster:";
+            td.appendChild(forecaster);
+
+            let forecasterText = document.createElement("p");
+            forecasterText.setAttribute("id", "tafplus-forecaster-text");
+            forecasterText.setAttribute("class", "tafplus-content");
+            this.#elementList["tafplus-forecaster"] = forecasterText;
+            td.appendChild(forecasterText);
+
+            this.#parent.appendChild(td);
+
+            this.parseTAFPlus(localStorage.getItem("hub"));
+
+
 
 
             // end of aviation mode ui setup
@@ -413,7 +497,7 @@ class UI {
 
     buildProductSelectors() {
 
-        let s = document.getElementById("product-nav");
+        let s = this.#elementList["product-nav"];
 
         // remove the nav element we may have built previously
         const oldn = document.querySelectorAll(".time-type-control");
@@ -421,6 +505,8 @@ class UI {
         oldn.forEach(o => {
             s.removeChild(o);
         });
+
+        this.#elementList["product-nav"] = s;
         
 
         let selectedRegion = localStorage.getItem("gfaRegion");
@@ -434,8 +520,10 @@ class UI {
         const products = app.dc.data[this.#submode][selectedRegion];
         
         for (const panel in products) {
+
             const n = document.createElement("nav");
             n.setAttribute("class", "time-type-control");
+            n.setAttribute("id", panel.toLowerCase()+"-nav");
 
             for (let i = 0; i < products[panel].length; i++) {
                 let rb = document.createElement("button");
@@ -472,7 +560,7 @@ class UI {
             }
             
             s.appendChild(n);    
-            
+            this.#elementList["product-nav"] = s;
         }
         
 
@@ -481,6 +569,7 @@ class UI {
     updateCMACGraphic(url){
         const img = document.getElementById("cmac-graphic");
         img.setAttribute("src", url);
+        this.#elementList["cmac-graphic"] = img;
     }
 
     populateTAFData(){
@@ -567,6 +656,19 @@ class UI {
         
 
     }
+
+    parseTAFPlus(hub) {        
+    
+        // read the data out of the datacontroller and then push the text to the appropriate elements
+        let hubData = app.dc.data.tafplus[hub];
+    
+        this.#elementList["tafplus-header"].innerHTML = hubData.strheaders;
+        this.#elementList["tafplus-discussion"].innerHTML = hubData.strdiscussion;
+        this.#elementList["tafplus-forecaster"].innerHTML = hubData.strforecaster + "/" + hubData.stroffice;  
+    
+    
+    }
+
 }
 
 function toggleObsDecode(mode) {
@@ -619,3 +721,5 @@ function toggleTAFNOTAM(mode) {
     
 
 }
+
+
