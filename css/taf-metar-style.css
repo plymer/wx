@@ -100,7 +100,7 @@ label[for="site-id"]::before { background-image:url("/images/icons/search.png");
     background-image: url("/images/icons/load.png");
 }
 
-#avn-toggle::before { background-image:url("/images/icons/plane.png"); }
+#raw-toggle::before { background-image:url("/images/icons/plane.png"); }
 #can-toggle::before { background-image:url("/images/icons/can.png"); }
 #usa-toggle::before { background-image:url("/images/icons/usa.png"); }
 
