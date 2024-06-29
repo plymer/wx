@@ -27,7 +27,7 @@ body > nav {
     display: flex;
     align-items: center;
     justify-content: space-around;
-    padding: 8px 0;
+    padding-top: 8px;
 }
 
 body > nav > button {
@@ -41,6 +41,13 @@ body > nav > button {
     height: calc(var(--box-size) / 2);
     white-space: pre-wrap;
     cursor: pointer;
+    padding: 8px 16px 4px;
+}
+
+body > nav > button.mode-toggle.selected {
+    border-radius: 4px 4px 0 0;
+    background: var(--infobg-c);
+    color: white;
 }
 
 .text-changes::after {

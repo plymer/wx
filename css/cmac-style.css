@@ -1,18 +1,37 @@
+#gfa-region-controller {
+    display: flex;
+    flex-flow: row wrap;
+    padding: 0;
+}
+
+.region-control {
+    flex-grow: 1;
+    border: 0;
+    border-top: var(--px1border);
+    border-left: var(--px1border);
+    border-radius: 0;
+    min-width: 25%;
+    font-size: 18px;
+    padding: 8px 0;
+}
+
+.region-control:first-of-type, .region-control:nth-of-type(5){border-left: none;}
+
 .time-type-control {
     --padd: 40px;
     --size: 24px;
     padding-left: var(--padd);
     background-size: var(--size) var(--size);
-    background-position: calc((var(--padd) - var(--size)) / 2);
+    background-position: calc((var(--padd) - var(--size)) / 2) center;
     background-repeat: no-repeat;
 }
 
 #cldwx-nav {
-    background-image: url("/images/icons/tsra-white.png");
+    background-image: url("../images/icons/tsra-white.png");
 }
 
 #turbc-nav {
-    background-image: url("/images/icons/sev-icg-white.png");
+    background-image: url("../images/icons/sev-icg-white.png");
 }
 
 .product-control:first-of-type {
@@ -25,7 +44,10 @@
 .product-control {
     border-radius: 0;
     border-left: 0;
+    font-size: 18px;
 }
+
+#cmac-graphic-container { text-align: center; margin: 0 auto; }
 
 #tafplus > button { border-left: var(--px1border); }
 #tafplus > button:first-of-type { border-left: none; }
@@ -33,7 +55,7 @@
 #tafplus > h1 { text-align: center; }
 #tafplus > h1::before {
     background-size: 100% 70%;
-    background-image: url("/images/icons/airport.png");
+    background-image: url("../images/icons/airport.png");
     background-repeat: no-repeat;
     background-position-y: center;
     filter: invert();

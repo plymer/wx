@@ -2,12 +2,12 @@
     "avn" : {
         "gfa" : {
             "GFACN31" : {
-                "longtext" : "GFACN31\nPacific",
+                "longtext" : "GFACN31 Pacific",
                 "shorttext" : "31",
                 "id" : "GFACN31"
             },
             "GFACN32" : {
-                "longtext" : "GFACN32\nPrairies",
+                "longtext" : "GFACN32 Prairies",
                 "shorttext" : "32",
                 "id" : "GFACN32"
             },
@@ -17,22 +17,22 @@
                 "id" : "GFACN33"
             },
             "GFACN34" : {
-                "longtext" : "GFACN34\nAtlantic",
+                "longtext" : "GFACN34 Atlantic",
                 "shorttext" : "34",
                 "id" : "GFACN34"
             },
             "GFACN35" : {
-                "longtext" : "GFACN35\nYukon-NWT",
+                "longtext" : "GFACN35 Yukon-NWT",
                 "shorttext" : "35",
                 "id" : "GFACN35"
             },
             "GFACN36" : {
-                "longtext" : "GFACN36\nNanuvut",
+                "longtext" : "GFACN36 Nunavut",
                 "shorttext" : "36",
                 "id" : "GFACN36"
             },
             "GFACN37" : {
-                "longtext" : "GFACN37\nArctic",
+                "longtext" : "GFACN37 Arctic",
                 "shorttext" : "37",
                 "id" : "GFACN37"
             }

@@ -95,6 +95,7 @@ class UI {
     #dataController;
     #elementList;
     #configController;
+    #decode;
 
     constructor(mode, data) {
         console.log("initializing the UI running", mode, "mode...");
@@ -104,6 +105,7 @@ class UI {
         this.#dataController = data;
         this.#elementList = {};
         this.#configController = {};
+        this.#decode = "raw";
 
         this.init();
         
@@ -133,16 +135,16 @@ class UI {
 
         // bind all of our UI buttons (mode selections) with eventHandlers
         let p = document.getElementById("public");
-        p.addEventListener("click", function(){ app.changeMode("pub"); });
+        p.addEventListener("click", function(){ app.changeMode("pub", this); });
 
         let a = document.getElementById("aviation");
-        a.addEventListener("click", function(){ app.changeMode("avn")});
+        a.addEventListener("click", function(){ app.changeMode("avn", this)});
 
         let o = document.getElementById("obs");
-        o.addEventListener("click", function(){ app.changeMode("obs")});
+        o.addEventListener("click", function(){ app.changeMode("obs", this)});
 
         let d = document.getElementById("data");
-        d.addEventListener("click", function(){ app.changeMode("sat")});
+        d.addEventListener("click", function(){ app.changeMode("sat", this)});
 
         let l = document.getElementById("outlook");
         //l.addEventListener("click", function(){ app.changeMode("otlk")});
@@ -155,9 +157,17 @@ class UI {
         return await configFile.json();
     }
 
-    changeMode(mode){
+    changeMode(mode, btn){
         this.#mode = mode;
         localStorage.setItem("mode", this.#mode);
+
+        let btns = document.querySelectorAll(".mode-toggle");
+        btns.forEach(b => {
+            b.classList.remove("selected");
+        });
+
+        btn.classList.add("selected");
+
         this.clearScreen();
         this.addElements();
     }
@@ -167,6 +177,11 @@ class UI {
         localStorage.setItem("submode", this.#submode);
         this.clearScreen();
         this.addElements();
+    }
+
+    changeDecodeMode(d){
+        this.#decode = d;
+        localStorage.setItem("decode", d);
     }
 
     clearScreen() {
@@ -206,7 +221,7 @@ class UI {
                 type: "text",
                 name: "site-id",
                 autofocus: "",
-                maxlength : 4,
+                maxLength : 4,
                 id: "site-id"
             });
 
@@ -253,7 +268,7 @@ class UI {
 
             n.appendChild(lunit);
 
-            let modes = ["avn", "can", "usa"];
+            let modes = ["raw", "can", "usa"];
             modes.forEach(m => {
                 let btog = document.createElement("button");
                 btog.setAttribute("id", m + "-toggle");
@@ -335,6 +350,11 @@ class UI {
                 localStorage.setItem("hub", "CYYC");
             }
 
+            if(!localStorage.getItem("submode")) {
+                localStorage.setItem("submode", "gfa");
+                this.changeSubMode("gfa");
+            }
+
             if (this.#submode == "gfa") {
 
                 n.setAttribute("id", "gfa-region-controller");
@@ -356,8 +376,10 @@ class UI {
                     let b = document.createElement("button");
                     b.dataset.shorttext = config["gfa"][product]["shorttext"];
                     b.dataset.longtext = config["gfa"][product]["longtext"];
+                    b.innerHTML = config["gfa"][product]["longtext"];
                     b.setAttribute("id", config["gfa"][product]["id"]);
-                    b.setAttribute("class", "text-changes region-control");
+                    // b.setAttribute("class", "text-changes region-control");
+                    b.setAttribute("class", "region-control");
 
                     if (b.getAttribute("id") == localStorage.getItem("gfaRegion")) {
                         b.classList.add("selected");
@@ -384,7 +406,7 @@ class UI {
                     n.appendChild(b);
 
                 }
-                
+
                 // end of gfa mode
             } else if (this.#submode == "upper") {
                 // do other
@@ -395,11 +417,17 @@ class UI {
             this.#elementList["product-nav"] = s;
             // now we build the product selectors and append them to the section
             this.buildProductSelectors();
+
+            const imgContainer = document.createElement("section");
+            imgContainer.setAttribute("id", "cmac-graphic-container");
+
                             
             const img = document.createElement("img");
             img.setAttribute("id", "cmac-graphic");
-            this.#parent.appendChild(img);
+            imgContainer.appendChild(img);            
             this.#elementList["cmac-graphic"] = img;
+
+            this.#parent.appendChild(imgContainer);
 
             // get the URL for the selected panel and build the img src
             let t = document.getElementById(localStorage.getItem("avnProdType") + "-" + localStorage.getItem("avnTimeStep"));
@@ -481,6 +509,12 @@ class UI {
             this.#parent.appendChild(td);
 
             this.parseTAFPlus(localStorage.getItem("hub"));
+
+            //-------------------------------------------------//
+            //        PIREPS and SIGMET/AIRMET Elements        //
+            //-------------------------------------------------//
+
+            // do some stuff here
 
 
 
@@ -672,18 +706,22 @@ class UI {
 function toggleObsDecode(mode) {
     console.log("changing obs decode mode to", mode);
 
+    app.changeDecodeMode(mode);
+
+    
+
     document.documentElement.classList.remove("can");
-    document.documentElement.classList.remove("avn");
+    document.documentElement.classList.remove("raw");
     document.documentElement.classList.remove("usa");
     document.documentElement.classList.add(mode);
-    document.getElementById("avn-toggle").classList.remove("selected");
+    document.getElementById("raw-toggle").classList.remove("selected");
     document.getElementById("can-toggle").classList.remove("selected");
     document.getElementById("usa-toggle").classList.remove("selected");
     
     if (mode == "can") {
         document.getElementById("can-toggle").classList.add("selected");
-    } else if (mode == "avn") {
-        document.getElementById("avn-toggle").classList.add("selected");
+    } else if (mode == "raw") {
+        document.getElementById("raw-toggle").classList.add("selected");
     } else if (mode == "usa") {
         document.getElementById("usa-toggle").classList.add("selected");
     }
@@ -698,7 +736,7 @@ async function getObs() {
     hrs = hrs.value;
     console.log("getting obs for", hrs, "hrs at", site);
 
-    let url = "/utilties/getObs.php?siteID=" + site + "&hrs=" + hrs;
+    let url = "./utilities/getObs.php?siteID=" + site + "&hrs=" + hrs;
 
     // let url = "./data/dummy-site.json";
 

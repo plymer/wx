@@ -93,16 +93,16 @@ button:not(.selected)::before,
 #load-button::before,
 button.selected::before { filter: none; }  
 
-label[for="site-id"]::before { background-image:url("/images/icons/search.png"); filter: invert();}
+label[for="site-id"]::before { background-image:url("../images/icons/search.png"); filter: invert();}
 #load-button::before {
     background-size: 80% 100%;
     background-repeat: no-repeat;
-    background-image: url("/images/icons/load.png");
+    background-image: url("../images/icons/load.png");
 }
 
-#raw-toggle::before { background-image:url("/images/icons/plane.png"); }
-#can-toggle::before { background-image:url("/images/icons/can.png"); }
-#usa-toggle::before { background-image:url("/images/icons/usa.png"); }
+#raw-toggle::before { background-image:url("../images/icons/plane.png"); }
+#can-toggle::before { background-image:url("../images/icons/can.png"); }
+#usa-toggle::before { background-image:url("../images/icons/usa.png"); }
 
 
 #metar-output { min-height: 240px; }
@@ -147,10 +147,10 @@ section > p {
 }
 
 #site-name { display: block; font-weight: 700; }
-#site-name::before { background-image:url("/images/icons/airport.png");  }
-#lat-lon::before   { background-image:url("/images/icons/map.png"); }
-#elevation::before { background-image:url("/images/icons/mountains.png"); }
-#sun-times::before { background-image:url("/images/icons/sun.png"); }
+#site-name::before { background-image:url("../images/icons/airport.png");  }
+#lat-lon::before   { background-image:url("../images/icons/map.png"); }
+#elevation::before { background-image:url("../images/icons/mountains.png"); }
+#sun-times::before { background-image:url("../images/icons/sun.png"); }
 
 
 #taf-notam { min-height: 120px; }
@@ -171,8 +171,8 @@ section > p {
 #tafplus > button { width: 25%; }
 
 #taf-notam > button:first-of-type { border-right: var(--px1border); }
-#taf-toggle::before { background-image:url("/images/icons/taf.png"); }
-#notam-toggle::before { background-image:url("/images/icons/notam.png"); }
+#taf-toggle::before { background-image:url("../images/icons/taf.png"); }
+#notam-toggle::before { background-image:url("../images/icons/notam.png"); }
 
 #taf-notam > p > span:not(.taf-main, .taf-meta) { display: block; }
 #taf-notam > p .metar-sigwx {
