@@ -384,10 +384,7 @@ class UI {
                     n.appendChild(b);
 
                 }
-
                 
-
-
                 // end of gfa mode
             } else if (this.#submode == "upper") {
                 // do other
@@ -408,8 +405,9 @@ class UI {
             let t = document.getElementById(localStorage.getItem("avnProdType") + "-" + localStorage.getItem("avnTimeStep"));
             this.updateCMACGraphic(t.dataset.url);
             
-
-            // now we want to add the taf discussions to the UI
+            //-------------------------------------------------//
+            //                 TAF PLUS ELEMENTS               //
+            //-------------------------------------------------//
 
             let td = document.createElement("section");
             td.setAttribute("id", "tafplus");
