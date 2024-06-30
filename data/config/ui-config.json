@@ -63,7 +63,7 @@
             "shorttext" : "PSPC",
             "city" : "Vancouver",
             "products" : [],
-            "warnings" : []
+            "warnings" : ["BC", "YT"]
         },
         "wwg" : {
             "longtext" : "Prairie and Arctic Storm Prediction Centre - Winnipeg",
@@ -152,13 +152,32 @@
             "warnings" : ["AB","SK","NT","NU"]
         },
         "wto" : {
-
+            "longtext" : "Ontario Storm Prediction Centre",
+            "shorttext" : "OSPC",
+            "city" : "Toronto",
+            "products" : [],
+            "warnings" : ["ON"]
         },
         "wul" : {
-
+            "longtext" : "Quebec Storm Prediction Centre",
+            "shorttext" : "QSPC",
+            "city" : "Montreal",
+            "products" : [],
+            "warnings" : ["QC"]
         },
         "whx" : {
-
+            "longtext" : "Altantic Storm Prediction Centre",
+            "shorttext" : "ASPC",
+            "city" : "Dartmouth",
+            "products" : [],
+            "warnings" : ["NS", "NB", "PE"]
+        },
+        "nlo" : {
+            "longtext" : "Newfoundland Weather Office",
+            "shorttext" : "NLWO",
+            "city" : "Gander",
+            "products" : [],
+            "warnings" : ["NL"]
         }
 
     }
