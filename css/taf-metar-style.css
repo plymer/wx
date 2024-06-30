@@ -82,7 +82,7 @@ button.selected {
 }
 
 button::before {
-    background-size: 100% 100%;
+    background-size: 80% 100%;
     background-repeat: no-repeat;
     padding-right: 12px;
 }
@@ -100,9 +100,13 @@ label[for="site-id"]::before { background-image:url("../images/icons/search.png"
     background-image: url("../images/icons/load.png");
 }
 
-#raw-toggle::before { background-image:url("../images/icons/plane.png"); }
-#can-toggle::before { background-image:url("../images/icons/can.png"); }
-#usa-toggle::before { background-image:url("../images/icons/usa.png"); }
+.decode-toggle { border-radius: 0; }
+#raw.decode-toggle { border-radius: 4px 0 0 4px; border-right: none;}
+#usa.decode-toggle { border-radius: 0 4px 4px 0; border-left: none;}
+
+#raw.decode-toggle::before { background-image:url("../images/icons/plane.png"); }
+#can.decode-toggle::before { background-image:url("../images/icons/can.png"); }
+#usa.decode-toggle::before { background-image:url("../images/icons/usa.png"); }
 
 
 #metar-output { min-height: 240px; }
@@ -195,7 +199,7 @@ section > p {
 
 
 
-#avn-toggle { border-radius: 4px 0 0 4px; border-right: none; }
+/* #avn-toggle { border-radius: 4px 0 0 4px; border-right: none; }
 #can-toggle { border-radius: 0; }
-#usa-toggle { border-radius: 0 4px 4px 0; border-left: none; }
+#usa-toggle { border-radius: 0 4px 4px 0; border-left: none; } */
 

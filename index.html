@@ -31,11 +31,6 @@
             "loadString" : "NavCanada",  // this should be what can be displayed in the UI if we need to
             "url" : "./data/current-gfas.json"
         },
-        "sat" : {
-            "name" : "satList",
-            "loadString" : "Satellite",
-            "url" : "./data/satellite-sources.json"
-        },
         "alerts" : {
             "name" : "alertList",
             "loadString" : "Public Alerts",
@@ -58,10 +53,10 @@
 
     <nav>
         <img id="site-icon" class="grey-invert" src="images/site-icon.png">
-        <button class="text-changes mode-toggle" id="public" data-longtext="Public&#x0a;Products" data-shorttext="PUB"></button>
-        <button class="text-changes mode-toggle" id="aviation" data-longtext="CMAC&#x0a;Products" data-shorttext="AVN"></button>
+        <button class="text-changes mode-toggle" id="pub" data-longtext="Public&#x0a;Products" data-shorttext="PUB"></button>
+        <button class="text-changes mode-toggle" id="avn" data-longtext="CMAC&#x0a;Products" data-shorttext="AVN"></button>
         <button class="text-changes mode-toggle" id="obs" data-longtext="METAR/&#x0a;TAF" data-shorttext="OBS"></button>
-        <button class="text-changes mode-toggle" id="data" data-longtext="Weather&#x0a;Data" data-shorttext="DATA"></button>
+        <button class="text-changes mode-toggle" id="sat" data-longtext="Weather&#x0a;Data" data-shorttext="DATA"></button>
         <button class="text-changes" id="outlook" data-longtext="Convective&#x0a;Outlooks" data-shorttext="OTLK"></button>
         <button id="burger"></button>
         

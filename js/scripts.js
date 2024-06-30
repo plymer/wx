@@ -89,66 +89,79 @@ class DataController {
 
 class UI {
 
-    #mode;
+    #appMode;
     #submode;
     #parent;
     #dataController;
     #elementList;
     #configController;
     #decode;
+    #decodeModes = ["raw", "can", "usa"];
+    #appModeList = ["pub", "avn", "obs", "sat"];
 
     constructor(mode, data) {
         console.log("initializing the UI running", mode, "mode...");
-        this.#mode = mode;
-        this.#submode = localStorage.getItem("submode");
+        this.#appMode = mode;
+        // set a default for the submode, this will get overwritten almost immediately
+        if (localStorage.getItem("submode")) {
+            this.#submode = localStorage.getItem("submode");
+        } else {
+            this.#submode = "gfa";
+            localStorage.setItem("submode", this.#submode);
+        }
+        
         this.#parent = document.getElementsByTagName("main")[0];
         this.#dataController = data;
         this.#elementList = {};
         this.#configController = {};
-        this.#decode = "raw";
 
+        // set a default for the ob decode mode
+        if (localStorage.getItem("decode")) {
+            this.#decode = localStorage.getItem("decode");
+        } else {
+            this.#decode = "raw";
+            localStorage.setItem("decode", this.#decode);
+        }
+
+        
+        // start building the UI for the app since we now have everything set up
         this.init();
         
     }
 
-    get mode() {
-        return this.#mode;
-    }
-
-    get dc() {
-        return this.#dataController;
-    }
-
-    get elementList(){
-        return this.#elementList;
-    }
-
-    get config() {
-        return this.#configController;
-    }
+    // getters
+    get mode() { return this.#appMode; }
+    get dc() { return this.#dataController; }
+    get elementList(){ return this.#elementList; }
+    get config() { return this.#configController; }
 
     async init() {
 
         this.#configController = await this.readUIConfig("./data/config/ui-config.json");
 
-        this.addElements();
-
         // bind all of our UI buttons (mode selections) with eventHandlers
-        let p = document.getElementById("public");
-        p.addEventListener("click", function(){ app.changeMode("pub", this); });
+        let p = document.getElementById("pub");
+        p.addEventListener("click", function(){ app.changeAppMode("pub"); });
+        this.#elementList["pub"] = p;
 
-        let a = document.getElementById("aviation");
-        a.addEventListener("click", function(){ app.changeMode("avn", this)});
+        let a = document.getElementById("avn");
+        a.addEventListener("click", function(){ app.changeAppMode("avn")});
+        this.#elementList["avn"] = a;
 
         let o = document.getElementById("obs");
-        o.addEventListener("click", function(){ app.changeMode("obs", this)});
+        o.addEventListener("click", function(){ app.changeAppMode("obs")});
+        this.#elementList["obs"] = o;
 
-        let d = document.getElementById("data");
-        d.addEventListener("click", function(){ app.changeMode("sat", this)});
+        let d = document.getElementById("sat");
+        d.addEventListener("click", function(){ app.changeAppMode("sat")});
+        this.#elementList["sat"] = d;
 
         let l = document.getElementById("outlook");
-        //l.addEventListener("click", function(){ app.changeMode("otlk")});
         l.addEventListener("click", function(){ window.open("/conv_otlk/", "_self"); });
+        this.#elementList["outlook"] = l;
+
+        this.changeAppMode(this.#appMode)
+
     }
 
     async readUIConfig(url) {
@@ -157,19 +170,22 @@ class UI {
         return await configFile.json();
     }
 
-    changeMode(mode, btn){
-        this.#mode = mode;
-        localStorage.setItem("mode", this.#mode);
+    changeAppMode(mode){
+
+        console.log(mode);
+        this.#appMode = mode;
+        localStorage.setItem("mode", this.#appMode);
 
         let btns = document.querySelectorAll(".mode-toggle");
         btns.forEach(b => {
             b.classList.remove("selected");
         });
 
-        btn.classList.add("selected");
-
         this.clearScreen();
         this.addElements();
+
+        // now that we've cleared out everything and added the appropriate elements back to the screen, make the appmode button selected
+        this.#elementList[this.#appMode].classList.add("selected");
     }
 
     changeSubMode(submode) {
@@ -182,6 +198,21 @@ class UI {
     changeDecodeMode(d){
         this.#decode = d;
         localStorage.setItem("decode", d);
+
+        console.log("changing obs decode mode to", d);
+
+        for (const m in this.#decodeModes) {
+            let mode = this.#decodeModes[m];
+            document.documentElement.classList.remove(mode);
+            this.#elementList[mode].classList.remove("selected");
+        }
+
+        document.documentElement.classList.add(d);
+        this.#elementList[this.#decode].classList.add("selected");
+        
+        // modify the data displayed in the metars
+
+        // <...>
     }
 
     clearScreen() {
@@ -196,15 +227,23 @@ class UI {
 
         this.#elementList = {};
 
+        // we now need to re-initialize the elementList with the static UI buttons
+        for (const m in this.#appModeList) {
+            let mode = this.#appModeList[m];
+            this.#elementList[mode] = document.getElementById(mode);
+        }
+        
+        this.#elementList["outlook"] = document.getElementById("outlook");
+
         console.log("screen cleared!")
     }
 
     async addElements(){
-        console.log("adding elements for", this.#mode, "mode...");
+        console.log("adding elements for", this.#appMode, "mode...");
 
         // do we 'hard code' each element of each config, or read from a config file?
 
-        if (this.#mode == "obs") {
+        if (this.#appMode == "obs") {
             // hard code this stuff, because it won't change
 
             let n = document.createElement("nav");
@@ -268,16 +307,16 @@ class UI {
 
             n.appendChild(lunit);
 
-            let modes = ["raw", "can", "usa"];
-            modes.forEach(m => {
+            this.#decodeModes.forEach(m => {
                 let btog = document.createElement("button");
-                btog.setAttribute("id", m + "-toggle");
-                btog.setAttribute("class", "has-icon");
-                if (m == "avn") {
-                    btog.setAttribute("class", "has-icon selected");
+                btog.setAttribute("id", m);
+                btog.setAttribute("class", "has-icon decode-toggle");
+                if (m == localStorage.getItem("decode")) {
+                    btog.classList.add("selected");
                 }
                 btog.innerHTML = m.toUpperCase();
-                btog.addEventListener("click", function(){toggleObsDecode(m)});
+                btog.addEventListener("click", function(){app.changeDecodeMode(m)});
+                this.#elementList[m] = btog;
                 n.appendChild(btog);
             });
 
@@ -324,7 +363,7 @@ class UI {
 
 
 
-        } else if (this.#mode == "sat") {
+        } else if (this.#appMode == "sat") {
             // hard code this stuff as well, because it also won't change
         } else {
             await this.buildUIFromConfig();
@@ -336,7 +375,7 @@ class UI {
 
     async buildUIFromConfig() {
 
-        let config = this.#configController[this.#mode];
+        let config = this.#configController[this.#appMode];
 
         // set up the section that will contain all of the nav elements for the navigation of products
         let s = document.createElement("section");
@@ -344,7 +383,7 @@ class UI {
 
         let n = document.createElement("nav");
 
-        if (this.#mode == "avn") {
+        if (this.#appMode == "avn") {
 
             if(!localStorage.getItem("hub")) {
                 localStorage.setItem("hub", "CYYC");
@@ -701,31 +740,6 @@ class UI {
     
     }
 
-}
-
-function toggleObsDecode(mode) {
-    console.log("changing obs decode mode to", mode);
-
-    app.changeDecodeMode(mode);
-
-    
-
-    document.documentElement.classList.remove("can");
-    document.documentElement.classList.remove("raw");
-    document.documentElement.classList.remove("usa");
-    document.documentElement.classList.add(mode);
-    document.getElementById("raw-toggle").classList.remove("selected");
-    document.getElementById("can-toggle").classList.remove("selected");
-    document.getElementById("usa-toggle").classList.remove("selected");
-    
-    if (mode == "can") {
-        document.getElementById("can-toggle").classList.add("selected");
-    } else if (mode == "raw") {
-        document.getElementById("raw-toggle").classList.add("selected");
-    } else if (mode == "usa") {
-        document.getElementById("usa-toggle").classList.add("selected");
-    }
-    
 }
 
 async function getObs() {
