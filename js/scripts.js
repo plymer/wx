@@ -99,6 +99,8 @@ class UI {
     #decodeModes = ["raw", "can", "usa"];
     #appModeList = ["pub", "avn", "obs", "sat"];
     #publicOffice;
+    #publicHeader;
+    #publicIssuer;
 
     constructor(mode, data) {
         console.log("initializing the UI running", mode, "mode...");
@@ -112,11 +114,18 @@ class UI {
         }
 
         // set the default office
-        if (localStorage.getItem("public-office")) {
-            this.#publicOffice = localStorage.getItem("public-office");
+        if (localStorage.getItem("publicOffice")) {
+            this.#publicOffice = localStorage.getItem("publicOffice");
+            this.#publicHeader = localStorage.getItem("publicHeader");
+            this.#publicIssuer = localStorage.getItem("publicIssuer");
         } else {
             this.#publicOffice = "wwg";
-            localStorage.setItem("public-office", this.#publicOffice);
+            this.#publicHeader = "FOCN45";
+            this.#publicIssuer = "CWWG";
+            localStorage.setItem("publicOffice", this.#publicOffice);
+            localStorage.setItem("publicHeader", this.#publicHeader);
+            localStorage.setItem("publicIssuer", this.#publicIssuer);
+            
         }
 
         // set a default for the ob decode mode
@@ -224,6 +233,14 @@ class UI {
         // modify the data displayed in the metars
 
         // <...>
+    }
+
+    changePublicOffice(office) {
+        this.#publicOffice = office;
+        localStorage.setItem("publicOffice", this.#publicOffice);
+        
+        this.clearScreen();
+        this.addElements();
     }
 
     clearScreen() {
@@ -479,7 +496,7 @@ class UI {
 
             this.#parent.appendChild(imgContainer);
 
-            // get the URL for the selected panel and build the img src
+            // get the URL for the selected p and build the img src
             let t = document.getElementById(localStorage.getItem("avnProdType") + "-" + localStorage.getItem("avnTimeStep"));
             this.updateCMACGraphic(t.dataset.url);
             
@@ -572,7 +589,121 @@ class UI {
             // end of aviation mode ui setup
         } else if (this.#appMode == "pub") {
 
+            let sel = document.createElement("select");
+            sel.setAttribute("id", "public-office");
+            sel.addEventListener("change", function(){
+                app.changePublicOffice(this.value);
+                app.buildProductSelectors();
 
+            });
+
+            for (const o in config) {
+                let opt = document.createElement("option");
+                opt.setAttribute("value", o);
+                opt.innerHTML = config[o]["longtext"];
+                if (opt.value == this.#publicOffice) {
+                    opt.setAttribute("selected", true);
+                }
+
+                sel.appendChild(opt);
+                
+            }
+
+            n.appendChild(sel);
+            this.#elementList["public-office"] = sel;
+
+            s.appendChild(n);
+            this.#parent.appendChild(s);
+            this.#elementList["product-nav"] = s;
+
+            // now we build the product selectors and append them to the section
+            this.buildProductSelectors();
+
+            let forecastContainer = document.createElement("section");
+            forecastContainer.setAttribute("id", "forecast-container");
+
+            let forecastText = document.createElement("p");
+            forecastText.setAttribute("id", "forecast-text");
+            this.#elementList["public-forecast"] = forecastText;
+
+            forecastContainer.appendChild(forecastText);
+
+            this.#parent.appendChild(forecastContainer);
+
+            if (document.querySelectorAll("#public-forecast-products > .selected")[0]) {
+                let selectedFx = document.querySelectorAll("#public-forecast-products > .selected")[0];
+                this.getPublicForecast(selectedFx.dataset.header, selectedFx.dataset.issuer)
+            }
+            
+
+            ///////////////////////////////////////////////////////////////////////////////////
+            // this will create a list of all of the warnings from the current-alerts.json file
+            //  --- this is a stopgap measure until the warnings/outlook map is operational
+            ///////////////////////////////////////////////////////////////////////////////////
+
+            
+
+            let warnList = document.createElement("section");
+            warnList.setAttribute("id", "alerts-list");
+
+            let warnHeading = document.createElement("h1");
+            warnHeading.setAttribute("class", "has-icon");
+            warnHeading.innerHTML = "Active Alerts";
+            warnList.appendChild(warnHeading);
+
+            const alerts = this.#dataController.data.alerts;
+            const aor = this.#configController.pub[this.#publicOffice].warnings;
+
+            console.log("building warning list for", this.#publicOffice);
+
+            
+
+            for (const a in alerts) {                
+                for (const p in aor) {                  
+                    
+                    if (alerts[a].prov == aor[p]) {
+                        let aType = alerts[a].alertType;
+                        let aTime = alerts[a].issueTime;
+                        let aText = alerts[a].text;
+                        let aRegions = alerts[a].parentName; // this should be an array
+
+                        let container = document.createElement("div");
+                        let aTyC = document.createElement("h2");
+                        aTyC.innerHTML = aType;
+                        container.appendChild(aTyC);
+
+                        let aTiC = document.createElement("h3");
+                        aTiC.innerHTML = aTime;
+                        container.appendChild(aTiC);
+
+                        for (const r in aRegions) {
+                            let aR = document.createElement("p");
+                            aR.innerHTML = aRegions[r];
+                            container.appendChild(aR);
+                        }
+
+                        let aTxt = document.createElement("p");
+                        aTxt.innerHTML = aText;
+                        container.appendChild(aTxt);
+
+                        warnList.appendChild(container);
+                    }
+                }
+            }
+
+            this.#parent.appendChild(warnList);
+
+
+            // end of the warnings list
+            ////////////////////////////////////////////////////////////
+
+            let mapHead = document.createElement("h1");
+            mapHead.innerHTML = "Outlooks and Warnings Map";
+            this.#parent.appendChild(mapHead);
+
+            let mapContent = document.createElement("section");
+            mapContent.setAttribute("id", "public-map");
+            this.#parent.appendChild(mapContent);
 
         }
 
@@ -584,71 +715,129 @@ class UI {
     buildProductSelectors() {
 
         let s = this.#elementList["product-nav"];
+        let mode = this.#appMode;
 
         // remove the nav element we may have built previously
-        const oldn = document.querySelectorAll(".time-type-control");
-
+        const oldn = document.querySelectorAll(".forecast-control");
+        
         oldn.forEach(o => {
             s.removeChild(o);
-        });
+        });        
 
         this.#elementList["product-nav"] = s;
-        
 
-        let selectedRegion = localStorage.getItem("gfaRegion");
-        let selectedTime = localStorage.getItem("avnTimeStep");
-        let selectedType = localStorage.getItem("avnProdType");
+        if (mode =="avn") {
+            let selectedRegion = localStorage.getItem("gfaRegion");
+            let selectedTime = localStorage.getItem("avnTimeStep");
+            let selectedType = localStorage.getItem("avnProdType");
 
 
 
-        console.log("building product selectors for", selectedRegion + "...");
-        
-        const products = app.dc.data[this.#submode][selectedRegion];
-        
-        for (const panel in products) {
+            console.log("building product selectors for", selectedRegion + "...");
+            const products = app.dc.data[this.#submode][selectedRegion]; //app.dc.data.gfa.GFACN31
+            
+            for (const p in products) {
 
-            const n = document.createElement("nav");
-            n.setAttribute("class", "time-type-control");
-            n.setAttribute("id", panel.toLowerCase()+"-nav");
+                const n = document.createElement("nav");
+                n.setAttribute("class", "forecast-control");
+                n.setAttribute("id", p.toLowerCase()+"-nav");
 
-            for (let i = 0; i < products[panel].length; i++) {
-                let rb = document.createElement("button");
-                rb.setAttribute("id", panel.toLowerCase() +"-" + i);
-                rb.dataset.timestep = i;
-                rb.dataset.product = panel.toLowerCase();
+                for (let i = 0; i < products[p].length; i++) {
+                    let rb = document.createElement("button");
+                    rb.setAttribute("id", p.toLowerCase() +"-" + i);
+                    rb.dataset.timestep = i;
+                    rb.dataset.product = p.toLowerCase();
 
-                rb.setAttribute("class", "product-control " + panel.toLowerCase());
-                rb.dataset.url = products[panel][i];
+                    rb.setAttribute("class", "product-control " + p.toLowerCase());
+                    rb.dataset.url = products[p][i];
 
-                if (rb.dataset.timestep == selectedTime && rb.dataset.product == selectedType) {
-                    rb.classList.add("selected");
+                    if (rb.dataset.timestep == selectedTime && rb.dataset.product == selectedType) {
+                        rb.classList.add("selected");
+                    }
+                    rb.addEventListener("click", function(){
+                        console.log("changing product to", selectedRegion, p, i*6);
+
+                        localStorage.setItem("avnProdType", this.dataset.product);
+                        selectedType = localStorage.getItem("avnProdType");
+                        localStorage.setItem("avnTimeStep", this.dataset.timestep);
+                        selectedTime = localStorage.getItem("avnTimeStep");
+
+                        let tb = document.querySelectorAll(".product-control");
+                        tb.forEach(tbtn => { tbtn.classList.remove("selected") });
+                        this.classList.add("selected");
+                        
+                        // add function to change the UI to update the image
+                        app.updateCMACGraphic(rb.dataset.url);
+                        
+                    });
+                    rb.innerHTML = "T+" + i*6;
+
+                    n.appendChild(rb);
+
                 }
-                rb.addEventListener("click", function(){
-                    console.log("changing product to", selectedRegion, panel, i*6);
+                // add this forecast-control to the product nav container
+                s.appendChild(n);
+                
+            }
 
-                    localStorage.setItem("avnProdType", this.dataset.product);
-                    selectedType = localStorage.getItem("avnProdType");
-                    localStorage.setItem("avnTimeStep", this.dataset.timestep);
-                    selectedTime = localStorage.getItem("avnTimeStep");
+        } else if (mode == "pub") {
 
-                    let tb = document.querySelectorAll(".product-control");
-                    tb.forEach(tbtn => { tbtn.classList.remove("selected") });
+            let pubHeader = localStorage.getItem("publicHeader");
+            let pubIssuer = localStorage.getItem("publicIssuer");
+
+            const products = app.config.pub[this.#publicOffice].products; //app.config.pub.weg.products
+
+            let n = document.createElement("nav");
+            n.setAttribute("id", "public-forecast-products");
+            n.setAttribute("class", "forecast-control");
+
+            console.log("building product selectors for", this.#publicOffice + "...");
+
+            for (const p in products) {
+                let b = document.createElement("button");
+                b.setAttribute("class", "region-control");
+                b.innerHTML = products[p].label;
+                b.dataset.issuer = products[p].issuer;
+                b.dataset.header = products[p].header;
+
+                if (products[p].header == pubHeader && products[p].issuer == pubIssuer) {
+                    b.classList.add("selected");
+                }
+                b.addEventListener("click", function(){
+                    localStorage.setItem("publicHeader", this.dataset.header);
+                    localStorage.setItem("publicIssuer", this.dataset.issuer);
+                    app.getPublicForecast(this.dataset.header, this.dataset.issuer);
+                    let fb = document.querySelectorAll(".region-control");
+                    fb.forEach(fpb => { fpb.classList.remove("selected") });
                     this.classList.add("selected");
-                    
-                    // add function to change the UI to update the image
-                    app.updateCMACGraphic(rb.dataset.url);
-                    
                 });
-                rb.innerHTML = "T+" + i*6;
 
-                n.appendChild(rb);
+                n.appendChild(b);
+
+
+
 
             }
+
+            s.appendChild(n);
             
-            s.appendChild(n);    
-            this.#elementList["product-nav"] = s;
+
         }
+
+        // update the product nav container to the main element list
         
+        this.#elementList["product-nav"] = s;
+
+    }
+
+    async getPublicForecast(header, issuer){
+        
+        let url = "./utilities/getFX.php?bulletin=" + header + "&office=" + issuer;
+        // let url = "../data/dummy-fx.json";
+        let fxText = await fetch(url);
+        fxText = await fxText.json();
+
+        this.#elementList["public-forecast"].innerHTML = fxText.text;
 
     }
 
@@ -665,6 +854,11 @@ class UI {
         let m = dc["metars"];
         let d = dc["metadata"];
         let t = dc["taf"];
+
+        // clear out old data
+        this.#elementList["metars"].innerHTML = "";
+        this.#elementList["metadata"].innerHTML = "";
+        this.#elementList["taf-notam"].innerHTML = "";
 
         for (let i = 0; i<m.length; i++) {
             let o = document.createElement("p");
@@ -736,7 +930,7 @@ class UI {
         }
 
         // all elements of the TAF have been added, now add the TAF to the DOM
-        app.elementList["taf-notam"].appendChild(taf);
+        this.#elementList["taf-notam"].appendChild(taf);
 
 
         
@@ -767,7 +961,7 @@ async function getObs() {
 
     let url = "./utilities/getObs.php?siteID=" + site + "&hrs=" + hrs;
 
-    // let url = "./data/dummy-site.json";
+    // let url = "../data/dummy-site.json";
 
     let siteJSON = await fetch(url);
     let data = await siteJSON.json();
