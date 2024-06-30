@@ -65,7 +65,7 @@ if ($bulletin == "focn45") {
 
 }
 
-// sometimes brad vrolijk includes accents in the fo45 because he's an idiot
+// brad vrolijk includes accents in the fo45 because he's an idiot
 $response = htmlentities($response, ENT_IGNORE, "UTF-8");
 
 $response = json_encode(array("text" => $response));
