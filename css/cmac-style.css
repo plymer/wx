@@ -17,7 +17,7 @@
 
 .region-control:first-of-type, .region-control:nth-of-type(5){border-left: none;}
 
-.time-type-control {
+.forecast-control {
     --padd: 40px;
     --size: 24px;
     padding-left: var(--padd);
@@ -48,6 +48,7 @@
 }
 
 #cmac-graphic-container { text-align: center; margin: 0 auto; }
+#cmac-graphic { max-width: 100%; }
 
 #tafplus > button { border-left: var(--px1border); }
 #tafplus > button:first-of-type { border-left: none; }
