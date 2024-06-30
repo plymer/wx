@@ -50,7 +50,7 @@ $metaURL = "https://aviationweather.gov/cgi-bin/data/location.php?id={$ident}";
 
 // check if metars exist
 if (file_get_contents($metarURL) == false) {
-    $metarOutput = "No METARs available for {$ident}.";
+    $metarOutput[] = "No METARs available for {$ident}.";
 } else {
     // grab the METARs
     $metars = file_get_contents($metarURL);
@@ -65,12 +65,19 @@ if (file_get_contents($metarURL) == false) {
     $metarOutput = $temp;
 }
 
-if (file_get_contents($metaURL) == false) {
-    $metaOutput = "No metadata availavle for {$ident}.";
-    } else {
-    // grab the json file for the station list and nab the metadata for the site
-    $metaJSON = file_get_contents($metaURL);
-    $metaJSON = json_decode($metaJSON, true);
+// have to do a slightly different check for validity for metadata
+$metaJSON = file_get_contents($metaURL);
+$metaJSON = json_decode($metaJSON, true);
+
+if (!$metaJSON["site"]) {
+    $metaOutput = array(
+        "site-name" => "No metadata available for {$ident}.",
+        "lat-lon" => "N/A",
+        "elevation" => "N/A",
+        "sun-times" => "N/A"        
+    );
+} else {
+    // parse the json down the way we want it
 
     $siteName = $metaJSON["site"];
     $siteLat = round($metaJSON["lat"], 2);
@@ -105,7 +112,7 @@ if (file_get_contents($metaURL) == false) {
 }
 
 if (file_get_contents($tafURL) == false) {
-    $tafOutput = "No TAF available for {$ident}.";
+    $tafOutput = array("main" => "No TAF available for {$ident}.");
 } else {
 // grab the TAF (if it exists)
     $taf = file_get_contents($tafURL);
