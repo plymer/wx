@@ -62,7 +62,64 @@
             "longtext" : "Pacfic Storm Prediction Centre",
             "shorttext" : "PSPC",
             "city" : "Vancouver",
-            "products" : [],
+            "products" : [
+              {
+                "label" : "South Coast",
+                "header" : "FPCN11",
+                "issuer" : "CWVR"
+              },
+              {
+                "label" : "Central &amp; Northern Coast",
+                "header" : "FPCN12",
+                "issuer" : "CWVR"
+                },
+                {
+                  "label" : "Southeast Yukon",
+                  "header" : "FPCN17",
+                  "issuer" : "CWVR"
+                },
+                {
+                  "label" : "Northeast BC",
+                  "header" : "FPCN18",
+                  "issuer" : "CWVR"
+                },
+                
+                {
+                  "label" : "N/C/SW Yukon",
+                  "header" : "FPCN19",
+                  "issuer" : "CWVR"
+                },
+                {
+                  "label" : "Southwest Interior",
+                  "header" : "FPCN13",
+                  "issuer" : "CWVR"
+                },
+                {
+                  "label" : "Columbia Districts",
+                  "header" : "FPCN14",
+                  "issuer" : "CWVR"
+                },
+                {
+                  "label" : "Kootenay Districts",
+                  "header" : "FPCN15",
+                  "issuer" : "CWVR"
+                },
+                {
+                  "label" : "Central Interior",
+                  "header" : "FPCN16",
+                  "issuer" : "CWVR"
+                },
+                {
+                  "label" : "BC Travellers",
+                  "header" : "FPCN68",
+                  "issuer" : "CWVR"
+                },
+                {
+                  "label" : "Haines - Skagway",
+                  "header" : "FPCN69",
+                  "issuer" : "CWVR"
+                }
+            ],
             "warnings" : ["BC", "YT"]
         },
         "wwg" : {
@@ -155,28 +212,102 @@
             "longtext" : "Ontario Storm Prediction Centre",
             "shorttext" : "OSPC",
             "city" : "Toronto",
-            "products" : [],
+            "products" : [
+              {
+                "label" : "Southern Ontario",
+                "header" : "FPCN11",
+                "issuer" : "CWTO"
+              },
+              {
+                "label" : "Northern Ontario",
+                "header" : "FPCN12",
+                "issuer" : "CWTO"
+              },
+              {
+                "label" : "Far Northern Ontario",
+                "header" : "FPCN13",
+                "issuer" : "CWTO"
+              }
+            ],
             "warnings" : ["ON"]
         },
         "wul" : {
             "longtext" : "Quebec Storm Prediction Centre",
             "shorttext" : "QSPC",
             "city" : "Montreal",
-            "products" : [],
+            "products" : [
+              {
+                "label" : "Western Quebec",
+                "header" : "FPCN11",
+                "issuer" : "CWUL"
+              },
+              {
+                "label" : "Eastern Quebec",
+                "header" : "FPCN14",
+                "issuer" : "CWXK"
+              },
+              {
+                "label" : "Central Quebec",
+                "header" : "FPCN13",
+                "issuer" : "CWQB"
+              },
+              {
+                "label" : "Northern Quebec",
+                "header" : "FPCN12",
+                "issuer" : "CWQB"
+              },
+              {
+                "label" : "Extreme Northern Quebec",
+                "header" : "FPCN15",
+                "issuer" : "CWQB"
+              }
+            ],
             "warnings" : ["QC"]
         },
         "whx" : {
             "longtext" : "Altantic Storm Prediction Centre",
             "shorttext" : "ASPC",
             "city" : "Dartmouth",
-            "products" : [],
+            "products" : [
+              {
+                "label" : "New Brunswick",
+                "header" : "FPCN14",
+                "issuer" : "CWHX"
+              },
+              {
+                "label" : "Nova Scotia",
+                "header" : "FPCN11",
+                "issuer" : "CWHX"
+              },
+              {
+                "label" : "Prince Edward Island",
+                "header" : "FPCN15",
+                "issuer" : "CWHX"
+              },
+              {
+                "label" : "Iles-de-la-Madeleine",
+                "header" : "FPCN13",
+                "issuer" : "CWHX"
+              }
+            ],
             "warnings" : ["NS", "NB", "PE"]
         },
         "nlo" : {
             "longtext" : "Newfoundland Weather Office",
             "shorttext" : "NLWO",
             "city" : "Gander",
-            "products" : [],
+            "products" : [
+              {
+                "label" : "Newfoundland",
+                "header" : "FPCN16",
+                "issuer" : "CWHX"
+              },
+              {
+                "label" : "Labrador",
+                "header" : "FPCN17",
+                "issuer" : "CWHX"
+              }
+            ],
             "warnings" : ["NL"]
         }
 
