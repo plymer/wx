@@ -1,4 +1,4 @@
-#gfa-region-controller {
+#gfa-region-controller, #public-forecast-products {
     display: flex;
     flex-flow: row wrap;
     padding: 0;
@@ -53,16 +53,27 @@
 #tafplus > button { border-left: var(--px1border); }
 #tafplus > button:first-of-type { border-left: none; }
 
-#tafplus > h1 { text-align: center; }
-#tafplus > h1::before {
-    background-size: 100% 70%;
-    background-image: url("../images/icons/airport.png");
+#tafplus > h1, #alerts-list > h1 { text-align: center; }
+#tafplus > h1::before, #alerts-list > h1::before {
+    background-size: 100% 70%;    
     background-repeat: no-repeat;
     background-position-y: center;
     filter: invert();
 }
-#tafplus > h2, #tafplus > h1 {
+
+
+
+#tafplus > h1::before { background-image: url("../images/icons/airport.png"); }
+
+#alerts-list > h1::before { background-image: url("../images/icons/alert.png"); }
+
+#tafplus > h2, #tafplus > h1, #alerts-list > h1, #alerts-list > div > h2 {
     margin: 0;
     padding: 4px;
     background: var(--infobg-c);
+}
+
+#alerts-list > h1 {
+    border-top: var(--px1border);
+    border-bottom: var(--px1border);
 }

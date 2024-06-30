@@ -112,7 +112,7 @@ label[for="site-id"]::before { background-image:url("../images/icons/search.png"
 #metar-output { min-height: 240px; }
 
 
-section > p {
+section > p, section > div > p {
     white-space: pre-wrap;
     font-family: "Sometype Mono", monospace;
     margin: 0;
