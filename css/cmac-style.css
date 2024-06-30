@@ -15,7 +15,7 @@
     padding: 8px 0;
 }
 
-.region-control:first-of-type, .region-control:nth-of-type(5){border-left: none;}
+.region-control:nth-of-type(4n+1){border-left: none;}
 
 .forecast-control {
     --padd: 40px;
