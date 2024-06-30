@@ -112,7 +112,7 @@ if (!$metaJSON["site"]) {
 }
 
 if (file_get_contents($tafURL) == false) {
-    $tafOutput = array("main" => "No TAF available for {$ident}.");
+    $tafOutput = array("meta" => "No TAF available for {$ident}.", "main" => "", "part-periods" => "", "rmk" => "");
 } else {
 // grab the TAF (if it exists)
     $taf = file_get_contents($tafURL);
