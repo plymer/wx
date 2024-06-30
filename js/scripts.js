@@ -98,6 +98,7 @@ class UI {
     #decode;
     #decodeModes = ["raw", "can", "usa"];
     #appModeList = ["pub", "avn", "obs", "sat"];
+    #publicOffice;
 
     constructor(mode, data) {
         console.log("initializing the UI running", mode, "mode...");
@@ -109,11 +110,14 @@ class UI {
             this.#submode = "gfa";
             localStorage.setItem("submode", this.#submode);
         }
-        
-        this.#parent = document.getElementsByTagName("main")[0];
-        this.#dataController = data;
-        this.#elementList = {};
-        this.#configController = {};
+
+        // set the default office
+        if (localStorage.getItem("public-office")) {
+            this.#publicOffice = localStorage.getItem("public-office");
+        } else {
+            this.#publicOffice = "wwg";
+            localStorage.setItem("public-office", this.#publicOffice);
+        }
 
         // set a default for the ob decode mode
         if (localStorage.getItem("decode")) {
@@ -122,6 +126,13 @@ class UI {
             this.#decode = "raw";
             localStorage.setItem("decode", this.#decode);
         }
+        
+        this.#parent = document.getElementsByTagName("main")[0];
+        this.#dataController = data;
+        this.#elementList = {};
+        this.#configController = {};
+
+
 
         
         // start building the UI for the app since we now have everything set up
@@ -559,6 +570,10 @@ class UI {
 
 
             // end of aviation mode ui setup
+        } else if (this.#appMode == "pub") {
+
+
+
         }
 
 
