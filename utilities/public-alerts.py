@@ -34,7 +34,7 @@ while i < len(alertsList):
     while j < len(alerts):
         alertType = alerts[j]["alertBannerText"]
         alertId = alerts[j]["id"]
-        parName = alerts[j]["parentName"]
+        parName = alerts[j]["zoneName"]
         alertText = alerts[j]["text"]
         issueTime = alerts[j]["issueTime"]
 
@@ -71,11 +71,11 @@ while i < len(alertsList):
             
         else:
             # make sure that a singular name is stored as an iterable array, by first storing it as a set and then converting it to a list
-            # name = set()
-            # name.add(parName)
+            name = set()
+            name.add(parName)
             
-            # output[alertId] = {"alertType" : alertType, "prov" : prov , "parentName" : list(name), "issueTime": issueTime, "text" : alertText}
-            output[alertId] = {"alertType" : alertType, "prov" : prov , "parentName" : parName, "issueTime": issueTime, "text" : alertText}
+            output[alertId] = {"alertType" : alertType, "prov" : prov , "parentName" : list(name), "issueTime": issueTime, "text" : alertText}
+            # output[alertId] = {"alertType" : alertType, "prov" : prov , "parentName" : parName, "issueTime": issueTime, "text" : alertText}
 
 
 
