@@ -47,7 +47,7 @@
     font-size: 18px;
 }
 
-#cmac-graphic-container { text-align: center; margin: 0 auto; }
+#cmac-graphic-container { text-align: center; margin: 0 auto; width: 100%; }
 #cmac-graphic { max-width: 100%; }
 
 #tafplus > button { border-left: var(--px1border); }

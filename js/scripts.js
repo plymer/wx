@@ -87,6 +87,70 @@ class DataController {
     }
 }
 
+class MapController {
+
+    #mapConfigs = {"wx" : "wx-map", "pub" : "public-map"};
+    #mode;
+    #mapObject;
+    #container;
+    #mapData;
+
+    constructor(mapMode) {
+        mapboxgl.accessToken = "pk.eyJ1IjoicGx5bWVyIiwiYSI6ImNsb2x3ZWZyMDFjcWEyanFvcjNzMm1qNHEifQ.V6wmuoD1GQM5tvPkRb2MvA";
+        this.#mode = mapMode;
+
+        this.init();
+    }
+
+    init(){
+
+        this.#container = this.#mapConfigs[this.#mode];
+
+        console.log("container", this.#container);
+
+        this.#mapData = app.dc.data.sat; // add all the data in the configuration to make it available
+
+        this.#mapObject = new mapboxgl.Map({
+            container: this.#container,
+            // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+            style: "mapbox://styles/plymer/cly2zivrf008e01r12tt04gwp/draft",
+            zoom: 3,
+            center: [-100, 62]
+        });
+
+        this.#mapObject.on("load", () => {
+
+            // add all the sources first
+            for (const sourceType in this.#mapData) {
+                for (const source in this.#mapData[sourceType]) {
+                    let s = this.#mapData[sourceType][source];
+
+                    this.#mapObject.addSource(s.name,
+                        {
+                            "type" : s.type,
+                            "tiles" : [s.url],
+                            "tileSize" : s.tileSize
+                        }
+                    );
+
+
+                    // we may NOT want to add all layers at once so this will likely get split out
+                    this.#mapObject.addLayer(
+                        {
+                            "id" : s.id,
+                            "type" : s.type,
+                            "source" : s.name,
+                            "paint" : {}
+                        },
+                        s.after
+                    );
+                }
+            }
+        });
+    }
+    
+}
+
 class UI {
 
     #appMode;
@@ -101,6 +165,7 @@ class UI {
     #publicOffice;
     #publicHeader;
     #publicIssuer;
+    #wxmap;
 
     constructor(mode, data) {
         console.log("initializing the UI running", mode, "mode...");
@@ -392,7 +457,33 @@ class UI {
 
 
         } else if (this.#appMode == "sat") {
+
+            let n = document.createElement("nav");
+            n.setAttribute("id", "wx-map-control");
+
+            let satLabel = document.createElement("label");
+            satLabel.innerHTML = "Satellite Channel:";
+            satLabel.setAttribute("for", "sat-type");
+            satLabel.setAttribute("class", "has-icon");
+
+            let satType = document.createElement("select");
+            satType.setAttribute("id", "sat-type");
+            satType.addEventListener("change", function(){ console.log(this.value); });
+
+            for (const products in app.dc.data.sat) {
+                console.log(products);
+            }
+
+            
+            
             // hard code this stuff as well, because it also won't change
+            let m = document.createElement("div");
+            m.setAttribute("id", "wx-map");
+
+            this.#parent.appendChild(m);
+
+            const wxmap = new MapController("wx");           
+            
         } else {
             await this.buildUIFromConfig();
         }
@@ -976,9 +1067,39 @@ async function getObs() {
 
 function toggleTAFNOTAM(mode) {
     console.log(mode);
-
-    
-
 }
 
+function buildMap(mapMode) {
+
+    const mapConfigs = {"wx" : "wx-map", "pub" : "public-map"};
+    mapboxgl.accessToken = "pk.eyJ1IjoicGx5bWVyIiwiYSI6ImNsb2x3ZWZyMDFjcWEyanFvcjNzMm1qNHEifQ.V6wmuoD1GQM5tvPkRb2MvA";
+    // this.#mapObject.addSource("goes-east", {
+    //     "type": "raster",
+    //     // use the tiles option to specify a WMS tile source URL
+    //     // https://docs.mapbox.comhttps://docs.mapbox.com/style-spec/reference/sources/
+    //     "tiles": [
+    //         "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=GOES-East_1km_DayCloudType-NightMicrophysics"
+    //     ],
+    //     "tileSize": 256
+    // });
+    // this.#mapObject.addSource("goes-west", {
+    //     "type": "raster",
+    //     // use the tiles option to specify a WMS tile source URL
+    //     // https://docs.mapbox.comhttps://docs.mapbox.com/style-spec/reference/sources/
+    //     "tiles": [
+    //         "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=GOES-West_1km_DayCloudType-NightMicrophysics"
+    //     ],
+    //     "tileSize": 256
+    // });
+    // this.#mapObject.addSource("cldn", {
+    //     "type": "raster",
+    //     // use the tiles option to specify a WMS tile source URL
+    //     // https://docs.mapbox.comhttps://docs.mapbox.com/style-spec/reference/sources/
+    //     "tiles": [
+    //         "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=Lightning_2.5km_Density" // loopable time using &time=2024-07-01T15:30:00Z (for example)
+    //     ],
+    //     "tileSize": 256
+    // });
+    
+}
 
