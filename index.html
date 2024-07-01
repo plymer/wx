@@ -15,15 +15,24 @@
     <link rel="stylesheet" href="css/main-style.css">
     <link rel="stylesheet" href="css/taf-metar-style.css">
     <link rel="stylesheet" href="css/cmac-style.css">
+    <link rel="stylesheet" href="css/map-style.css">
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@100..700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Sometype+Mono&display=swap');
+
     </style>
     
     <script src="js/scripts.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
+
+    
 
     <script>
+
+    // GeoMet WMS GetCapabilities String:
+    // https://geo.weather.gc.ca/geomet/?lang=en&service=WMS&version=1.3.0&request=GetCapabilities
 
     const dataSources = {
         "gfa" : {
@@ -40,6 +49,11 @@
             "name" : "tafPlus",
             "loadString" : "CMAC Hub TAF Discussions",
             "url" : "./data/taf-plus.json"
+        },
+        "sat" : {
+            "name" : "satList",
+            "loadString" : "Satellite Sources",
+            "url" : "./data/config/satellite-sources.json"
         }
     }
 
@@ -65,7 +79,6 @@
     <main>
 
     </main>
-
 
 </body>
 
