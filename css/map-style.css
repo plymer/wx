@@ -1,1 +1,6 @@
 #wx-map { width: 100%; height: 70vh; }
+
+label[for="sat-type"]::before {
+    background-image:url("../images/icons/satellite.png");
+    filter: invert();
+}
