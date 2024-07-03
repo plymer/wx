@@ -25,6 +25,9 @@
     </style>
     
     <script src="js/scripts.js"></script>
+    <script src="js/DataController.js"></script>
+    <script src="js/MapController.js"></script>
+    <script src="js/UI.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
 
     
@@ -51,12 +54,13 @@
             "url" : "./data/taf-plus.json"
         },
         "sat" : {
-            "name" : "satList",
-            "loadString" : "Satellite Sources",
-            "url" : "./data/config/satellite-sources.json"
+            "name" : "wxmapList",
+            "loadString" : "Weather Map Sources",
+            "url" : "./data/config/wx-map-sources.json"
         }
     }
 
+    // this begins the site's functionality being initialized
     let siteData = new DataController(dataSources);
 
     </script>
