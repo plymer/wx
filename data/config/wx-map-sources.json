@@ -1,0 +1,42 @@
+{
+    "goes" : {
+        "daynightmicro" : {
+            "nameBase" : "DayNightMicro",
+            "uiName" : "Day/Night Microphysics",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "after" : "land",
+            "type" : "raster",
+            "layerList" : [
+                {
+                    "name" : "East",
+                    "layer" : "GOES-East_1km_DayCloudType-NightMicrophysics",
+                    "bounds" : [-100, -90, 180, 90]
+                },
+                {
+                    "name" : "West",
+                    "layer" : "GOES-West_1km_DayCloudType-NightMicrophysics",
+                    "bounds" : [-180, -90, -100, 90]
+                }
+            ],
+            "paint" : {}
+        }
+    },
+    "cldn": {
+        "cldn-data" : {
+            "nameBase" : "Lightning-Density",            
+            "uiName" : "Lightning Density (2.5km)",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "type" : "raster",
+            "layerList" : [
+                {
+                    "name" : "CLDN",
+                    "layer" : "Lightning_2.5km_Density",
+                    "bounds" : [-180, -90, 180, 90]
+                }
+            ],
+            "paint" : {}
+        }
+    }
+}
