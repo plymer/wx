@@ -77,3 +77,11 @@
     border-top: var(--px1border);
     border-bottom: var(--px1border);
 }
+
+@media screen and (max-width: 865px) {
+
+    
+    .region-control { font-size: 12px; }
+
+
+}

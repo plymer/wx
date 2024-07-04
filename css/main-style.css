@@ -24,7 +24,6 @@ body {
 
 body > nav {
     display: flex;
-    align-items: center;
     justify-content: space-around;
     padding-top: 8px;
 }
@@ -48,6 +47,8 @@ body > nav > button.mode-toggle.selected {
     background: var(--infobg-c);
     color: white;
 }
+
+label.has-icon::before{ filter: invert(); }
 
 .text-changes::after { content:attr(data-longtext); }
 
@@ -78,10 +79,15 @@ pre {
 
 #site-icon {
     width: var(--icon-size);
+    height: var(--icon-size);
     filter: grayscale() invert();
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 865px) {
+
+    body > nav > button { font-size: 20px; padding: 4px 8px 4px;}
+    .region-control { font-size: 12px; }
+
     .text-changes::after { content:attr(data-shorttext); }
 
     #site-icon { display: none;}
