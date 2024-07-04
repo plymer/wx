@@ -24,48 +24,20 @@ class UI {
     #publicHeader;
     #publicIssuer;
     #wxmap;
+    #wxmapSat;
+    #cldnStatus;
 
     constructor(mode, data) {
         console.log("initializing the UI running", mode, "mode...");
         this.#appMode = mode;
-        // set a default for the submode, this will get overwritten almost immediately
-        if (localStorage.getItem("submode")) {
-            this.#submode = localStorage.getItem("submode");
-        } else {
-            this.#submode = "gfa";
-            localStorage.setItem("submode", this.#submode);
-        }
 
-        // set the default office
-        if (localStorage.getItem("publicOffice")) {
-            this.#publicOffice = localStorage.getItem("publicOffice");
-            this.#publicHeader = localStorage.getItem("publicHeader");
-            this.#publicIssuer = localStorage.getItem("publicIssuer");
-        } else {
-            this.#publicOffice = "wwg";
-            this.#publicHeader = "FOCN45";
-            this.#publicIssuer = "CWWG";
-            localStorage.setItem("publicOffice", this.#publicOffice);
-            localStorage.setItem("publicHeader", this.#publicHeader);
-            localStorage.setItem("publicIssuer", this.#publicIssuer);
-            
-        }
+        // set all of the default values for the various submodes and options/preferences
+        this.setAppDefaults();
 
-        // set a default for the ob decode mode
-        if (localStorage.getItem("decode")) {
-            this.#decode = localStorage.getItem("decode");
-        } else {
-            this.#decode = "raw";
-            localStorage.setItem("decode", this.#decode);
-        }
-        
         this.#parent = document.getElementsByTagName("main")[0];
         this.#dataController = data;
         this.#elementList = {};
         this.#configController = {};
-
-
-
         
         // start building the UI for the app since we now have everything set up
         this.init();
@@ -78,6 +50,12 @@ class UI {
     get elementList(){ return this.#elementList; }
     get config() { return this.#configController; }
     get wxmap() { return this.#wxmap; }
+    get wxmapSat() {return this.#wxmapSat; }
+    get cldnStatus() { return this.#cldnStatus; }
+
+    // setters
+    set wxmapSat(sat) { this.#wxmapSat = sat; }
+    set cldnStatus(status) { this.#cldnStatus = status; }
 
     async init() {
 
@@ -114,12 +92,58 @@ class UI {
         return await configFile.json();
     }
 
+    setAppDefaults(){
+        if (localStorage.getItem("submode")) {
+            this.#submode = localStorage.getItem("submode");
+        } else {
+            this.#submode = "gfa";
+            localStorage.setItem("submode", this.#submode);
+        }
+
+        // set the default office
+        if (localStorage.getItem("publicOffice")) {
+            this.#publicOffice = localStorage.getItem("publicOffice");
+            this.#publicHeader = localStorage.getItem("publicHeader");
+            this.#publicIssuer = localStorage.getItem("publicIssuer");
+        } else {
+            this.#publicOffice = "wwg";
+            this.#publicHeader = "FOCN45";
+            this.#publicIssuer = "CWWG";
+            localStorage.setItem("publicOffice", this.#publicOffice);
+            localStorage.setItem("publicHeader", this.#publicHeader);
+            localStorage.setItem("publicIssuer", this.#publicIssuer);
+        }
+
+        // set a default for the ob decode mode
+        if (localStorage.getItem("decode")) {
+            this.#decode = localStorage.getItem("decode");
+        } else {
+            this.#decode = "raw";
+            localStorage.setItem("decode", this.#decode);
+        }
+
+        // set a default for the satellite to be displayed on the wxmap
+        if (localStorage.getItem("wxmapSat")) {
+            this.#wxmapSat = localStorage.getItem("wxmapSat");
+        } else {
+            this.#wxmapSat = "daynightmicro";
+            localStorage.setItem("wxmapSat", this.#wxmapSat);
+        }
+
+        // set a default for the satellite to be displayed on the wxmap
+        if (localStorage.getItem("cldnStatus")) {
+            this.#cldnStatus = localStorage.getItem("cldnStatus");
+        } else {
+            this.#cldnStatus = "true";
+            localStorage.setItem("cldnStatus", this.#cldnStatus);
+        }
+    }
+
     changeAppMode(mode){
         // this is the main mode controller to switch between the major tabs at the top of the app
         // this handles ensuring that the correct 'tab' is visually identifiable
         // it also clears out the old content and initializes the newly selected content
 
-        console.log(mode);
         this.#appMode = mode;
         localStorage.setItem("mode", this.#appMode);
 
@@ -343,20 +367,61 @@ class UI {
 
             let satType = document.createElement("select");
             satType.setAttribute("id", "sat-type");
-            satType.addEventListener("change", function(){ console.log(this.value); });
+            satType.setAttribute("name", "sat-type");
+            
+            satType.addEventListener("change", function(){
+                app.wxmap.removeLayer(app.wxmap.getLayersList[app.wxmapSat]);
+                app.wxmap.addLayer(app.wxmap.getLayersList[this.value]);
+                app.wxmapSat = this.value;
+                localStorage.setItem("wxmapSat", app.wxmapSat);
+                console.log(localStorage.getItem("wxmapSat"));
+            });
 
 
             // build the selectors for the satellite products we have, as well as toggles for lightning, etc
             for (const product in app.dc.data.sat.goes) {
-                console.log(product);
                 let o = document.createElement("option");
                 o.setAttribute("value", product);
+                if (o.value == this.#wxmapSat) {
+                    o.setAttribute("selected", "");
+                }
                 o.innerHTML = app.dc.data.sat.goes[product].uiName;
                 satType.appendChild(o);
             }
 
             n.appendChild(satLabel);
             n.appendChild(satType);
+
+            // build a toggle to enable/disable the lightning plot
+            let cldnLabel = document.createElement("label");
+            cldnLabel.setAttribute("for", "cldn");
+            cldnLabel.setAttribute("class", "has-icon");
+            cldnLabel.innerHTML = "Lightning Density Plot"
+
+
+            let cldnChk = document.createElement("input");
+            cldnChk.setAttribute("type", "checkbox");
+            cldnChk.setAttribute("id", "cldn");
+            cldnChk.setAttribute("name", "cldn");
+            if(app.cldnStatus){
+                cldnChk.setAttribute("checked", "");
+            }
+            cldnChk.addEventListener("change", function(){
+                // if the checkbox is checked, we add the layer, else we delete it
+                if (this.checked) {
+                    app.wxmap.addLayer(app.wxmap.getLayersList["cldn-data"]);
+                } else {
+                    app.wxmap.removeLayer(app.wxmap.getLayersList["cldn-data"]);
+                }
+
+                app.cldnStatus = this.checked;
+                localStorage.setItem("cldnStatus", app.cldnStatus);
+                console.log(localStorage.getItem("cldnStatus"));
+                
+            });
+
+            n.appendChild(cldnLabel);
+            n.appendChild(cldnChk);
 
             
             
