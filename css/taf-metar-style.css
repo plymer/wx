@@ -4,15 +4,6 @@
     /* --bgc: #800b00; */
     /* --bgc: #ff4433; */
     /* --bgc: #008000; */
-
-    --infobg-c: #333333;
-    --btnbg-c: #eeeeee;
-    --btninactive-c: #444444;
-    --txt-c: #ffffff;
-    --txtinv-c: #000000;
-    --txtbg-c: #eeeeee;
-
-    --px1border: 1px solid black;
 }
 
 body > main { background: var(--bg-c); }
