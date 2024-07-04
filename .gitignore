@@ -3,6 +3,7 @@ data/current-gfas.json
 data/taf-plus.json
 data/dummy-fx.json
 data/notams.json
+data/stations-raw.json
 maps/
 conv_otlk/images/
 conv_otlk/text/
