@@ -18,6 +18,8 @@ main > nav, main > section > nav, #site-meta {
 .has-icon::before {
     content: "";
     background-size: 100% 100%;
+    background-position: top left;
+    background-repeat: no-repeat;
     padding-right: 16px;
     margin-right: 4px;
 }
@@ -27,6 +29,7 @@ nav > input {
     font-family: "Sometype Mono", monospace;
     text-align: center;
     background-color: var(--txtbg-c);
+    font-weight: bold;
 }
 
 nav > input, nav > select, nav > label { margin-left: 4px; margin-right: 4px; }
@@ -67,10 +70,13 @@ section > button {
 }
 
 #load-button,
-button.selected {
+button.selected,
+nav > select {
     background: var(--btnbg-c);
     color: var(--txtinv-c);
 }
+
+main > nav > * { font-size: inherit; }
 
 button::before {
     background-size: 80% 100%;
@@ -84,7 +90,7 @@ button:not(.selected)::before,
 #load-button::before,
 button.selected::before { filter: none; }  
 
-label[for="site-id"]::before { background-image:url("../images/icons/search.png"); filter: invert();}
+label[for="site-id"]::before { background-image:url("../images/icons/search.png"); }
 #load-button::before {
     background-size: 80% 100%;
     background-repeat: no-repeat;
@@ -161,6 +167,7 @@ section > p, section > div > p {
     border: none;
     border-top: var(--px1border);
     border-bottom: var(--px1border);
+    font-size: 18px;
 }
 
 #tafplus > button { width: 25%; }

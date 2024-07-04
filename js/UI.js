@@ -262,6 +262,10 @@ class UI {
                 }
             });
 
+            i.addEventListener("focus", function(){
+                this.value = "";
+            });
+
             n.appendChild(i);
 
             let load = document.createElement("button");
@@ -485,10 +489,8 @@ class UI {
                     let b = document.createElement("button");
                     b.dataset.shorttext = config["gfa"][product]["shorttext"];
                     b.dataset.longtext = config["gfa"][product]["longtext"];
-                    b.innerHTML = config["gfa"][product]["longtext"];
                     b.setAttribute("id", config["gfa"][product]["id"]);
-                    // b.setAttribute("class", "text-changes region-control");
-                    b.setAttribute("class", "region-control");
+                    b.setAttribute("class", "text-changes region-control");
 
                     if (b.getAttribute("id") == localStorage.getItem("gfaRegion")) {
                         b.classList.add("selected");

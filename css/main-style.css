@@ -50,7 +50,8 @@ body > nav > button.mode-toggle.selected {
 
 label.has-icon::before{ filter: invert(); }
 
-.text-changes::after { content:attr(data-longtext); }
+.text-changes::after { content:attr(data-shorttext) "\a" attr(data-longtext); white-space: pre;}
+body > nav > button.text-changes::after { content: attr(data-longtext); }
 
 button#burger {
     width: var(--icon-size);
@@ -87,8 +88,9 @@ pre {
 
     body > nav > button { font-size: 20px; padding: 4px 8px 4px;}
     .region-control { font-size: 12px; }
-
-    .text-changes::after { content:attr(data-shorttext); }
+    
+    body > nav > button.text-changes::after, .text-changes::after { content:attr(data-shorttext); }
+    
 
     #site-icon { display: none;}
 }

@@ -2,38 +2,38 @@
     "avn" : {
         "gfa" : {
             "GFACN31" : {
-                "longtext" : "GFACN31 Pacific",
-                "shorttext" : "31",
+                "longtext" : "Pacific",
+                "shorttext" : "GFA31",
                 "id" : "GFACN31"
             },
             "GFACN32" : {
-                "longtext" : "GFACN32 Prairies",
-                "shorttext" : "32",
+                "longtext" : "Prairies",
+                "shorttext" : "GFA32",
                 "id" : "GFACN32"
             },
             "GFACN33" : {
-                "longtext" : "GFACN33\nOntario-Quebec",
-                "shorttext" : "33",
+                "longtext" : "Ontario-Quebec",
+                "shorttext" : "GFA33",
                 "id" : "GFACN33"
             },
             "GFACN34" : {
-                "longtext" : "GFACN34 Atlantic",
-                "shorttext" : "34",
+                "longtext" : "Atlantic",
+                "shorttext" : "GFA34",
                 "id" : "GFACN34"
             },
             "GFACN35" : {
-                "longtext" : "GFACN35 Yukon-NWT",
-                "shorttext" : "35",
+                "longtext" : "Yukon-NWT",
+                "shorttext" : "GFA35",
                 "id" : "GFACN35"
             },
             "GFACN36" : {
-                "longtext" : "GFACN36 Nunavut",
-                "shorttext" : "36",
+                "longtext" : "Nunavut",
+                "shorttext" : "GFA36",
                 "id" : "GFACN36"
             },
             "GFACN37" : {
-                "longtext" : "GFACN37 Arctic",
-                "shorttext" : "37",
+                "longtext" : "Arctic",
+                "shorttext" : "GFA37",
                 "id" : "GFACN37"
             }
         },
