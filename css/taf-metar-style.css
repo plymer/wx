@@ -147,7 +147,7 @@ section > p, section > div > p {
     border-bottom: none;
 }
 
-#site-name { display: block; font-weight: 700; }
+#site-name { display: block; font-weight: 700; margin-bottom: 4px;}
 #site-name::before { background-image:url("../images/icons/airport.png");  }
 #lat-lon::before   { background-image:url("../images/icons/map.png"); }
 #elevation::before { background-image:url("../images/icons/mountains.png"); }
