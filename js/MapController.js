@@ -1,3 +1,9 @@
+/*
+
+
+
+*/
+
 class MapController {
 
     #mapConfigs = {"wx" : "wx-map", "pub" : "public-map"};
@@ -5,7 +11,7 @@ class MapController {
     #mapObject;
     #container;
     #mapData;
-    #layerSources = [];
+    #layerSources = {};
 
     constructor(mapMode) {
         mapboxgl.accessToken = "pk.eyJ1IjoicGx5bWVyIiwiYSI6ImNsb2x3ZWZyMDFjcWEyanFvcjNzMm1qNHEifQ.V6wmuoD1GQM5tvPkRb2MvA";
@@ -31,7 +37,7 @@ class MapController {
             container: this.#container,
             style: "mapbox://styles/plymer/cly2zivrf008e01r12tt04gwp/draft",
             zoom: 3, // 3 is a roughly continental view, smaller number is zoomed out
-            center: [-100, 62] // lon, lat of centre of map view
+            center: [-100, 55] // lon, lat of centre of map view
         });
 
         this.#mapObject.on("load", () => {
@@ -40,39 +46,45 @@ class MapController {
 
             // IMPORTANT::right now, this is all sourced the the GeoMet WMS server
             for (const sourceType in this.#mapData) {
-                for (const source in this.#mapData[sourceType]) {
+                for (const product in this.#mapData[sourceType]) {
 
-                    
+                    // "product" will be used as a grouping method for when we store the source data for later use
 
-                    let s = this.#mapData[sourceType][source];
+                    let p = this.#mapData[sourceType][product];
 
-                    for (const l in s.layerList) {
-                        let sourceName = s.layerList[l].name + "-" + s.nameBase;
-                        let sourceURL = s.urlBase + s.layerList[l].layer;
-                        let sourceID = s.type + "-" + s.nameBase + "-" + s.layerList[l].name;
+                    for (const l in p.layerList) {
+                        let productName = p.layerList[l].name + "-" + p.nameBase;
+                        let productURL = p.urlBase + p.layerList[l].layer;
+                        let productID = (p.type + "-" + p.nameBase + "-" + p.layerList[l].name).toString().toLowerCase();
                         
                         
-                        this.#mapObject.addSource(sourceName,
+                        this.#mapObject.addSource(productName,
                             {
-                                "type" : s.type, // type of data, i.e. raster
-                                "tiles" : [sourceURL], // tiles are requested from the URL in an array
-                                "tileSize" : s.tileSize, // limits the number of pixels pulled from WMS server
-                                "bounds" : s.layerList[l].bounds // clip the data
+                                "type" : p.type, // type of data, i.e. raster
+                                "tiles" : [productURL], // tiles are requested from the URL in an array
+                                "tileSize" : p.tileSize, // limits the number of pixels pulled from WMS server
+                                "bounds" : p.layerList[l].bounds // clip the data
                             }
                         );
 
-                        // we may NOT want to add all layers at once so this will likely get split out
-
-                        this.makeLayer(sourceName, s.type, sourceID, s.paint, s.after, true);
+                        // here we build a 'profile' for the layer if we want to add it to the map at some point
+                        this.makeLayer(product, productName, p.type, productID, p.paint, p.after);
 
 
                     }
                 }
             }
+
+            // we want to add at least one layer of satellite, and the CLDN for now
+            this.addLayer(this.#layerSources[app.wxmapSat]);
+            if (app.cldnStatus) {
+                this.addLayer(this.#layerSources["cldn-data"]);
+            }
+            
         });
     }
 
-    makeLayer(source, type, id, paint, after, add = false){
+    makeLayer(product, source, type, id, paint, after, add = false){
         // create a sourceData object that contains all of our metaData
         let sourceData = {
             "source" : source, // source name i.e. East-DayNightMicro
@@ -82,34 +94,44 @@ class MapController {
             "after" : after // specify the layer we are drawing *underneath*
         };
 
-        // add the source data to our list so we can rebuild it later if we have removed it from the display
-        this.#layerSources.push(sourceData);
-
-        // if we specified we want to add the layer, we run the addLayer function with this new layer object
-        if (add) {
-            this.addLayer(sourceData)
+        if (!this.#layerSources[product]) {
+            // if we haven't added this product to the layerSources yet, set up an array to store the incoming sourceData for this product type
+            this.#layerSources[product] = [];
         }
+
+        // add the source data to our list so we can rebuild it later if we have removed it from the display
+        this.#layerSources[product].push(sourceData);
+
     }
 
-    addLayer(sourceData){
-        // adding a layer to the map object will cause it to be displayed
-        // we do this by running the Mapbox GL JS method "addLayer"
-        this.#mapObject.addLayer(
-            {
-                "id" : sourceData.id,
-                "type" : sourceData.type,
-                "source" : sourceData.source,
-                "paint" : sourceData.paint
-            },
-            sourceData.after            
-        );
+    addLayer(layerSource){
+        // we need to loop through all of the possible sources per layer, since we are likely dealing with a goes-east+goes-west situation
+        for (let i = 0; i < layerSource.length; i++){
+            // adding a layer to the map object will cause it to be displayed
+            // we do this by running the Mapbox GL JS method "addLayer"
+            this.#mapObject.addLayer(
+                {
+                    "id" : layerSource[i].id,
+                    "type" : layerSource[i].type,
+                    "source" : layerSource[i].source,
+                    "paint" : layerSource[i].paint
+                },
+                layerSource[i].after
+            );
+
+        }
+
     }
 
-    removeLayer(sourceData){
+    removeLayer(layerSource){
         // deletes the layer from the map object (but leaves the source data intact)
         // we run the Mapbox GL JS method "removeLayer" with the layer's id reference
-        console.log("remove layer:", sourceData.id);
-        this.#mapObject.removelayer(sourceData.id)
+        // we have to loop through the layer source to remove all instances of the layer, for things like a goes-east+goes-west situation
+
+        for (let i = 0; i < layerSource.length; i++){
+            this.#mapObject.removeLayer(layerSource[i].id);
+        }
+        
     }
 
     get getLayersList() { return this.#layerSources; }
