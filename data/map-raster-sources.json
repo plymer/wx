@@ -1,0 +1,207 @@
+{
+    "goes" : {
+        "daynightmicro" : {
+            "nameBase" : "DayNightMicro",
+            "uiName" : "Day/Night Microphysics",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "after" : "land",
+            "type" : "raster",
+            "layerList" : [
+                {
+                    "name" : "East",
+                    "layer" : "GOES-East_1km_DayCloudType-NightMicrophysics",
+                    "bounds" : [-100, -90, 180, 90]
+                },
+                {
+                    "name" : "West",
+                    "layer" : "GOES-West_1km_DayCloudType-NightMicrophysics",
+                    "bounds" : [-180, -90, -100, 90]
+                }
+            ],
+            "paint" : {}
+        },
+        "daynightsandwich" : {
+            "nameBase" : "DayNightSandwich",
+            "uiName" : "IR Sandwich",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "after" : "land",
+            "type" : "raster",
+            "layerList" : [
+                {
+                    "name" : "East",
+                    "layer" : "GOES-East_1km_VisibleIRSandwich-NightMicrophysicsIR",
+                    "bounds" : [-100, -90, 180, 90]
+                },
+                {
+                    "name" : "West",
+                    "layer" : "GOES-West_1km_VisibleIRSandwich-NightMicrophysicsIR",
+                    "bounds" : [-180, -90, -100, 90]
+                }
+            ],
+            "paint" : {}
+        },
+        "dayvisnightir" : {
+            "nameBase" : "DayVisNightIR",
+            "uiName" : "Day Vis/Night IR",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "after" : "land",
+            "type" : "raster",
+            "layerList" : [
+                {
+                    "name" : "East",
+                    "layer" : "GOES-East_1km_DayVis-NightIR",
+                    "bounds" : [-100, -90, 180, 90]
+                },
+                {
+                    "name" : "West",
+                    "layer" : "GOES-West_1km_DayVis-NightIR",
+                    "bounds" : [-180, -90, -100, 90]
+                }
+            ],
+            "paint" : {}
+        },
+        "firetemp" : {
+            "nameBase" : "FireTemp",
+            "uiName" : "SW IR Fire Temperature",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "after" : "land",
+            "type" : "raster",
+            "layerList" : [
+                {
+                    "name" : "East",
+                    "layer" : "GOES-East_1km_FireTemperature-SWIR",
+                    "bounds" : [-100, -90, 180, 90]
+                },
+                {
+                    "name" : "West",
+                    "layer" : "GOES-West_1km_FireTemperature-SWIR",
+                    "bounds" : [-180, -90, -100, 90]
+                }
+            ],
+            "paint" : {}
+        },
+        "snowfog" : {
+            "nameBase" : "SnowFog",
+            "uiName" : "Snow and Fog/Night Microphysics",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "after" : "land",
+            "type" : "raster",
+            "layerList" : [
+                {
+                    "name" : "East",
+                    "layer" : "GOES-East_1km_SnowFog-NightMicrophysics",
+                    "bounds" : [-100, -90, 180, 90]
+                },
+                {
+                    "name" : "West",
+                    "layer" : "GOES-West_1km_SnowFog-NightMicrophysics",
+                    "bounds" : [-180, -90, -100, 90]
+                }
+            ],
+            "paint" : {}
+        },
+        "va" : {
+            "nameBase" : "VA",
+            "uiName" : "Volcanic Ash",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "after" : "land",
+            "type" : "raster",
+            "layerList" : [
+                {
+                    "name" : "East",
+                    "layer" : "GOES-East_2km_Ash",
+                    "bounds" : [-100, -90, 180, 90]
+                },
+                {
+                    "name" : "West",
+                    "layer" : "GOES-West_2km_Ash",
+                    "bounds" : [-180, -90, -100, 90]
+                }
+            ],
+            "paint" : {}
+        },
+        "sulphur" : {
+            "nameBase" : "Sulphur",
+            "uiName" : "Sulphur Dioxide",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "after" : "land",
+            "type" : "raster",
+            "layerList" : [
+                {
+                    "name" : "East",
+                    "layer" : "GOES-East_2km_SO2",
+                    "bounds" : [-100, -90, 180, 90]
+                },
+                {
+                    "name" : "West",
+                    "layer" : "GOES-West_2km_SO2",
+                    "bounds" : [-180, -90, -100, 90]
+                }
+            ],
+            "paint" : {}
+        },
+        "nightir" : {
+            "nameBase" : "NightIR",
+            "uiName" : "Night IR",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "after" : "land",
+            "type" : "raster",
+            "layerList" : [
+                {
+                    "name" : "East",
+                    "layer" : "GOES-East_2km_NightIR",
+                    "bounds" : [-100, -90, 180, 90]
+                },
+                {
+                    "name" : "West",
+                    "layer" : "GOES-West_2km_NightIR",
+                    "bounds" : [-180, -90, -100, 90]
+                }
+            ],
+            "paint" : {}
+        }
+    },
+    "cldn": {
+        "cldn-data" : {
+            "nameBase" : "Lightning-Density",            
+            "uiName" : "Lightning Density (2.5km)",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "type" : "raster",
+            "layerList" : [
+                {
+                    "name" : "CLDN",
+                    "layer" : "Lightning_2.5km_Density",
+                    "bounds" : [-180, -90, 180, 90]
+                }
+            ],
+            "paint" : {}
+        }
+    },
+    "radar": {
+        "rainrate" : {
+            "nameBase" : "Rain-Rate",            
+            "uiName" : "North American Radar Mosaic",
+            "urlBase" : "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=",
+            "tileSize" : 256,
+            "type" : "raster",
+            "after" : "land",
+            "layerList" : [
+                {
+                    "name" : "1kmRadar",
+                    "layer" : "RADAR_1KM_RRAI&style=Radar-Rain_Dis-14colors",
+                    "bounds" : [-180, -90, 180, 90]
+                }
+            ],
+            "paint" : {}
+        }
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "public-alerts" : {
+        "url" : "https://weather.gc.ca/data/dms/alert_geojson/alerts.en.geojson"
+    },
+    "airports" : {
+        "url" : "/stations.geojson"
+    }
+}
