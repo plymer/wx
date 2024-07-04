@@ -53,10 +53,15 @@
             "loadString" : "CMAC Hub TAF Discussions",
             "url" : "./data/taf-plus.json"
         },
-        "sat" : {
-            "name" : "wxmapList",
-            "loadString" : "Weather Map Sources",
-            "url" : "./data/config/wx-map-sources.json"
+        "raster" : {
+            "name" : "rasterSourceList",
+            "loadString" : "Weather Map Raster Sources",
+            "url" : "./data/map-raster-sources.json"
+        },
+        "vector" : {
+            "name" : "vectorSourceList",
+            "loadString" : "Weather Map Vector Sources",
+            "url" : "./data/map-vector-sources.json"
         }
     }
 
@@ -74,7 +79,7 @@
         <button class="text-changes mode-toggle" id="pub" data-longtext="Public&#x0a;Products" data-shorttext="PUB"></button>
         <button class="text-changes mode-toggle" id="avn" data-longtext="CMAC&#x0a;Products" data-shorttext="AVN"></button>
         <button class="text-changes mode-toggle" id="obs" data-longtext="METAR/&#x0a;TAF" data-shorttext="OBS"></button>
-        <button class="text-changes mode-toggle" id="sat" data-longtext="Weather&#x0a;Data" data-shorttext="DATA"></button>
+        <button class="text-changes mode-toggle" id="wxmap" data-longtext="Weather&#x0a;Map" data-shorttext="MAP"></button>
         <button class="text-changes" id="outlook" data-longtext="Convective&#x0a;Outlooks" data-shorttext="OTLK"></button>
         <!-- <button id="burger"></button> -->
         
