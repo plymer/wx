@@ -85,12 +85,16 @@ pre {
 }
 
 @media screen and (max-width: 865px) {
+    :root { --icon-size: 32px; }
 
-    body > nav > button { font-size: 20px; padding: 4px 8px 4px;}
+    body > nav {padding: 4px 4px 0 4px; }
+    body > nav > button { font-size: 20px; padding: 4px 8px 4px; flex-grow: 1;}
     .region-control { font-size: 12px; }
     
     body > nav > button.text-changes::after, .text-changes::after { content:attr(data-shorttext); }
+
+    
     
 
-    #site-icon { display: none;}
+    /* #site-icon { display: none;}s */
 }
