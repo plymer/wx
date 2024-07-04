@@ -19,7 +19,7 @@ class UI {
     #configController;
     #decode;
     #decodeModes = ["raw", "can", "usa"];
-    #appModeList = ["pub", "avn", "obs", "sat"];
+    #appModeList = ["pub", "avn", "obs", "wxmap"];
     #publicOffice;
     #publicHeader;
     #publicIssuer;
@@ -74,9 +74,9 @@ class UI {
         o.addEventListener("click", function(){ app.changeAppMode("obs")});
         this.#elementList["obs"] = o;
 
-        let d = document.getElementById("sat");
-        d.addEventListener("click", function(){ app.changeAppMode("sat")});
-        this.#elementList["sat"] = d;
+        let d = document.getElementById("wxmap");
+        d.addEventListener("click", function(){ app.changeAppMode("wxmap")});
+        this.#elementList["wxmap"] = d;
 
         let l = document.getElementById("outlook");
         l.addEventListener("click", function(){ window.open("/conv_otlk/", "_self"); });
@@ -224,7 +224,7 @@ class UI {
     async addElements(){
         // This is the largest method in this entire app since it contains ALL of the logic
         // for each of the app's modes looks, feels, and behaves.
-        // "obs" mode is hard-coded within this method, as is the "sat" mode since these are
+        // "obs" mode is hard-coded within this method, as is the "wxmap" mode since these are
         // data-display modes, vs the "avn" and "pub" modes are more interactive and will change
         //
         // The setup of each mode's UI is similar:
@@ -359,7 +359,7 @@ class UI {
 
 
 
-        } else if (this.#appMode == "sat") {
+        } else if (this.#appMode == "wxmap") {
 
             let n = document.createElement("nav");
             n.setAttribute("id", "wx-map-control");
@@ -383,13 +383,13 @@ class UI {
 
 
             // build the selectors for the satellite products we have, as well as toggles for lightning, etc
-            for (const product in app.dc.data.sat.goes) {
+            for (const product in app.dc.data.raster.goes) {
                 let o = document.createElement("option");
                 o.setAttribute("value", product);
                 if (o.value == this.#wxmapSat) {
                     o.setAttribute("selected", "");
                 }
-                o.innerHTML = app.dc.data.sat.goes[product].uiName;
+                o.innerHTML = app.dc.data.raster.goes[product].uiName;
                 satType.appendChild(o);
             }
 
@@ -720,11 +720,19 @@ class UI {
                         aTiC.innerHTML = aTime;
                         container.appendChild(aTiC);
 
-                        for (const r in aRegions) {
+                        if (aRegions.length > 10) {
                             let aR = document.createElement("p");
-                            aR.innerHTML = aRegions[r];
+                            aR.innerHTML = "There are " + aRegions.length + " regions affected by this alert in " + alerts[a].prov + ".";
                             container.appendChild(aR);
+                        } else {
+                            for (const r in aRegions) {
+                                let aR = document.createElement("p");
+                                aR.innerHTML = aRegions[r];
+                                container.appendChild(aR);
+                            }
                         }
+
+                        
 
                         let aTxt = document.createElement("p");
                         aTxt.innerHTML = aText;
