@@ -10,7 +10,8 @@ class MapController {
     #mode;
     #mapObject;
     #container;
-    #mapData;
+    #mapRasterData;
+    #mapVectorData;
     #layerSources = {};
 
     constructor(mapMode) {
@@ -30,12 +31,13 @@ class MapController {
         ////////////////////////////////////
         // for now this is all WMS data!! //
         ////////////////////////////////////
-        this.#mapData = app.dc.data.sat; 
+        this.#mapRasterData = app.dc.data.raster;
+        this.#mapVectorData = app.dc.data.vector;
 
         // initialize the map object with the style we have defined in Mapbox Studio
         this.#mapObject = new mapboxgl.Map({
             container: this.#container,
-            style: "mapbox://styles/plymer/cly2zivrf008e01r12tt04gwp/draft",
+            style: "mapbox://styles/plymer/cly2zivrf008e01r12tt04gwp",
             zoom: 3, // 3 is a roughly continental view, smaller number is zoomed out
             center: [-100, 55] // lon, lat of centre of map view
         });
@@ -45,12 +47,12 @@ class MapController {
             // read through all of our map data sources first, then add them all to the map object
 
             // IMPORTANT::right now, this is all sourced the the GeoMet WMS server
-            for (const sourceType in this.#mapData) {
-                for (const product in this.#mapData[sourceType]) {
+            for (const sourceType in this.#mapRasterData) {
+                for (const product in this.#mapRasterData[sourceType]) {
 
                     // "product" will be used as a grouping method for when we store the source data for later use
 
-                    let p = this.#mapData[sourceType][product];
+                    let p = this.#mapRasterData[sourceType][product];
 
                     for (const l in p.layerList) {
                         let productName = p.layerList[l].name + "-" + p.nameBase;
@@ -80,6 +82,7 @@ class MapController {
             if (app.cldnStatus) {
                 this.addLayer(this.#layerSources["cldn-data"]);
             }
+            this.addLayer(this.#layerSources["rainrate"])
             
         });
     }
