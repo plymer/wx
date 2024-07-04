@@ -106,7 +106,7 @@ label[for="site-id"]::before { background-image:url("../images/icons/search.png"
 #usa.decode-toggle::before { background-image:url("../images/icons/usa.png"); }
 
 
-#metar-output { min-height: 240px; }
+#metar-output, #forecast-container { min-height: 240px; max-height: 70vh; overflow-y: scroll; }
 
 
 section > p, section > div > p {
