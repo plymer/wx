@@ -2,6 +2,7 @@ data/current-alerts.json
 data/current-gfas.json
 data/taf-plus.json
 data/dummy-fx.json
+data/notams.json
 maps/
 conv_otlk/images/
 conv_otlk/text/
