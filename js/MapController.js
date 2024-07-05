@@ -13,6 +13,7 @@ class MapController {
     #mapRasterData;
     #mapVectorData;
     #layerSources = {};
+    #loopURLs = {};
 
     constructor(mapMode) {
         mapboxgl.accessToken = "pk.eyJ1IjoicGx5bWVyIiwiYSI6ImNsb2x3ZWZyMDFjcWEyanFvcjNzMm1qNHEifQ.V6wmuoD1GQM5tvPkRb2MvA";
@@ -20,6 +21,9 @@ class MapController {
 
         this.init();
     }
+
+    get getLayersList() { return this.#layerSources; }
+    get mapObject() { return this.#mapObject; }
 
     init(){
 
@@ -137,6 +141,49 @@ class MapController {
         
     }
 
-    get getLayersList() { return this.#layerSources; }
+    async initializeLoop() {
+        // get all of the currently-displayed layers
+        // get all of the base tile URLs
+        // check the 'getcapabilities' time dimension
+        // create an array of time strings that we can append to the tile url as we loop through
+        // QUESTION:: how do we deal with the fact that radar is 6 minutes and sat/cldn is 10 minutes
+
+        /////////
+        // looping info
+        // this.#mapObject.getSource("CLDN-Lightning-Density").tiles -- shows all the tiles in the array
+        // this.#mapObject.getSource("CLDN-Lightning-Density").tiles = ["some url"] -- set the tiles to the new url array
+        // this.#mapObject.style._sourceCaches["other:CLDN-Lightning-Density"].clearTiles()  -- removes the currently-drawn layer
+        // this.#mapObject.style._sourceCaches["other:CLDN-Lightning-Density"].update(this.#mapObject.transform) -- repaints the layer
+
+        
+        let parser = new DOMParser();
+        let capabilities = await fetch("https://geo.weather.gc.ca/geomet/?lang=en&service=WMS&version=1.3.0&request=GetCapabilities&layer=Lightning_2.5km_Density");
+        let xmlText = await capabilities.text();
+
+        let dimString = parser.parseFromString(xmlText, "text/xml").getElementsByTagName("Dimension")[0].childNodes[0].nodeValue.split("/");
+
+        // dimString will look something like this: 2024-07-05T11:50:00Z/2024-07-05T14:50:00Z/PT10M
+
+        let timeStart = Date.parse(dimString[0]); // in unix epox milliseconds
+        let timeEnd = Date.parse(dimString[1]);
+        let timeDiff = parseInt(dimString[2].replaceAll(/[a-zA-Z]/g, "")) * 1000 * 60; // this should be milliseconds equiv of whatever the PTxxM is
+
+        let timeSlices = (timeEnd - timeStart) / timeDiff; // determine how many time slices there are between the start and end of the range
+        let timeStrings = []; // contains all of the strings we will concatenate onto our base URL
+
+        for (let i = 0; i < timeSlices; i++) {
+            // create each time string based on our calculated time diff and number of slices
+            timeStrings[i] = timeStart + (i * timeDiff); // need to convert this back to the YYY-MM-DDTHH:mm:ssZ format
+        }
+
+        // we will store all of these new URLs in this.#loopURLs;
+        console.log(this.#loopURLs);
+        
+
+        
+
+    }
+
+
     
 }
