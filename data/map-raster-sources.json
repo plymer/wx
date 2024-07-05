@@ -198,7 +198,7 @@
                 {
                     "name" : "1kmRadar",
                     "layer" : "RADAR_1KM_RRAI&style=Radar-Rain_Dis-14colors",
-                    "bounds" : [-180, -90, 180, 90]
+                    "bounds" : [-171, 16, -50, 68]
                 }
             ],
             "paint" : {}
