@@ -86,7 +86,7 @@ button::before {
 
 button:not(.selected)::before,
 #site-meta > *::before { filter: invert(); }
-#site-meta > *:not(:first-child) { margin-right: 16px; }
+#site-meta > *:not(:first-child, :last-child) { margin-right: 16px; }
 
 #load-button::before,
 button.selected::before { filter: none; }  
