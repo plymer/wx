@@ -591,29 +591,17 @@ class UI {
 
             }
 
-            let header = document.createElement("h2");
-            header.innerHTML = "Header:";
-            td.appendChild(header);
-
             let headerText = document.createElement("p");
             headerText.setAttribute("id", "tafplus-header-text");
             headerText.setAttribute("class", "tafplus-content");
             this.#elementList["tafplus-header"] = headerText;
             td.appendChild(headerText);
 
-            let discuss = document.createElement("h2");
-            discuss.innerHTML = "Discussion:";
-            td.appendChild(discuss);
-
             let discussText = document.createElement("p");
             discussText.setAttribute("id", "tafplus-discussion-text");
             discussText.setAttribute("class", "tafplus-content");
             this.#elementList["tafplus-discussion"] = discussText;
             td.appendChild(discussText);
-
-            let forecaster = document.createElement("h2");
-            forecaster.innerHTML = "Forecaster:";
-            td.appendChild(forecaster);
 
             let forecasterText = document.createElement("p");
             forecasterText.setAttribute("id", "tafplus-forecaster-text");
