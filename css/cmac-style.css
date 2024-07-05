@@ -61,7 +61,8 @@
     filter: invert();
 }
 
-
+.tafplus-content { padding-bottom: 12px; }
+.tafplus-content:first-of-type { padding-top: 12px; }
 
 #tafplus > h1::before { background-image: url("../images/icons/airport.png"); }
 
