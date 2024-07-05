@@ -982,7 +982,7 @@ class UI {
         let hubData = app.dc.data.tafplus[hub];
     
         this.#elementList["tafplus-header"].innerHTML = hubData.strheaders;
-        this.#elementList["tafplus-discussion"].innerHTML = hubData.strdiscussion;
+        this.#elementList["tafplus-discussion"].innerHTML = hubData.strdiscussion.trim();
         this.#elementList["tafplus-forecaster"].innerHTML = hubData.strforecaster + "/" + hubData.stroffice;  
     
     
