@@ -351,11 +351,15 @@ class UI {
             ntmBtn.addEventListener("click", function(){ toggleTAFNOTAM("notam")});
             ntmBtn.innerHTML = "NOTAM (coming soon)";
 
+            let tncontent = document.createElement("p");
+            tncontent.setAttribute("id", "taf-notam-content");
+
             tafNotam.appendChild(tafbtn);
             tafNotam.appendChild(ntmBtn);
+            tafNotam.appendChild(tncontent);
 
             this.#parent.appendChild(tafNotam);
-            this.#elementList["taf-notam"] = tafNotam;
+            this.#elementList["taf-notam"] = tncontent;
 
 
 
@@ -947,7 +951,8 @@ class UI {
             this.#elementList["metadata"].appendChild(o);
         }
 
-        let taf = document.createElement("p");
+        let taf = this.#elementList["taf-notam"]; // this a <p> tag that lives inside the taf/notam container
+
         let tafMeta = document.createElement("span");
         tafMeta.setAttribute("class", "taf-meta");
         tafMeta.innerHTML = t["meta"];
@@ -979,13 +984,7 @@ class UI {
             o.setAttribute("class", "taf-rmk");
             o.innerHTML = t["rmk"]
             taf.appendChild(o);
-        }
-
-        // all elements of the TAF have been added, now add the TAF to the DOM
-        this.#elementList["taf-notam"].appendChild(taf);
-
-
-        
+        }      
 
     }
 
