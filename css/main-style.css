@@ -67,16 +67,7 @@ button#burger {
 
 button#burger.clicked { mask-position: 50% 96%, 50% 50%, 50% 4%; } 
 
-pre {
-    padding: 0.5em;
-    font-family: monospace;
-    color: black;
-    width: 100%;
-    background: rgba(255,255,255,0.4);
-    font-size: 1.25em;
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-}
+.forecast-container > p { white-space: pre; }
 
 #site-icon {
     width: var(--icon-size);
