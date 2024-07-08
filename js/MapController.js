@@ -155,6 +155,8 @@ class MapController {
         // this.#mapObject.style._sourceCaches["other:CLDN-Lightning-Density"].clearTiles()  -- removes the currently-drawn layer
         // this.#mapObject.style._sourceCaches["other:CLDN-Lightning-Density"].update(this.#mapObject.transform) -- repaints the layer
 
+        let layerIds = []; // store all of our layer source's ids so we can do a comparison against what is in the mapobject's layer list
+        let loopCoords = {}; // this object will store all of the loop URLs that we generate, for each layer source id that we retrieve
         
         let parser = new DOMParser();
         let capabilities = await fetch("https://geo.weather.gc.ca/geomet/?lang=en&service=WMS&version=1.3.0&request=GetCapabilities&layer=Lightning_2.5km_Density");
@@ -173,11 +175,28 @@ class MapController {
 
         for (let i = 0; i < timeSlices; i++) {
             // create each time string based on our calculated time diff and number of slices
-            timeStrings[i] = timeStart + (i * timeDiff); // need to convert this back to the YYY-MM-DDTHH:mm:ssZ format
+            // this returns the timestamp for each image in the YYY-MM-DDTHH:mm:ssZ format
+            // -- the replace() removes the milliseconds from the string which would break the WMS lookup
+            timeStrings[i] = new Date(timeStart + (i * timeDiff)).toISOString().replace(/.\d+Z$/g, "Z"); 
+        }
+
+        for (const ls in this.#layerSources) {
+            for (let i = 0; i < this.#layerSources[ls].length; i++) {
+                layerIds.push(this.#layerSources[ls][i].id);
+            }
+        }
+
+        for (const lid in layerIds) {
+            let temp = [];
+            for (const ts in timeStrings) {
+                temp.push(timeStrings[ts]);                
+            }
+            loopCoords[layerIds[lid]] = temp;
+            
         }
 
         // we will store all of these new URLs in this.#loopURLs;
-        console.log(this.#loopURLs);
+        console.log(loopCoords);
         
 
         
