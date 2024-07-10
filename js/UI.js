@@ -25,6 +25,7 @@ class UI {
     #publicIssuer;
     #wxmap;
     #wxmapSat;
+    #wxmapInfo;
     #cldnStatus;
 
     constructor(mode, data) {
@@ -378,8 +379,8 @@ class UI {
             satType.setAttribute("name", "sat-type");
             
             satType.addEventListener("change", function(){
-                app.wxmap.removeLayer(app.wxmap.getLayersList[app.wxmapSat]);
-                app.wxmap.addLayer(app.wxmap.getLayersList[this.value]);
+                app.wxmap.removeLayer(app.wxmap.layerSources[app.wxmapSat]);
+                app.wxmap.addLayer(app.wxmap.layerSources[this.value]);
                 app.wxmapSat = this.value;
                 localStorage.setItem("wxmapSat", app.wxmapSat);
                 console.log(localStorage.getItem("wxmapSat"));
@@ -437,8 +438,15 @@ class UI {
             let m = document.createElement("div");
             m.setAttribute("id", "wx-map");
 
+            let i = document.createElement("section");
+            i.setAttribute("id", "wx-map-info");
+            i.setAttribute("class", "map-display-info");
+
+            this.#elementList["wx-map-info"] = i;
+
             this.#parent.appendChild(n);
             this.#parent.appendChild(m);
+            this.#parent.appendChild(i);
 
             const wxmap = new MapController("wx");
             this.#wxmap = wxmap;
@@ -986,6 +994,10 @@ class UI {
         this.#elementList["tafplus-forecaster"].innerHTML = hubData.strforecaster + "/" + hubData.stroffice;  
     
     
+    }
+
+    updateMapDisplayInfo(mapConfig) {
+
     }
 
 }
