@@ -236,8 +236,7 @@ class UI {
         //  -- initialize any data retrieval that the user will want, based on stored "preferences"
         //     that were saved in localStorage
 
-        if (this.#appMode == "obs") {
-            
+        if (this.#appMode == "obs") {            
 
             let n = document.createElement("nav");
 
@@ -258,14 +257,10 @@ class UI {
             });
 
             i.addEventListener("keyup", function(e){
-                if (e.key === "Enter") {
-                    getObs();
-                }
+                if (e.key === "Enter") { getObs(); }
             });
 
-            i.addEventListener("focus", function(){
-                this.value = "";
-            });
+            i.addEventListener("focus", function(){ this.value = ""; });
 
             n.appendChild(i);
 
@@ -350,14 +345,12 @@ class UI {
             });
 
             ntmBtn.addEventListener("click", function(){ toggleTAFNOTAM("notam")});
-            ntmBtn.innerHTML = "NOTAM (coming soon)";
+            ntmBtn.innerHTML = "NOTAM";
 
             let tncontent = document.createElement("p");
             tncontent.setAttribute("id", "taf-notam-content");
 
-            tafNotam.appendChild(tafbtn);
-            tafNotam.appendChild(ntmBtn);
-            tafNotam.appendChild(tncontent);
+            tafNotam.append(tafbtn,ntmBtn,tncontent);
 
             this.#parent.appendChild(tafNotam);
             this.#elementList["taf-notam"] = tncontent;
@@ -366,90 +359,7 @@ class UI {
 
         } else if (this.#appMode == "wxmap") {
 
-            let n = document.createElement("nav");
-            n.setAttribute("id", "wx-map-control");
-
-            let satLabel = document.createElement("label");
-            satLabel.innerHTML = "Satellite Channel:";
-            satLabel.setAttribute("for", "sat-type");
-            satLabel.setAttribute("class", "has-icon");
-
-            let satType = document.createElement("select");
-            satType.setAttribute("id", "sat-type");
-            satType.setAttribute("name", "sat-type");
-            
-            satType.addEventListener("change", function(){
-                app.wxmap.removeLayer(app.wxmap.layerSources[app.wxmapSat]);
-                app.wxmap.addLayer(app.wxmap.layerSources[this.value]);
-                app.wxmapSat = this.value;
-                localStorage.setItem("wxmapSat", app.wxmapSat);
-                console.log(localStorage.getItem("wxmapSat"));
-            });
-
-
-            // build the selectors for the satellite products we have, as well as toggles for lightning, etc
-            for (const product in app.dc.data.raster.goes) {
-                let o = document.createElement("option");
-                o.setAttribute("value", product);
-                if (o.value == this.#wxmapSat) {
-                    o.setAttribute("selected", "");
-                }
-                o.innerHTML = app.dc.data.raster.goes[product].uiName;
-                satType.appendChild(o);
-            }
-
-            n.appendChild(satLabel);
-            n.appendChild(satType);
-
-            // build a toggle to enable/disable the lightning plot
-            let cldnLabel = document.createElement("label");
-            cldnLabel.setAttribute("for", "cldn");
-            cldnLabel.setAttribute("class", "has-icon");
-            cldnLabel.innerHTML = "Lightning Density Plot"
-
-
-            let cldnChk = document.createElement("input");
-            cldnChk.setAttribute("type", "checkbox");
-            cldnChk.setAttribute("id", "cldn");
-            cldnChk.setAttribute("name", "cldn");
-            if(app.cldnStatus){
-                cldnChk.setAttribute("checked", "");
-            }
-            cldnChk.addEventListener("change", function(){
-                // if the checkbox is checked, we add the layer, else we delete it
-                if (this.checked) {
-                    app.wxmap.addLayer(app.wxmap.getLayersList["cldn-data"]);
-                } else {
-                    app.wxmap.removeLayer(app.wxmap.getLayersList["cldn-data"]);
-                }
-
-                app.cldnStatus = this.checked;
-                localStorage.setItem("cldnStatus", app.cldnStatus);
-                console.log(localStorage.getItem("cldnStatus"));
-                
-            });
-
-            n.appendChild(cldnLabel);
-            n.appendChild(cldnChk);
-
-            
-            
-            // hard code this stuff as well, because it also won't change
-            let m = document.createElement("div");
-            m.setAttribute("id", "wx-map");
-
-            let i = document.createElement("section");
-            i.setAttribute("id", "wx-map-info");
-            i.setAttribute("class", "map-display-info");
-
-            this.#elementList["wx-map-info"] = i;
-
-            this.#parent.appendChild(n);
-            this.#parent.appendChild(m);
-            this.#parent.appendChild(i);
-
-            const wxmap = new MapController("wx");
-            this.#wxmap = wxmap;
+            this.createMap("wx", true);
             
         } else {
             await this.buildUIFromConfig();
@@ -749,13 +659,7 @@ class UI {
             // end of the warnings list
             ////////////////////////////////////////////////////////////
 
-            let mapHead = document.createElement("h1");
-            mapHead.innerHTML = "Outlooks and Warnings Map";
-            this.#parent.appendChild(mapHead);
-
-            let mapContent = document.createElement("section");
-            mapContent.setAttribute("id", "public-map");
-            this.#parent.appendChild(mapContent);
+            // this.createMap("pub");
 
         }
 
@@ -957,8 +861,8 @@ class UI {
         tafMain.setAttribute("class", "taf-main");
         tafMain.innerHTML = t["main"];
 
-        taf.appendChild(tafMeta);
-        taf.appendChild(tafMain);
+        taf.append(tafMeta, tafMain);
+        
 
         // now loop through all of the part periods and append those to the taf
 
@@ -996,8 +900,134 @@ class UI {
     
     }
 
-    updateMapDisplayInfo(mapConfig) {
+    createMap(mode, looping = false) {
 
+        console.log("creating map for", mode, "mode");
+
+        let n = document.createElement("nav");
+            n.setAttribute("id", "wx-map-control");
+
+            let satLabel = document.createElement("label");
+            satLabel.innerHTML = "Satellite Channel:";
+            satLabel.setAttribute("for", "sat-type");
+            satLabel.setAttribute("class", "has-icon");
+
+            let satType = document.createElement("select");
+            satType.setAttribute("id", "sat-type");
+            satType.setAttribute("name", "sat-type");
+            
+            satType.addEventListener("change", function(){
+                app.wxmap.removeLayer(app.wxmap.layerSources[app.wxmapSat]);
+                app.wxmap.addLayer(app.wxmap.layerSources[this.value]);
+                app.wxmapSat = this.value;
+                localStorage.setItem("wxmapSat", app.wxmapSat);
+                console.log(localStorage.getItem("wxmapSat"));
+            });
+
+
+            // build the selectors for the satellite products we have, as well as toggles for lightning, etc
+            for (const product in app.dc.data.raster.goes) {
+                let o = document.createElement("option");
+                o.setAttribute("value", product);
+                if (o.value == this.#wxmapSat) {
+                    o.setAttribute("selected", "");
+                }
+                o.innerHTML = app.dc.data.raster.goes[product].uiName;
+                satType.appendChild(o);
+            }
+
+            n.append(satLabel, satType);
+
+            // build a toggle to enable/disable the lightning plot
+            let cldnLabel = document.createElement("label");
+            cldnLabel.setAttribute("for", "cldn");
+            cldnLabel.setAttribute("class", "has-icon");
+            cldnLabel.innerHTML = "Lightning Density Plot"
+
+
+            let cldnChk = document.createElement("input");
+            cldnChk.setAttribute("type", "checkbox");
+            cldnChk.setAttribute("id", "cldn");
+            cldnChk.setAttribute("name", "cldn");
+            if(app.cldnStatus){
+                cldnChk.setAttribute("checked", "");
+            }
+            cldnChk.addEventListener("change", function(){
+                // if the checkbox is checked, we add the layer, else we delete it
+                if (this.checked) {
+                    app.wxmap.addLayer(app.wxmap.getLayersList["cldn-data"]);
+                } else {
+                    app.wxmap.removeLayer(app.wxmap.getLayersList["cldn-data"]);
+                }
+
+                app.cldnStatus = this.checked;
+                localStorage.setItem("cldnStatus", app.cldnStatus);
+                console.log(localStorage.getItem("cldnStatus"));
+                
+            });
+
+            n.append(cldnLabel, cldnChk);
+            this.#parent.appendChild(n);
+
+            
+            
+            // hard code this stuff as well, because it also won't change
+            let m = document.createElement("div");
+            m.setAttribute("id", "wx-map");
+
+            this.#parent.appendChild(m);
+
+            let i = document.createElement("section");
+            i.setAttribute("id", "wx-map-info");
+            i.setAttribute("class", "map-display-info");
+            this.#elementList["wx-map-info"] = i;
+
+            this.#parent.appendChild(i);
+
+            if (looping) {
+                // create map control buttons
+                let nb = document.createElement("button");
+                nb.setAttribute("class", "player-button");
+                nb.innerHTML = ">";
+                nb.addEventListener("click", function(){
+                    app.wxmap.nextFrame();
+                });
+
+                let prb = document.createElement("button");
+                prb.setAttribute("class", "player-button");
+                prb.innerHTML = "<";
+                prb.addEventListener("click", function(){
+                    app.wxmap.prevFrame();
+                });
+
+                let play = document.createElement("button");
+                play.setAttribute("class", "player-button");
+                play.innerHTML = "&#9654"
+                play.addEventListener("click", function(){
+                    app.wxmap.startLoop();
+                });
+
+                let ffb = document.createElement("button");
+                ffb.setAttribute("class", "player-button");
+                ffb.innerHTML = "|<";
+                ffb.addEventListener("click", function(){
+                    app.wxmap.firstFrame();
+                });
+
+                let lfb = document.createElement("button");
+                lfb.setAttribute("class", "player-button");
+                lfb.innerHTML = ">|";
+                lfb.addEventListener("click", function(){
+                    app.wxmap.lastFrame();
+                });
+
+                // add all loop control buttons to the UI
+                this.#parent.append(ffb, prb, play, nb, lfb);
+            }
+
+            const wxmap = new MapController("wx");
+            this.#wxmap = wxmap;
     }
+
 
 }
