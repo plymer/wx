@@ -5,10 +5,8 @@ os.chdir(path)
 os.chdir("../data/")
 path = os.getcwd()
 
-raw = open(path + "/stations-raw.json")
-rawStationData = json.load(raw)
-
-idPattern = "([A-Z]{4})"
+rawStationData = json.load(open(path + "/stations-raw.json"))
+irisStationList = open(path + "/iris-station-list.txt").read().split(",")
 
 output = {
     "type" : "FeatureCollection",
@@ -20,22 +18,21 @@ featureList = []
 
 i = 0
 while i < len(rawStationData):
-    if len(rawStationData[i]["icaoId"]) == 4 and rawStationData[i]["iataId"] and rawStationData[i]["lon"] < -45 and rawStationData[i]["lat"] > 15:
-        if re.search(idPattern, rawStationData[i]["icaoId"]):
+    if rawStationData[i]["icaoId"] in irisStationList:        
 
-            temp = {}
-            temp["type"] = "Feature"
-            temp["geometry"] = {}
-            temp["geometry"]["type"] = "Point"
-            temp["geometry"]["coordinates"] = [rawStationData[i]["lon"], rawStationData[i]["lat"]]
-            temp["properties"] = {}
-            temp["properties"]["siteID"] = rawStationData[i]["icaoId"]
-            temp["properties"]["name"] = rawStationData[i]["site"]
-            temp["properties"]["elev"] = rawStationData[i]["elev"]
-            temp["properties"]["priority"] = rawStationData[i]["priority"]
+        temp = {}
+        temp["type"] = "Feature"
+        temp["geometry"] = {}
+        temp["geometry"]["type"] = "Point"
+        temp["geometry"]["coordinates"] = [rawStationData[i]["lon"], rawStationData[i]["lat"]]
+        temp["properties"] = {}
+        temp["properties"]["siteID"] = rawStationData[i]["icaoId"]
+        temp["properties"]["name"] = rawStationData[i]["site"]
+        temp["properties"]["elev"] = rawStationData[i]["elev"]
+        temp["properties"]["priority"] = rawStationData[i]["priority"]
 
-            # add the geojson encoded data to the output array
-            featureList.append(temp)
+        # add the geojson encoded data to the output array
+        featureList.append(temp)
     
     i += 1
 
