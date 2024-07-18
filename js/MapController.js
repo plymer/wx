@@ -13,11 +13,14 @@ class MapController {
     #mapRasterData;
     #mapVectorData;
     #layerSources = {};
-    #loopURLs = {};
-    #loopIndex;
-    #loopLength;
-    #timeStrings;
-    #infoBox;
+    #loop = {
+        "urls" : {},
+        "timeStrings" : [],
+        "index" : 0,
+        "length" : 0,
+        "status" : false
+    }
+    #infoBox; // contains the timestamp for the currently displayed map data
 
     constructor(mapMode) {
         mapboxgl.accessToken = "pk.eyJ1IjoicGx5bWVyIiwiYSI6ImNsb2x3ZWZyMDFjcWEyanFvcjNzMm1qNHEifQ.V6wmuoD1GQM5tvPkRb2MvA";
@@ -28,8 +31,8 @@ class MapController {
 
     get layerSources() { return this.#layerSources; }
     get mapObject() { return this.#mapObject; }
-    get timeStrings() { return this.#timeStrings; }
     get infoBox() { return this.#infoBox; }
+    get loop() { return this.#loop; }
 
     set infoBox(content) { this.#infoBox.innerHTML = content; }
 
@@ -38,7 +41,6 @@ class MapController {
         // read the map container we are targetting from the baked-in config
         this.#container = this.#mapConfigs[this.#mode];
         this.#infoBox = app.elementList[this.#container + "-info"];
-        this.#loopIndex = 0;
         
         // add all the data in the configuration to make it available
         ////////////////////////////////////
@@ -66,6 +68,7 @@ class MapController {
 
             // we want to add at least one layer of satellite, and the CLDN for now
             this.addLayer(this.#layerSources[app.wxmapSat]);
+
             if (app.cldnStatus) {
                 this.addLayer(this.#layerSources["cldn-data"]);
             }
@@ -187,18 +190,16 @@ class MapController {
         let timeDiff = parseInt(dimString[2].replaceAll(/[a-zA-Z]/g, "")) * 1000 * 60; // this should be milliseconds equiv of whatever the PTxxM is
 
         let timeSlices = (timeEnd - timeStart) / timeDiff; // determine how many time slices there are between the start and end of the range
-        this.#timeStrings = []; // contains all of the strings we will concatenate onto our base URL
 
         for (let i = 0; i < timeSlices; i++) {
             // create each time string based on our calculated time diff and number of slices
             // this returns the timestamp for each image in the YYY-MM-DDTHH:mm:ssZ format
             // -- the replace() removes the milliseconds from the string which would break the WMS lookup
-            this.#timeStrings[i] = new Date(timeStart + (i * timeDiff)).toISOString().replace(/.\d+Z$/g, "Z"); 
+            this.#loop.timeStrings[i] = new Date(timeStart + (i * timeDiff)).toISOString().replace(/.\d+Z$/g, "Z"); 
         }
 
-        this.#timeStrings.reverse();
-
-        this.#loopLength = this.#timeStrings.length - 1;
+        this.#loop.timeStrings.reverse();
+        this.#loop.length = this.#loop.timeStrings.length - 1;
 
         for (const ls in this.#layerSources) {
             for (let i = 0; i < this.#layerSources[ls].length; i++) {
@@ -210,26 +211,17 @@ class MapController {
 
         for (const lid in layerData) {
             let temp = [];
-            for (const ts in this.#timeStrings) {                
-                temp.push(layerData[lid].tiles + "&time=" + this.#timeStrings[ts]);
+            for (const ts in this.#loop.timeStrings) {                
+                temp.push(layerData[lid].tiles + "&time=" + this.#loop.timeStrings[ts]);
             }
-
-            loopCoords[layerData[lid].source] = temp.reverse();
 
             // loopCoords now contains all of the layer sources with an array of URLs that can be used to loop through multiple images
-            /* i.e.
-            {
-                "CLDN-Lightning-Density" : [
-                    "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=RADAR_1KM_RRAI&style=Radar-Rain_Dis-14colors&time=2024-07-08T16:10:00Z",
-                    "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=RADAR_1KM_RRAI&style=Radar-Rain_Dis-14colors&time=2024-07-08T16:20:00Z",
-                    ...
-                ]
-            }
-            */
+            loopCoords[layerData[lid].source] = temp;            
+            
         }
 
-        // we will store all of these new URLs in this.#loopURLs;
-        this.#loopURLs = loopCoords;
+        // we will store all of these new URLs in this.#loop.urls;
+        this.#loop.urls = loopCoords;
 
         this.updateMapDisplay();
 
@@ -252,13 +244,11 @@ class MapController {
         // then 1th index is the next newest, and so on
         // since this is looking backward in time, we want to 
         //   look positively in the index
-        let n = this.#loopIndex + 1;
-        if (n >= this.#loopLength) {
-            console.log("setting loopIndex to", 0);
-            this.#loopIndex = 0;
+        let n = this.#loop.index + 1;
+        if (n >= this.#loop.length) {
+            this.#loop.index = 0;
         } else {
-            console.log("setting loopIndex to", n);
-            this.#loopIndex = n;
+            this.#loop.index = n;
         }
 
         this.updateMapDisplay();
@@ -272,17 +262,26 @@ class MapController {
         // since this is looking forward in time, we want to 
         //   look negatively in the index
 
-        let n = this.#loopIndex - 1;
+        let n = this.#loop.index - 1;
         if (n < 0) {
-            console.log("setting loopIndex to", this.#loopLength - 1);
-            this.#loopIndex = this.#loopLength - 1;
+            this.#loop.index = this.#loop.length - 1;
         } else {
-            console.log("setting loopIndex to", n);
-            this.#loopIndex = n;
+            this.#loop.index = n;
         }
 
         this.updateMapDisplay();
 
+    }
+
+    firstFrame() {
+        this.#loop.index = this.#loop.length - 1;
+        
+        this.updateMapDisplay();
+    }
+
+    lastFrame() {
+        this.#loop.index = 0;
+        this.updateMapDisplay();
     }
 
     updateMapDisplay() {
@@ -291,18 +290,18 @@ class MapController {
             for (const source in this.#layerSources[layer]) {
 
                 let sourceName = this.#layerSources[layer][source].source;
-                let currentTiles = this.#loopURLs[sourceName][this.#loopIndex];
+                let currentTiles = this.#loop.urls[sourceName][this.#loop.index];
                 let currentSource = this.#mapObject.getSource(sourceName);
 
                 currentSource.setTiles([currentTiles]);
-                currentSource.reload();
+                // currentSource.reload();
 
             }
             
         }
 
         // update the infoBox content with the current timestamp
-        this.infoBox = this.#timeStrings[this.#loopIndex];
+        this.infoBox = this.#loop.timeStrings[this.#loop.index];
 
     }
 
