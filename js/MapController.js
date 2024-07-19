@@ -8,19 +8,29 @@ class MapController {
 
     #mapConfigs = {"wx" : "wx-map", "pub" : "public-map"};
     #mode;
-    #mapObject;
-    #container;
-    #mapRasterData;
-    #mapVectorData;
-    #layerSources = {};
+
+    #map = {
+        "object" : "",
+        "container" : "",
+        "data" : {
+            "raster" : "",
+            "vector" : ""
+        },
+        "layerSources" : {}
+    }
+
+    // loop contains all relevant data to looping the map layers
     #loop = {
         "urls" : {},
         "timeStrings" : [],
         "index" : 0,
         "length" : 0,
-        "status" : false
+        "status" : false,
+        "fps" : 8,
+        "loopObject" : 0
     }
-    #infoBox; // contains the timestamp for the currently displayed map data
+    // contains the timestamp for the currently displayed map data
+    #infoBox;
 
     constructor(mapMode) {
         mapboxgl.accessToken = "pk.eyJ1IjoicGx5bWVyIiwiYSI6ImNsb2x3ZWZyMDFjcWEyanFvcjNzMm1qNHEifQ.V6wmuoD1GQM5tvPkRb2MvA";
@@ -29,29 +39,31 @@ class MapController {
         this.init();
     }
 
-    get layerSources() { return this.#layerSources; }
-    get mapObject() { return this.#mapObject; }
+
+    get map() { return this.#map; }
     get infoBox() { return this.#infoBox; }
     get loop() { return this.#loop; }
+    get loopObject() { return this.#loop.loopObject; }
 
+    set loopObject(obj) { this.#loop.loopObject = obj; }
     set infoBox(content) { this.#infoBox.innerHTML = content; }
 
     init(){
 
         // read the map container we are targetting from the baked-in config
-        this.#container = this.#mapConfigs[this.#mode];
-        this.#infoBox = app.elementList[this.#container + "-info"];
+        this.#map.container = this.#mapConfigs[this.#mode];
+        this.#infoBox = app.elementList[this.#map.container + "-info"];
         
         // add all the data in the configuration to make it available
         ////////////////////////////////////
         // for now this is all WMS data!! //
         ////////////////////////////////////
-        this.#mapRasterData = app.dc.data.raster;
-        this.#mapVectorData = app.dc.data.vector;
+        this.#map.data.raster = app.dc.data.raster;
+        this.#map.data.vector = app.dc.data.vector;
 
         // initialize the map object with the style we have defined in Mapbox Studio
-        this.#mapObject = new mapboxgl.Map({
-            container: this.#container,
+        this.#map.object = new mapboxgl.Map({
+            container: this.#map.container,
             style: "mapbox://styles/plymer/cly2zivrf008e01r12tt04gwp",
             zoom: 3, // 3 is a roughly continental view, smaller number is zoomed out
             center: [-100, 55], // lon, lat of centre of map view
@@ -61,16 +73,16 @@ class MapController {
             boxZoom: false
         });
 
-        this.#mapObject.on("load", () => {
+        this.#map.object.on("load", () => {
 
             // read through all of our map data sources first, then add them all to the map object
             this.createLayerSources();
 
             // we want to add at least one layer of satellite, and the CLDN for now
-            this.addLayer(this.#layerSources[app.wxmapSat]);
+            this.addLayer(this.#map.layerSources[app.wxmapSat]);
 
             if (app.cldnStatus) {
-                this.addLayer(this.#layerSources["cldn-data"]);
+                this.addLayer(this.#map.layerSources["cldn-data"]);
             }
             // this.addLayer(this.#layerSources["rainrate"])
 
@@ -85,12 +97,12 @@ class MapController {
 
     createLayerSources() {
         // IMPORTANT::right now, this is all sourced the the GeoMet WMS server
-        for (const sourceType in this.#mapRasterData) {
-            for (const product in this.#mapRasterData[sourceType]) {
+        for (const sourceType in this.#map.data.raster) {
+            for (const product in this.#map.data.raster[sourceType]) {
 
                 // "product" will be used as a grouping method for when we store the source data for later use
 
-                let p = this.#mapRasterData[sourceType][product];
+                let p = this.#map.data.raster[sourceType][product];
 
                 for (const l in p.layerList) {
                     let productName = p.layerList[l].name + "-" + p.nameBase;
@@ -98,7 +110,7 @@ class MapController {
                     let productID = (p.type + "-" + p.nameBase + "-" + p.layerList[l].name).toString().toLowerCase();
                     
                     
-                    this.#mapObject.addSource(productName,
+                    this.#map.object.addSource(productName,
                         {
                             "type" : p.type, // type of data, i.e. raster
                             "tiles" : [productURL], // tiles are requested from the URL in an array
@@ -126,13 +138,13 @@ class MapController {
             "tiles" : tileURL // the base URL for the data from the WMS
         };
 
-        if (!this.#layerSources[product]) {
+        if (!this.#map.layerSources[product]) {
             // if we haven't added this product to the layerSources yet, set up an array to store the incoming sourceData for this product type
-            this.#layerSources[product] = [];
+            this.#map.layerSources[product] = [];
         }
 
         // add the source data to our list so we can rebuild it later if we have removed it from the display
-        this.#layerSources[product].push(sourceData);
+        this.#map.layerSources[product].push(sourceData);
 
     }
 
@@ -141,7 +153,7 @@ class MapController {
         for (let i = 0; i < layerSource.length; i++){
             // adding a layer to the map object will cause it to be displayed
             // we do this by running the Mapbox GL JS method "addLayer"
-            this.#mapObject.addLayer(
+            this.#map.object.addLayer(
                 {
                     "id" : layerSource[i].id,
                     "type" : layerSource[i].type,
@@ -161,7 +173,7 @@ class MapController {
         // we have to loop through the layer source to remove all instances of the layer, for things like a goes-east+goes-west situation
 
         for (let i = 0; i < layerSource.length; i++){
-            this.#mapObject.removeLayer(layerSource[i].id);
+            this.#map.object.removeLayer(layerSource[i].id);
         }
         
     }
@@ -201,10 +213,10 @@ class MapController {
         this.#loop.timeStrings.reverse();
         this.#loop.length = this.#loop.timeStrings.length - 1;
 
-        for (const ls in this.#layerSources) {
-            for (let i = 0; i < this.#layerSources[ls].length; i++) {
-                let source = this.#layerSources[ls][i].source;
-                let tiles = this.#layerSources[ls][i].tiles
+        for (const ls in this.#map.layerSources) {
+            for (let i = 0; i < this.#map.layerSources[ls].length; i++) {
+                let source = this.#map.layerSources[ls][i].source;
+                let tiles = this.#map.layerSources[ls][i].tiles
                 layerData.push({"source" : source, "tiles" : tiles});
             }
         }
@@ -232,9 +244,20 @@ class MapController {
     
     startLoop(){
 
+        // we will want to include some kind of pre-load caching thing before we begin the loop in earnest
+        let interval = 1000 / this.#loop.fps;
+        console.log("starting loop at", this.#loop.fps, "fps");
+        // this.#loop.loopObject = setInterval(() => this.nextFrame(), interval);
+
     }
 
     pauseLoop() {
+        if (this.#loop.loopObject) {
+            clearInterval(this.#loop.loopObject);
+        } else {
+            console.log("no loop object to pause");
+        }
+        
 
     }
 
@@ -286,12 +309,13 @@ class MapController {
 
     updateMapDisplay() {
 
-        for (const layer in this.#layerSources) {
-            for (const source in this.#layerSources[layer]) {
+        // this is a very expensive operation
+        for (const layer in this.#map.layerSources) {
+            for (const source in this.#map.layerSources[layer]) {
 
-                let sourceName = this.#layerSources[layer][source].source;
+                let sourceName = this.#map.layerSources[layer][source].source;
                 let currentTiles = this.#loop.urls[sourceName][this.#loop.index];
-                let currentSource = this.#mapObject.getSource(sourceName);
+                let currentSource = this.#map.object.getSource(sourceName);
 
                 currentSource.setTiles([currentTiles]);
                 // currentSource.reload();
@@ -302,6 +326,8 @@ class MapController {
 
         // update the infoBox content with the current timestamp
         this.infoBox = this.#loop.timeStrings[this.#loop.index];
+
+        // update the 'progress bar' with the current position of the loop
 
     }
 

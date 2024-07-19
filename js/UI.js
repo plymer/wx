@@ -20,9 +20,11 @@ class UI {
     #decode;
     #decodeModes = ["raw", "can", "usa"];
     #appModeList = ["pub", "avn", "obs", "wxmap"];
-    #publicOffice;
-    #publicHeader;
-    #publicIssuer;
+    #public = {
+        "office" : "",
+        "header" : "",
+        "issuer" : ""
+    }
     #wxmap;
     #wxmapSat;
     #wxmapInfo;
@@ -47,6 +49,7 @@ class UI {
 
     // getters
     get mode() { return this.#appMode; }
+    get submode() { return this.#submode; }
     get dc() { return this.#dataController; }
     get elementList(){ return this.#elementList; }
     get config() { return this.#configController; }
@@ -94,25 +97,32 @@ class UI {
     }
 
     setAppDefaults(){
+
+        // set the default submode depending on the main app mode
         if (localStorage.getItem("submode")) {
             this.#submode = localStorage.getItem("submode");
         } else {
-            this.#submode = "gfa";
+            if (this.#appMode == "avn") {
+                this.#submode = "gfa";
+            } else if (this.#appMode == "pub") {
+                this.#submode = "fp";
+            }
+            
             localStorage.setItem("submode", this.#submode);
         }
 
         // set the default office
         if (localStorage.getItem("publicOffice")) {
-            this.#publicOffice = localStorage.getItem("publicOffice");
-            this.#publicHeader = localStorage.getItem("publicHeader");
-            this.#publicIssuer = localStorage.getItem("publicIssuer");
+            this.#public.office = localStorage.getItem("publicOffice");
+            this.#public.header = localStorage.getItem("publicHeader");
+            this.#public.issuer = localStorage.getItem("publicIssuer");
         } else {
-            this.#publicOffice = "wwg";
-            this.#publicHeader = "FOCN45";
-            this.#publicIssuer = "CWWG";
-            localStorage.setItem("publicOffice", this.#publicOffice);
-            localStorage.setItem("publicHeader", this.#publicHeader);
-            localStorage.setItem("publicIssuer", this.#publicIssuer);
+            this.#public.office = "wwg";
+            this.#public.header = "FOCN45";
+            this.#public.issuer = "CWWG";
+            localStorage.setItem("publicOffice", this.#public.office);
+            localStorage.setItem("publicHeader", this.#public.header);
+            localStorage.setItem("publicIssuer", this.#public.issuer);
         }
 
         // set a default for the ob decode mode
@@ -131,7 +141,7 @@ class UI {
             localStorage.setItem("wxmapSat", this.#wxmapSat);
         }
 
-        // set a default for the satellite to be displayed on the wxmap
+        // set a default for the lightning to be displayed on the wxmap
         if (localStorage.getItem("cldnStatus")) {
             this.#cldnStatus = localStorage.getItem("cldnStatus");
         } else {
@@ -190,8 +200,8 @@ class UI {
 
     changePublicOffice(office) {
         // this function is called when the contents of the dropdown box changes
-        this.#publicOffice = office;
-        localStorage.setItem("publicOffice", this.#publicOffice);
+        this.#public.office = office;
+        localStorage.setItem("publicOffice", this.#public.office);
         
         this.clearScreen();
         this.addElements();
@@ -385,10 +395,6 @@ class UI {
                 localStorage.setItem("hub", "CYYC");
             }
 
-            if(!localStorage.getItem("submode")) {
-                localStorage.setItem("submode", "gfa");
-                this.changeSubMode("gfa");
-            }
 
             if (this.#submode == "gfa") {
 
@@ -555,7 +561,7 @@ class UI {
                 let opt = document.createElement("option");
                 opt.setAttribute("value", o);
                 opt.innerHTML = config[o]["longtext"];
-                if (opt.value == this.#publicOffice) {
+                if (opt.value == this.#public.office) {
                     opt.setAttribute("selected", true);
                 }
 
@@ -606,9 +612,9 @@ class UI {
             warnList.appendChild(warnHeading);
 
             const alerts = this.#dataController.data.alerts;
-            const aor = this.#configController.pub[this.#publicOffice].warnings;
+            const aor = this.#configController.pub[this.#public.office].warnings;
 
-            console.log("building warning list for", this.#publicOffice);
+            console.log("building warning list for", this.#public.office);
 
             
 
@@ -741,13 +747,13 @@ class UI {
             let pubHeader = localStorage.getItem("publicHeader");
             let pubIssuer = localStorage.getItem("publicIssuer");
 
-            const products = app.config.pub[this.#publicOffice].products; //app.config.pub.weg.products
+            const products = app.config.pub[this.#public.office].products; //app.config.pub.weg.products
 
             let n = document.createElement("nav");
             n.setAttribute("id", "public-forecast-products");
             n.setAttribute("class", "forecast-control");
 
-            console.log("building product selectors for", this.#publicOffice + "...");
+            console.log("building product selectors for", this.#public.office + "...");
 
             for (const p in products) {
                 let b = document.createElement("button");
