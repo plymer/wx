@@ -16,7 +16,8 @@ class MapController {
             "raster" : "",
             "vector" : ""
         },
-        "layerSources" : {}
+        "layerSources" : {},
+        "activeLayers" : {}
     }
 
     // loop contains all relevant data to looping the map layers
@@ -90,9 +91,6 @@ class MapController {
             this.initializeLoop();
             
         });
-
-
-
     }
 
     createLayerSources() {
@@ -163,6 +161,8 @@ class MapController {
                 layerSource[i].after
             );
 
+            this.#map.activeLayers[layerSource[i].id] = layerSource[i];
+
         }
 
     }
@@ -174,6 +174,7 @@ class MapController {
 
         for (let i = 0; i < layerSource.length; i++){
             this.#map.object.removeLayer(layerSource[i].id);
+            delete this.#map.activeLayers[layerSource[i].id];
         }
         
     }
@@ -309,18 +310,24 @@ class MapController {
 
     updateMapDisplay() {
 
-        // this is a very expensive operation
-        for (const layer in this.#map.layerSources) {
-            for (const source in this.#map.layerSources[layer]) {
+        // https://github.com/mapbox/mapbox-gl-js/issues/12707
+        // https://github.com/mapbox/mapbox-gl-js/pull/12352
+        // https://github.com/mapbox/mapbox-gl-js/issues/11776
+        // https://docs.mapbox.com/mapbox-gl-js/api/map/#map.event:data
 
-                let sourceName = this.#map.layerSources[layer][source].source;
+        
+        for (const layer in this.#map.activeLayers) {
+
+            
+
+                let sourceName = this.#map.activeLayers[layer].source;
                 let currentTiles = this.#loop.urls[sourceName][this.#loop.index];
                 let currentSource = this.#map.object.getSource(sourceName);
 
-                currentSource.setTiles([currentTiles]);
-                // currentSource.reload();
+                currentSource.setTiles([currentTiles]);                
+                console.log(this.#map.object.areTilesLoaded());
 
-            }
+            
             
         }
 
