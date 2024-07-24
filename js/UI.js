@@ -923,8 +923,8 @@ class UI {
             satType.setAttribute("name", "sat-type");
             
             satType.addEventListener("change", function(){
-                app.wxmap.removeLayer(app.wxmap.layerSources[app.wxmapSat]);
-                app.wxmap.addLayer(app.wxmap.layerSources[this.value]);
+                app.wxmap.removeLayer(app.wxmap.map.layerSources[app.wxmapSat]);
+                app.wxmap.addLayer(app.wxmap.map.layerSources[this.value]);
                 app.wxmapSat = this.value;
                 localStorage.setItem("wxmapSat", app.wxmapSat);
                 console.log(localStorage.getItem("wxmapSat"));
