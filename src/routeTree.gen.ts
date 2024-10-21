@@ -11,14 +11,42 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as AboutImport } from './routes/about'
+import { Route as WxmapImport } from './routes/wxmap'
+import { Route as PublicImport } from './routes/public'
+import { Route as OutlooksImport } from './routes/outlooks'
+import { Route as ObservationsImport } from './routes/observations'
+import { Route as AviationImport } from './routes/aviation'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
 
-const AboutRoute = AboutImport.update({
-  id: '/about',
-  path: '/about',
+const WxmapRoute = WxmapImport.update({
+  id: '/wxmap',
+  path: '/wxmap',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PublicRoute = PublicImport.update({
+  id: '/public',
+  path: '/public',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const OutlooksRoute = OutlooksImport.update({
+  id: '/outlooks',
+  path: '/outlooks',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ObservationsRoute = ObservationsImport.update({
+  id: '/observations',
+  path: '/observations',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AviationRoute = AviationImport.update({
+  id: '/aviation',
+  path: '/aviation',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,11 +67,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutImport
+    '/aviation': {
+      id: '/aviation'
+      path: '/aviation'
+      fullPath: '/aviation'
+      preLoaderRoute: typeof AviationImport
+      parentRoute: typeof rootRoute
+    }
+    '/observations': {
+      id: '/observations'
+      path: '/observations'
+      fullPath: '/observations'
+      preLoaderRoute: typeof ObservationsImport
+      parentRoute: typeof rootRoute
+    }
+    '/outlooks': {
+      id: '/outlooks'
+      path: '/outlooks'
+      fullPath: '/outlooks'
+      preLoaderRoute: typeof OutlooksImport
+      parentRoute: typeof rootRoute
+    }
+    '/public': {
+      id: '/public'
+      path: '/public'
+      fullPath: '/public'
+      preLoaderRoute: typeof PublicImport
+      parentRoute: typeof rootRoute
+    }
+    '/wxmap': {
+      id: '/wxmap'
+      path: '/wxmap'
+      fullPath: '/wxmap'
+      preLoaderRoute: typeof WxmapImport
       parentRoute: typeof rootRoute
     }
   }
@@ -53,37 +109,70 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/aviation': typeof AviationRoute
+  '/observations': typeof ObservationsRoute
+  '/outlooks': typeof OutlooksRoute
+  '/public': typeof PublicRoute
+  '/wxmap': typeof WxmapRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/aviation': typeof AviationRoute
+  '/observations': typeof ObservationsRoute
+  '/outlooks': typeof OutlooksRoute
+  '/public': typeof PublicRoute
+  '/wxmap': typeof WxmapRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/aviation': typeof AviationRoute
+  '/observations': typeof ObservationsRoute
+  '/outlooks': typeof OutlooksRoute
+  '/public': typeof PublicRoute
+  '/wxmap': typeof WxmapRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths:
+    | '/'
+    | '/aviation'
+    | '/observations'
+    | '/outlooks'
+    | '/public'
+    | '/wxmap'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/' | '/aviation' | '/observations' | '/outlooks' | '/public' | '/wxmap'
+  id:
+    | '__root__'
+    | '/'
+    | '/aviation'
+    | '/observations'
+    | '/outlooks'
+    | '/public'
+    | '/wxmap'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
+  AviationRoute: typeof AviationRoute
+  ObservationsRoute: typeof ObservationsRoute
+  OutlooksRoute: typeof OutlooksRoute
+  PublicRoute: typeof PublicRoute
+  WxmapRoute: typeof WxmapRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  AviationRoute: AviationRoute,
+  ObservationsRoute: ObservationsRoute,
+  OutlooksRoute: OutlooksRoute,
+  PublicRoute: PublicRoute,
+  WxmapRoute: WxmapRoute,
 }
 
 export const routeTree = rootRoute
@@ -99,14 +188,30 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about"
+        "/aviation",
+        "/observations",
+        "/outlooks",
+        "/public",
+        "/wxmap"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/about": {
-      "filePath": "about.tsx"
+    "/aviation": {
+      "filePath": "aviation.tsx"
+    },
+    "/observations": {
+      "filePath": "observations.tsx"
+    },
+    "/outlooks": {
+      "filePath": "outlooks.tsx"
+    },
+    "/public": {
+      "filePath": "public.tsx"
+    },
+    "/wxmap": {
+      "filePath": "wxmap.tsx"
     }
   }
 }
