@@ -8,50 +8,54 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <>
-      <nav className="bg-neutral-800 text-white">
-        <img src="/site-icon.svg" className="w-16 h-16 inline invert" />
-        <div className="p-2 inline-flex justify-between gap-2 text-lg">
-          <Link
-            to="/public"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            Public
-          </Link>
-          <Link
-            to="/aviation"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            Aviation
-          </Link>
-          <Link
-            to="/observations"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            Observations
-          </Link>
-          <Link
-            to="/wxmap"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            Weather Map
-          </Link>
-          <Link
-            to="/outlooks"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            Outlooks
-          </Link>
-        </div>
+      <nav className="bg-neutral-100  flex justify-between px-4 place-items-center">
+        <img src="/site-icon.svg" className="w-10 h-10 inline mb-2" />
+
+        <Link
+          className="px-6 py-3 text-center"
+          to="/public"
+          activeProps={{
+            className: "bg-neutral-800 text-white rounded-t-md",
+          }}
+        >
+          Public
+        </Link>
+        <Link
+          className="px-6 py-3 text-center"
+          to="/aviation"
+          activeProps={{
+            className: "bg-neutral-800 text-white rounded-t-md",
+          }}
+        >
+          Aviation
+        </Link>
+        <Link
+          className="px-6 py-3 text-center"
+          to="/observations"
+          activeProps={{
+            className: "bg-neutral-800 text-white rounded-t-md",
+          }}
+        >
+          Observations
+        </Link>
+        <Link
+          className="px-6 py-3 text-center"
+          to="/wxmap"
+          activeProps={{
+            className: "bg-neutral-800 text-white rounded-t-md",
+          }}
+        >
+          Weather Map
+        </Link>
+        <Link
+          className="px-6 py-3 text-center"
+          to="/outlooks"
+          activeProps={{
+            className: "bg-neutral-800 text-white rounded-t-md",
+          }}
+        >
+          Outlooks
+        </Link>
       </nav>
 
       <Outlet />
@@ -59,4 +63,3 @@ function RootComponent() {
     </>
   );
 }
-
