@@ -7,61 +7,48 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+    const LinkDetails = [
+        { longName: "Public", shortName: "PUB", endpoint: "/public" },
+        { longName: "Aviation", shortName: "AVN", endpoint: "/aviation" },
+        { longName: "Observations", shortName: "OBS", endpoint: "/observations" },
+        { longName: "Weather Map", shortName: "MAP", endpoint: "/wxmap" },
+        { longName: "Outlooks", shortName: "OTLK", endpoint: "/outlooks" },
+    ];
+
     return (
         <>
-            <nav className="bg-neutral-100  flex justify-between px-4 place-items-center">
+            <nav className="bg-neutral-100 flex justify-between px-4 place-items-center portrait:hidden">
                 <img src="/site-icon.svg" className="w-10 h-10 inline mb-2" />
-
-                <Link
-                    className="px-6 py-3 text-center"
-                    to="/public"
-                    activeProps={{
-                        className: "bg-neutral-800 text-white rounded-t-md",
-                    }}
-                >
-                    Public
-                </Link>
-                <Link
-                    className="px-6 py-3 text-center"
-                    to="/aviation"
-                    activeProps={{
-                        className: "bg-neutral-800 text-white rounded-t-md",
-                    }}
-                >
-                    Aviation
-                </Link>
-                <Link
-                    className="px-6 py-3 text-center"
-                    to="/observations"
-                    activeProps={{
-                        className: "bg-neutral-800 text-white rounded-t-md",
-                    }}
-                >
-                    Observations
-                </Link>
-                <Link
-                    className="px-6 py-3 text-center"
-                    to="/wxmap"
-                    activeProps={{
-                        className: "bg-neutral-800 text-white rounded-t-md",
-                    }}
-                >
-                    Weather Map
-                </Link>
-                <Link
-                    className="px-6 py-3 text-center"
-                    to="/outlooks"
-                    activeProps={{
-                        className: "bg-neutral-800 text-white rounded-t-md",
-                    }}
-                >
-                    Outlooks
-                </Link>
+                {LinkDetails.map((l, i) => (
+                    <Link
+                        key={i}
+                        className={
+                            "px-6 py-3 text-center [&.active]:bg-neutral-800 [&.active]:text-white [&.active]:rounded-t-md"
+                        }
+                        to={l.endpoint}
+                    >
+                        {l.longName}
+                    </Link>
+                ))}
+            </nav>
+            <nav className="bg-neutral-100 flex justify-between px-4 place-items-center landscape:hidden ">
+                <img src="/site-icon.svg" className="w-6 h-6 inline" />
+                {LinkDetails.map((l, i) => (
+                    <Link
+                        key={i}
+                        className={
+                            "px-3 py-1 text-center [&.active]:bg-neutral-800 [&.active]:text-white [&.active]:rounded-t-md"
+                        }
+                        to={l.endpoint}
+                    >
+                        {l.shortName}
+                    </Link>
+                ))}
             </nav>
 
             <Outlet />
             {/* <ReactQueryDevtools /> */}
-            <TanStackRouterDevtools position="bottom-right" />
+            {/* <TanStackRouterDevtools position="bottom-right" /> */}
         </>
     );
 }
