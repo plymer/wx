@@ -21,7 +21,7 @@ function ObsComponent() {
 
   return (
     <>
-      <div className="flex justify-around bg-neutral-800 text-white p-2 rounded-t-md">
+      <div className="flex justify-around bg-neutral-800 text-white p-2">
         <div className="flex place-items-center">
           <label htmlFor="site" className="text-white flex place-items-center">
             <Search className="w-4 h-4 me-2 inline" />
@@ -67,4 +67,3 @@ function ObsComponent() {
     </>
   );
 }
-

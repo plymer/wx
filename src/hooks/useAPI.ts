@@ -23,7 +23,6 @@ const useAPI = (endpoint: string, searchParams: SearchParam[]) => {
 
   const getData = async () => {
     const data = await api.get(url).then((res) => res.data);
-    // console.log(data);
     return data;
   };
 

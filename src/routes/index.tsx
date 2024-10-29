@@ -11,4 +11,3 @@ function HomeComponent() {
     </div>
   );
 }
-
