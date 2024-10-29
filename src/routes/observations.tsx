@@ -33,7 +33,7 @@ function ObsComponent() {
             minLength={3}
             maxLength={4}
             defaultValue={inputText}
-            className="ms-2 w-24 text-black text-center uppercase rounded-e-none font-mono"
+            className="ms-2 w-24 text-black text-center text-base uppercase rounded-e-none font-mono"
             autoComplete="false"
             spellCheck="false"
             onChange={(e) => setInputText(e.target.value)}
