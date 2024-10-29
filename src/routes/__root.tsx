@@ -1,5 +1,5 @@
 import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
-// import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const Route = createRootRoute({
@@ -17,7 +17,7 @@ function RootComponent() {
 
     return (
         <>
-            <nav className="flex justify-between px-4 place-items-center portrait:hidden">
+            <nav className="bg-neutral-100 flex justify-between px-4 place-items-center portrait:hidden">
                 <img src="/site-icon.svg" className="w-10 h-10 inline mb-2" />
                 {LinkDetails.map((l, i) => (
                     <Link
@@ -31,7 +31,7 @@ function RootComponent() {
                     </Link>
                 ))}
             </nav>
-            <nav className="flex justify-between px-4 place-items-center landscape:hidden ">
+            <nav className="bg-neutral-100 flex justify-between px-4 place-items-center landscape:hidden ">
                 <img src="/site-icon.svg" className="w-6 h-6 inline" />
                 {LinkDetails.map((l, i) => (
                     <Link
