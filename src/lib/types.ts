@@ -26,3 +26,14 @@ export type METAR = APIResponse & {
 export type APIResponse = {
   status: "error" | "success";
 };
+
+export type GFAData = {
+  domain: string;
+  cldwx: string[];
+  turbc: string[];
+};
+
+export type OtherChartData = {
+  domain: string;
+  images: string[];
+};
