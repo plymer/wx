@@ -18,12 +18,12 @@ const api = axios.create({ baseURL: "https://api.prairiewx.ca" });
  * @returns a react-query object
  */
 
-const useAPI = (endpoint: string, searchParams: SearchParam[]) => {
+const useAPI = <T>(endpoint: string, searchParams: SearchParam[]) => {
   const url = `/${endpoint}?` + searchParams.map((p) => `${p.param}=${p.value}`).join("&");
 
   const getData = async () => {
     const data = await api.get(url).then((res) => res.data);
-    return data;
+    return data as T;
   };
 
   return useQuery({
