@@ -32,7 +32,7 @@ const AvChartsGFA = () => {
             key={i}
             onClick={() => setRegion("gfacn3" + (i + 1).toString())}
           >
-            {r.toUpperCase()}
+            {r.replace("gfacn", "gfa ").toUpperCase()}
           </Button>
         ))}
       </nav>
