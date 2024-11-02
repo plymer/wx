@@ -1,8 +1,8 @@
+import { useEffect, useState } from "react";
+
 import useAPI from "@/hooks/useAPI";
 import { GFAData } from "@/lib/types";
 import { Button } from "./ui/button";
-import { useEffect, useState } from "react";
-import HubDiscussion from "./HubDiscussion";
 
 const AvChartsGFA = () => {
   const [region, setRegion] = useState("gfacn32");
