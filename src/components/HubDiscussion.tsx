@@ -18,7 +18,7 @@ const HubDiscussion = () => {
         <h2 className="md:inline max-md:hidden me-2">Hub Discussions:</h2>
         {HUBS.map((h, i) => (
           <Button
-            variant={site === h ? "default" : "secondary"}
+            variant={site === h ? "selected" : "secondary"}
             className="md:mt-2 rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/4"
             key={i}
             onClick={() => setSite(h)}
@@ -37,19 +37,19 @@ const HubDiscussion = () => {
             <Notebook className="inline" />
             <h3 className="text-bold px-2 inline">Discussion for {site.toUpperCase()}:</h3>
           </div>
-          <div className="font-mono px-4 py-2 mt-2 bg-neutral-300 text-black whitespace-pre-wrap">
+          <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">
             {hubData?.hubData.header}
             <br />
             <br />
             {hubData?.hubData.discussion}
           </div>
-          <div className="md:grid grid-rows-1 md:grid-cols-2 bg-neutral-300 ">
+          <div className="md:grid grid-rows-1 md:grid-cols-2 bg-muted ">
             <div className="md:col-start-1 md:row-start-1">
               <div className="px-4 py-2 bg-neutral-800">
                 <Binoculars className="inline" />
                 <h3 className="text-bold p-2 inline">Outlook:</h3>
               </div>
-              <div className="font-mono p-4 py-2 bg-neutral-300 text-black whitespace-pre-wrap">
+              <div className="font-mono p-4 py-2 bg-muted text-black whitespace-pre-wrap">
                 {hubData?.hubData.outlook}
               </div>
             </div>
@@ -58,7 +58,7 @@ const HubDiscussion = () => {
                 <Pencil className="inline" />
                 <h3 className="text-bold p-2 inline">Forecaster:</h3>
               </div>
-              <div className="font-mono px-4 py-2 bg-neutral-300 text-black">
+              <div className="font-mono px-4 py-2 bg-muted text-black">
                 {hubData?.hubData.forecaster}/{hubData?.hubData.office}
               </div>
             </div>
@@ -67,7 +67,7 @@ const HubDiscussion = () => {
                 <Plane className="inline" />
                 <h3 className="text-bold p-2 inline">TAF</h3>
               </div>
-              <div className="font-mono px-4 py-2 bg-neutral-300 text-black">
+              <div className="font-mono px-4 py-2 bg-muted text-black">
                 {tafIsLoading ? (
                   "Loading TAF"
                 ) : (

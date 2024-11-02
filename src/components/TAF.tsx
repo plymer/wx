@@ -13,15 +13,15 @@ const TAF = ({ site }: Props) => {
 
   if (isLoading) {
     return (
-      <div className="px-6 py-2 bg-neutral-300">
+      <div className="px-6 py-2 bg-secondary">
         <Loader2 className="inline animate-spin" /> Loading TAF...
       </div>
     );
   }
   // return the JSX elements
-  if (site && data && data.status === "success") {
+  if (site && data?.status === "success") {
     return (
-      <div className="px-8 py-4 bg-neutral-300 text-black font-mono ">
+      <div className="px-8 py-4 bg-muted text-black font-mono ">
         <div className="font-bold">{data.taf.main}</div>
         {data.taf.partPeriods
           ? data.taf.partPeriods.map((p, i) => (
@@ -35,13 +35,13 @@ const TAF = ({ site }: Props) => {
     );
   } else if (site && data && data.status === "error") {
     return (
-      <div className="px-6 py-2 bg-neutral-300">
+      <div className="px-6 py-2 bg-muted">
         <OctagonAlert className="inline" /> No TAF available for '{site.toUpperCase()}'
       </div>
     );
   } else if (!site) {
     return (
-      <div className="px-6 py-2 bg-neutral-300">
+      <div className="px-6 py-2 bg-muted">
         <OctagonX className="inline" /> No site specified - Cannot retrieve TAF
       </div>
     );

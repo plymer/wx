@@ -27,7 +27,7 @@ const AvChartsGFA = () => {
         <label className="me-4 max-md:hidden">Region:</label>
         {GFA_REGIONS.map((r, i) => (
           <Button
-            variant={region === r ? "default" : "secondary"}
+            variant={region === r ? "selected" : "secondary"}
             className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md"
             key={i}
             onClick={() => setRegion("gfacn3" + (i + 1).toString())}
@@ -45,7 +45,7 @@ const AvChartsGFA = () => {
               ? p.cldwx.map((u, i) => (
                   <Button
                     className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                    variant={product === "cldwx" && timeStep === i ? "default" : "secondary"}
+                    variant={product === "cldwx" && timeStep === i ? "selected" : "secondary"}
                     key={i}
                     value={u}
                     onClick={() => {
@@ -67,7 +67,7 @@ const AvChartsGFA = () => {
             p.domain === region
               ? p.turbc.map((u, i) => (
                   <Button
-                    variant={product === "turbc" && timeStep === i ? "default" : "secondary"}
+                    variant={product === "turbc" && timeStep === i ? "selected" : "secondary"}
                     className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
                     key={i}
                     value={u}

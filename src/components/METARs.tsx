@@ -28,10 +28,7 @@ const METARs = ({ site, hrs }: Props) => {
     return (
       <>
         {data.metars.map((m: string, i: number) => (
-          <div
-            className="font-mono px-6 odd:bg-neutral-300 even:bg-neutral-800 even:text-white ps-10 -indent-8"
-            key={i}
-          >
+          <div className="font-mono px-6 odd:bg-muted even:bg-muted-foreground ps-10 -indent-8" key={i}>
             {m}
           </div>
         ))}
@@ -39,13 +36,13 @@ const METARs = ({ site, hrs }: Props) => {
     );
   } else if (site && data && data.status === "error") {
     return (
-      <div className="px-6 py-2 bg-neutral-300">
+      <div className="px-6 py-2 bg-muted">
         <OctagonAlert className="inline" /> No METARs available for '{site.toUpperCase()}'
       </div>
     );
   } else if (!site) {
     return (
-      <div className="px-6 py-2 bg-neutral-300 ">
+      <div className="px-6 py-2 bg-muted ">
         <OctagonX className="inline" /> No site specified - Cannot retrieve METARs
       </div>
     );

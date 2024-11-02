@@ -23,7 +23,7 @@ function AviationComponent() {
           {CATEGORIES.map((c, i) => (
             <Button
               className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5"
-              variant={category === c ? "default" : "secondary"}
+              variant={category === c ? "selected" : "secondary"}
               key={i}
               onClick={() => setCategory(c)}
             >
