@@ -12,7 +12,7 @@ const AvChartsGFA = () => {
 
   const { data, isLoading, error } = useAPI<GFAData[]>("charts/gfa", []);
 
-  const GFA_REGIONS = ["GFA 31", "GFA 32", "GFA 33", "GFA 34", "GFA 35", "GFA 36", "GFA 37"];
+  const GFA_REGIONS = ["gfacn31", "gfacn32", "gfacn33", "gfacn34", "gfacn35", "gfacn36", "gfacn37"];
 
   useEffect(() => {
     if (data) {
@@ -27,22 +27,24 @@ const AvChartsGFA = () => {
         <label className="me-4">Region:</label>
         {GFA_REGIONS.map((r, i) => (
           <Button
+            variant={region === r ? "default" : "secondary"}
             className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
             key={i}
             onClick={() => setRegion("gfacn3" + (i + 1).toString())}
           >
-            {r}
+            {r.toUpperCase()}
           </Button>
         ))}
       </nav>
       {!data && !isLoading && error ? <div className="p-2">There was an error loading the image data</div> : ""}
-      <nav className="px-2">
+      <nav className="px-2 mt-2">
         <label className="me-4">Clouds & Wx</label>
         {data?.map((p) =>
           p.domain === region
             ? p.cldwx.map((u, i) => (
                 <Button
                   className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                  variant={product === "cldwx" && timeStep === i ? "default" : "secondary"}
                   key={i}
                   value={u}
                   onClick={() => {
@@ -56,12 +58,13 @@ const AvChartsGFA = () => {
             : "",
         )}
       </nav>
-      <nav className="px-2">
+      <nav className="px-2 mt-2">
         <label className="me-4">Turbulence & Icing</label>
         {data?.map((p) =>
           p.domain === region
             ? p.turbc.map((u, i) => (
                 <Button
+                  variant={product === "turbc" && timeStep === i ? "default" : "secondary"}
                   className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
                   key={i}
                   value={u}
@@ -76,8 +79,7 @@ const AvChartsGFA = () => {
             : "",
         )}
       </nav>
-      <img className="max-w-full mx-auto px-2" src={URL} />
-      <HubDiscussion />
+      <img className="max-w-full mx-auto px-2 mt-2" src={URL} />
     </>
   );
 };

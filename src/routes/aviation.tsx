@@ -1,5 +1,6 @@
 import AvChartsGFA from "@/components/AvChartsGFA";
 import AvChartsOther from "@/components/AvChartsOther";
+import HubDiscussion from "@/components/HubDiscussion";
 import { Button } from "@/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
@@ -11,7 +12,7 @@ export const Route = createFileRoute("/aviation")({
 function AviationComponent() {
   const [category, setCategory] = useState("gfa");
 
-  const CATEGORIES = ["gfa", "lgf", "hlt", "sigwx"];
+  const CATEGORIES = ["gfa", "lgf", "hlt", "sigwx", "hubs"];
 
   return (
     <>
@@ -21,7 +22,7 @@ function AviationComponent() {
           {CATEGORIES.map((c, i) => (
             <Button
               className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-              variant={"secondary"}
+              variant={category === c ? "default" : "secondary"}
               key={i}
               onClick={() => setCategory(c)}
             >
@@ -30,7 +31,8 @@ function AviationComponent() {
           ))}
         </nav>
         {category === "gfa" ? <AvChartsGFA /> : ""}
-        {category !== "gfa" ? <AvChartsOther category={category} /> : ""}
+        {category !== "gfa" && category !== "hubs" ? <AvChartsOther category={category} /> : ""}
+        {category === "hubs" ? <HubDiscussion /> : ""}
       </div>
     </>
   );
