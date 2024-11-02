@@ -14,8 +14,8 @@ const HubDiscussion = () => {
 
   return (
     <>
-      <div className="ps-2 text-2xl mt-2 font-bold py-2 border-y-2 border-black">
-        <h2 className="inline me-2">Hub Discussions: </h2>
+      <div className="ps-2 text-2xl mt-2 font-bold py-2 border-y-2 border-black portrait:text-center">
+        <h2 className="landscape:inline me-2">Hub Discussions: </h2>
         {HUBS.map((h, i) => (
           <Button
             variant={site === h ? "default" : "secondary"}

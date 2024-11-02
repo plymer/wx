@@ -25,7 +25,7 @@ const TAF = ({ site }: Props) => {
         <div className="font-bold">{data.taf.main}</div>
         {data.taf.partPeriods
           ? data.taf.partPeriods.map((p, i) => (
-              <div className="ms-4" key={i}>
+              <div className="ms-8 -indent-4" key={i}>
                 {p}
               </div>
             ))

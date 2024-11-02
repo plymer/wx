@@ -47,13 +47,15 @@ const SiteMetadata = ({ site }: Props) => {
           <MountainSnow className="inline me-2 w-4 h-4" />
           {data.metadata.elev_f} / {data.metadata.elev_m}
         </div>
-        <div className="inline me-4 place-items-center text-sm">
-          <Sunrise className="inline me-2 w-4 h-4" />
-          {data.metadata.sunrise}
-        </div>
-        <div className="inline me-4 place-items-center text-sm">
-          <Sunset className="inline me-2 w-4 h-4" />
-          {data.metadata.sunset}
+        <div>
+          <div className="inline me-4 place-items-center text-sm">
+            <Sunrise className="inline me-2 w-4 h-4" />
+            {data.metadata.sunrise}
+          </div>
+          <div className="inline me-4 place-items-center text-sm">
+            <Sunset className="inline me-2 w-4 h-4" />
+            {data.metadata.sunset}
+          </div>
         </div>
       </div>
     );

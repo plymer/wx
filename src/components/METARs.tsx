@@ -28,7 +28,10 @@ const METARs = ({ site, hrs }: Props) => {
     return (
       <>
         {data.metars.map((m: string, i: number) => (
-          <div className="font-mono px-6 odd:bg-neutral-300 even:bg-neutral-800 even:text-white" key={i}>
+          <div
+            className="font-mono px-6 odd:bg-neutral-300 even:bg-neutral-800 even:text-white ps-10 -indent-8"
+            key={i}
+          >
             {m}
           </div>
         ))}
