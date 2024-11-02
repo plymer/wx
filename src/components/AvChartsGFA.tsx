@@ -23,12 +23,12 @@ const AvChartsGFA = () => {
 
   return (
     <>
-      <nav className="px-2">
-        <label className="me-4">Region:</label>
+      <nav className="md:px-2 max-md:pt-2 max-md:flex max-md:flex-wrap max-md:justify-center">
+        <label className="me-4 max-md:hidden">Region:</label>
         {GFA_REGIONS.map((r, i) => (
           <Button
             variant={region === r ? "default" : "secondary"}
-            className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+            className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md"
             key={i}
             onClick={() => setRegion("gfacn3" + (i + 1).toString())}
           >
@@ -37,49 +37,54 @@ const AvChartsGFA = () => {
         ))}
       </nav>
       {!data && !isLoading && error ? <div className="p-2">There was an error loading the image data</div> : ""}
-      <nav className="px-2 mt-2">
-        <label className="me-4">Clouds & Wx</label>
-        {data?.map((p) =>
-          p.domain === region
-            ? p.cldwx.map((u, i) => (
-                <Button
-                  className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                  variant={product === "cldwx" && timeStep === i ? "default" : "secondary"}
-                  key={i}
-                  value={u}
-                  onClick={() => {
-                    setProduct("cldwx");
-                    setTimeStep(i);
-                  }}
-                >
-                  T+{i * 6}
-                </Button>
-              ))
-            : "",
-        )}
+      <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
+        <label className="me-4">Clouds & Weather:</label>
+        <div>
+          {data?.map((p) =>
+            p.domain === region
+              ? p.cldwx.map((u, i) => (
+                  <Button
+                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                    variant={product === "cldwx" && timeStep === i ? "default" : "secondary"}
+                    key={i}
+                    value={u}
+                    onClick={() => {
+                      setProduct("cldwx");
+                      setTimeStep(i);
+                    }}
+                  >
+                    T+{i * 6}
+                  </Button>
+                ))
+              : "",
+          )}
+        </div>
       </nav>
-      <nav className="px-2 mt-2">
-        <label className="me-4">Turbulence & Icing</label>
-        {data?.map((p) =>
-          p.domain === region
-            ? p.turbc.map((u, i) => (
-                <Button
-                  variant={product === "turbc" && timeStep === i ? "default" : "secondary"}
-                  className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                  key={i}
-                  value={u}
-                  onClick={() => {
-                    setProduct("turbc");
-                    setTimeStep(i);
-                  }}
-                >
-                  T+{i * 6}
-                </Button>
-              ))
-            : "",
-        )}
+      <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
+        <label className="me-4">Turbulence & Icing:</label>
+        <div>
+          {data?.map((p) =>
+            p.domain === region
+              ? p.turbc.map((u, i) => (
+                  <Button
+                    variant={product === "turbc" && timeStep === i ? "default" : "secondary"}
+                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                    key={i}
+                    value={u}
+                    onClick={() => {
+                      setProduct("turbc");
+                      setTimeStep(i);
+                    }}
+                  >
+                    T+{i * 6}
+                  </Button>
+                ))
+              : "",
+          )}
+        </div>
       </nav>
-      <img className="max-w-full mx-auto px-2 mt-2" src={URL} />
+
+      <img className="max-w-full mx-auto px-2 mt-2 pb-2" src={URL} />
     </>
   );
 };

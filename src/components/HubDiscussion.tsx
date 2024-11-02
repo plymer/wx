@@ -14,12 +14,12 @@ const HubDiscussion = () => {
 
   return (
     <>
-      <div className="ps-2 text-2xl mt-2 font-bold py-2 border-y-2 border-black portrait:text-center">
-        <h2 className="landscape:inline me-2">Hub Discussions: </h2>
+      <div className="md:ps-2 text-2xl mt-2 font-bold md:py-2 md:border-y-2 border-black portrait:text-center">
+        <h2 className="md:inline max-md:hidden me-2">Hub Discussions:</h2>
         {HUBS.map((h, i) => (
           <Button
             variant={site === h ? "default" : "secondary"}
-            className="mt-2 rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+            className="md:mt-2 rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/4"
             key={i}
             onClick={() => setSite(h)}
           >
@@ -29,13 +29,9 @@ const HubDiscussion = () => {
       </div>
       {hubIsLoading ? (
         <div className="px-2">
-          <Loader2 className="animate-spin" /> Loading...
+          <Loader2 className="animate-spin inline" /> Loading...
         </div>
-      ) : (
-        ""
-      )}
-
-      {hubData?.status === "success" ? (
+      ) : hubData?.status === "success" ? (
         <div>
           <div className="mt-2 px-4">
             <Notebook className="inline" />
@@ -47,51 +43,47 @@ const HubDiscussion = () => {
             <br />
             {hubData?.hubData.discussion}
           </div>
-          <div className="landscape:grid grid-rows-1 landscape:grid-cols-2 bg-neutral-300 ">
-            <div className="landscape:col-start-1 landscape:row-start-1">
+          <div className="md:grid grid-rows-1 md:grid-cols-2 bg-neutral-300 ">
+            <div className="md:col-start-1 md:row-start-1">
               <div className="px-4 py-2 bg-neutral-800">
                 <Binoculars className="inline" />
-                <h3 className="mt-2 text-bold px-2 inline">Outlook:</h3>
+                <h3 className="text-bold p-2 inline">Outlook:</h3>
               </div>
-              <div className="font-mono p-4 py-2 mt-2 bg-neutral-300 text-black whitespace-pre-wrap">
+              <div className="font-mono p-4 py-2 bg-neutral-300 text-black whitespace-pre-wrap">
                 {hubData?.hubData.outlook}
               </div>
             </div>
-            <div className="landscape:col-start-1 landscape:row-start-2">
-              <div className="mt-2 px-4 py-2 bg-neutral-800">
+            <div className="md:col-start-1 md:row-start-2">
+              <div className="px-4 py-2 bg-neutral-800">
                 <Pencil className="inline" />
-                <h3 className="mt-2 text-bold px-2 inline">Forecaster:</h3>
+                <h3 className="text-bold p-2 inline">Forecaster:</h3>
               </div>
-              <div className="font-mono px-4 py-2 mt-2 bg-neutral-300 text-black">
+              <div className="font-mono px-4 py-2 bg-neutral-300 text-black">
                 {hubData?.hubData.forecaster}/{hubData?.hubData.office}
               </div>
             </div>
-            <div className="landscape:col-start-2 landscape:row-start-1 landscape:row-span-2 landscape:border-s-2 landscape:border-black ">
-              <div className="portrait:mt-2 px-4 py-2 bg-neutral-800">
+            <div className="md:col-start-2 md:row-start-1 md:row-span-2 md:border-s-2 md:border-black ">
+              <div className="px-4 py-2 bg-neutral-800">
                 <Plane className="inline" />
-                <h3 className="mt-2 text-bold px-2 inline">TAF</h3>
+                <h3 className="text-bold p-2 inline">TAF</h3>
               </div>
-              <div className="font-mono px-4 py-2 mt-2 bg-neutral-300 text-black">
-                {tafIsLoading ? "Loading TAF" : ""}
-                {tafData ? (
-                  <>
-                    <div>{tafData.taf.main}</div>
-                    {tafData.taf.partPeriods.map((p) => (
-                      <div className="ms-8 -indent-4">{p}</div>
-                    ))}
-                    <div>{tafData.taf.rmk}</div>
-                  </>
+              <div className="font-mono px-4 py-2 bg-neutral-300 text-black">
+                {tafIsLoading ? (
+                  "Loading TAF"
                 ) : (
-                  ""
+                  <>
+                    <div>{tafData?.taf?.main}</div>
+                    {tafData?.taf?.partPeriods.map((p) => <div className="ms-8 -indent-4">{p}</div>)}
+                    <div>{tafData?.taf?.rmk}</div>
+                  </>
                 )}
               </div>
             </div>
           </div>
         </div>
       ) : (
-        ""
+        <div>{hubData?.status}</div>
       )}
-      {hubData?.status === "error" ? <div>{hubData?.status}</div> : ""}
     </>
   );
 };

@@ -17,7 +17,7 @@ function RootComponent() {
 
   return (
     <>
-      <nav className="flex justify-between px-4 place-items-center portrait:hidden">
+      <nav className="flex justify-between px-4 place-items-center max-md:hidden">
         <img src="/site-icon.svg" className="w-10 h-10 inline mb-2" />
         {LinkDetails.map((l, i) => (
           <Link
@@ -29,7 +29,7 @@ function RootComponent() {
           </Link>
         ))}
       </nav>
-      <nav className="flex justify-between px-4 place-items-center landscape:hidden ">
+      <nav className="flex justify-between px-4 place-items-center md:hidden ">
         <img src="/site-icon.svg" className="w-6 h-6 inline" />
         {LinkDetails.map((l, i) => (
           <Link

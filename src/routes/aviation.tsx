@@ -2,6 +2,7 @@ import AvChartsGFA from "@/components/AvChartsGFA";
 import AvChartsOther from "@/components/AvChartsOther";
 import HubDiscussion from "@/components/HubDiscussion";
 import { Button } from "@/components/ui/button";
+
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
@@ -17,11 +18,11 @@ function AviationComponent() {
   return (
     <>
       <div className="bg-neutral-800 text-white ">
-        <nav className="p-2">
-          <label className="me-4">Product:</label>
+        <nav className="md:p-2 max-md:pt-2">
+          <label className="me-2 max-md:hidden">Product:</label>
           {CATEGORIES.map((c, i) => (
             <Button
-              className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+              className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5"
               variant={category === c ? "default" : "secondary"}
               key={i}
               onClick={() => setCategory(c)}
