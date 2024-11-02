@@ -37,3 +37,15 @@ export type OtherChartData = {
   domain: string;
   images: string[];
 };
+
+export type HubData = {
+  status: "error" | "success";
+  hubData: {
+    siteName: string;
+    header: string;
+    discussion: string;
+    outlook: string;
+    forecaster: string;
+    office: string;
+  };
+};

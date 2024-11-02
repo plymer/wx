@@ -2,27 +2,14 @@ import useAPI from "@/hooks/useAPI";
 import { TAFData } from "@/lib/types";
 
 import { Loader2, OctagonAlert, OctagonX, Skull } from "lucide-react";
-import { useEffect, useState } from "react";
 
 interface Props {
   site: string;
 }
 
 const TAF = ({ site }: Props) => {
-  const [APIData, setAPIData] = useState<TAFData>();
-
   // destructure the react-query object that is returned from the useAPI hook and pass the arguments
-  const { data, isLoading, fetchStatus, refetch } = useAPI<TAFData>("alpha/taf", [{ param: "site", value: site }]);
-
-  // update the interface once we have new data to display
-  useEffect(() => {
-    if (data) setAPIData(data);
-  }, [fetchStatus]);
-
-  // refetch the data whenever the user changes the interface options (site or time range)
-  useEffect(() => {
-    refetch();
-  }, [site]);
+  const { data, isLoading } = useAPI<TAFData>("alpha/taf", [{ param: "site", value: site }]);
 
   if (isLoading) {
     return (
@@ -32,21 +19,21 @@ const TAF = ({ site }: Props) => {
     );
   }
   // return the JSX elements
-  if (site && APIData && APIData.status === "success") {
+  if (site && data && data.status === "success") {
     return (
       <div className="px-8 py-4 bg-neutral-300 text-black font-mono ">
-        <div className="font-bold">{APIData.taf.main}</div>
-        {APIData.taf.partPeriods
-          ? APIData.taf.partPeriods.map((p, i) => (
+        <div className="font-bold">{data.taf.main}</div>
+        {data.taf.partPeriods
+          ? data.taf.partPeriods.map((p, i) => (
               <div className="ms-4" key={i}>
                 {p}
               </div>
             ))
           : ""}
-        <div>{APIData.taf.rmk}</div>
+        <div>{data.taf.rmk}</div>
       </div>
     );
-  } else if (site && APIData && APIData.status === "error") {
+  } else if (site && data && data.status === "error") {
     return (
       <div className="px-6 py-2 bg-neutral-300">
         <OctagonAlert className="inline" /> No TAF available for '{site.toUpperCase()}'
