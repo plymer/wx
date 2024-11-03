@@ -51,6 +51,8 @@ function ObsComponent() {
             spellCheck="false"
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => (e.key === "Enter" ? handleInputText(inputText) : "")}
+            onClick={(e) => (e.currentTarget.value = "")}
+            autoFocus={true}
           />
           <Button
             className="me-2 rounded-e-md rounded-s-none flex place-items-center"
