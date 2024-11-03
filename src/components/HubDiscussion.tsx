@@ -73,7 +73,11 @@ const HubDiscussion = () => {
                 ) : (
                   <>
                     <div>{tafData?.taf?.main}</div>
-                    {tafData?.taf?.partPeriods.map((p) => <div className="ms-8 -indent-4">{p}</div>)}
+                    {tafData?.taf?.partPeriods.map((p, i) => (
+                      <div key={i} className="ms-8 -indent-4">
+                        {p}
+                      </div>
+                    ))}
                     <div>{tafData?.taf?.rmk}</div>
                   </>
                 )}
