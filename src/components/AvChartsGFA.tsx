@@ -19,7 +19,7 @@ const AvChartsGFA = () => {
       //@ts-ignore
       data.forEach((d) => (d.domain === region ? setURL(d[product][timeStep]) : ""));
     }
-  }, [region, product, timeStep]);
+  }, [region, product, timeStep, data]);
 
   return (
     <>

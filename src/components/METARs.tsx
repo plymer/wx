@@ -17,7 +17,7 @@ const METARs = ({ site, hrs }: Props) => {
 
   if (isLoading) {
     return (
-      <div className="px-6 py-2 bg-neutral-300">
+      <div className="px-6 py-2 bg-muted">
         <Loader2 className="inline animate-spin" /> Loading METARs...
       </div>
     );
