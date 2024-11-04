@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import useAPI from "@/hooks/useAPI";
 import { GFAData } from "@/lib/types";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useAviationContext } from "@/contexts/aviationContext";
 
 const AvChartsGFA = () => {

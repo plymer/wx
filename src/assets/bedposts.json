@@ -1,0 +1,185 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.732, 49.816]
+      },
+      "properties": {
+        "name": "KEINN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.174, 49.471]
+      },
+      "properties": {
+        "name": "VITEV"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.983, 49.463]
+      },
+      "properties": {
+        "name": "LIBOG"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.5094472, 48.71163]
+      },
+      "properties": {
+        "name": "EGRET"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.9721891, 49.07373]
+      },
+      "properties": {
+        "name": "CASDY"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.5875, 51.57778]
+      },
+      "properties": {
+        "name": "ADVOX"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-113.2636111, 51.47556]
+      },
+      "properties": {
+        "name": "BIRKO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-113.3719444, 50.69694]
+      },
+      "properties": {
+        "name": "EBGAL"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.6580556, 50.70778]
+      },
+      "properties": {
+        "name": "IGVEP"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.05416667, 44.24917]
+      },
+      "properties": {
+        "name": "IMEBA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-78.805, 44.04167]
+      },
+      "properties": {
+        "name": "RAGID"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.35472222, 43.3025]
+      },
+      "properties": {
+        "name": "LINNG"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-80.3775, 43.45778]
+      },
+      "properties": {
+        "name": "NUBER"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-80.20166667, 44.17806]
+      },
+      "properties": {
+        "name": "BOXUM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.49636667, 46.04601]
+      },
+      "properties": {
+        "name": "VIDGO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-72.76126389, 45.74604]
+      },
+      "properties": {
+        "name": "OMBRE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-74.61761111, 45.11769]
+      },
+      "properties": {
+        "name": "ARVIE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-73.54145833, 44.85827]
+      },
+      "properties": {
+        "name": "LATTS"
+      }
+    }
+  ]
+}

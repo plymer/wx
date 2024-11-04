@@ -1,8 +1,9 @@
 import useAPI from "@/hooks/useAPI";
 import { OtherChartData } from "@/lib/types";
 import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
+
 import { useAviationContext } from "@/contexts/aviationContext";
+import { Button } from "../ui/button";
 
 const AvChartsOther = () => {
   const [domainList, setDomainList] = useState<string[]>([]);

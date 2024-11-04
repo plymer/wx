@@ -1,0 +1,29 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-91.166, 38.233]
+      },
+      "properties": {
+        "id": "KUUV",
+        "name": "SULLIVAN REGIONAL AIRPORT, MO, US",
+        "elevation": "932ft"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-79.631, 43.677]
+      },
+      "properties": {
+        "id": "CYYZ",
+        "name": "TORONTO INTL A",
+        "elevation": "421ft"
+      }
+    }
+  ]
+}

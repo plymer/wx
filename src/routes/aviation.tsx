@@ -1,6 +1,6 @@
-import AvChartsGFA from "@/components/AvChartsGFA";
-import AvChartsOther from "@/components/AvChartsOther";
-import HubDiscussion from "@/components/HubDiscussion";
+import AvChartsGFA from "@/components/aviation/AvChartsGFA";
+import AvChartsOther from "@/components/aviation/AvChartsOther";
+import HubDiscussion from "@/components/aviation/HubDiscussion";
 import { Button } from "@/components/ui/button";
 import { useAviationContext } from "@/contexts/aviationContext";
 

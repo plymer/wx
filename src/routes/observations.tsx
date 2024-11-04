@@ -1,6 +1,6 @@
-import METARs from "@/components/METARs";
-import SiteMetadata from "@/components/SiteMetadata";
-import TAF from "@/components/TAF";
+import METARs from "@/components/observations/METARs";
+import SiteMetadata from "@/components/observations/SiteMetadata";
+import TAF from "@/components/observations/TAF";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

@@ -1,6 +1,6 @@
 import useAPI from "@/hooks/useAPI";
 import { HubData, TAFData } from "@/lib/types";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { Binoculars, Loader2, Notebook, Pencil, Plane } from "lucide-react";
 import { useAviationContext } from "@/contexts/aviationContext";
 
