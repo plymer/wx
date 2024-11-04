@@ -1,14 +1,14 @@
 import useAPI from "@/hooks/useAPI";
 import { HubData, TAFData } from "@/lib/types";
-import { useState } from "react";
 import { Button } from "./ui/button";
 import { Binoculars, Loader2, Notebook, Pencil, Plane } from "lucide-react";
+import { useAviationContext } from "@/contexts/aviationContext";
 
 const HubDiscussion = () => {
-  const [site, setSite] = useState<string>("cyyc");
+  const hub = useAviationContext();
 
-  const { data: hubData, isLoading: hubIsLoading } = useAPI<HubData>("alpha/hubs", [{ param: "site", value: site }]);
-  const { data: tafData, isLoading: tafIsLoading } = useAPI<TAFData>("alpha/taf", [{ param: "site", value: site }]);
+  const { data: hubData, isLoading: hubIsLoading } = useAPI<HubData>("alpha/hubs", [{ param: "site", value: hub.hub }]);
+  const { data: tafData, isLoading: tafIsLoading } = useAPI<TAFData>("alpha/taf", [{ param: "site", value: hub.hub }]);
 
   const HUBS = ["cyvr", "cyyc", "cyyz", "cyul"];
 
@@ -18,10 +18,10 @@ const HubDiscussion = () => {
         <h2 className="md:inline max-md:hidden me-2">Hub Discussions:</h2>
         {HUBS.map((h, i) => (
           <Button
-            variant={site === h ? "selected" : "secondary"}
+            variant={hub.hub === h ? "selected" : "secondary"}
             className="md:mt-2 rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/4"
             key={i}
-            onClick={() => setSite(h)}
+            onClick={() => hub.setHub(h)}
           >
             {h.toUpperCase()}
           </Button>
@@ -35,7 +35,7 @@ const HubDiscussion = () => {
         <div>
           <div className="mt-2 px-4">
             <Notebook className="inline" />
-            <h3 className="text-bold px-2 inline">Discussion for {site.toUpperCase()}:</h3>
+            <h3 className="text-bold px-2 inline">Discussion for {hub.hub.toUpperCase()}:</h3>
           </div>
           <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">
             {hubData?.hubData.header}

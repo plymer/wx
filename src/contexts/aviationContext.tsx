@@ -18,6 +18,8 @@ export interface IAviationContext {
   setTimeDelta: React.Dispatch<React.SetStateAction<IAviationContext["timeDelta"]>>;
   url: string;
   setUrl: React.Dispatch<React.SetStateAction<IAviationContext["url"]>>;
+  hub: string;
+  setHub: React.Dispatch<React.SetStateAction<IAviationContext["hub"]>>;
 }
 
 export const AviationContext = createContext<IAviationContext | null>(null);
@@ -32,6 +34,7 @@ export const AviationContextProvider = ({ children }: React.PropsWithChildren<{}
   const [gfaTimeStep, setGfaTimeStep] = useState<IAviationContext["gfaTimeStep"]>(0);
   const [timeDelta, setTimeDelta] = useState<IAviationContext["timeDelta"]>(0);
   const [url, setUrl] = useState<IAviationContext["url"]>("");
+  const [hub, setHub] = useState<IAviationContext["hub"]>("cyyc");
 
   const value = useMemo(
     () => ({
@@ -51,8 +54,10 @@ export const AviationContextProvider = ({ children }: React.PropsWithChildren<{}
       setTimeDelta,
       url,
       setUrl,
+      hub,
+      setHub,
     }),
-    [product, domain, gfaDomain, subProduct, timeStep, gfaTimeStep, timeDelta, url],
+    [product, domain, gfaDomain, subProduct, timeStep, gfaTimeStep, timeDelta, url, hub],
   );
 
   return <AviationContext.Provider value={value}>{children}</AviationContext.Provider>;
