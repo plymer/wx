@@ -1,14 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import useAPI from "@/hooks/useAPI";
 import { GFAData } from "@/lib/types";
 import { Button } from "./ui/button";
+import { useAviationContext } from "@/contexts/aviationContext";
 
 const AvChartsGFA = () => {
-  const [region, setRegion] = useState("gfacn32");
-  const [product, setProduct] = useState<"cldwx" | "turbc">("cldwx");
-  const [timeStep, setTimeStep] = useState<number>(0);
-  const [URL, setURL] = useState<string>("");
+  const gfa = useAviationContext();
 
   const { data, isLoading, error } = useAPI<GFAData[]>("charts/gfa", []);
 
@@ -17,20 +15,20 @@ const AvChartsGFA = () => {
   useEffect(() => {
     if (data) {
       //@ts-ignore
-      data.forEach((d) => (d.domain === region ? setURL(d[product][timeStep]) : ""));
+      data.forEach((d) => (d.domain === gfa.gfaDomain ? gfa.setUrl(d[gfa.subProduct][gfa.gfaTimeStep]) : ""));
     }
-  }, [region, product, timeStep, data]);
+  }, [gfa.gfaDomain, gfa.subProduct, gfa.gfaTimeStep, data]);
 
   return (
     <>
       <nav className="md:px-2 max-md:pt-2 max-md:flex max-md:flex-wrap max-md:justify-center">
-        <label className="me-4 max-md:hidden">Region:</label>
+        <label className="me-4 max-md:hidden">Domain:</label>
         {GFA_REGIONS.map((r, i) => (
           <Button
-            variant={region === r ? "selected" : "secondary"}
+            variant={gfa.gfaDomain === r ? "selected" : "secondary"}
             className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md"
             key={i}
-            onClick={() => setRegion("gfacn3" + (i + 1).toString())}
+            onClick={() => gfa.setGfaDomain("gfacn3" + (i + 1).toString())}
           >
             {r.replace("gfacn", "gfa ").toUpperCase()}
           </Button>
@@ -41,16 +39,16 @@ const AvChartsGFA = () => {
         <label className="me-4">Clouds & Weather:</label>
         <div>
           {data?.map((p) =>
-            p.domain === region
+            p.domain === gfa.gfaDomain
               ? p.cldwx.map((u, i) => (
                   <Button
                     className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                    variant={product === "cldwx" && timeStep === i ? "selected" : "secondary"}
+                    variant={gfa.subProduct === "cldwx" && gfa.gfaTimeStep === i ? "selected" : "secondary"}
                     key={i}
                     value={u}
                     onClick={() => {
-                      setProduct("cldwx");
-                      setTimeStep(i);
+                      gfa.setSubProduct!("cldwx");
+                      gfa.setGfaTimeStep(i);
                     }}
                   >
                     T+{i * 6}
@@ -64,16 +62,16 @@ const AvChartsGFA = () => {
         <label className="me-4">Turbulence & Icing:</label>
         <div>
           {data?.map((p) =>
-            p.domain === region
+            p.domain === gfa.gfaDomain
               ? p.turbc.map((u, i) => (
                   <Button
-                    variant={product === "turbc" && timeStep === i ? "selected" : "secondary"}
+                    variant={gfa.subProduct === "turbc" && gfa.gfaTimeStep === i ? "selected" : "secondary"}
                     className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
                     key={i}
                     value={u}
                     onClick={() => {
-                      setProduct("turbc");
-                      setTimeStep(i);
+                      gfa.setSubProduct!("turbc");
+                      gfa.setGfaTimeStep(i);
                     }}
                   >
                     T+{i * 6}
@@ -84,7 +82,7 @@ const AvChartsGFA = () => {
         </div>
       </nav>
 
-      <img className="max-w-full mx-auto px-2 mt-2 pb-2" src={URL} />
+      <img className="max-w-full mx-auto px-2 mt-2 pb-2" src={gfa.url} />
     </>
   );
 };

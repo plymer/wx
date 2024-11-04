@@ -2,57 +2,49 @@ import useAPI from "@/hooks/useAPI";
 import { OtherChartData } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
+import { useAviationContext } from "@/contexts/aviationContext";
 
-interface Props {
-  category: string;
-}
-
-const AvChartsOther = ({ category }: Props) => {
-  const [product, setProduct] = useState<string>(category);
+const AvChartsOther = () => {
   const [domainList, setDomainList] = useState<string[]>([]);
-  const [domain, setDomain] = useState<string>(domainList[0]);
-  const [timeDelta, setTimeDelta] = useState<number>(3);
-  const [timeStep, setTimeStep] = useState<number>(0);
-  const [URL, setURL] = useState<string>("");
 
-  const { data, isLoading, error } = useAPI<OtherChartData[]>(`charts/${category}`, []);
+  const charts = useAviationContext();
 
-  // const DOMAINS = ["lgfzvr41", "lgfzvr42", "lgfzvr43", "canada", "north_atlantic", "atlantic"];
+  const { data, isLoading, error } = useAPI<OtherChartData[]>(`charts/${charts.product}`, []);
+
   const LGF_DOMAINS = ["lgfzvr41", "lgfzvr42", "lgfzvr43"];
   const HLT_DOMAINS = ["canada", "north_atlantic"];
   const SIGWX_DOMAINS = ["canada", "atlantic"];
 
   useEffect(() => {
-    setProduct(category);
-    switch (category) {
+    switch (charts.product) {
       case "lgf":
         setDomainList(LGF_DOMAINS);
-        setDomain(LGF_DOMAINS[0]);
-        setTimeStep(0);
-        setTimeDelta(3);
+        charts.setDomain(LGF_DOMAINS[0]);
+        charts.setTimeStep(0);
+        charts.setTimeDelta(3);
         break;
       case "hlt":
         setDomainList(HLT_DOMAINS);
-        setDomain(HLT_DOMAINS[0]);
-        setTimeStep(0);
-        setTimeDelta(12);
+        charts.setDomain(HLT_DOMAINS[0]);
+        charts.setTimeStep(0);
+        charts.setTimeDelta(12);
         break;
       case "sigwx":
         setDomainList(SIGWX_DOMAINS);
-        setDomain(SIGWX_DOMAINS[0]);
-        setTimeStep(0);
-        setTimeDelta(12);
+        charts.setDomain(SIGWX_DOMAINS[0]);
+        charts.setTimeStep(0);
+        charts.setTimeDelta(12);
         break;
     }
-  }, [category]);
+  }, [charts.product]);
 
   useEffect(() => {
     if (data) {
       // console.log(data);
       //@ts-ignore
-      data.forEach((d) => (d.domain === domain ? setURL(d.images[timeStep]) : ""));
+      data.forEach((d) => (d.domain === charts.domain ? charts.setUrl(d.images[charts.timeStep]) : ""));
     }
-  }, [category, domain, product, timeStep, data]);
+  }, [charts.product, charts.domain, charts.timeStep, data]);
 
   return (
     <>
@@ -60,13 +52,11 @@ const AvChartsOther = ({ category }: Props) => {
         <label className="me-4 max-md:hidden">Domain:</label>
         {domainList.map((d, i) => (
           <Button
-            variant={domain === d ? "selected" : "secondary"}
+            variant={charts.domain === d ? "selected" : "secondary"}
             className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md"
             key={i}
             onClick={() => {
-              setDomain(d);
-              // console.log(d);
-              // console.log(product, domain, domainList, timeStep, timeDelta);
+              charts.setDomain(d);
             }}
           >
             {d.toUpperCase()}
@@ -78,18 +68,22 @@ const AvChartsOther = ({ category }: Props) => {
         <label className="me-4">Forecasts:</label>
         <div>
           {data?.map((p) =>
-            p.domain === domain
+            p.domain === charts.domain
               ? p.images.map((u, i) => (
                   <Button
                     className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                    variant={timeStep === i ? "selected" : "secondary"}
+                    variant={charts.timeStep === i ? "selected" : "secondary"}
                     key={i}
                     value={u}
                     onClick={() => {
-                      setTimeStep(i);
+                      charts.setTimeStep(i);
                     }}
                   >
-                    T+{i * (product === "sigwx" && domain === "canada" ? timeDelta / 2 : timeDelta)}
+                    T+
+                    {i *
+                      (charts.product === "sigwx" && charts.domain === "canada"
+                        ? charts.timeDelta / 2
+                        : charts.timeDelta)}
                   </Button>
                 ))
               : "",
@@ -97,7 +91,7 @@ const AvChartsOther = ({ category }: Props) => {
         </div>
       </nav>
 
-      <img className="max-w-full mx-auto px-2 mt-2 pb-2" src={URL} />
+      <img className="max-w-full mx-auto px-2 mt-2 pb-2" src={charts.url} />
     </>
   );
 };

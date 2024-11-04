@@ -1,3 +1,5 @@
+import { AviationContextProvider } from "@/contexts/aviationContext";
+import { ObservationsContextProvider } from "@/contexts/observationsContext";
 import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
 // import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -42,7 +44,11 @@ function RootComponent() {
         ))}
       </nav>
 
-      <Outlet />
+      <AviationContextProvider>
+        <ObservationsContextProvider>
+          <Outlet />
+        </ObservationsContextProvider>
+      </AviationContextProvider>
       {/* <ReactQueryDevtools /> */}
       {/* <TanStackRouterDevtools position="bottom-right" /> */}
     </>
