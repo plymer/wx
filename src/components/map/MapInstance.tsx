@@ -21,9 +21,10 @@ interface Props {
   defaultLat: number | 53;
   defaultZoom: number | 3.25;
   children?: ReactElement<any, any>;
+  onClick?: () => void;
 }
 
-const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, children }: Props) => {
+const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, children, onClick }: Props) => {
   // controls the state of the loading spinner
   const animation = useAnimationContext();
   const [isLoading, setIsLoading] = useState(false);
@@ -58,6 +59,7 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
         //           .filter((layer) => !baseMapLayers.includes(layer)),
         //       );
         // }}
+        onClick={onClick ? () => onClick() : undefined}
         onSourceData={() => {
           // if (e.isSourceLoaded) {
           //   console.log(e.sourceId, "completed loading");
