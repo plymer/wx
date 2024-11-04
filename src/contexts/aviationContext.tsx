@@ -28,7 +28,7 @@ export const AviationContextProvider = ({ children }: React.PropsWithChildren<{}
   // we will want to store/retrieve this from localStorage or sessionStorage at some point in the future
   const [product, setProduct] = useState<IAviationContext["product"]>("gfa");
   const [domain, setDomain] = useState<IAviationContext["domain"]>("lgf");
-  const [gfaDomain, setGfaDomain] = useState<IAviationContext["gfaDomain"]>("lgf");
+  const [gfaDomain, setGfaDomain] = useState<IAviationContext["gfaDomain"]>("gfacn32");
   const [subProduct, setSubProduct] = useState<IAviationContext["subProduct"]>("cldwx");
   const [timeStep, setTimeStep] = useState<IAviationContext["timeStep"]>(0);
   const [gfaTimeStep, setGfaTimeStep] = useState<IAviationContext["gfaTimeStep"]>(0);
