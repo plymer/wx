@@ -193,24 +193,26 @@ const AnimationControls = () => {
   // const sliderStep = (NUM_HRS_DATA * 60 * 60 * 1000) / animation.timeStep;
 
   return (
-    <div className="grid grid-cols-1">
-      <div className="mt-2 flex justify-between font-mono">
-        <span key="start">{startTime}</span>
-        <span key="end">{endTime}</span>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 md:my-1">
+      <div>
+        <div className="mt-2 flex justify-between font-mono">
+          <span key="start">{startTime}</span>
+          <span key="end">{endTime}</span>
+        </div>
 
-      <Slider
-        max={animation.endTime}
-        min={animation.startTime + animation.timeStep}
-        step={animation.timeStep}
-        value={[animation.startTime + animation.timeStep * (animation.currentFrame + 1)]}
-        onValueChange={(e) => {
-          animation.setCurrentFrame(
-            getNewFrame(animation.frameCount, (e[0] - animation.startTime) / animation.timeStep),
-          );
-        }}
-        className="my-2 bg-gray-800"
-      />
+        <Slider
+          max={animation.endTime}
+          min={animation.startTime + animation.timeStep}
+          step={animation.timeStep}
+          value={[animation.startTime + animation.timeStep * (animation.currentFrame + 1)]}
+          onValueChange={(e) => {
+            animation.setCurrentFrame(
+              getNewFrame(animation.frameCount, (e[0] - animation.startTime) / animation.timeStep),
+            );
+          }}
+          className="my-2 bg-gray-800"
+        />
+      </div>
 
       <div className="my-2 inline-flex">
         <div className="inline-flex">{ANIM_CONTROLS.map((c, index) => buildButton(c, index))}</div>

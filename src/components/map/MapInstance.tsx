@@ -45,7 +45,7 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
         touchPitch={false}
         boxZoom={false}
         maxBounds={MAP_BOUNDS}
-        style={{ width: width || "100%", height: height || "400px" }}
+        style={{ width: width || "100%", height: height, minHeight: "200px" }}
         mapStyle={basemap as StyleSpecification}
         // onLoad={() => console.log(layers)}
         // onStyleData={(e) => {

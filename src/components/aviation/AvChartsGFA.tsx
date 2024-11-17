@@ -1,14 +1,18 @@
 import { useEffect } from "react";
 
-import useAPI from "@/hooks/useAPI";
 import { GFAData } from "@/lib/types";
 import { Button } from "../ui/button";
 import { useAviationContext } from "@/contexts/aviationContext";
+import { Loader2 } from "lucide-react";
 
-const AvChartsGFA = () => {
+interface Props {
+  data: GFAData[] | undefined;
+  isLoading: boolean;
+  error: Error | null;
+}
+
+const AvChartsGFA = ({ data, isLoading, error }: Props) => {
   const gfa = useAviationContext();
-
-  const { data, isLoading, error } = useAPI<GFAData[]>("charts/gfa", []);
 
   const GFA_REGIONS = ["gfacn31", "gfacn32", "gfacn33", "gfacn34", "gfacn35", "gfacn36", "gfacn37"];
 
@@ -35,54 +39,61 @@ const AvChartsGFA = () => {
         ))}
       </nav>
       {!data && !isLoading && error ? <div className="p-2">There was an error loading the image data</div> : ""}
-      <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
-        <label className="me-4">Clouds & Weather:</label>
+      {data ? (
+        <>
+          <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
+            <label className="me-4">Clouds & Weather:</label>
+            <div>
+              {data?.map((p) =>
+                p.domain === gfa.gfaDomain
+                  ? p.cldwx.map((u, i) => (
+                      <Button
+                        className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                        variant={gfa.subProduct === "cldwx" && gfa.gfaTimeStep === i ? "selected" : "secondary"}
+                        key={i}
+                        value={u}
+                        onClick={() => {
+                          gfa.setSubProduct!("cldwx");
+                          gfa.setGfaTimeStep(i);
+                        }}
+                      >
+                        T+{i * 6}
+                      </Button>
+                    ))
+                  : "",
+              )}
+            </div>
+          </nav>
+          <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
+            <label className="me-4">Turbulence & Icing:</label>
+            <div>
+              {data?.map((p) =>
+                p.domain === gfa.gfaDomain
+                  ? p.turbc.map((u, i) => (
+                      <Button
+                        variant={gfa.subProduct === "turbc" && gfa.gfaTimeStep === i ? "selected" : "secondary"}
+                        className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                        key={i}
+                        value={u}
+                        onClick={() => {
+                          gfa.setSubProduct!("turbc");
+                          gfa.setGfaTimeStep(i);
+                        }}
+                      >
+                        T+{i * 6}
+                      </Button>
+                    ))
+                  : "",
+              )}
+            </div>
+          </nav>
+        </>
+      ) : (
         <div>
-          {data?.map((p) =>
-            p.domain === gfa.gfaDomain
-              ? p.cldwx.map((u, i) => (
-                  <Button
-                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                    variant={gfa.subProduct === "cldwx" && gfa.gfaTimeStep === i ? "selected" : "secondary"}
-                    key={i}
-                    value={u}
-                    onClick={() => {
-                      gfa.setSubProduct!("cldwx");
-                      gfa.setGfaTimeStep(i);
-                    }}
-                  >
-                    T+{i * 6}
-                  </Button>
-                ))
-              : "",
-          )}
+          <Loader2 className="inline animate-spin me-2" />
+          Loading...
         </div>
-      </nav>
-      <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
-        <label className="me-4">Turbulence & Icing:</label>
-        <div>
-          {data?.map((p) =>
-            p.domain === gfa.gfaDomain
-              ? p.turbc.map((u, i) => (
-                  <Button
-                    variant={gfa.subProduct === "turbc" && gfa.gfaTimeStep === i ? "selected" : "secondary"}
-                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                    key={i}
-                    value={u}
-                    onClick={() => {
-                      gfa.setSubProduct!("turbc");
-                      gfa.setGfaTimeStep(i);
-                    }}
-                  >
-                    T+{i * 6}
-                  </Button>
-                ))
-              : "",
-          )}
-        </div>
-      </nav>
-
-      <img className="max-w-full mx-auto px-2 mt-2 pb-2" src={gfa.url} />
+      )}
     </>
   );
 };

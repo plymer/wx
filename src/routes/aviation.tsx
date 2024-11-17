@@ -1,8 +1,11 @@
 import AvChartsGFA from "@/components/aviation/AvChartsGFA";
 import AvChartsOther from "@/components/aviation/AvChartsOther";
+import AvImageContainer from "@/components/aviation/AvImageContainer";
 import HubDiscussion from "@/components/aviation/HubDiscussion";
 import { Button } from "@/components/ui/button";
 import { useAviationContext } from "@/contexts/aviationContext";
+import useAPI from "@/hooks/useAPI";
+import { GFAData } from "@/lib/types";
 
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -14,6 +17,8 @@ export const PRODUCTS = ["gfa", "lgf", "hlt", "sigwx", "hubs"];
 
 function AviationComponent() {
   const aviation = useAviationContext();
+
+  const { data: gfaData, isLoading: gfaLoading, error: gfaError } = useAPI<GFAData[]>("charts/gfa", []);
 
   return (
     <>
@@ -31,9 +36,10 @@ function AviationComponent() {
             </Button>
           ))}
         </nav>
-        {aviation.product === "gfa" ? <AvChartsGFA /> : ""}
+        {aviation.product === "gfa" ? <AvChartsGFA data={gfaData} isLoading={gfaLoading} error={gfaError} /> : ""}
         {aviation.product !== "gfa" && aviation.product !== "hubs" ? <AvChartsOther /> : ""}
         {aviation.product === "hubs" ? <HubDiscussion /> : ""}
+        {aviation.product !== "hubs" ? <AvImageContainer url={aviation.url} /> : ""}
       </div>
     </>
   );

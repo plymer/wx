@@ -24,7 +24,7 @@ export default function WeatherControls() {
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
         <DrawerTitle />
         <DrawerTrigger asChild>
-          <Button className="p-3">
+          <Button className="p-3 w-12 h-12">
             <MapIcon />
           </Button>
         </DrawerTrigger>
