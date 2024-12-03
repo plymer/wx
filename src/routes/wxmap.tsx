@@ -23,8 +23,8 @@ function WxMapComponent() {
       <AnimationContextProvider>
         <MapInstance height="calc(100svh - 9.6rem)" defaultLat={53} defaultLon={-95} defaultZoom={3.25}>
           <>
-            <GeoMetLayer type="satellite" product={geoMet.subProduct} domain="west" belowLayer="wateroutline" />
-            <GeoMetLayer type="satellite" product={geoMet.subProduct} domain="east" belowLayer="wateroutline" />
+            {/* <GeoMetLayer type="satellite" product={geoMet.subProduct} domain="west" belowLayer="wateroutline" />
+            <GeoMetLayer type="satellite" product={geoMet.subProduct} domain="east" belowLayer="wateroutline" /> */}
             <WeatherControls />
           </>
         </MapInstance>

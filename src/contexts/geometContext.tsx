@@ -3,50 +3,38 @@ import useContextWrapper from "@/hooks/useContextWrapper";
 import { SATELLITE_CHANNELS } from "@/config/satellite";
 
 export interface IGeoMetContext {
-  subProduct?: string;
-  setSubProduct?: React.Dispatch<
-    React.SetStateAction<IGeoMetContext["subProduct"]>
-  >;
+  satelliteProduct?: string;
+  setSatelliteProduct?: React.Dispatch<React.SetStateAction<IGeoMetContext["satelliteProduct"]>>;
   radarProduct?: string;
-  setRadarProduct?: React.Dispatch<
-    React.SetStateAction<IGeoMetContext["radarProduct"]>
-  >;
+  setRadarProduct?: React.Dispatch<React.SetStateAction<IGeoMetContext["radarProduct"]>>;
   showRadar?: boolean;
-  setShowRadar?: React.Dispatch<
-    React.SetStateAction<IGeoMetContext["showRadar"]>
-  >;
+  setShowRadar?: React.Dispatch<React.SetStateAction<IGeoMetContext["showRadar"]>>;
 }
 
 export const GeoMetContext = createContext<IGeoMetContext | null>(null);
 
-export const GeoMetContextProvider = ({
-  children,
-}: React.PropsWithChildren<{}>) => {
-  const [subProduct, setSubProduct] = useState<IGeoMetContext["subProduct"]>(
+export const GeoMetContextProvider = ({ children }: React.PropsWithChildren<{}>) => {
+  const [satelliteProduct, setSatelliteProduct] = useState<IGeoMetContext["satelliteProduct"]>(
     SATELLITE_CHANNELS[0].wms,
   );
 
-  const [radarProduct, setRadarProduct] =
-    useState<IGeoMetContext["radarProduct"]>("RRAI");
+  const [radarProduct, setRadarProduct] = useState<IGeoMetContext["radarProduct"]>("RRAI");
 
-  const [showRadar, setShowRadar] =
-    useState<IGeoMetContext["showRadar"]>(false);
+  const [showRadar, setShowRadar] = useState<IGeoMetContext["showRadar"]>(false);
 
   const value = useMemo(
     () => ({
-      subProduct,
-      setSubProduct,
+      satelliteProduct,
+      setSatelliteProduct,
       radarProduct,
       setRadarProduct,
       showRadar,
       setShowRadar,
     }),
-    [subProduct, radarProduct, showRadar],
+    [satelliteProduct, radarProduct, showRadar],
   );
 
-  return (
-    <GeoMetContext.Provider value={value}>{children}</GeoMetContext.Provider>
-  );
+  return <GeoMetContext.Provider value={value}>{children}</GeoMetContext.Provider>;
 };
 
 export const useGeoMetContext = () =>

@@ -19,7 +19,7 @@ const api = axios.create({ baseURL: "https://api.prairiewx.ca" });
  * @returns a react-query object
  */
 
-const useAPI = <T>(endpoint: string, searchParams: SearchParam[], queryName?: string) => {
+const useAPI = <T>(endpoint: string, searchParams: SearchParam[], queryName?: string, interval?: number) => {
   // build the url that will query the api, creating a valid queryParam string
   const url = `/${endpoint}?` + searchParams.map((p) => `${p.param}=${p.value}`).join("&");
 
@@ -33,7 +33,7 @@ const useAPI = <T>(endpoint: string, searchParams: SearchParam[], queryName?: st
   const { data, error, isLoading, fetchStatus, refetch } = useQuery({
     queryKey: [queryName ? queryName : endpoint],
     queryFn: getData,
-    refetchInterval: 5 * 1000 * 60,
+    refetchInterval: interval ? interval * 1000 * 60 : 5 * 1000 * 60,
     retry: true,
   });
 
