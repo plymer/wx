@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import type { RasterSource } from "react-map-gl/maplibre";
-import { Layer, Source } from "react-map-gl/maplibre";
+import type { RasterSource } from "@vis.gl/react-maplibre";
+import { Layer, Source } from "@vis.gl/react-maplibre";
 
 import { DataParams } from "@/lib/types";
 import { GOES_EAST_BOUNDS, GOES_WEST_BOUNDS, MAP_BOUNDS } from "@/lib/constants";

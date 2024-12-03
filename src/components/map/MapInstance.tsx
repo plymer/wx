@@ -1,5 +1,4 @@
-import Map, { ViewState } from "react-map-gl/maplibre";
-import { AttributionControl } from "react-map-gl";
+import Map, { ViewState, AttributionControl } from "@vis.gl/react-maplibre";
 import { StyleSpecification } from "maplibre-gl";
 
 // css
