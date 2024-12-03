@@ -1,4 +1,4 @@
-import Map from "react-map-gl/maplibre";
+import Map, { ViewState } from "react-map-gl/maplibre";
 import { AttributionControl } from "react-map-gl";
 import { StyleSpecification } from "maplibre-gl";
 
@@ -28,17 +28,22 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
   // controls the state of the loading spinner
   const animation = useAnimationContext();
   const [isLoading, setIsLoading] = useState(false);
-
-  // map viewstate is CONTROLLED in this app
-  const [lat, setLat] = useState(defaultLat);
-  const [lon, setLon] = useState(defaultLon);
-  const [zoom, setZoom] = useState(defaultZoom);
+  const [viewState, setViewState] = useState<ViewState>({
+    latitude: defaultLat,
+    longitude: defaultLon,
+    zoom: defaultZoom,
+    bearing: 0,
+    pitch: 0,
+    padding: { top: 0, left: 0, right: 0, bottom: 0 },
+  });
   return (
     <div>
       <Map
-        latitude={lat}
-        longitude={lon}
-        zoom={zoom}
+        latitude={viewState.latitude}
+        longitude={viewState.longitude}
+        zoom={viewState.zoom}
+        bearing={viewState.bearing}
+        pitch={viewState.pitch}
         attributionControl={false}
         dragRotate={false}
         pitchWithRotate={false}
@@ -78,9 +83,12 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
         onMove={
           /* update our map-center lat-lon and zoom whenever we move the map view */
           (e) => {
-            setLat(e.viewState.latitude);
-            setLon(e.viewState.longitude);
-            setZoom(e.viewState.zoom);
+            setViewState({
+              ...viewState,
+              longitude: e.viewState.longitude,
+              latitude: e.viewState.latitude,
+              zoom: e.viewState.zoom,
+            });
           }
         }
       >

@@ -2,7 +2,7 @@ import { LngLatBoundsLike } from "maplibre-gl";
 
 // map object constants
 const MAX_WEST: number = -180;
-const MAX_SOUTH: number = -30;
+const MAX_SOUTH: number = -85;
 const MAX_EAST: number = 0;
 const MAX_NORTH: number = 85;
 const EAST_WEST_SPLIT: number = -90;

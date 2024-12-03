@@ -5,7 +5,7 @@ import { useEffect } from "react";
 // define the search params shape
 type SearchParam = {
   param: string;
-  value: string | number;
+  value: string | number | undefined;
 };
 
 // configure axios behaviour
@@ -19,7 +19,7 @@ const api = axios.create({ baseURL: "https://api.prairiewx.ca" });
  * @returns a react-query object
  */
 
-const useAPI = <T>(endpoint: string, searchParams: SearchParam[]) => {
+const useAPI = <T>(endpoint: string, searchParams: SearchParam[], queryName?: string) => {
   // build the url that will query the api, creating a valid queryParam string
   const url = `/${endpoint}?` + searchParams.map((p) => `${p.param}=${p.value}`).join("&");
 
@@ -31,10 +31,10 @@ const useAPI = <T>(endpoint: string, searchParams: SearchParam[]) => {
 
   // destructure the queryObject from react-query to give us access to the params and methods we need
   const { data, error, isLoading, fetchStatus, refetch } = useQuery({
-    queryKey: [endpoint],
+    queryKey: [queryName ? queryName : endpoint],
     queryFn: getData,
     refetchInterval: 5 * 1000 * 60,
-    retry: false,
+    retry: true,
   });
 
   // set up to refetch the data whenever the search string changes

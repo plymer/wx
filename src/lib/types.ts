@@ -1,3 +1,7 @@
+export type APIResponse = {
+  status: "error" | "success";
+};
+
 export type SiteData = APIResponse & {
   metadata: {
     icaoId: string;
@@ -23,23 +27,18 @@ export type METAR = APIResponse & {
   metars: string[];
 };
 
-export type APIResponse = {
-  status: "error" | "success";
-};
-
-export type GFAData = {
+export type GFAData = APIResponse & {
   domain: string;
   cldwx: string[];
   turbc: string[];
 };
 
-export type OtherChartData = {
+export type OtherChartData = APIResponse & {
   domain: string;
   images: string[];
 };
 
-export type HubData = {
-  status: "error" | "success";
+export type HubData = APIResponse & {
   hubData: {
     siteName: string;
     header: string;
