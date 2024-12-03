@@ -201,10 +201,10 @@ const AnimationControls = () => {
         </div>
 
         <Slider
-          max={animation.endTime}
-          min={animation.startTime + animation.timeStep}
+          max={animation.endTime - animation.timeStep}
+          min={animation.startTime}
           step={animation.timeStep}
-          value={[animation.startTime + animation.timeStep * (animation.currentFrame + 1)]}
+          value={[animation.startTime + animation.timeStep * animation.currentFrame]}
           onValueChange={(e) => {
             animation.setCurrentFrame(
               getNewFrame(animation.frameCount, (e[0] - animation.startTime) / animation.timeStep),

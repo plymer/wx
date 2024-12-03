@@ -3,11 +3,7 @@ import type { RasterSource } from "react-map-gl/maplibre";
 import { Layer, Source } from "react-map-gl/maplibre";
 
 import { DataParams } from "@/lib/types";
-import {
-  GOES_EAST_BOUNDS,
-  GOES_WEST_BOUNDS,
-  MAP_BOUNDS,
-} from "@/lib/constants";
+import { GOES_EAST_BOUNDS, GOES_WEST_BOUNDS, MAP_BOUNDS } from "@/lib/constants";
 
 import useGeoMet from "@/hooks/useGeoMet";
 import { useGeoMetContext } from "@/contexts/geometContext";
@@ -28,8 +24,7 @@ const GeoMetLayer = ({ type, domain, product, belowLayer }: Props) => {
 
   switch (type) {
     case "satellite":
-      geoMetSearchString =
-        domain === "west" ? "GOES-West_" + product : "GOES-East_" + product;
+      geoMetSearchString = domain === "west" ? "GOES-West_" + product : "GOES-East_" + product;
       break;
     case "radar":
       geoMetSearchString = "RADAR_1KM_" + product;
@@ -61,12 +56,7 @@ const GeoMetLayer = ({ type, domain, product, belowLayer }: Props) => {
   const source: RasterSource = {
     type: "raster",
     tileSize: 256,
-    bounds:
-      type === "satellite"
-        ? domain === "west"
-          ? GOES_WEST_BOUNDS
-          : GOES_EAST_BOUNDS
-        : MAP_BOUNDS,
+    bounds: type === "satellite" ? (domain === "west" ? GOES_WEST_BOUNDS : GOES_EAST_BOUNDS) : MAP_BOUNDS,
   };
 
   /*
@@ -83,22 +73,14 @@ const GeoMetLayer = ({ type, domain, product, belowLayer }: Props) => {
 
   if (layerInfo) {
     if (animation.animationState === "stopped") {
+      // console.log("not playing!");
       return (
-        <Source
-          {...source}
-          id={layerId + "-0"}
-          key="0"
-          tiles={[layerInfo.urls[animation.currentFrame]]}
-        >
-          <Layer
-            type="raster"
-            source="source"
-            id={layerId + "-0"}
-            beforeId={belowLayer}
-          />
+        <Source {...source} id={layerId + "-0"} key="0" tiles={[layerInfo.urls[animation.currentFrame]]}>
+          <Layer type="raster" source="source" id={layerId + "-0"} beforeId={belowLayer} />
         </Source>
       );
     } else {
+      // console.log("playing!");
       return layerInfo.urls.map((u, index) => (
         <Source {...source} key={index} tiles={[u]} id={layerId + "-" + index}>
           <Layer
