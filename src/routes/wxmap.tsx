@@ -1,10 +1,9 @@
 import AnimationControls from "@/components/map/AnimationControls";
-import GeoMetLayer from "@/components/map/GeoMetLayer";
+
 import MapInstance from "@/components/map/MapInstance";
 import WeatherControls from "@/components/map/WeatherControls";
 
 import { AnimationContextProvider } from "@/contexts/animationContext";
-import { useGeoMetContext } from "@/contexts/geometContext";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/wxmap")({
@@ -12,8 +11,6 @@ export const Route = createFileRoute("/wxmap")({
 });
 
 function WxMapComponent() {
-  const geoMet = useGeoMetContext();
-
   // const handleClick = () => {
   //   alert("clicked!");
   // };
@@ -22,11 +19,7 @@ function WxMapComponent() {
     <div className="bg-neutral-800 pt-2">
       <AnimationContextProvider>
         <MapInstance height="calc(100svh - 9.6rem)" defaultLat={53} defaultLon={-95} defaultZoom={3.25}>
-          <>
-            {/* <GeoMetLayer type="satellite" product={geoMet.subProduct} domain="west" belowLayer="wateroutline" />
-            <GeoMetLayer type="satellite" product={geoMet.subProduct} domain="east" belowLayer="wateroutline" /> */}
-            <WeatherControls />
-          </>
+          <WeatherControls />
         </MapInstance>
         <div className="w-full flex justify-center border-t-2  border-black bg-accent px-2 text-white">
           <AnimationControls />

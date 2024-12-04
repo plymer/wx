@@ -31,9 +31,9 @@ const useAPI = <T>(endpoint: string, searchParams: SearchParam[], queryName?: st
 
   // destructure the queryObject from react-query to give us access to the params and methods we need
   const { data, error, isLoading, fetchStatus, refetch } = useQuery({
-    queryKey: [queryName ? queryName : endpoint],
+    queryKey: [queryName ? queryName : endpoint], // defaults to the api endpoint requested
     queryFn: getData,
-    refetchInterval: interval ? interval * 1000 * 60 : 5 * 1000 * 60,
+    refetchInterval: interval ? interval * 1000 * 60 : 5 * 1000 * 60, // default is 5 minutes
     retry: true,
   });
 

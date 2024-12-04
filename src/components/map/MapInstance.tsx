@@ -28,7 +28,7 @@ interface Props {
 
 const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, children }: Props) => {
   const animation = useAnimationContext();
-  const [baseMapLayers, setBaseMapLayers] = useState<string[]>([""]);
+  const [baseMapLayers, setBaseMapLayers] = useState<string[]>();
   const [isMapLoading, setIsMapLoading] = useState(false);
   const [isMapInitialized, setIsMapInitialized] = useState(false);
   const [viewState, setViewState] = useState<ViewState>({
@@ -87,10 +87,10 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
           });
         }}
       >
-        {isMapInitialized ? (
+        {isMapInitialized && baseMapLayers ? (
           <>
             {children}
-            <LayerManager config={{ wms: ["west", "east"] }} />
+            <LayerManager config={{ raster: ["west", "east"] }} baseLayers={baseMapLayers} />
           </>
         ) : (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white">

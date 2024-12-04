@@ -37,7 +37,7 @@ export default function WeatherControls() {
                 {/* <TabsTrigger value="overlays">Overlays</TabsTrigger> */}
               </TabsList>
               <TabsContent value="satellite" className="mt-4">
-                <Select defaultValue={geomet.subProduct} onValueChange={(e) => geomet.setSubProduct!(e)}>
+                <Select defaultValue={geomet.satelliteProduct} onValueChange={(e) => geomet.setSatelliteProduct!(e)}>
                   <SelectTrigger className="w-full text-black">
                     <SelectValue placeholder="Select Satellite Channel" />
                   </SelectTrigger>

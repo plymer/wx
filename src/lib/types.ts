@@ -1,3 +1,5 @@
+// custom type definitions
+
 export type APIResponse = {
   status: "error" | "success";
 };
@@ -49,8 +51,19 @@ export type HubData = APIResponse & {
   };
 };
 
-export type View = { lon: number; lat: number; zoom: number };
+export type GeoMetData = APIResponse & {
+  layers: LayerData[];
+};
 
+export type LayerData = {
+  name: string;
+  dimension: string;
+  timeSteps: string[];
+  domain: "national" | "west" | "east";
+  type: string;
+};
+
+// TO BE DEPRECATED
 export type DataParams = {
   timeStart: number;
   timeEnd: number;
