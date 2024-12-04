@@ -57,10 +57,17 @@ export type GeoMetData = APIResponse & {
 
 export type LayerData = {
   name: string;
-  dimension: string;
   timeSteps: string[];
   domain: "national" | "west" | "east";
   type: string;
+  delta: number;
+  start: number;
+  end: number;
+};
+
+export type MapLayerConfig = {
+  vector: string[] | "east" | "west" | "national";
+  raster: string[];
 };
 
 // TO BE DEPRECATED

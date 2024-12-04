@@ -4,10 +4,10 @@ import RasterDataLayer from "./RasterDataLayer";
 import useMapConfig from "@/hooks/useMapConfig";
 import { useEffect, useState } from "react";
 import useAPI from "@/hooks/useAPI";
-import { GeoMetData } from "@/lib/types";
+import { GeoMetData, LayerData, MapLayerConfig } from "@/lib/types";
 
 interface Props {
-  config: Object;
+  config: MapLayerConfig;
   baseLayers: string[];
 }
 
@@ -16,13 +16,34 @@ type LayerConstraints = {
   raster: string;
 };
 
+function generateLayerId(type: string, domain: string) {
+  return `layer-${type}-${domain}`;
+}
+
 const LayerManager = ({ config, baseLayers }: Props) => {
-  const [layerConstraints, setLayerConstraints] = useState<LayerConstraints>();
-  const [apiRasterData, setApiRasterData] = useState<GeoMetData>();
+  const [layerConfig, setLayerConfig] = useState<MapLayerConfig>();
+  const [layerConstraints, setLayerConstraints] = useState<LayerConstraints | undefined>({
+    vector: baseLayers[baseLayers.length - 1],
+    raster: baseLayers[0],
+  });
+  const [apiRasterData, setApiRasterData] = useState<LayerData[]>();
 
   const { data: rasterData, fetchStatus: rasterFetchStatus } = useAPI<GeoMetData>("geomet", [
-    { param: "layers", value: "all" },
+    {
+      param: "layers",
+      value: "RADAR_1KM_RRAI,GOES-West_1km_DayCloudType-NightMicrophysics,GOES-East_1km_DayCloudType-NightMicrophysics",
+    },
   ]);
+
+  useEffect(() => {
+    if (!config) return;
+
+    setLayerConfig(config);
+
+    return () => {
+      setLayerConfig(undefined);
+    };
+  }, [config]);
 
   useEffect(() => {
     if (!baseLayers) return;
@@ -34,31 +55,52 @@ const LayerManager = ({ config, baseLayers }: Props) => {
   }, [baseLayers]);
 
   useEffect(() => {
-    setApiRasterData(rasterData);
+    setApiRasterData(rasterData?.layers);
 
     return () => {
       setApiRasterData(undefined);
     };
   }, [rasterFetchStatus]);
 
-  console.log(apiRasterData);
-
   const geoMet = useGeoMetContext();
 
   const mapConfig = useMapConfig();
 
-  // config.wms.map((d) => console.log(d));
-
   return (
     <>
-      {config.raster.map((d, i) => (
-        <RasterDataLayer
-          key={i}
-          type="satellite"
-          product={geoMet.satelliteProduct}
-          domain={d}
-          belowLayer="wateroutline"
-        />
+      {apiRasterData?.map((d, i) => (
+        <div key={i}>
+          {d.type === "satellite" ? (
+            <RasterDataLayer
+              key={`satellite${i}`}
+              type="satellite"
+              product={geoMet.satelliteProduct}
+              domain={d.domain}
+              belowLayer={
+                i === 0
+                  ? layerConstraints?.raster
+                  : generateLayerId(apiRasterData[i - 1].type, apiRasterData[i - 1].domain) + "-0"
+              }
+            />
+          ) : (
+            ""
+          )}
+          {d.type === "radar" ? (
+            <RasterDataLayer
+              key={`radar${i}`}
+              type="radar"
+              product={geoMet.radarProduct}
+              domain={d.domain}
+              belowLayer={
+                i === 0
+                  ? layerConstraints?.raster
+                  : generateLayerId(apiRasterData[i - 1].type, apiRasterData[i - 1].domain) + "-0"
+              }
+            />
+          ) : (
+            ""
+          )}
+        </div>
       ))}
       {/* {config.wms.map((d, i) => (
         <GeoMetLayer key={i} type="satellite" product={geoMet.satelliteProduct} domain={d} belowLayer="wateroutline" />

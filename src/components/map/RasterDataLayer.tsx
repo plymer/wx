@@ -11,7 +11,7 @@ import { useAnimationContext } from "@/contexts/animationContext";
 
 interface Props {
   type: "satellite" | "radar";
-  domain?: "west" | "east";
+  domain: "national" | "west" | "east";
   product?: string;
   belowLayer?: string;
 }
