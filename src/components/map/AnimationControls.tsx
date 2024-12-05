@@ -201,7 +201,7 @@ const AnimationControls = () => {
         </div>
 
         <Slider
-          max={animation.endTime - animation.timeStep}
+          max={animation.endTime}
           min={animation.startTime}
           step={animation.timeStep}
           value={[animation.startTime + animation.timeStep * animation.currentFrame]}

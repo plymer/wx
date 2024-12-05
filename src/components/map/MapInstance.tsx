@@ -12,8 +12,6 @@ import basemap from "@/assets/map-styles/positronwxmap.json";
 // helpers
 import { MAP_BOUNDS } from "@/lib/constants";
 
-import { useAnimationContext } from "@/contexts/animationContext";
-
 import LayerManager from "./LayerManager";
 import { MapLayerConfig } from "@/lib/types";
 import { useMapConfigContext } from "@/contexts/mapConfigContext";

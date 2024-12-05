@@ -1,61 +1,26 @@
-import { useEffect, useState } from "react";
 import type { RasterSource } from "@vis.gl/react-maplibre";
 import { Layer, Source } from "@vis.gl/react-maplibre";
 
-import { DataParams, LayerData } from "@/lib/types";
+import { LayerData } from "@/lib/types";
 import { GEOMET_GETMAP, GOES_EAST_BOUNDS, GOES_WEST_BOUNDS, MAP_BOUNDS } from "@/lib/constants";
 
-import useGeoMet from "@/hooks/useGeoMet";
 import { useMapConfigContext } from "@/contexts/mapConfigContext";
 
 interface Props {
-  type: "satellite" | "radar";
-  domain: "national" | "west" | "east";
-  product?: string;
   belowLayer?: string;
-  apiData?: LayerData;
+  apiData: LayerData;
 }
 
-const RasterDataLayer = ({ type, domain, product, belowLayer, apiData }: Props) => {
+const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
   const mapConfig = useMapConfigContext();
 
-  let geoMetSearchString: string = "";
-
-  switch (type) {
-    case "satellite":
-      geoMetSearchString = domain === "west" ? "GOES-West_" + product : "GOES-East_" + product;
-      break;
-    case "radar":
-      geoMetSearchString = "RADAR_1KM_" + product;
-  }
-
-  const [layerInfo, setLayerInfo] = useState<DataParams>();
-
-  const { data, fetchStatus, refetch } = useGeoMet(geoMetSearchString);
-
-  const updateTimes = (times: DataParams) => {
-    setLayerInfo(times);
-    mapConfig.setEndTime(times.timeEnd);
-    mapConfig.setStartTime(times.timeStart);
-    mapConfig.setTimeStep(times.timeDiff);
-  };
-
-  // this effect will update the satellite data whenever the data is refetched
-  useEffect(() => {
-    if (data) updateTimes(data);
-  }, [fetchStatus]);
-
-  // this effect is called whenever the subproduct changes from user input
-  useEffect(() => {
-    refetch();
-  }, [mapConfig.radarProduct, mapConfig.satelliteProduct, mapConfig.showRadar, mapConfig.showSatellite]);
-
-  const layerId = domain ? "layer-" + type + "-" + domain : "layer-" + type;
+  const layerId = "layer-" + apiData.type + "-" + apiData.domain;
 
   const source: RasterSource = {
     type: "raster",
     tileSize: 256,
-    bounds: type === "satellite" ? (domain === "west" ? GOES_WEST_BOUNDS : GOES_EAST_BOUNDS) : MAP_BOUNDS,
+    bounds:
+      apiData.type === "satellite" ? (apiData.domain === "west" ? GOES_WEST_BOUNDS : GOES_EAST_BOUNDS) : MAP_BOUNDS,
   };
 
   /*
@@ -102,7 +67,7 @@ const RasterDataLayer = ({ type, domain, product, belowLayer, apiData }: Props) 
               "raster-opacity":
                 index === mapConfig.currentFrame ||
                 index === mapConfig.currentFrame - 1 ||
-                (type === "satellite" && index === 0)
+                (apiData.type === "satellite" && index === 0)
                   ? 1
                   : 0, // here, we want the current, the previous, and the very last frame to be preserved so that we don't get any flickering of the map background since the renderer does not repsect our fade-duration property
             }}

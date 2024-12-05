@@ -1,5 +1,3 @@
-import { useGeoMetContext } from "@/contexts/geometContext";
-import GeoMetLayer from "./GeoMetLayer";
 import RasterDataLayer from "./RasterDataLayer";
 
 import { useEffect, useState } from "react";
@@ -22,6 +20,8 @@ function generateLayerId(type: string, domain: string) {
 }
 
 const LayerManager = ({ config, baseLayers }: Props) => {
+  const mapConfig = useMapConfigContext();
+
   const [layerConfig, setLayerConfig] = useState<MapLayerConfig>();
   const [layerConstraints, setLayerConstraints] = useState<LayerConstraints | undefined>({
     vector: baseLayers[baseLayers.length - 1],
@@ -63,8 +63,6 @@ const LayerManager = ({ config, baseLayers }: Props) => {
     };
   }, [rasterFetchStatus]);
 
-  const mapConfig = useMapConfigContext();
-
   return (
     <>
       {apiRasterData?.map((d, i) => (
@@ -72,9 +70,6 @@ const LayerManager = ({ config, baseLayers }: Props) => {
           {d.type === "satellite" ? (
             <RasterDataLayer
               key={`raster-${i}`}
-              type="satellite"
-              product={mapConfig.satelliteProduct}
-              domain={d.domain}
               apiData={d}
               belowLayer={
                 i === 0
@@ -88,9 +83,6 @@ const LayerManager = ({ config, baseLayers }: Props) => {
           {apiRasterData && d.type === "radar" ? (
             <RasterDataLayer
               key={`raster-${i}`}
-              type="radar"
-              product={mapConfig.radarProduct}
-              domain={d.domain}
               apiData={d}
               belowLayer={
                 i === 0
