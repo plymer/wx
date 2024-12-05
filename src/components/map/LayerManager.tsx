@@ -80,7 +80,7 @@ const LayerManager = ({ config, baseLayers }: Props) => {
           ) : (
             ""
           )}
-          {apiRasterData && d.type === "radar" ? (
+          {d.type === "radar" ? (
             <RasterDataLayer
               key={`raster-${i}`}
               apiData={d}

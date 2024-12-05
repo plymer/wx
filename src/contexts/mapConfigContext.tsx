@@ -13,7 +13,7 @@ export interface IMapConfigContext {
   showRadar: boolean;
   setShowRadar: React.Dispatch<React.SetStateAction<IMapConfigContext["showRadar"]>>;
 
-  // animation config
+  // map animation config
   animationState: "playing" | "loading" | "paused" | "stopped";
   setAnimationState: React.Dispatch<React.SetStateAction<IMapConfigContext["animationState"]>>;
   currentFrame: number; // which frame is being displayed
@@ -33,13 +33,15 @@ export interface IMapConfigContext {
 export const MapConfigContext = createContext<IMapConfigContext | null>(null);
 
 export const MapConfigContextProvider = ({ children }: React.PropsWithChildren<{}>) => {
+  // raster data states
   const [satelliteProduct, setSatelliteProduct] = useState<IMapConfigContext["satelliteProduct"]>(
     SATELLITE_CHANNELS[0].wms,
   );
   const [showSatellite, setShowSatellite] = useState<IMapConfigContext["showSatellite"]>(true);
   const [radarProduct, setRadarProduct] = useState<IMapConfigContext["radarProduct"]>("RRAI");
-  const [showRadar, setShowRadar] = useState<IMapConfigContext["showRadar"]>(false);
+  const [showRadar, setShowRadar] = useState<IMapConfigContext["showRadar"]>(true);
 
+  // map animation states
   const [animationState, setAnimationState] = useState<IMapConfigContext["animationState"]>("stopped");
   const [frameCount, setFrameCount] = useState<IMapConfigContext["frameCount"]>(24);
   const [currentFrame, setCurrentFrame] = useState<IMapConfigContext["currentFrame"]>(frameCount - 1);
@@ -48,6 +50,7 @@ export const MapConfigContextProvider = ({ children }: React.PropsWithChildren<{
   const [endTime, setEndTime] = useState<IMapConfigContext["endTime"]>(Date.now());
   const [timeStep, setTimeStep] = useState<IMapConfigContext["timeStep"]>(60000);
 
+  // memoize all parts of the state to limit re-render calls
   const value = useMemo(
     () => ({
       satelliteProduct,
