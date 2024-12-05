@@ -38,7 +38,7 @@ export const MapConfigContextProvider = ({ children }: React.PropsWithChildren<{
     SATELLITE_CHANNELS[0].wms,
   );
   const [showSatellite, setShowSatellite] = useState<IMapConfigContext["showSatellite"]>(true);
-  const [radarProduct, setRadarProduct] = useState<IMapConfigContext["radarProduct"]>("RRAI");
+  const [radarProduct, setRadarProduct] = useState<IMapConfigContext["radarProduct"]>("RADAR_1KM_RRAI");
   const [showRadar, setShowRadar] = useState<IMapConfigContext["showRadar"]>(true);
 
   // map animation states

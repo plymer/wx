@@ -13,7 +13,6 @@ import basemap from "@/assets/map-styles/positronwxmap.json";
 import { MAP_BOUNDS } from "@/lib/constants";
 
 import LayerManager from "./LayerManager";
-import { MapLayerConfig } from "@/lib/types";
 import { useMapConfigContext } from "@/contexts/mapConfigContext";
 
 interface Props {
@@ -39,8 +38,6 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
     pitch: 0,
     padding: { top: 0, left: 0, right: 0, bottom: 0 },
   });
-
-  const config: MapLayerConfig = { raster: ["east", "west"], vector: [] };
 
   return (
     <div>
@@ -93,7 +90,7 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
         {isMapInitialized && baseMapLayers ? (
           <>
             {children}
-            <LayerManager config={config} baseLayers={baseMapLayers} />
+            <LayerManager baseLayers={baseMapLayers} />
           </>
         ) : (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white">

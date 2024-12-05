@@ -2,11 +2,11 @@ import RasterDataLayer from "./RasterDataLayer";
 
 import { useEffect, useState } from "react";
 import useAPI from "@/hooks/useAPI";
-import { GeoMetData, LayerData, MapLayerConfig } from "@/lib/types";
+import { GeoMetData, LayerData } from "@/lib/types";
 import { useMapConfigContext } from "@/contexts/mapConfigContext";
+import { SATELLITES } from "@/config/satellite";
 
 interface Props {
-  config: MapLayerConfig;
   baseLayers: string[];
 }
 
@@ -19,32 +19,48 @@ function generateLayerId(type: string, domain: string) {
   return `layer-${type}-${domain}`;
 }
 
-const LayerManager = ({ config, baseLayers }: Props) => {
+const LayerManager = ({ baseLayers }: Props) => {
   const mapConfig = useMapConfigContext();
 
-  const [layerConfig, setLayerConfig] = useState<MapLayerConfig>();
+  // this is passed to the api endpoint as a searchParam value (comma-separated)
+  const [rasterSearchString, setRasterSearchString] = useState<string>();
+  // this keeps track of the layerIds for each raster dataset being shown on the map
+  const [rasterLayerManifest, setRasterLayerManifest] = useState<string[]>();
+
+  // set the layers for drawing logic - vector must be the highest basemap layer and raster the lowest
   const [layerConstraints, setLayerConstraints] = useState<LayerConstraints | undefined>({
     vector: baseLayers[baseLayers.length - 1],
     raster: baseLayers[0],
   });
+  // keep track of the api raster data response
   const [apiRasterData, setApiRasterData] = useState<LayerData[]>();
 
+  // data fetching
   const { data: rasterData, fetchStatus: rasterFetchStatus } = useAPI<GeoMetData>("geomet", [
     {
       param: "layers",
-      value: "RADAR_1KM_RRAI,GOES-West_1km_DayCloudType-NightMicrophysics,GOES-East_1km_DayCloudType-NightMicrophysics",
+      value: rasterSearchString,
     },
   ]);
 
   useEffect(() => {
-    if (!config) return;
+    console.log("Config has changed, setting search string...");
 
-    setLayerConfig(config);
+    let search = [
+      mapConfig.radarProduct,
+      SATELLITES.map((s) => `${s}_${mapConfig.satelliteProduct}`).toString(),
+    ].toString();
+
+    // do some string sanitization so that we don't have any leading or trailing commas
+    if (search.charAt(search.length - 1) === ",") search = search.slice(0, search.length - 1);
+    if (search.charAt(0) === ",") search = search.slice(1, search.length);
+
+    setRasterSearchString(search);
 
     return () => {
-      setLayerConfig(undefined);
+      setRasterSearchString(undefined);
     };
-  }, [config]);
+  }, [mapConfig.showRadar, mapConfig.radarProduct, mapConfig.showSatellite, mapConfig.satelliteProduct]);
 
   useEffect(() => {
     if (!baseLayers) return;
@@ -63,43 +79,45 @@ const LayerManager = ({ config, baseLayers }: Props) => {
     };
   }, [rasterFetchStatus]);
 
-  return (
-    <>
-      {apiRasterData?.map((d, i) => (
-        <div key={i}>
-          {d.type === "satellite" ? (
-            <RasterDataLayer
-              key={`raster-${i}`}
-              apiData={d}
-              belowLayer={
-                i === 0
-                  ? layerConstraints?.raster
-                  : generateLayerId(apiRasterData[i - 1].type, apiRasterData[i - 1].domain) + "-0"
-              }
-            />
-          ) : (
-            ""
-          )}
-          {d.type === "radar" ? (
-            <RasterDataLayer
-              key={`raster-${i}`}
-              apiData={d}
-              belowLayer={
-                i === 0
-                  ? layerConstraints?.raster
-                  : generateLayerId(apiRasterData[i - 1].type, apiRasterData[i - 1].domain) + "-0"
-              }
-            />
-          ) : (
-            ""
-          )}
-        </div>
-      ))}
-      {/* {config.wms.map((d, i) => (
-        <GeoMetLayer key={i} type="satellite" product={geoMet.satelliteProduct} domain={d} belowLayer="wateroutline" />
-      ))} */}
-    </>
-  );
+  useEffect(() => {
+    if (!apiRasterData) return;
+    setRasterLayerManifest(apiRasterData.map((d) => generateLayerId(d.type, d.domain)));
+
+    return () => {
+      setRasterLayerManifest(undefined);
+    };
+  }, [apiRasterData]);
+
+  if (rasterLayerManifest) {
+    return (
+      <>
+        {apiRasterData?.map((d, i) => (
+          <div key={i}>
+            {d.type === "satellite" && mapConfig.showSatellite ? (
+              <>
+                <RasterDataLayer
+                  key={`raster-${i}`}
+                  apiData={d}
+                  belowLayer={i === 0 ? layerConstraints?.raster : rasterLayerManifest[i - 1] + "-0"}
+                />
+              </>
+            ) : (
+              ""
+            )}
+            {d.type === "radar" && mapConfig.showRadar ? (
+              <RasterDataLayer
+                key={`raster-${i}`}
+                apiData={d}
+                belowLayer={i === 0 ? layerConstraints?.raster : rasterLayerManifest[i - 1] + "-0"}
+              />
+            ) : (
+              ""
+            )}
+          </div>
+        ))}
+      </>
+    );
+  }
 };
 
 export default LayerManager;
