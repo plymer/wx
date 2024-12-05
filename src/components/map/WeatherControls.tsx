@@ -8,15 +8,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MapIcon } from "lucide-react";
 
 import { SATELLITE_CHANNELS } from "@/config/satellite";
-import { useGeoMetContext } from "@/contexts/geometContext";
 import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "../ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { useMapConfigContext } from "@/contexts/mapConfigContext";
 // import { Label } from "../ui/label";
 // import { Switch } from "../ui/switch";
 // import { Checkbox } from "../ui/checkbox";
 
 export default function WeatherControls() {
-  const geomet = useGeoMetContext();
+  const geomet = useMapConfigContext();
   const [isOpen, setIsOpen] = useState(false);
 
   return (

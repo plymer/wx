@@ -16,6 +16,7 @@ import { useAnimationContext } from "@/contexts/animationContext";
 
 import LayerManager from "./LayerManager";
 import { MapLayerConfig } from "@/lib/types";
+import { useMapConfigContext } from "@/contexts/mapConfigContext";
 
 interface Props {
   width?: string;
@@ -28,7 +29,7 @@ interface Props {
 }
 
 const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, children }: Props) => {
-  const animation = useAnimationContext();
+  const animation = useMapConfigContext();
   const [baseMapLayers, setBaseMapLayers] = useState<string[]>();
   const [isMapLoading, setIsMapLoading] = useState(false);
   const [isMapInitialized, setIsMapInitialized] = useState(false);

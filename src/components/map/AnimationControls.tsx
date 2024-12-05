@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import AnimationControlButton from "./AnimationControlButton";
-import { useAnimationContext } from "@/contexts/animationContext";
+import { useMapConfigContext } from "@/contexts/mapConfigContext";
 
 import { makeISOTimeStamp } from "@/lib/utils";
 import { Slider } from "../ui/slider";
@@ -9,7 +9,7 @@ import { Slider } from "../ui/slider";
 // import { NUM_HRS_DATA } from "@/utilities/constants";
 
 const AnimationControls = () => {
-  const animation = useAnimationContext();
+  const animation = useMapConfigContext();
 
   const [startTime, setStartTime] = useState(makeISOTimeStamp(animation.startTime, "display"));
   const [endTime, setEndTime] = useState(makeISOTimeStamp(animation.endTime, "display"));

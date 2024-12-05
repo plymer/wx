@@ -2,23 +2,22 @@ import { useEffect, useState } from "react";
 import type { RasterSource } from "@vis.gl/react-maplibre";
 import { Layer, Source } from "@vis.gl/react-maplibre";
 
-import { DataParams } from "@/lib/types";
-import { GOES_EAST_BOUNDS, GOES_WEST_BOUNDS, MAP_BOUNDS } from "@/lib/constants";
+import { DataParams, LayerData } from "@/lib/types";
+import { GEOMET_GETMAP, GOES_EAST_BOUNDS, GOES_WEST_BOUNDS, MAP_BOUNDS } from "@/lib/constants";
 
 import useGeoMet from "@/hooks/useGeoMet";
-import { useGeoMetContext } from "@/contexts/geometContext";
-import { useAnimationContext } from "@/contexts/animationContext";
+import { useMapConfigContext } from "@/contexts/mapConfigContext";
 
 interface Props {
   type: "satellite" | "radar";
   domain: "national" | "west" | "east";
   product?: string;
   belowLayer?: string;
+  apiData?: LayerData;
 }
 
-const RasterDataLayer = ({ type, domain, product, belowLayer }: Props) => {
-  const animation = useAnimationContext();
-  const geoMet = useGeoMetContext();
+const RasterDataLayer = ({ type, domain, product, belowLayer, apiData }: Props) => {
+  const mapConfig = useMapConfigContext();
 
   let geoMetSearchString: string = "";
 
@@ -36,9 +35,9 @@ const RasterDataLayer = ({ type, domain, product, belowLayer }: Props) => {
 
   const updateTimes = (times: DataParams) => {
     setLayerInfo(times);
-    animation.setEndTime(times.timeEnd);
-    animation.setStartTime(times.timeStart);
-    animation.setTimeStep(times.timeDiff);
+    mapConfig.setEndTime(times.timeEnd);
+    mapConfig.setStartTime(times.timeStart);
+    mapConfig.setTimeStep(times.timeDiff);
   };
 
   // this effect will update the satellite data whenever the data is refetched
@@ -49,7 +48,7 @@ const RasterDataLayer = ({ type, domain, product, belowLayer }: Props) => {
   // this effect is called whenever the subproduct changes from user input
   useEffect(() => {
     refetch();
-  }, [geoMet]);
+  }, [mapConfig.radarProduct, mapConfig.satelliteProduct, mapConfig.showRadar, mapConfig.showSatellite]);
 
   const layerId = domain ? "layer-" + type + "-" + domain : "layer-" + type;
 
@@ -71,18 +70,28 @@ const RasterDataLayer = ({ type, domain, product, belowLayer }: Props) => {
 
   */
 
-  if (layerInfo) {
-    if (animation.animationState === "stopped") {
+  if (apiData) {
+    if (mapConfig.animationState === "stopped") {
       // console.log("not playing!");
       return (
-        <Source {...source} id={layerId + "-0"} key="0" tiles={[layerInfo.urls[animation.currentFrame]]}>
+        <Source
+          {...source}
+          id={layerId + "-0"}
+          key="0"
+          tiles={[GEOMET_GETMAP + apiData.name + "&time=" + apiData.timeSteps[mapConfig.currentFrame]]}
+        >
           <Layer type="raster" source="source" id={layerId + "-0"} beforeId={belowLayer} />
         </Source>
       );
     } else {
       // console.log("playing!");
-      return layerInfo.urls.map((u, index) => (
-        <Source {...source} key={index} tiles={[u]} id={layerId + "-" + index}>
+      return apiData.timeSteps.map((u, index) => (
+        <Source
+          {...source}
+          key={index}
+          tiles={[GEOMET_GETMAP + apiData.name + "&time=" + u]}
+          id={layerId + "-" + index}
+        >
           <Layer
             type="raster"
             source="source"
@@ -91,8 +100,8 @@ const RasterDataLayer = ({ type, domain, product, belowLayer }: Props) => {
             paint={{
               "raster-fade-duration": 0, // this literally doesn't do anything
               "raster-opacity":
-                index === animation.currentFrame ||
-                index === animation.currentFrame - 1 ||
+                index === mapConfig.currentFrame ||
+                index === mapConfig.currentFrame - 1 ||
                 (type === "satellite" && index === 0)
                   ? 1
                   : 0, // here, we want the current, the previous, and the very last frame to be preserved so that we don't get any flickering of the map background since the renderer does not repsect our fade-duration property
