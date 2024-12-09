@@ -1,6 +1,7 @@
-import Map, { ViewState } from "react-map-gl/maplibre";
-import { AttributionControl } from "react-map-gl";
+import { ReactElement, useState } from "react";
+import Map, { ViewState, AttributionControl } from "@vis.gl/react-maplibre";
 import { StyleSpecification } from "maplibre-gl";
+import { Loader2 } from "lucide-react";
 
 // css
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -10,9 +11,9 @@ import basemap from "@/assets/map-styles/positronwxmap.json";
 
 // helpers
 import { MAP_BOUNDS } from "@/lib/constants";
-import { ReactElement, useState } from "react";
-import { useAnimationContext } from "@/contexts/animationContext";
-import { Loader2 } from "lucide-react";
+
+import LayerManager from "./LayerManager";
+import { useMapConfigContext } from "@/contexts/mapConfigContext";
 
 interface Props {
   width?: string;
@@ -21,13 +22,14 @@ interface Props {
   defaultLat: number | 53;
   defaultZoom: number | 3.25;
   children?: ReactElement<any, any>;
-  onClick?: () => void;
+  // onClick?: () => void;
 }
 
-const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, children, onClick }: Props) => {
-  // controls the state of the loading spinner
-  const animation = useAnimationContext();
-  const [isLoading, setIsLoading] = useState(false);
+const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, children }: Props) => {
+  const animation = useMapConfigContext();
+  const [baseMapLayers, setBaseMapLayers] = useState<string[]>();
+  const [isMapLoading, setIsMapLoading] = useState(false);
+  const [isMapInitialized, setIsMapInitialized] = useState(false);
   const [viewState, setViewState] = useState<ViewState>({
     latitude: defaultLat,
     longitude: defaultLon,
@@ -36,6 +38,7 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
     pitch: 0,
     padding: { top: 0, left: 0, right: 0, bottom: 0 },
   });
+
   return (
     <div>
       <Map
@@ -52,50 +55,53 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
         maxBounds={MAP_BOUNDS}
         style={{ width: width || "100%", height: height, minHeight: "200px" }}
         mapStyle={basemap as StyleSpecification}
-        // onLoad={() => console.log(layers)}
-        // onStyleData={(e) => {
-        //   // make sure we know what layers are in use by the basemap so that we can filter these out from our actual data layers that we are adding later
-        //   // this should only fire on initial map load
-        //   !baseMapLayers
-        //     ? setBaseMapLayers(e.target.getLayersOrder())
-        //     : setLayers(
-        //         e.target
-        //           .getLayersOrder()
-        //           .filter((layer) => !baseMapLayers.includes(layer)),
-        //       );
-        // }}
-        onClick={onClick ? () => onClick() : undefined}
+        onStyleData={(e) => {
+          // make sure we know what layers are in use by the basemap so that we can filter these out from our actual data layers that we are adding later
+          // this should only fire on initial map load
+          if (!baseMapLayers) setBaseMapLayers(e.target.getLayersOrder());
+        }}
         onSourceData={() => {
           // if (e.isSourceLoaded) {
           //   console.log(e.sourceId, "completed loading");
           // }
-          setIsLoading(true);
-          // we set our 'isLoading' flag to true any time one of the layers in the map is loading data
-          // this allows us to show the loading spinner active
+
+          // show the loading spinner in the top right of the map while a data source is loading data
+          setIsMapLoading(true);
         }}
         onIdle={() => {
           // we turn the loading spinner off when the map isn't doing anything
-          setIsLoading(false);
+          setIsMapLoading(false);
+
+          // once the map is idle for the first time, it has initialized, so we can start adding data to it
+          setIsMapInitialized(true);
 
           // once no more source data is loading, allow the map to transistion to animating
-          animation.animationState === "loading" ? animation.setAnimationState("playing") : "";
+          if (animation.animationState === "loading") animation.setAnimationState("playing");
         }}
-        onMove={
-          /* update our map-center lat-lon and zoom whenever we move the map view */
-          (e) => {
-            setViewState({
-              ...viewState,
-              longitude: e.viewState.longitude,
-              latitude: e.viewState.latitude,
-              zoom: e.viewState.zoom,
-            });
-          }
-        }
+        onMove={(e) => {
+          setViewState({
+            ...viewState,
+            longitude: e.viewState.longitude,
+            latitude: e.viewState.latitude,
+            zoom: e.viewState.zoom,
+          });
+        }}
       >
-        {children}
+        {isMapInitialized && baseMapLayers ? (
+          <>
+            {children}
+            <LayerManager baseLayers={baseMapLayers} />
+          </>
+        ) : (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white">
+            <Loader2 className="inline animate-spin me-2" />
+            Map Initializing...
+          </div>
+        )}
 
         <AttributionControl compact position="top-right" />
-        {isLoading ? (
+
+        {isMapLoading ? (
           <div className="text-white absolute top-0 left-0 mt-2 ms-2 place-items-center">
             <Loader2 className="inline animate-spin me-2" />
             Loading...
@@ -104,8 +110,6 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
           ""
         )}
       </Map>
-
-      {/* <LayerList layerNames={layers} /> */}
     </div>
   );
 };

@@ -1,3 +1,5 @@
+// custom type definitions
+
 export type APIResponse = {
   status: "error" | "success";
 };
@@ -49,20 +51,22 @@ export type HubData = APIResponse & {
   };
 };
 
-export type View = { lon: number; lat: number; zoom: number };
-
-export type DataParams = {
-  timeStart: number;
-  timeEnd: number;
-  timeSlices: number;
-  timeDiff: number;
-  urls: string[];
+export type GeoMetData = APIResponse & {
+  metadata: { start: number; end: number; delta: number };
+  layers: LayerData[];
 };
 
-export type LayerDetails = {
+export type LayerData = {
   name: string;
+  timeSteps: string[];
+  domain: "national" | "west" | "east";
   type: string;
-  domain: "west" | "east" | undefined;
-  product: string | undefined;
-  position: number;
+  delta: number;
+  start: number;
+  end: number;
+};
+
+export type MapLayerConfig = {
+  vector: string[] | "east" | "west" | "national";
+  raster: string[];
 };

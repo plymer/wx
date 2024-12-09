@@ -8,20 +8,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { MapIcon } from "lucide-react";
 
 import { SATELLITE_CHANNELS } from "@/config/satellite";
-import { useGeoMetContext } from "@/contexts/geometContext";
 import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "../ui/drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { useMapConfigContext } from "@/contexts/mapConfigContext";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import { Checkbox } from "../ui/checkbox";
+import { Description } from "@radix-ui/react-dialog";
 // import { Label } from "../ui/label";
 // import { Switch } from "../ui/switch";
 // import { Checkbox } from "../ui/checkbox";
 
 export default function WeatherControls() {
-  const geomet = useGeoMetContext();
+  const mapConfig = useMapConfigContext();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="absolute bottom-0 left-0 ms-2 mb-2">
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
+        <Description />
         <DrawerTitle />
         <DrawerTrigger asChild>
           <Button className="p-3 w-12 h-12">
@@ -33,11 +38,22 @@ export default function WeatherControls() {
             <Tabs defaultValue="satellite" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="satellite">Satellite</TabsTrigger>
-                {/* <TabsTrigger value="radar">Radar</TabsTrigger> */}
-                {/* <TabsTrigger value="overlays">Overlays</TabsTrigger> */}
+                <TabsTrigger value="radar">Radar</TabsTrigger>
+                <TabsTrigger value="overlays">Overlays</TabsTrigger>
               </TabsList>
-              <TabsContent value="satellite" className="mt-4">
-                <Select defaultValue={geomet.subProduct} onValueChange={(e) => geomet.setSubProduct!(e)}>
+              <TabsContent value="satellite" className="mt-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="satellite-switch">Satellite</Label>
+                  <Switch
+                    id="satellite-switch"
+                    checked={mapConfig.showSatellite}
+                    onCheckedChange={(e) => mapConfig.setShowSatellite!(e)}
+                  />
+                </div>
+                <Select
+                  defaultValue={mapConfig.satelliteProduct}
+                  onValueChange={(e) => mapConfig.setSatelliteProduct!(e)}
+                >
                   <SelectTrigger className="w-full text-black">
                     <SelectValue placeholder="Select Satellite Channel" />
                   </SelectTrigger>
@@ -50,40 +66,40 @@ export default function WeatherControls() {
                   </SelectContent>
                 </Select>
               </TabsContent>
-              {/* <TabsContent value="radar" className="mt-4 space-y-4">
+              <TabsContent value="radar" className="mt-4 space-y-4">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="radar-switch">Radar</Label>
                   <Switch
                     id="radar-switch"
-                    checked={geomet.showRadar}
-                    onCheckedChange={(e) => geomet.setShowRadar!(e)}
+                    checked={mapConfig.showRadar}
+                    onCheckedChange={(e) => mapConfig.setShowRadar!(e)}
                   />
                 </div>
                 <div className="flex items-center">
                   <Button
-                    variant={geomet.radarProduct === "RRAI" ? "default" : "outline"}
-                    onClick={() => geomet.setRadarProduct!("RRAI")}
+                    variant={mapConfig.radarProduct === "RADAR_1KM_RRAI" ? "default" : "outline"}
+                    onClick={() => mapConfig.setRadarProduct!("RADAR_1KM_RRAI")}
                     className="w-full"
                   >
                     Rain
                   </Button>
                   <Button
-                    variant={geomet.radarProduct === "RSNO" ? "default" : "outline"}
-                    onClick={() => geomet.setRadarProduct!("RSNO")}
+                    variant={mapConfig.radarProduct === "RADAR_1KM_RSNO" ? "default" : "outline"}
+                    onClick={() => mapConfig.setRadarProduct!("RADAR_1KM_RSNO")}
                     className="w-full"
                   >
                     Snow
                   </Button>
                 </div>
-              </TabsContent> */}
-              {/* <TabsContent value="overlays" className="mt-4 space-y-4">
+              </TabsContent>
+              <TabsContent value="overlays" className="mt-4 space-y-4">
                 {["Lightning", "Surface Observations", "PIREPs", "SIGMETs", "AIRMETs"].map((item) => (
                   <div key={item} className="flex items-center space-x-2">
                     <Checkbox id={item.toLowerCase().replace(/\s+/g, "-")} />
                     <Label htmlFor={item.toLowerCase().replace(/\s+/g, "-")}>{item}</Label>
                   </div>
                 ))}
-              </TabsContent> */}
+              </TabsContent>
             </Tabs>
           </div>
         </DrawerContent>

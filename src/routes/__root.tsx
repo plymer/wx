@@ -1,5 +1,4 @@
 import { AviationContextProvider } from "@/contexts/aviationContext";
-import { GeoMetContextProvider } from "@/contexts/geometContext";
 import { ObservationsContextProvider } from "@/contexts/observationsContext";
 import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
 // import { TanStackRouterDevtools } from "@tanstack/router-devtools";
@@ -44,13 +43,13 @@ function RootComponent() {
           </Link>
         ))}
       </nav>
-      <GeoMetContextProvider>
-        <AviationContextProvider>
-          <ObservationsContextProvider>
-            <Outlet />
-          </ObservationsContextProvider>
-        </AviationContextProvider>
-      </GeoMetContextProvider>
+
+      <AviationContextProvider>
+        <ObservationsContextProvider>
+          <Outlet />
+        </ObservationsContextProvider>
+      </AviationContextProvider>
+
       {/* <ReactQueryDevtools /> */}
       {/* <TanStackRouterDevtools position="bottom-right" /> */}
     </>
