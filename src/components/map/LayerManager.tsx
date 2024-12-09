@@ -54,6 +54,7 @@ const LayerManager = ({ baseLayers }: Props) => {
     },
   ]);
 
+  // create a search string to query the API any time our satellite channels or radar product changes
   useEffect(() => {
     let search = [
       mapConfig.showRadar ? mapConfig.radarProduct : undefined,
@@ -66,15 +67,24 @@ const LayerManager = ({ baseLayers }: Props) => {
 
     // console.log(search);
 
-    setLayersChanging(true);
     setRasterSearchString(search);
 
     return () => {
-      setLayersChanging(false);
       setRasterSearchString(undefined);
     };
-  }, [mapConfig.showRadar, mapConfig.radarProduct, mapConfig.showSatellite, mapConfig.satelliteProduct]);
+  }, [mapConfig.radarProduct, mapConfig.satelliteProduct, layersChanging]);
 
+  // for the map to release all of our raster data layers so we can
+  //   re-order them whenever we turn on/off a raster layer
+  useEffect(() => {
+    setLayersChanging(true);
+
+    return () => {
+      setLayersChanging(false);
+    };
+  }, [mapConfig.showRadar, mapConfig.showSatellite]);
+
+  // store our layer constraints whenever the baselayers of the map change
   useEffect(() => {
     if (!baseLayers) return;
     setLayerConstraints({ vector: baseLayers[baseLayers.length - 1], raster: baseLayers[0] });
@@ -84,6 +94,8 @@ const LayerManager = ({ baseLayers }: Props) => {
     };
   }, [baseLayers]);
 
+  // store the raster layer data for later use, and update the mapConfig animation settings whenever
+  //   the API returns new data
   useEffect(() => {
     if (!rasterData?.layers && !rasterData?.metadata) return;
     setApiRasterData(rasterData.layers);
@@ -96,6 +108,7 @@ const LayerManager = ({ baseLayers }: Props) => {
     };
   }, [rasterFetchStatus]);
 
+  // update the list of raster layerIds whenever we have stored new data from API
   useEffect(() => {
     if (!apiRasterData) return;
     setRasterLayerManifest(apiRasterData.map((d) => generateLayerId(d.type, d.domain)));
@@ -107,6 +120,7 @@ const LayerManager = ({ baseLayers }: Props) => {
     };
   }, [apiRasterData]);
 
+  // draw the layers if we have a list of layerIds and we aren't in the middle of toggling on/off a data layer
   return (
     rasterLayerManifest &&
     !layersChanging && (
