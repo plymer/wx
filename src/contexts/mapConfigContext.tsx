@@ -1,6 +1,7 @@
 import { createContext, useMemo, useState } from "react";
 import useContextWrapper from "@/hooks/useContextWrapper";
 import { SATELLITE_CHANNELS } from "@/config/satellite";
+import { NUM_HRS_DATA } from "@/lib/constants";
 
 export interface IMapConfigContext {
   // raster data config
@@ -43,10 +44,12 @@ export const MapConfigContextProvider = ({ children }: React.PropsWithChildren<{
 
   // map animation states
   const [animationState, setAnimationState] = useState<IMapConfigContext["animationState"]>("stopped");
-  const [frameCount, setFrameCount] = useState<IMapConfigContext["frameCount"]>(24);
+  const [frameCount, setFrameCount] = useState<IMapConfigContext["frameCount"]>(18);
   const [currentFrame, setCurrentFrame] = useState<IMapConfigContext["currentFrame"]>(frameCount - 1);
   const [frameRate, setFrameRate] = useState<IMapConfigContext["frameRate"]>(10);
-  const [startTime, setStartTime] = useState<IMapConfigContext["startTime"]>(0);
+  const [startTime, setStartTime] = useState<IMapConfigContext["startTime"]>(
+    Date.now() - NUM_HRS_DATA * 60 * 60 * 1000,
+  );
   const [endTime, setEndTime] = useState<IMapConfigContext["endTime"]>(Date.now());
   const [timeStep, setTimeStep] = useState<IMapConfigContext["timeStep"]>(60000);
 

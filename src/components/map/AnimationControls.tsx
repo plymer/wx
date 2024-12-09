@@ -11,12 +11,10 @@ import { Slider } from "../ui/slider";
 const AnimationControls = () => {
   const animation = useMapConfigContext();
 
-  const [startTime, setStartTime] = useState(makeISOTimeStamp(animation.startTime, "display"));
-  const [endTime, setEndTime] = useState(makeISOTimeStamp(animation.endTime, "display"));
   const [loopID, setLoopID] = useState<NodeJS.Timeout>();
 
   // type of buttons for controlling the animation
-  const ANIM_CONTROLS: string[] = ["last", "prev", "play", "pause", "next", "first"];
+  const ANIM_CONTROLS: string[] = ["last", "prev", "stop", "play", "pause", "next", "first"];
 
   /**
    * helper function to handle the logic for looping through the animation
@@ -53,6 +51,11 @@ const AnimationControls = () => {
         animation.setAnimationState("paused");
         break;
 
+      case "stop":
+        animation.setAnimationState("stopped");
+        animation.setCurrentFrame(getNewFrame(animation.frameCount, 0));
+        break;
+
       case "next":
         animation.setAnimationState("paused");
         animation.setCurrentFrame(getNewFrame(animation.frameCount, animation.currentFrame, 1));
@@ -84,7 +87,12 @@ const AnimationControls = () => {
     // console.log(code);
     switch (code) {
       case "Space":
-        if (animation.animationState === "paused" || "loading" || "stopped") return "play";
+        if (
+          animation.animationState === "paused" ||
+          animation.animationState === "loading" ||
+          animation.animationState === "stopped"
+        )
+          return "play";
         else return "pause";
       case "Comma":
         return "prev";
@@ -104,9 +112,9 @@ const AnimationControls = () => {
    */
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
-      event.code === "Slash" ? event.preventDefault() : "";
+      event.code === "Slash" && event.preventDefault();
       const translated = translateKeyboardInput(event.code);
-      translated != "" ? doAnimateCommand(translated) : "";
+      translated != "" && doAnimateCommand(translated);
     },
     [animation.currentFrame, animation.animationState],
   );
@@ -121,15 +129,6 @@ const AnimationControls = () => {
       document.removeEventListener("keydown", handleKeyPress);
     };
   }, [handleKeyPress]);
-
-  /**
-   * updates our start and end times every time the data updates
-   * listens for the a change in the animation context
-   */
-  useEffect(() => {
-    setStartTime(makeISOTimeStamp(animation.startTime, "display"));
-    setEndTime(makeISOTimeStamp(animation.endTime, "display"));
-  }, [animation]);
 
   /**
    * create a setInterval that will be applied or removed as necessary depending on the animation state that the user has chosen
@@ -196,12 +195,12 @@ const AnimationControls = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 md:my-1">
       <div>
         <div className="mt-2 flex justify-between font-mono">
-          <span key="start">{startTime}</span>
-          <span key="end">{endTime}</span>
+          <span>{makeISOTimeStamp(animation.startTime, "display")}</span>
+          <span>{makeISOTimeStamp(animation.endTime, "display")}</span>
         </div>
 
         <Slider
-          max={animation.endTime}
+          max={animation.endTime - animation.timeStep}
           min={animation.startTime}
           step={animation.timeStep}
           value={[animation.startTime + animation.timeStep * animation.currentFrame]}

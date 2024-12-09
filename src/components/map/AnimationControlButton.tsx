@@ -1,4 +1,4 @@
-import { Play, Pause, ChevronFirst, ChevronLeft, ChevronLast, ChevronRight } from "lucide-react";
+import { Play, Pause, ChevronFirst, ChevronLeft, ChevronLast, ChevronRight, Square } from "lucide-react";
 import { Button } from "../ui/button";
 
 interface Props {
@@ -12,6 +12,8 @@ const buttonIcons = (type: string) => {
       return <ChevronFirst />;
     case "prev":
       return <ChevronLeft />;
+    case "stop":
+      return <Square />;
     case "play":
       return <Play />;
     case "pause":

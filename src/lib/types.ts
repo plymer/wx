@@ -52,6 +52,7 @@ export type HubData = APIResponse & {
 };
 
 export type GeoMetData = APIResponse & {
+  metadata: { start: number; end: number; delta: number };
   layers: LayerData[];
 };
 
