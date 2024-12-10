@@ -10,14 +10,14 @@ interface Props {
 
 const METARs = ({ site, hrs }: Props) => {
   // destructure the react-query object that is returned from the useAPI hook and pass the arguments
-  const { data, isLoading } = useAPI<METAR>("alpha/metars", [
+  const { data, fetchStatus } = useAPI<METAR>("alpha/metars", [
     { param: "site", value: site },
     { param: "hrs", value: hrs },
   ]);
 
-  if (isLoading) {
+  if (fetchStatus !== "idle") {
     return (
-      <div className="px-6 py-2 bg-muted">
+      <div className="px-6 py-2 bg-muted min-h-22 max-h-96">
         <Loader2 className="inline animate-spin" /> Loading METARs...
       </div>
     );
@@ -26,29 +26,29 @@ const METARs = ({ site, hrs }: Props) => {
   // return the JSX elements
   if (site && data && data.status === "success") {
     return (
-      <>
+      <div className="min-h-22 max-h-96 overflow-scroll">
         {data.metars.map((m: string, i: number) => (
           <div className="font-mono px-6 odd:bg-muted even:bg-muted-foreground ps-10 -indent-8" key={i}>
             {m}
           </div>
         ))}
-      </>
+      </div>
     );
   } else if (site && data && data.status === "error") {
     return (
-      <div className="px-6 py-2 bg-muted">
+      <div className="px-6 py-2 bg-muted min-h-22 max-h-44">
         <OctagonAlert className="inline" /> No METARs available for '{site.toUpperCase()}'
       </div>
     );
   } else if (!site) {
     return (
-      <div className="px-6 py-2 bg-muted ">
+      <div className="px-6 py-2 bg-muted min-h-22 max-h-44">
         <OctagonX className="inline" /> No site specified - Cannot retrieve METARs
       </div>
     );
   } else {
     return (
-      <div className="px-6 py-2 bg-neutral-800 text-destructive">
+      <div className="px-6 py-2 bg-neutral-800 text-destructive min-h-22 max-h-44">
         <Skull className="inline" /> There was an unknown error
       </div>
     );

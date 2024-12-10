@@ -21,9 +21,9 @@ interface Props {
 
 const SiteMetadata = ({ site }: Props) => {
   // destructure the react-query object that is returned from the useAPI hook and pass the arguments
-  const { data, isLoading } = useAPI<SiteData>("alpha/sitedata", [{ param: "site", value: site }]);
+  const { data, fetchStatus } = useAPI<SiteData>("alpha/sitedata", [{ param: "site", value: site }]);
 
-  if (isLoading) {
+  if (fetchStatus !== "idle") {
     return (
       <div className="bg-neutral-800 py-2 text-white border-y-2 border-black">
         <Loader2 className="inline animate-spin" /> Loading metadata...

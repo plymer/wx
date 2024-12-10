@@ -7,11 +7,10 @@ import { Loader2 } from "lucide-react";
 
 interface Props {
   data: GFAData[] | undefined;
-  isLoading: boolean;
-  error: Error | null;
+  fetchStatus: string;
 }
 
-const AvChartsGFA = ({ data, isLoading, error }: Props) => {
+const AvChartsGFA = ({ data, fetchStatus }: Props) => {
   const gfa = useAviationContext();
 
   const GFA_REGIONS = ["gfacn31", "gfacn32", "gfacn33", "gfacn34", "gfacn35", "gfacn36", "gfacn37"];
@@ -22,6 +21,14 @@ const AvChartsGFA = ({ data, isLoading, error }: Props) => {
       data.forEach((d) => (d.domain === gfa.gfaDomain ? gfa.setUrl(d[gfa.subProduct][gfa.gfaTimeStep]) : ""));
     }
   }, [gfa.gfaDomain, gfa.subProduct, gfa.gfaTimeStep, data]);
+
+  if (fetchStatus !== "idle") {
+    return (
+      <div className="px-6 py-2 min-h-22 max-h-96">
+        <Loader2 className="inline animate-spin" /> Loading GFA Data...
+      </div>
+    );
+  }
 
   return (
     <>
@@ -38,29 +45,28 @@ const AvChartsGFA = ({ data, isLoading, error }: Props) => {
           </Button>
         ))}
       </nav>
-      {!data && !isLoading && error ? <div className="p-2">There was an error loading the image data</div> : ""}
-      {data ? (
+      {data && (
         <>
           <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
             <label className="me-4">Clouds & Weather:</label>
             <div>
-              {data?.map((p) =>
-                p.domain === gfa.gfaDomain
-                  ? p.cldwx.map((u, i) => (
-                      <Button
-                        className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                        variant={gfa.subProduct === "cldwx" && gfa.gfaTimeStep === i ? "selected" : "secondary"}
-                        key={i}
-                        value={u}
-                        onClick={() => {
-                          gfa.setSubProduct!("cldwx");
-                          gfa.setGfaTimeStep(i);
-                        }}
-                      >
-                        T+{i * 6}
-                      </Button>
-                    ))
-                  : "",
+              {data?.map(
+                (p) =>
+                  p.domain === gfa.gfaDomain &&
+                  p.cldwx.map((u, i) => (
+                    <Button
+                      className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                      variant={gfa.subProduct === "cldwx" && gfa.gfaTimeStep === i ? "selected" : "secondary"}
+                      key={i}
+                      value={u}
+                      onClick={() => {
+                        gfa.setSubProduct!("cldwx");
+                        gfa.setGfaTimeStep(i);
+                      }}
+                    >
+                      T+{i * 6}
+                    </Button>
+                  )),
               )}
             </div>
           </nav>
@@ -88,11 +94,6 @@ const AvChartsGFA = ({ data, isLoading, error }: Props) => {
             </div>
           </nav>
         </>
-      ) : (
-        <div>
-          <Loader2 className="inline animate-spin me-2" />
-          Loading...
-        </div>
       )}
     </>
   );

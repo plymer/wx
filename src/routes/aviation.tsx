@@ -18,7 +18,7 @@ export const PRODUCTS = ["gfa", "lgf", "hlt", "sigwx", "hubs"];
 function AviationComponent() {
   const aviation = useAviationContext();
 
-  const { data: gfaData, isLoading: gfaLoading, error: gfaError } = useAPI<GFAData[]>("charts/gfa", []);
+  const { data: gfaData, fetchStatus: gfaFetching } = useAPI<GFAData[]>("charts/gfa", []);
 
   return (
     <>
@@ -36,10 +36,10 @@ function AviationComponent() {
             </Button>
           ))}
         </nav>
-        {aviation.product === "gfa" ? <AvChartsGFA data={gfaData} isLoading={gfaLoading} error={gfaError} /> : ""}
-        {aviation.product !== "gfa" && aviation.product !== "hubs" ? <AvChartsOther /> : ""}
-        {aviation.product === "hubs" ? <HubDiscussion /> : ""}
-        {aviation.product !== "hubs" ? <AvImageContainer url={aviation.url} /> : ""}
+        {aviation.product === "gfa" && <AvChartsGFA data={gfaData} fetchStatus={gfaFetching} />}
+        {aviation.product !== "gfa" && aviation.product !== "hubs" && <AvChartsOther />}
+        {aviation.product === "hubs" && <HubDiscussion />}
+        {aviation.product !== "hubs" && <AvImageContainer url={aviation.url} />}
       </div>
     </>
   );

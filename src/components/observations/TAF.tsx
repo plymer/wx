@@ -9,9 +9,9 @@ interface Props {
 
 const TAF = ({ site }: Props) => {
   // destructure the react-query object that is returned from the useAPI hook and pass the arguments
-  const { data, isLoading } = useAPI<TAFData>("alpha/taf", [{ param: "site", value: site }]);
+  const { data, fetchStatus } = useAPI<TAFData>("alpha/taf", [{ param: "site", value: site }]);
 
-  if (isLoading) {
+  if (fetchStatus !== "idle") {
     return (
       <div className="px-6 py-2 bg-secondary">
         <Loader2 className="inline animate-spin" /> Loading TAF...

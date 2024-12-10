@@ -10,29 +10,22 @@ const AvChartsOther = () => {
   const [domainList, setDomainList] = useState<string[]>([]);
   const [data, setData] = useState<OtherChartData[] | undefined>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
 
   const charts = useAviationContext();
 
-  const { data: lgfData, isLoading: lgfIsLoading, error: lgfError } = useAPI<OtherChartData[]>(`charts/lgf`, []);
-  const { data: hltData, isLoading: hltIsLoading, error: hltError } = useAPI<OtherChartData[]>(`charts/hlt`, []);
-  const {
-    data: sigwxData,
-    isLoading: sigwxIsLoading,
-    error: sigwxError,
-  } = useAPI<OtherChartData[]>(`charts/sigwx`, []);
+  const { data: lgfData, fetchStatus: lgfFetchStatus } = useAPI<OtherChartData[]>(`charts/lgf`, []);
+  const { data: hltData, fetchStatus: hltFetchStatus } = useAPI<OtherChartData[]>(`charts/hlt`, []);
+  const { data: sigwxData, fetchStatus: sigwxFetchStatus } = useAPI<OtherChartData[]>(`charts/sigwx`, []);
 
   const LGF_DOMAINS = ["lgfzvr41", "lgfzvr42", "lgfzvr43"];
   const HLT_DOMAINS = ["canada", "north_atlantic"];
   const SIGWX_DOMAINS = ["canada", "atlantic"];
 
   useEffect(() => {
-    console.log("data:", data, "isLoading:", isLoading, "error message:", error?.message);
     switch (charts.product) {
       case "lgf":
         setData(lgfData);
-        setIsLoading(lgfIsLoading && hltIsLoading && sigwxIsLoading);
-        setError(lgfError);
+        setIsLoading(lgfFetchStatus !== "idle" && hltFetchStatus !== "idle" && sigwxFetchStatus !== "idle");
         setDomainList(LGF_DOMAINS);
         charts.setDomain(LGF_DOMAINS[0]);
         charts.setTimeStep(0);
@@ -40,8 +33,7 @@ const AvChartsOther = () => {
         break;
       case "hlt":
         setData(hltData);
-        setIsLoading(lgfIsLoading && hltIsLoading && sigwxIsLoading);
-        setError(hltError);
+        setIsLoading(lgfFetchStatus !== "idle" && hltFetchStatus !== "idle" && sigwxFetchStatus !== "idle");
         setDomainList(HLT_DOMAINS);
         charts.setDomain(HLT_DOMAINS[0]);
         charts.setTimeStep(0);
@@ -49,23 +41,29 @@ const AvChartsOther = () => {
         break;
       case "sigwx":
         setData(sigwxData);
-        setIsLoading(lgfIsLoading && hltIsLoading && sigwxIsLoading);
-        setError(sigwxError);
+        setIsLoading(lgfFetchStatus !== "idle" && hltFetchStatus !== "idle" && sigwxFetchStatus !== "idle");
         setDomainList(SIGWX_DOMAINS);
         charts.setDomain(SIGWX_DOMAINS[0]);
         charts.setTimeStep(0);
         charts.setTimeDelta(12);
         break;
     }
-  }, [charts.product, lgfIsLoading, hltIsLoading, sigwxIsLoading]);
+  }, [charts.product, lgfFetchStatus, hltFetchStatus, sigwxFetchStatus]);
 
   useEffect(() => {
     if (data) {
-      // console.log(data);
       //@ts-ignore
       data.forEach((d) => (d.domain === charts.domain ? charts.setUrl(d.images[charts.timeStep]) : ""));
     }
   }, [charts.product, charts.domain, charts.timeStep, data]);
+
+  if (isLoading) {
+    return (
+      <div className="px-6 py-2 min-h-22 max-h-96">
+        <Loader2 className="inline animate-spin" /> Loading Other Chart Data...
+      </div>
+    );
+  }
 
   return (
     <>
@@ -84,40 +82,34 @@ const AvChartsOther = () => {
           </Button>
         ))}
       </nav>
-      {error ? <div className="p-2">There was an error loading the image data</div> : ""}
 
-      {data ? (
+      {data && (
         <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
           <label className="me-4">Forecasts:</label>
           <div>
-            {data.map((p) =>
-              p.domain === charts.domain
-                ? p.images.map((u, i) => (
-                    <Button
-                      className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                      variant={charts.timeStep === i ? "selected" : "secondary"}
-                      key={i}
-                      value={u}
-                      onClick={() => {
-                        charts.setTimeStep(i);
-                      }}
-                    >
-                      T+
-                      {i *
-                        (charts.product === "sigwx" && charts.domain === "canada"
-                          ? charts.timeDelta / 2
-                          : charts.timeDelta)}
-                    </Button>
-                  ))
-                : "",
+            {data.map(
+              (p) =>
+                p.domain === charts.domain &&
+                p.images.map((u, i) => (
+                  <Button
+                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                    variant={charts.timeStep === i ? "selected" : "secondary"}
+                    key={i}
+                    value={u}
+                    onClick={() => {
+                      charts.setTimeStep(i);
+                    }}
+                  >
+                    T+
+                    {i *
+                      (charts.product === "sigwx" && charts.domain === "canada"
+                        ? charts.timeDelta / 2
+                        : charts.timeDelta)}
+                  </Button>
+                )),
             )}
           </div>
         </nav>
-      ) : (
-        <div>
-          <Loader2 className="inline animate-spin me-2" />
-          Loading...
-        </div>
       )}
     </>
   );
