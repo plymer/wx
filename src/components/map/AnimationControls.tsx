@@ -53,7 +53,7 @@ const AnimationControls = () => {
 
       case "stop":
         animation.setAnimationState("stopped");
-        animation.setCurrentFrame(getNewFrame(animation.frameCount, 0));
+        animation.setCurrentFrame(getNewFrame(animation.frameCount, animation.frameCount - 1));
         break;
 
       case "next":

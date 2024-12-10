@@ -97,11 +97,11 @@ const LayerManager = ({ baseLayers }: Props) => {
   // store the raster layer data for later use, and update the mapConfig animation settings whenever
   //   the API returns new data
   useEffect(() => {
-    if (!rasterData?.layers && !rasterData?.metadata) return;
+    if (!rasterData?.layers && !rasterData?.timesAvailable && !rasterData?.timeStep) return;
     setApiRasterData(rasterData.layers);
-    mapConfig.setEndTime(rasterData.metadata.end);
-    mapConfig.setStartTime(rasterData.metadata.start);
-    mapConfig.setTimeStep(rasterData.metadata.delta);
+    mapConfig.setEndTime(rasterData.timesAvailable[mapConfig.frameCount - 1]);
+    mapConfig.setStartTime(rasterData.timesAvailable[0]);
+    mapConfig.setTimeStep(rasterData.timeStep);
 
     return () => {
       setApiRasterData(undefined);

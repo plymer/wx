@@ -52,18 +52,16 @@ export type HubData = APIResponse & {
 };
 
 export type GeoMetData = APIResponse & {
-  metadata: { start: number; end: number; delta: number };
+  timeStep: number;
+  timesAvailable: number[];
   layers: LayerData[];
 };
 
 export type LayerData = {
   name: string;
-  timeSteps: string[];
   domain: "national" | "west" | "east";
   type: string;
-  delta: number;
-  start: number;
-  end: number;
+  timeSteps: string[];
 };
 
 export type MapLayerConfig = {
