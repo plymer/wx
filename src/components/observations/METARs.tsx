@@ -2,6 +2,7 @@ import useAPI from "@/hooks/useAPI";
 import { METAR } from "@/lib/types";
 
 import { Loader2, OctagonAlert, OctagonX, Skull } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 interface Props {
   site: string;
@@ -9,11 +10,17 @@ interface Props {
 }
 
 const METARs = ({ site, hrs }: Props) => {
+  const scrollTargetRef = useRef<null | HTMLDivElement>(null);
+
   // destructure the react-query object that is returned from the useAPI hook and pass the arguments
   const { data, fetchStatus } = useAPI<METAR>("alpha/metars", [
     { param: "site", value: site },
     { param: "hrs", value: hrs },
   ]);
+
+  useEffect(() => {
+    scrollTargetRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [data, fetchStatus]);
 
   if (fetchStatus !== "idle") {
     return (
@@ -32,6 +39,7 @@ const METARs = ({ site, hrs }: Props) => {
             {m}
           </div>
         ))}
+        <div ref={scrollTargetRef}></div>
       </div>
     );
   } else if (site && data && data.status === "error") {

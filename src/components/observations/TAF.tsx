@@ -22,14 +22,13 @@ const TAF = ({ site }: Props) => {
   if (site && data?.status === "success") {
     return (
       <div className="px-8 py-4 bg-muted text-black font-mono ">
-        <div className="font-bold">{data.taf.main}</div>
-        {data.taf.partPeriods
-          ? data.taf.partPeriods.map((p, i) => (
-              <div className="ms-8 -indent-4" key={i}>
-                {p}
-              </div>
-            ))
-          : ""}
+        <div>{data.taf.main}</div>
+        {data.taf.partPeriods &&
+          data.taf.partPeriods.map((p, i) => (
+            <div className="ms-8 -indent-4" key={i}>
+              {p}
+            </div>
+          ))}
         <div>{data.taf.rmk}</div>
       </div>
     );
