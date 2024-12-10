@@ -25,7 +25,7 @@ const AvChartsOther = () => {
     switch (charts.product) {
       case "lgf":
         setData(lgfData);
-        setIsLoading(lgfFetchStatus !== "idle" && hltFetchStatus !== "idle" && sigwxFetchStatus !== "idle");
+        setIsLoading(lgfFetchStatus !== "idle");
         setDomainList(LGF_DOMAINS);
         charts.setDomain(LGF_DOMAINS[0]);
         charts.setTimeStep(0);
@@ -33,7 +33,7 @@ const AvChartsOther = () => {
         break;
       case "hlt":
         setData(hltData);
-        setIsLoading(lgfFetchStatus !== "idle" && hltFetchStatus !== "idle" && sigwxFetchStatus !== "idle");
+        setIsLoading(hltFetchStatus !== "idle");
         setDomainList(HLT_DOMAINS);
         charts.setDomain(HLT_DOMAINS[0]);
         charts.setTimeStep(0);
@@ -41,7 +41,7 @@ const AvChartsOther = () => {
         break;
       case "sigwx":
         setData(sigwxData);
-        setIsLoading(lgfFetchStatus !== "idle" && hltFetchStatus !== "idle" && sigwxFetchStatus !== "idle");
+        setIsLoading(sigwxFetchStatus !== "idle");
         setDomainList(SIGWX_DOMAINS);
         charts.setDomain(SIGWX_DOMAINS[0]);
         charts.setTimeStep(0);
@@ -53,8 +53,12 @@ const AvChartsOther = () => {
   useEffect(() => {
     if (data) {
       //@ts-ignore
-      data.forEach((d) => (d.domain === charts.domain ? charts.setUrl(d.images[charts.timeStep]) : ""));
+      data.forEach((d) => d.domain === charts.domain && charts.setUrl(d.images[charts.timeStep]));
     }
+
+    return () => {
+      charts.setUrl("");
+    };
   }, [charts.product, charts.domain, charts.timeStep, data]);
 
   if (isLoading) {
@@ -82,35 +86,32 @@ const AvChartsOther = () => {
           </Button>
         ))}
       </nav>
-
-      {data && (
-        <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
-          <label className="me-4">Forecasts:</label>
-          <div>
-            {data.map(
-              (p) =>
-                p.domain === charts.domain &&
-                p.images.map((u, i) => (
-                  <Button
-                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                    variant={charts.timeStep === i ? "selected" : "secondary"}
-                    key={i}
-                    value={u}
-                    onClick={() => {
-                      charts.setTimeStep(i);
-                    }}
-                  >
-                    T+
-                    {i *
-                      (charts.product === "sigwx" && charts.domain === "canada"
-                        ? charts.timeDelta / 2
-                        : charts.timeDelta)}
-                  </Button>
-                )),
-            )}
-          </div>
-        </nav>
-      )}
+      <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
+        <label className="me-4">Forecasts:</label>
+        <div>
+          {data?.map(
+            (p) =>
+              p.domain === charts.domain &&
+              p.images.map((u, i) => (
+                <Button
+                  className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                  variant={charts.timeStep === i ? "selected" : "secondary"}
+                  key={i}
+                  value={u}
+                  onClick={() => {
+                    charts.setTimeStep(i);
+                  }}
+                >
+                  T+
+                  {i *
+                    (charts.product === "sigwx" && charts.domain === "canada"
+                      ? charts.timeDelta / 2
+                      : charts.timeDelta)}
+                </Button>
+              )),
+          )}
+        </div>
+      </nav>
     </>
   );
 };

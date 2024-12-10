@@ -44,7 +44,8 @@ const HubDiscussion = () => {
         <div className="py-2 px-4 bg-neutral-800">
           <Notebook className="inline" />
           <h3 className="text-bold px-2 inline">
-            Discussion for {hub.hub.toUpperCase()} - {hub.hubName}:
+            <span className="max-md:hidden">Discussion for </span>
+            {hub.hub.toUpperCase()} - {hub.hubName}:
           </h3>
         </div>
         {hubFetchStatus !== "idle" ? (
