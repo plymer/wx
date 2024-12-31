@@ -1,4 +1,6 @@
-/** @type {import('tailwindcss').Config} */
+import type { Config } from "tailwindcss";
+import twAnimate from "tailwindcss-animate";
+
 export default {
   darkMode: ["class"],
   content: ["./src/**/*.tsx", "./*.html"],
@@ -53,5 +55,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-};
+  plugins: [twAnimate],
+} satisfies Config;
