@@ -1,4 +1,3 @@
-import useAPI from "@/hooks/useAPI";
 import { OtherChartData } from "@/lib/types";
 import { useEffect, useState } from "react";
 
@@ -6,16 +5,15 @@ import { useAviationContext } from "@/contexts/aviationContext";
 import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
 
-const AvChartsOther = () => {
+interface Props {
+  data?: OtherChartData[];
+  fetchStatus: string;
+}
+
+const AvChartsOther = ({ data, fetchStatus }: Props) => {
   const [domainList, setDomainList] = useState<string[]>([]);
-  const [data, setData] = useState<OtherChartData[] | undefined>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const charts = useAviationContext();
-
-  const { data: lgfData, fetchStatus: lgfFetchStatus } = useAPI<OtherChartData[]>(`charts/lgf`, []);
-  const { data: hltData, fetchStatus: hltFetchStatus } = useAPI<OtherChartData[]>(`charts/hlt`, []);
-  const { data: sigwxData, fetchStatus: sigwxFetchStatus } = useAPI<OtherChartData[]>(`charts/sigwx`, []);
 
   const LGF_DOMAINS = ["lgfzvr41", "lgfzvr42", "lgfzvr43"];
   const HLT_DOMAINS = ["canada", "north_atlantic"];
@@ -24,31 +22,25 @@ const AvChartsOther = () => {
   useEffect(() => {
     switch (charts.product) {
       case "lgf":
-        setData(lgfData);
-        setIsLoading(lgfFetchStatus !== "idle");
         setDomainList(LGF_DOMAINS);
         charts.setDomain(LGF_DOMAINS[0]);
         charts.setTimeStep(0);
         charts.setTimeDelta(3);
         break;
       case "hlt":
-        setData(hltData);
-        setIsLoading(hltFetchStatus !== "idle");
         setDomainList(HLT_DOMAINS);
         charts.setDomain(HLT_DOMAINS[0]);
         charts.setTimeStep(0);
         charts.setTimeDelta(12);
         break;
       case "sigwx":
-        setData(sigwxData);
-        setIsLoading(sigwxFetchStatus !== "idle");
         setDomainList(SIGWX_DOMAINS);
         charts.setDomain(SIGWX_DOMAINS[0]);
         charts.setTimeStep(0);
         charts.setTimeDelta(12);
         break;
     }
-  }, [charts.product, lgfFetchStatus, hltFetchStatus, sigwxFetchStatus]);
+  }, [charts.product]);
 
   useEffect(() => {
     if (data) {
@@ -61,7 +53,7 @@ const AvChartsOther = () => {
     };
   }, [charts.product, charts.domain, charts.timeStep, data]);
 
-  if (isLoading) {
+  if (fetchStatus !== "idle") {
     return (
       <div className="px-6 py-2 min-h-22 max-h-96">
         <Loader2 className="inline animate-spin" /> Loading Other Chart Data...
