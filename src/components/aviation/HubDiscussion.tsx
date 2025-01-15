@@ -1,8 +1,9 @@
 import useAPI from "@/hooks/useAPI";
 import { HubData, TAFData } from "@/lib/types";
 import { Button } from "../ui/button";
-import { Binoculars, Loader2, Notebook, Pencil, Plane } from "lucide-react";
+import { Binoculars, Notebook, Pencil, Plane } from "lucide-react";
 import { useAviationContext } from "@/contexts/aviationContext";
+import LoadingIndicator from "../ui/LoadingIndicator";
 
 const HubDiscussion = () => {
   const hub = useAviationContext();
@@ -49,9 +50,7 @@ const HubDiscussion = () => {
           </h3>
         </div>
         {hubFetchStatus !== "idle" ? (
-          <div className="px-4 py-2 mt-2 bg-muted text-black">
-            <Loader2 className="animate-spin inline" /> Loading Discussion...
-          </div>
+          <LoadingIndicator displayText="Loading Discussion" />
         ) : (
           <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">
             {hubData?.hubData.header}
@@ -69,9 +68,7 @@ const HubDiscussion = () => {
             <h3 className="text-bold p-2 inline">Outlook:</h3>
           </div>
           {hubFetchStatus !== "idle" ? (
-            <div className="px-4 py-2 mt-2 bg-muted text-black">
-              <Loader2 className="animate-spin inline" /> Loading Outlook...
-            </div>
+            <LoadingIndicator displayText="Loading Outlook" />
           ) : (
             <div className="font-mono p-4 py-2 bg-muted text-black whitespace-pre-wrap">
               {hubData?.hubData.outlook.trim()}
@@ -85,9 +82,7 @@ const HubDiscussion = () => {
             <h3 className="text-bold p-2 inline">Forecaster:</h3>
           </div>
           {hubFetchStatus !== "idle" ? (
-            <div className="px-4 py-2 mt-2 bg-muted text-black">
-              <Loader2 className="animate-spin inline" /> Loading Forecaster...
-            </div>
+            <LoadingIndicator displayText="Loading Forecaster" />
           ) : (
             <div className="font-mono px-4 py-2 bg-muted text-black whitespace-pre-wrap">
               {hubData?.hubData.forecaster}/{hubData?.hubData.office}
@@ -95,21 +90,13 @@ const HubDiscussion = () => {
           )}
         </div>
         <div className="md:col-start-2 md:row-start-1 md:row-span-2 md:border-s-2 md:border-black ">
-          {tafFetchStatus !== "idle" && (
-            <div className="px-2 md:col-span-2 bg-neutral-800 text-white">
-              <Loader2 className="animate-spin inline" /> Loading TAF Data...
-            </div>
-          )}
-
           <div className="px-4 py-2 bg-neutral-800">
             <Plane className="inline" />
             <h3 className="text-bold p-2 inline">TAF</h3>
           </div>
 
           {tafFetchStatus !== "idle" ? (
-            <div className="px-4 py-2 mt-2 bg-muted text-black">
-              <Loader2 className="animate-spin inline" /> Loading TAF...
-            </div>
+            <LoadingIndicator displayText="Loading TAF" />
           ) : (
             <div className="font-mono px-4 py-2 bg-muted text-black whitespace-pre-wrap">
               <div>{tafData?.taf?.main}</div>

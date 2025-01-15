@@ -12,17 +12,15 @@ import {
 } from "lucide-react";
 
 // custom imports
-import useAPI from "@/hooks/useAPI";
 import { SiteData } from "@/lib/types";
 
 interface Props {
   site: string;
+  data?: SiteData;
+  fetchStatus: "fetching" | "idle" | "paused";
 }
 
-const SiteMetadata = ({ site }: Props) => {
-  // destructure the react-query object that is returned from the useAPI hook and pass the arguments
-  const { data, fetchStatus } = useAPI<SiteData>("alpha/sitedata", [{ param: "site", value: site }]);
-
+const SiteMetadata = ({ site, data, fetchStatus }: Props) => {
   if (fetchStatus !== "idle") {
     return (
       <div className="bg-neutral-800 py-2 text-white border-y-2 border-black">
