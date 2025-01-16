@@ -1,25 +1,12 @@
 import ReactDOM from "react-dom/client";
 import { StrictMode } from "react";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-//@ts-ignore
-import { routeTree } from "./routeTree.gen";
-
 import "./index.css";
-
-// Set up a Router instance
-const router = createRouter({
-  routeTree,
-  defaultPreload: "intent",
-});
-
-// Register things for typesafety
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
-}
+import { App } from "./App";
+import { AviationContextProvider } from "./contexts/aviationContext";
+import { ObservationsContextProvider } from "./contexts/observationsContext";
 
 const queryClient = new QueryClient();
 
@@ -30,8 +17,12 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <AviationContextProvider>
+          <ObservationsContextProvider>
+            <App />
+          </ObservationsContextProvider>
+        </AviationContextProvider>
       </QueryClientProvider>
-    </StrictMode>
+    </StrictMode>,
   );
 }

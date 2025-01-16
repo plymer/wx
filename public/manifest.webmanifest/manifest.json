@@ -1,6 +1,7 @@
 {
-  "name": "PrairieWx",
-  "short_name": "PrairieWx",
+  "name": "PrairieWx Beta",
+  "short_name": "PrairieWx Beta",
+  "start_url": "/",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
