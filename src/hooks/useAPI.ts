@@ -8,8 +8,10 @@ type SearchParam = {
   value: string | number | undefined;
 };
 
+const apiUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://api.prairiewx.ca";
+
 // configure axios behaviour
-const api = axios.create({ baseURL: "https://api.prairiewx.ca" });
+const api = axios.create({ baseURL: apiUrl });
 
 /**
  *
