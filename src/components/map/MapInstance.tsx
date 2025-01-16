@@ -53,6 +53,7 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
         touchPitch={false}
         boxZoom={false}
         maxBounds={MAP_BOUNDS}
+        projection={"globe"}
         style={{ width: width || "100%", height: height, minHeight: "200px" }}
         mapStyle={basemap as StyleSpecification}
         onStyleData={(e) => {

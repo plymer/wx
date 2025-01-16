@@ -1,14 +1,28 @@
-import METARs from "@/components/observations/METARs";
-import SiteMetadata from "@/components/observations/SiteMetadata";
-import TAF from "@/components/observations/TAF";
+// third-party libraries
+import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { RefreshCw, Search } from "lucide-react";
+
+// custom hooks
+import useAPI from "@/hooks/useAPI";
+
+// custom types
+import { METAR, SiteData, TAFData } from "@/lib/types";
+
+// ui components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useObservationsContext } from "@/contexts/observationsContext";
-import { createFileRoute } from "@tanstack/react-router";
-import { RefreshCw, Search } from "lucide-react";
-import { useState } from "react";
 
+// context
+import { useObservationsContext } from "@/contexts/observationsContext";
+
+// child components
+import METARs from "@/components/observations/METARs";
+import SiteMetadata from "@/components/observations/SiteMetadata";
+import TAF from "@/components/observations/TAF";
+
+// export the route for the router
 export const Route = createFileRoute("/observations")({
   component: ObsComponent,
 });
@@ -22,6 +36,20 @@ function ObsComponent() {
 
   // hours that are available as options in the dropdown list
   const HOURS: number[] = [6, 12, 18, 24, 36, 48, 96];
+
+  // fetch all data within the route and then pass it to the child components for each data type
+  const { data: metarData, fetchStatus: metarFetchStatus } = useAPI<METAR>("alpha/metars", [
+    { param: "site", value: obs.site },
+    { param: "hrs", value: obs.hours },
+  ]);
+
+  const { data: metaData, fetchStatus: metaFetchStatus } = useAPI<SiteData>("alpha/sitedata", [
+    { param: "site", value: obs.site },
+  ]);
+
+  const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("alpha/taf", [
+    { param: "site", value: obs.site },
+  ]);
 
   // validate the input and mutate the search string, passing it to the context and then it will propagate to the child components
   //   to show the user the data they have requested
@@ -83,9 +111,11 @@ function ObsComponent() {
         </div>
       </div>
 
-      <METARs site={obs.site} hrs={obs.hours} />
-      <SiteMetadata site={obs.site} />
-      <TAF site={obs.site} />
+      <div className="overflow-y-scroll" style={{ height: "calc(100svh - 6.5rem)" }}>
+        <METARs site={obs.site} data={metarData} fetchStatus={metarFetchStatus} />
+        <SiteMetadata site={obs.site} data={metaData} fetchStatus={metaFetchStatus} />
+        <TAF site={obs.site} data={tafData} fetchStatus={tafFetchStatus} />
+      </div>
     </>
   );
 }

@@ -6,7 +6,7 @@ import { useAviationContext } from "@/contexts/aviationContext";
 import { Loader2 } from "lucide-react";
 
 interface Props {
-  data: GFAData[] | undefined;
+  data?: GFAData[];
   fetchStatus: string;
 }
 
