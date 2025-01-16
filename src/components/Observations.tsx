@@ -1,6 +1,5 @@
 // third-party libraries
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
 import { RefreshCw, Search } from "lucide-react";
 
 // custom hooks
@@ -22,12 +21,7 @@ import METARs from "@/components/observations/METARs";
 import SiteMetadata from "@/components/observations/SiteMetadata";
 import TAF from "@/components/observations/TAF";
 
-// export the route for the router
-export const Route = createFileRoute("/observations")({
-  component: ObsComponent,
-});
-
-function ObsComponent() {
+export default function Observations() {
   // store the input state so we can validate it before we pass it
   const [inputText, setInputText] = useState<string>("");
 

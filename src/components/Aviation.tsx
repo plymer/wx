@@ -1,6 +1,3 @@
-// third-party libraries
-import { createFileRoute } from "@tanstack/react-router";
-
 // custom hooks
 import useAPI from "@/hooks/useAPI";
 
@@ -19,14 +16,9 @@ import AvChartsOther from "@/components/aviation/AvChartsOther";
 import AvImageContainer from "@/components/aviation/AvImageContainer";
 import HubDiscussion from "@/components/aviation/HubDiscussion";
 
-// export the route for the router
-export const Route = createFileRoute("/aviation")({
-  component: AviationComponent,
-});
-
 export const PRODUCTS = ["gfa", "lgf", "hlt", "sigwx", "hubs"];
 
-function AviationComponent() {
+export default function Aviation() {
   const aviation = useAviationContext();
 
   const { data: gfaData, fetchStatus: gfaFetching } = useAPI<GFAData[]>("charts/gfa", []);

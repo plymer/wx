@@ -4,13 +4,8 @@ import MapInstance from "@/components/map/MapInstance";
 import WeatherControls from "@/components/map/WeatherControls";
 
 import { MapConfigContextProvider } from "@/contexts/mapConfigContext";
-import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/wxmap")({
-  component: WxMapComponent,
-});
-
-function WxMapComponent() {
+export default function WxMap() {
   // const handleClick = () => {
   //   alert("clicked!");
   // };
