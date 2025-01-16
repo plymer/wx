@@ -1,16 +1,14 @@
-import useAPI from "@/hooks/useAPI";
 import { TAFData } from "@/lib/types";
 
 import { Loader2, OctagonAlert, OctagonX, Skull } from "lucide-react";
 
 interface Props {
   site: string;
+  data?: TAFData;
+  fetchStatus: "fetching" | "idle" | "paused";
 }
 
-const TAF = ({ site }: Props) => {
-  // destructure the react-query object that is returned from the useAPI hook and pass the arguments
-  const { data, fetchStatus } = useAPI<TAFData>("alpha/taf", [{ param: "site", value: site }]);
-
+const TAF = ({ site, data, fetchStatus }: Props) => {
   if (fetchStatus !== "idle") {
     return (
       <div className="px-6 py-2 bg-secondary">
