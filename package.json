@@ -37,6 +37,7 @@
     "@tanstack/react-query-devtools": "^5.64.1",
     "@vis.gl/react-maplibre": "^1.0.0-alpha.4",
     "axios": "^1.7.7",
+    "babel-plugin-react-compiler": "^19.0.0-beta-e552027-20250112",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.453.0",

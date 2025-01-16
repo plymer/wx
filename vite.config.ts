@@ -5,9 +5,20 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
+const ReactCompilerConfig = {
+  target: "19",
+};
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), VitePWA({ registerType: "autoUpdate", manifest: false })],
+  plugins: [
+    react({
+      babel: {
+        plugins: [["babel-plugin-react-compiler", ReactCompilerConfig]],
+      },
+    }),
+    VitePWA({ registerType: "autoUpdate", manifest: false }),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

@@ -77,14 +77,14 @@ export default function WeatherControls() {
                 </div>
                 <div className="flex items-center">
                   <Button
-                    variant={mapConfig.radarProduct === "RADAR_1KM_RRAI" ? "default" : "outline"}
+                    variant={mapConfig.radarProduct === "RADAR_1KM_RRAI" ? "default" : "secondary"}
                     onClick={() => mapConfig.setRadarProduct!("RADAR_1KM_RRAI")}
                     className="w-full"
                   >
                     Rain
                   </Button>
                   <Button
-                    variant={mapConfig.radarProduct === "RADAR_1KM_RSNO" ? "default" : "outline"}
+                    variant={mapConfig.radarProduct === "RADAR_1KM_RSNO" ? "default" : "secondary"}
                     onClick={() => mapConfig.setRadarProduct!("RADAR_1KM_RSNO")}
                     className="w-full"
                   >
