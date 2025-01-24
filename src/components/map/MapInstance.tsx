@@ -102,13 +102,11 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
 
         <AttributionControl compact position="top-right" />
 
-        {isMapLoading ? (
+        {isMapLoading && (
           <div className="text-white absolute top-0 left-0 mt-2 ms-2 place-items-center">
             <Loader2 className="inline animate-spin me-2" />
             Loading...
           </div>
-        ) : (
-          ""
         )}
       </Map>
     </div>
