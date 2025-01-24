@@ -2,18 +2,15 @@ import useAPI from "@/hooks/useAPI";
 import { HubData, TAFData } from "@/lib/types";
 import { Button } from "../ui/button";
 import { Binoculars, Notebook, Pencil, Plane } from "lucide-react";
-import { useAviationContext } from "@/contexts/aviationContext";
 import LoadingIndicator from "../ui/LoadingIndicator";
+import { useAviation } from "@/stateStores/aviation";
 
 const HubDiscussion = () => {
-  const hub = useAviationContext();
+  const hub = useAviation((state) => state.hub);
+  const setHub = useAviation((state) => state.setHub);
 
-  const { data: hubData, fetchStatus: hubFetchStatus } = useAPI<HubData>("alpha/hubs", [
-    { param: "site", value: hub.hub },
-  ]);
-  const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("alpha/taf", [
-    { param: "site", value: hub.hub },
-  ]);
+  const { data: hubData, fetchStatus: hubFetchStatus } = useAPI<HubData>("alpha/hubs", [{ param: "site", value: hub }]);
+  const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("alpha/taf", [{ param: "site", value: hub }]);
 
   const HUBS = [
     { ident: "cyvr", name: "Vancouver Intl Airport" },
@@ -28,12 +25,11 @@ const HubDiscussion = () => {
         <h2 className="md:inline max-md:hidden me-2">Hub Discussions:</h2>
         {HUBS.map((h, i) => (
           <Button
-            variant={hub.hub === h.ident ? "selected" : "secondary"}
+            variant={hub === h.ident ? "selected" : "secondary"}
             className="md:mt-2 rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/4"
             key={i}
             onClick={() => {
-              hub.setHub(h.ident);
-              hub.setHubName(h.name);
+              setHub(h.ident);
             }}
           >
             {h.ident.toUpperCase()}
@@ -46,7 +42,7 @@ const HubDiscussion = () => {
           <Notebook className="inline" />
           <h3 className="text-bold px-2 inline">
             <span className="max-md:hidden">Discussion for </span>
-            {hub.hub.toUpperCase()} - {hub.hubName}:
+            {hub.toUpperCase()}:
           </h3>
         </div>
         {hubFetchStatus !== "idle" ? (

@@ -140,4 +140,5 @@ export const AVIATION_PRODUCTS = {
       timeSteps: 2,
     },
   ],
+  hubs: [],
 } as const;

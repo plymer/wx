@@ -1,100 +1,106 @@
-import { useEffect } from "react";
-
 import { GFAData } from "@/lib/types";
 import { Button } from "../ui/button";
-import { useAviationContext } from "@/contexts/aviationContext";
-import { Loader2 } from "lucide-react";
+
+import { AVIATION_PRODUCTS, ProductDomains, Products } from "@/config/aviationProducts";
+import { useAviation } from "@/stateStores/aviation";
+import AvImageContainer from "./AvImageContainer";
 
 interface Props {
+  product: Products;
   data?: GFAData[];
-  fetchStatus: string;
 }
 
-const AvChartsGFA = ({ data, fetchStatus }: Props) => {
-  const gfa = useAviationContext();
+const AvChartsGFA = ({ product, data }: Props) => {
+  // get our state variables and mutation
+  const domain = useAviation((state) => state.domain);
+  const setDomain = useAviation((state) => state.setDomain);
 
-  const GFA_REGIONS = ["gfacn31", "gfacn32", "gfacn33", "gfacn34", "gfacn35", "gfacn36", "gfacn37"];
+  const subProduct = useAviation((state) => state.subProduct);
+  const setSubProduct = useAviation((state) => state.setSubProduct);
 
-  useEffect(() => {
-    if (data) {
-      //@ts-ignore
-      data.forEach((d) => d.domain === gfa.gfaDomain && gfa.setUrl(d[gfa.subProduct][gfa.gfaTimeStep]));
-    }
+  const timeStep = useAviation((state) => state.timeStep);
+  const setTimeStep = useAviation((state) => state.setTimeStep);
 
-    return () => {
-      gfa.setUrl("");
-    };
-  }, [gfa.gfaDomain, gfa.subProduct, gfa.gfaTimeStep, data]);
+  // get our available domains for our currently selected product
+  // we will use this to build the ui to switch between the different domains
+  const domainList = AVIATION_PRODUCTS[product];
 
-  if (fetchStatus !== "idle") {
-    return (
-      <div className="px-6 py-2 min-h-22 max-h-96">
-        <Loader2 className="inline animate-spin" /> Loading GFA Data...
-      </div>
-    );
-  }
+  // select the domain's product details so the user can select the forecast time they want to view
+  const currentProduct = domainList.find((p) => p.domain === domain);
+
+  // if our currentProduct is undefined, our current domain is not in the domainList
+  // default it back to the first domain in the domainList
+  !currentProduct && domainList[0] && setDomain(domainList[0].domain);
+
+  const currentProductData = data?.find((d) => d.domain === domain);
+
+  // build the image url
+  const imageUrl = currentProductData && currentProductData[subProduct][timeStep];
 
   return (
     <>
       <nav className="md:px-2 max-md:pt-2 max-md:flex max-md:flex-wrap max-md:justify-center">
         <label className="me-4 max-md:hidden">Domain:</label>
-        {GFA_REGIONS.map((r, i) => (
+        {domainList.map((r, i) => (
           <Button
-            variant={gfa.gfaDomain === r ? "selected" : "secondary"}
+            variant={domain === r.domain ? "selected" : "secondary"}
             className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md"
             key={i}
-            onClick={() => gfa.setGfaDomain("gfacn3" + (i + 1).toString())}
+            onClick={() => setDomain(("gfacn3" + (i + 1).toString()) as ProductDomains)}
           >
-            {r.replace("gfacn", "gfa ").toUpperCase()}
+            {r.domain.replace("gfacn", "gfa ").toUpperCase()}
           </Button>
         ))}
       </nav>
       <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
         <label className="me-4">Clouds & Weather:</label>
         <div>
-          {data?.map(
-            (p) =>
-              p.domain === gfa.gfaDomain &&
-              p.cldwx.map((u, i) => (
-                <Button
-                  className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                  variant={gfa.subProduct === "cldwx" && gfa.gfaTimeStep === i ? "selected" : "secondary"}
-                  key={i}
-                  value={u}
-                  onClick={() => {
-                    gfa.setSubProduct!("cldwx");
-                    gfa.setGfaTimeStep(i);
-                  }}
-                >
-                  T+{i * 6}
-                </Button>
-              )),
-          )}
+          {currentProduct &&
+            data?.map(
+              (p) =>
+                p.domain === domain &&
+                p.cldwx.map((u, i) => (
+                  <Button
+                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                    variant={subProduct === "cldwx" && timeStep === i ? "selected" : "secondary"}
+                    key={i}
+                    value={u}
+                    onClick={() => {
+                      setSubProduct!("cldwx");
+                      setTimeStep(i);
+                    }}
+                  >
+                    T+{i * currentProduct.timeDelta}
+                  </Button>
+                ))
+            )}
         </div>
       </nav>
       <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
         <label className="me-4">Turbulence & Icing:</label>
         <div>
-          {data?.map(
-            (p) =>
-              p.domain === gfa.gfaDomain &&
-              p.turbc.map((u, i) => (
-                <Button
-                  variant={gfa.subProduct === "turbc" && gfa.gfaTimeStep === i ? "selected" : "secondary"}
-                  className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                  key={i}
-                  value={u}
-                  onClick={() => {
-                    gfa.setSubProduct!("turbc");
-                    gfa.setGfaTimeStep(i);
-                  }}
-                >
-                  T+{i * 6}
-                </Button>
-              )),
-          )}
+          {currentProduct &&
+            data?.map(
+              (p) =>
+                p.domain === domain &&
+                p.turbc.map((u, i) => (
+                  <Button
+                    variant={subProduct === "turbc" && timeStep === i ? "selected" : "secondary"}
+                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                    key={i}
+                    value={u}
+                    onClick={() => {
+                      setSubProduct!("turbc");
+                      setTimeStep(i);
+                    }}
+                  >
+                    T+{i * currentProduct.timeDelta}
+                  </Button>
+                ))
+            )}
         </div>
       </nav>
+      {currentProduct && data && imageUrl && <AvImageContainer url={imageUrl} />}
     </>
   );
 };

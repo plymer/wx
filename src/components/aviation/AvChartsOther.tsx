@@ -9,10 +9,9 @@ import AvImageContainer from "./AvImageContainer";
 interface Props {
   product: Products;
   data?: OtherChartData[];
-  fetchStatus: string;
 }
 
-const AvChartsOther = ({ product, data, fetchStatus }: Props) => {
+const AvChartsOther = ({ product, data }: Props) => {
   // get our state variables and mutation
   const domain = useAviation((state) => state.domain);
   const setDomain = useAviation((state) => state.setDomain);
@@ -29,7 +28,7 @@ const AvChartsOther = ({ product, data, fetchStatus }: Props) => {
 
   // if our currentProduct is undefined, our current domain is not in the domainList
   // default it back to the first domain in the domainList
-  !currentProduct && setDomain(domainList[0].domain);
+  !currentProduct && domainList[0] && setDomain(domainList[0].domain);
 
   const currentProductData = data?.find((d) => d.domain === domain);
 
