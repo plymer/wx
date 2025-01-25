@@ -5,8 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "./index.css";
 import { App } from "./App";
-import { AviationContextProvider } from "./contexts/aviationContext";
-import { ObservationsContextProvider } from "./contexts/observationsContext";
 
 const queryClient = new QueryClient();
 
@@ -17,12 +15,8 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <AviationContextProvider>
-          <ObservationsContextProvider>
-            <App />
-          </ObservationsContextProvider>
-        </AviationContextProvider>
+        <App />
       </QueryClientProvider>
-    </StrictMode>,
+    </StrictMode>
   );
 }

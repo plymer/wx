@@ -13,8 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// context
-import { useObservationsContext } from "@/contexts/observationsContext";
+// stateStore
+import { useObservations } from "@/stateStores/observations";
 
 // child components
 import METARs from "@/components/observations/METARs";
@@ -26,7 +26,7 @@ export default function Observations() {
   const siteId = useRef("");
 
   // use a context to store state so that when we come back to this tab it restores our obs/taf search
-  const obs = useObservationsContext();
+  const obs = useObservations((state) => state);
 
   // hours that are available as options in the dropdown list
   const HOURS: number[] = [6, 12, 18, 24, 36, 48, 96];
