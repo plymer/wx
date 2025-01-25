@@ -3,6 +3,7 @@ import { NUM_HRS_DATA } from "@/lib/constants";
 import { AnimationState } from "@/lib/types";
 import { create } from "zustand";
 
+// type definition for better DX
 type MapState = {
   rasterData: {
     satelliteProduct: SatelliteChannelsWMSName;
@@ -39,6 +40,7 @@ type MapState = {
   };
 };
 
+// create and export the stateStore, including default values and data mutation methods
 export const useMap = create<MapState>((set) => ({
   rasterData: {
     satelliteProduct: "1km_DayCloudType-NightMicrophysics",

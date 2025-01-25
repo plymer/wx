@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import useAPI from "@/hooks/useAPI";
 import { GeoMetData, LayerData } from "@/lib/types";
 
-import { SATELLITES } from "@/config/satellite";
+import { SATELLITES } from "@/config/map";
 import { useMap } from "@/stateStores/map";
 
 interface Props {

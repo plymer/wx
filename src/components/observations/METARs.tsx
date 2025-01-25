@@ -2,12 +2,13 @@ import { METAR } from "@/lib/types";
 
 import { OctagonAlert, OctagonX, Skull } from "lucide-react";
 import { useEffect, useRef } from "react";
-import LoadingIndicator from "../ui/LoadingIndicator";
+import { FetchStatus } from "@tanstack/react-query";
+import LoadingIndicator from "@/components/ui/LoadingIndicator";
 
 interface Props {
   site: string;
   data?: METAR;
-  fetchStatus: "fetching" | "idle" | "paused";
+  fetchStatus: FetchStatus;
 }
 
 const METARs = ({ site, data, fetchStatus }: Props) => {

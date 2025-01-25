@@ -10,6 +10,7 @@ import {
   Sunset,
   TowerControl,
 } from "lucide-react";
+import { FetchStatus } from "@tanstack/react-query";
 
 // custom imports
 import { SiteData } from "@/lib/types";
@@ -17,7 +18,7 @@ import { SiteData } from "@/lib/types";
 interface Props {
   site: string;
   data?: SiteData;
-  fetchStatus: "fetching" | "idle" | "paused";
+  fetchStatus: FetchStatus;
 }
 
 const SiteMetadata = ({ site, data, fetchStatus }: Props) => {

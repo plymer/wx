@@ -1,11 +1,12 @@
 import { TAFData } from "@/lib/types";
+import { FetchStatus } from "@tanstack/react-query";
 
 import { Loader2, OctagonAlert, OctagonX, Skull } from "lucide-react";
 
 interface Props {
   site: string;
   data?: TAFData;
-  fetchStatus: "fetching" | "idle" | "paused";
+  fetchStatus: FetchStatus;
 }
 
 const TAF = ({ site, data, fetchStatus }: Props) => {
