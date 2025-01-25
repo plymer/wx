@@ -1,5 +1,7 @@
 // custom type definitions
 
+export type AnimationState = "playing" | "loading" | "paused" | "stopped";
+
 export type APIResponse = {
   status: "error" | "success";
 };

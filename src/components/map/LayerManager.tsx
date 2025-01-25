@@ -3,8 +3,9 @@ import RasterDataLayer from "./RasterDataLayer";
 import { useEffect, useState } from "react";
 import useAPI from "@/hooks/useAPI";
 import { GeoMetData, LayerData } from "@/lib/types";
-import { useMapConfigContext } from "@/contexts/mapConfigContext";
+
 import { SATELLITES } from "@/config/satellite";
+import { useMap } from "@/stateStores/map";
 
 interface Props {
   baseLayers: string[];
@@ -20,7 +21,8 @@ function generateLayerId(type: string, domain: string) {
 }
 
 const LayerManager = ({ baseLayers }: Props) => {
-  const mapConfig = useMapConfigContext();
+  const rasterDataStore = useMap((state) => state.rasterData);
+  const animation = useMap((state) => state.animation);
 
   const [layersChanging, setLayersChanging] = useState<boolean>(true);
 
@@ -37,28 +39,38 @@ const LayerManager = ({ baseLayers }: Props) => {
   // keep track of the api raster data response
   const [apiRasterData, setApiRasterData] = useState<LayerData[]>();
 
-  // data fetching
-  const { data: rasterData, fetchStatus: rasterFetchStatus } = useAPI<GeoMetData>("geomet", [
-    {
-      param: "layers",
-      value: rasterSearchString,
-    },
-    {
-      param: "frames",
-      value: mapConfig.frameCount,
-    },
+  const enableFetch = rasterSearchString ? true : false;
 
-    {
-      param: "mode",
-      value: mapConfig.animationState !== "stopped" ? "loop" : "",
-    },
-  ]);
+  // data fetching
+  const { data: rasterData, fetchStatus: rasterFetchStatus } = useAPI<GeoMetData>(
+    "geomet",
+    [
+      {
+        param: "layers",
+        value: rasterSearchString,
+      },
+      {
+        param: "frames",
+        value: animation.frameCount,
+      },
+
+      {
+        param: "mode",
+        value: animation.state !== "stopped" ? "loop" : "",
+      },
+    ],
+    "geomet",
+    1,
+    enableFetch
+  );
 
   // create a search string to query the API any time our satellite channels or radar product changes
   useEffect(() => {
     let search = [
-      mapConfig.showRadar ? mapConfig.radarProduct : undefined,
-      mapConfig.showSatellite ? SATELLITES.map((s) => `${s}_${mapConfig.satelliteProduct}`).toString() : undefined,
+      rasterDataStore.showRadar ? rasterDataStore.radarProduct : undefined,
+      rasterDataStore.showSatellite
+        ? SATELLITES.map((s) => `${s}_${rasterDataStore.satelliteProduct}`).toString()
+        : undefined,
     ].toString();
 
     // do some string sanitization so that we don't have any leading or trailing commas
@@ -72,7 +84,7 @@ const LayerManager = ({ baseLayers }: Props) => {
     return () => {
       setRasterSearchString(undefined);
     };
-  }, [mapConfig.radarProduct, mapConfig.satelliteProduct, layersChanging]);
+  }, [rasterDataStore.radarProduct, rasterDataStore.satelliteProduct, layersChanging]);
 
   // for the map to release all of our raster data layers so we can
   //   re-order them whenever we turn on/off a raster layer
@@ -82,7 +94,7 @@ const LayerManager = ({ baseLayers }: Props) => {
     return () => {
       setLayersChanging(false);
     };
-  }, [mapConfig.showRadar, mapConfig.showSatellite]);
+  }, [rasterDataStore.showRadar, rasterDataStore.showSatellite]);
 
   // store our layer constraints whenever the baselayers of the map change
   useEffect(() => {
@@ -99,9 +111,9 @@ const LayerManager = ({ baseLayers }: Props) => {
   useEffect(() => {
     if (!rasterData?.layers && !rasterData?.timesAvailable && !rasterData?.timeStep) return;
     setApiRasterData(rasterData.layers);
-    mapConfig.setEndTime(rasterData.timesAvailable[mapConfig.frameCount - 1]);
-    mapConfig.setStartTime(rasterData.timesAvailable[0]);
-    mapConfig.setTimeStep(rasterData.timeStep);
+    animation.setEndTime(rasterData.timesAvailable[animation.frameCount - 1]);
+    animation.setStartTime(rasterData.timesAvailable[0]);
+    animation.setDeltaTime(rasterData.timeStep);
 
     return () => {
       setApiRasterData(undefined);
@@ -127,7 +139,7 @@ const LayerManager = ({ baseLayers }: Props) => {
       <>
         {apiRasterData?.map((d, i) => (
           <div key={i}>
-            {d.type === "satellite" && mapConfig.showSatellite && (
+            {d.type === "satellite" && rasterDataStore.showSatellite && (
               <>
                 <RasterDataLayer
                   key={`raster-${i}`}
@@ -136,7 +148,7 @@ const LayerManager = ({ baseLayers }: Props) => {
                 />
               </>
             )}
-            {d.type === "radar" && mapConfig.showRadar && (
+            {d.type === "radar" && rasterDataStore.showRadar && (
               <RasterDataLayer
                 key={`raster-${i}`}
                 apiData={d}

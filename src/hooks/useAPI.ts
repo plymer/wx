@@ -21,22 +21,29 @@ const api = axios.create({ baseURL: apiUrl });
  * @returns a react-query object
  */
 
-const useAPI = <T>(endpoint: string, searchParams: SearchParam[], queryName?: string, interval?: number) => {
+const useAPI = <T>(
+  endpoint: string,
+  searchParams: SearchParam[],
+  queryName?: string,
+  interval?: number,
+  isEnabled?: boolean
+) => {
   // build the url that will query the api, creating a valid queryParam string
   const url = `/${endpoint}?` + searchParams.map((p) => `${p.param}=${p.value}`).join("&");
 
   // the function that returns the data
   const getData = async () => {
-    const data = await api.get(url).then((res) => res.data);
-    return data as T;
+    const data: T = await api.get(url).then((res) => res.data);
+    return data;
   };
 
   // destructure the queryObject from react-query to give us access to the params and methods we need
-  const { data, error, isLoading, fetchStatus, refetch } = useQuery({
-    queryKey: [queryName ? queryName : endpoint], // defaults to the api endpoint requested
+  const { data, error, fetchStatus, refetch } = useQuery({
+    queryKey: [queryName ?? endpoint], // defaults to the api endpoint requested
     queryFn: getData,
     refetchInterval: interval ? interval * 1000 * 60 : 5 * 1000 * 60, // default is 5 minutes
     retry: true,
+    enabled: isEnabled,
   });
 
   // set up to refetch the data whenever the search string changes
@@ -45,7 +52,7 @@ const useAPI = <T>(endpoint: string, searchParams: SearchParam[], queryName?: st
   }, [url]);
 
   // return all of the relevant data and methods for the UI
-  return { data, error, isLoading, fetchStatus };
+  return { data, error, fetchStatus };
 };
 
 export default useAPI;

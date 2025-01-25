@@ -13,7 +13,7 @@ import basemap from "@/assets/map-styles/positronwxmap.json";
 import { MAP_BOUNDS } from "@/lib/constants";
 
 import LayerManager from "./LayerManager";
-import { useMapConfigContext } from "@/contexts/mapConfigContext";
+import { useMap } from "@/stateStores/map";
 
 interface Props {
   width?: string;
@@ -26,7 +26,8 @@ interface Props {
 }
 
 const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, children }: Props) => {
-  const animation = useMapConfigContext();
+  const animation = useMap((state) => state.animation);
+
   const [baseMapLayers, setBaseMapLayers] = useState<string[]>();
   const [isMapLoading, setIsMapLoading] = useState(false);
   const [isMapInitialized, setIsMapInitialized] = useState(false);
@@ -77,7 +78,7 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
           setIsMapInitialized(true);
 
           // once no more source data is loading, allow the map to transistion to animating
-          if (animation.animationState === "loading") animation.setAnimationState("playing");
+          if (animation.state === "loading") animation.setState("playing");
         }}
         onMove={(e) => {
           setViewState({
