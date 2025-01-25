@@ -7,20 +7,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import { MapIcon } from "lucide-react";
 
-import { SATELLITE_CHANNELS } from "@/config/satellite";
-import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "../ui/drawer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { useMapConfigContext } from "@/contexts/mapConfigContext";
-import { Label } from "../ui/label";
-import { Switch } from "../ui/switch";
-import { Checkbox } from "../ui/checkbox";
+import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Description } from "@radix-ui/react-dialog";
-// import { Label } from "../ui/label";
-// import { Switch } from "../ui/switch";
-// import { Checkbox } from "../ui/checkbox";
+import { SATELLITE_CHANNELS, SatelliteChannelsList, SatelliteChannelsWMSName } from "@/config/map";
+
+import { useMap } from "@/stateStores/map";
 
 export default function WeatherControls() {
-  const mapConfig = useMapConfigContext();
+  const rasterData = useMap((state) => state.rasterData);
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -43,26 +42,26 @@ export default function WeatherControls() {
               </TabsList>
               <TabsContent value="satellite" className="mt-4 space-y-4">
                 <div className="flex items-center justify-between p-2 rounded-md  text-black border border-input">
-                  <Label htmlFor="satellite-switch" className={mapConfig.showSatellite ? "" : "text-neutral-400"}>
+                  <Label htmlFor="satellite-switch" className={rasterData.showSatellite ? "" : "text-neutral-400"}>
                     Show Satellite
                   </Label>
                   <Switch
                     id="satellite-switch"
-                    checked={mapConfig.showSatellite}
-                    onCheckedChange={(e) => mapConfig.setShowSatellite!(e)}
+                    checked={rasterData.showSatellite}
+                    onCheckedChange={() => rasterData.toggleSatellite()}
                   />
                 </div>
                 <Select
-                  defaultValue={mapConfig.satelliteProduct}
-                  onValueChange={(e) => mapConfig.setSatelliteProduct!(e)}
+                  defaultValue={rasterData.satelliteProduct}
+                  onValueChange={(e) => rasterData.setSatelliteProduct(e as SatelliteChannelsWMSName)}
                 >
-                  <SelectTrigger className="w-full text-black">
+                  <SelectTrigger disabled={!rasterData.showSatellite} className="w-full text-black">
                     <SelectValue placeholder="Select Satellite Channel" />
                   </SelectTrigger>
                   <SelectContent>
-                    {SATELLITE_CHANNELS.map((ch, index) => (
-                      <SelectItem key={index} value={ch.wms}>
-                        {ch.menuName}
+                    {(Object.keys(SATELLITE_CHANNELS) as SatelliteChannelsList[]).map((ch, index) => (
+                      <SelectItem key={index} value={SATELLITE_CHANNELS[ch].wms}>
+                        {SATELLITE_CHANNELS[ch].menuName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -70,29 +69,31 @@ export default function WeatherControls() {
               </TabsContent>
               <TabsContent value="radar" className="mt-4 space-y-4">
                 <div className="flex items-center justify-between p-2 rounded-md  text-black border border-input">
-                  <Label htmlFor="radar-switch" className={mapConfig.showRadar ? "" : "text-neutral-400"}>
+                  <Label htmlFor="radar-switch" className={rasterData.showRadar ? "" : "text-neutral-400"}>
                     Show Radar
                   </Label>
                   <Switch
                     id="radar-switch"
-                    checked={mapConfig.showRadar}
-                    onCheckedChange={(e) => mapConfig.setShowRadar!(e)}
+                    checked={rasterData.showRadar}
+                    onCheckedChange={() => rasterData.toggleRadar()}
                   />
                 </div>
                 <div className="flex items-center">
                   <Button
-                    variant={mapConfig.radarProduct === "RADAR_1KM_RRAI" ? "selected" : "secondary"}
-                    onClick={() => mapConfig.setRadarProduct!("RADAR_1KM_RRAI")}
-                    className="w-full"
+                    variant={rasterData.radarProduct === "RADAR_1KM_RRAI" ? "selected" : "secondary"}
+                    onClick={() => rasterData.setRadarProduct("RADAR_1KM_RRAI")}
+                    disabled={!rasterData.showRadar}
+                    className="w-full rounded-none rounded-s-md"
                   >
-                    Rain
+                    1KM Rain CAPPI
                   </Button>
                   <Button
-                    variant={mapConfig.radarProduct === "RADAR_1KM_RSNO" ? "selected" : "secondary"}
-                    onClick={() => mapConfig.setRadarProduct!("RADAR_1KM_RSNO")}
-                    className="w-full"
+                    variant={rasterData.radarProduct === "RADAR_1KM_RSNO" ? "selected" : "secondary"}
+                    onClick={() => rasterData.setRadarProduct("RADAR_1KM_RSNO")}
+                    disabled={!rasterData.showRadar}
+                    className="w-full rounded-none rounded-e-md"
                   >
-                    Snow
+                    1KM Snow CAPPI
                   </Button>
                 </div>
               </TabsContent>

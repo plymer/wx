@@ -4,7 +4,7 @@ import { Layer, Source } from "@vis.gl/react-maplibre";
 import { LayerData } from "@/lib/types";
 import { GEOMET_GETMAP, GOES_EAST_BOUNDS, GOES_WEST_BOUNDS, MAP_BOUNDS } from "@/lib/constants";
 
-import { useMapConfigContext } from "@/contexts/mapConfigContext";
+import { useMap } from "@/stateStores/map";
 
 interface Props {
   belowLayer?: string;
@@ -12,7 +12,8 @@ interface Props {
 }
 
 const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
-  const mapConfig = useMapConfigContext();
+  const frame = useMap((state) => state.animation.frame);
+  const animationState = useMap((state) => state.animation.state);
 
   const layerId = "layer-" + apiData.type + "-" + apiData.domain;
 
@@ -36,14 +37,14 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
   */
 
   if (apiData) {
-    if (mapConfig.animationState === "stopped") {
+    if (animationState === "stopped") {
       // console.log("not playing!");
       return (
         <Source
           {...source}
           id={layerId + "-0"}
           key="0"
-          tiles={[GEOMET_GETMAP + apiData.name + "&time=" + apiData.timeSteps[mapConfig.currentFrame]]}
+          tiles={[GEOMET_GETMAP + apiData.name + "&time=" + apiData.timeSteps[frame]]}
         >
           <Layer type="raster" source="source" id={layerId + "-0"} beforeId={belowLayer} />
         </Source>
@@ -65,11 +66,7 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
             paint={{
               "raster-fade-duration": 0, // this literally doesn't do anything
               "raster-opacity":
-                index === mapConfig.currentFrame ||
-                index === mapConfig.currentFrame - 1 ||
-                (apiData.type === "satellite" && index === 0)
-                  ? 1
-                  : 0, // here, we want the current, the previous, and the very last frame to be preserved so that we don't get any flickering of the map background since the renderer does not repsect our fade-duration property
+                index === frame || index === frame - 1 || (apiData.type === "satellite" && index === 0) ? 1 : 0, // here, we want the current, the previous, and the very last frame to be preserved so that we don't get any flickering of the map background since the renderer does not repsect our fade-duration property
             }}
           />
         </Source>

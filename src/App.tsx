@@ -12,24 +12,21 @@ import Outlooks from "./components/Outlooks";
 import Public from "./components/Public";
 
 // app mode configuration
-import { APP_MODES } from "./config/modes";
+import { APP_MODES_LIST, AppMode } from "./config/modes";
+
+const appModesList: AppMode[] = Object.keys(APP_MODES_LIST).map((k) => k as AppMode);
 
 export const App = () => {
-  const [appMode, setAppMode] = useState("obs");
+  const [appMode, setAppMode] = useState<AppMode>("obs");
 
   return (
     <>
       {/* large-screen nav bar */}
       <nav className="flex justify-between px-4 mt-2 place-items-center max-md:hidden">
         <img src="/site-icon.svg" className="w-10 h-10 inline" />
-        {APP_MODES.map((l, i) => (
-          <Button
-            key={i}
-            variant={"menuTab"}
-            className={appMode === l.mode ? "active " : ""}
-            onClick={() => setAppMode(l.mode)}
-          >
-            {l.longName}
+        {appModesList.map((l, i) => (
+          <Button key={i} variant={"menuTab"} className={appMode === l ? "active " : ""} onClick={() => setAppMode(l)}>
+            {APP_MODES_LIST[l].longName}
           </Button>
         ))}
       </nav>
@@ -37,14 +34,9 @@ export const App = () => {
       {/* small-screen nav bar */}
       <nav className="flex justify-between px-4 place-items-center md:hidden ">
         <img src="/site-icon.svg" className="w-6 h-6 inline" />
-        {APP_MODES.map((l, i) => (
-          <Button
-            key={i}
-            variant={"menuTab"}
-            className={appMode === l.mode ? "active " : ""}
-            onClick={() => setAppMode(l.mode)}
-          >
-            {l.shortName}
+        {appModesList.map((l, i) => (
+          <Button key={i} variant={"menuTab"} className={appMode === l ? "active " : ""} onClick={() => setAppMode(l)}>
+            {APP_MODES_LIST[l].shortName}
           </Button>
         ))}
       </nav>

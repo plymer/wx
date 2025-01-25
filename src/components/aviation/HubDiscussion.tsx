@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { Binoculars, Notebook, Pencil, Plane } from "lucide-react";
 import LoadingIndicator from "../ui/LoadingIndicator";
 import { useAviation } from "@/stateStores/aviation";
+import TAF from "../observations/TAF";
 
 const HubDiscussion = () => {
   const hub = useAviation((state) => state.hub);
@@ -91,19 +92,7 @@ const HubDiscussion = () => {
             <h3 className="text-bold p-2 inline">TAF</h3>
           </div>
 
-          {tafFetchStatus !== "idle" ? (
-            <LoadingIndicator displayText="Loading TAF" />
-          ) : (
-            <div className="font-mono px-4 py-2 bg-muted text-black whitespace-pre-wrap">
-              <div>{tafData?.taf?.main}</div>
-              {tafData?.taf?.partPeriods.map((p, i) => (
-                <div key={i} className="ms-8 -indent-4">
-                  {p}
-                </div>
-              ))}
-              <div>{tafData?.taf?.rmk}</div>
-            </div>
-          )}
+          <TAF site={hub} data={tafData} fetchStatus={tafFetchStatus} />
         </div>
       </div>
     </>

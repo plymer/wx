@@ -1,6 +1,7 @@
 import { ProductDomains, Products } from "@/config/aviationProducts";
 import { create } from "zustand";
 
+// type definition for better DX
 type AviationState = {
   product: Products;
   subProduct: "cldwx" | "turbc";
@@ -14,6 +15,7 @@ type AviationState = {
   setHub: (hub: string) => void;
 };
 
+// create and export the stateStore, including default values and data mutation methods
 export const useAviation = create<AviationState>((set) => ({
   product: "gfa",
   subProduct: "cldwx",
