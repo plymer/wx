@@ -1,5 +1,5 @@
 // third-party libraries
-import { useState } from "react";
+import { useRef } from "react";
 import { RefreshCw, Search } from "lucide-react";
 
 // custom hooks
@@ -22,8 +22,8 @@ import SiteMetadata from "@/components/observations/SiteMetadata";
 import TAF from "@/components/observations/TAF";
 
 export default function Observations() {
-  // store the input state so we can validate it before we pass it
-  const [inputText, setInputText] = useState<string>("");
+  // create a ref to the siteId text input
+  const siteId = useRef("");
 
   // use a context to store state so that when we come back to this tab it restores our obs/taf search
   const obs = useObservationsContext();
@@ -77,15 +77,15 @@ export default function Observations() {
             autoComplete="false"
             spellCheck="false"
             defaultValue={obs.site}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyDown={(e) => (e.key === "Enter" ? handleInputText(inputText) : "")}
+            onChange={(e) => (siteId.current = e.currentTarget.value)}
+            onKeyDown={(e) => (e.key === "Enter" ? handleInputText(e.currentTarget.value) : "")}
             onClick={(e) => (e.currentTarget.value = "")}
             autoFocus={true}
           />
           <Button
             className="me-2 rounded-e-md rounded-s-none flex place-items-center"
             variant={"secondary"}
-            onClick={() => handleInputText(inputText)}
+            onClick={() => handleInputText(siteId.current)}
           >
             <RefreshCw className="w-4 h-4 me-2 inline" />
             Load

@@ -1,65 +1,45 @@
 import { OtherChartData } from "@/lib/types";
-import { useEffect, useState } from "react";
 
-import { useAviationContext } from "@/contexts/aviationContext";
 import { Button } from "../ui/button";
-import { Loader2 } from "lucide-react";
+
+import { AVIATION_PRODUCTS, Products } from "@/config/aviationProducts";
+import { useAviation } from "@/stateStores/aviation";
+import AvImageContainer from "./AvImageContainer";
 
 interface Props {
+  product: Products;
   data?: OtherChartData[];
-  fetchStatus: string;
 }
 
-const AvChartsOther = ({ data, fetchStatus }: Props) => {
-  const [domainList, setDomainList] = useState<string[]>([]);
+const AvChartsOther = ({ product, data }: Props) => {
+  // get our state variables and mutation
+  const domain = useAviation((state) => state.domain);
+  const setDomain = useAviation((state) => state.setDomain);
 
-  const charts = useAviationContext();
+  const timeStep = useAviation((state) => state.timeStep);
+  const setTimeStep = useAviation((state) => state.setTimeStep);
 
-  const LGF_DOMAINS = ["lgfzvr41", "lgfzvr42", "lgfzvr43"];
-  const HLT_DOMAINS = ["canada", "north_atlantic"];
-  const SIGWX_DOMAINS = ["canada", "atlantic"];
+  // get our available domains for our currently selected product
+  // we will use this to build the ui to switch between the different domains
+  const domainList = AVIATION_PRODUCTS[product];
 
-  useEffect(() => {
-    switch (charts.product) {
-      case "lgf":
-        setDomainList(LGF_DOMAINS);
-        charts.setDomain(LGF_DOMAINS[0]);
-        charts.setTimeStep(0);
-        charts.setTimeDelta(3);
-        break;
-      case "hlt":
-        setDomainList(HLT_DOMAINS);
-        charts.setDomain(HLT_DOMAINS[0]);
-        charts.setTimeStep(0);
-        charts.setTimeDelta(12);
-        break;
-      case "sigwx":
-        setDomainList(SIGWX_DOMAINS);
-        charts.setDomain(SIGWX_DOMAINS[0]);
-        charts.setTimeStep(0);
-        charts.setTimeDelta(12);
-        break;
-    }
-  }, [charts.product]);
+  // select the domain's product details so the user can select the forecast time they want to view
+  const currentProduct = domainList.find((p) => p.domain === domain);
 
-  useEffect(() => {
-    if (data) {
-      //@ts-ignore
-      data.forEach((d) => d.domain === charts.domain && charts.setUrl(d.images[charts.timeStep]));
-    }
+  // if our currentProduct is undefined, our current domain is not in the domainList
+  // default it back to the first domain in the domainList
+  !currentProduct && domainList[0] && setDomain(domainList[0].domain);
 
-    return () => {
-      charts.setUrl("");
-    };
-  }, [charts.product, charts.domain, charts.timeStep, data]);
+  const currentProductData = data?.find((d) => d.domain === domain);
 
-  if (fetchStatus !== "idle") {
-    return (
-      <div className="px-6 py-2 min-h-22 max-h-96">
-        <Loader2 className="inline animate-spin" /> Loading Other Chart Data...
-      </div>
-    );
-  }
+  // if our current timeStep is greater than the number of timeSteps available in our data layer
+  // default it back to the highest available timeStep
+  currentProductData &&
+    timeStep > currentProductData.images.length - 1 &&
+    setTimeStep(currentProductData.images.length - 1);
+
+  // build the image url
+  const imageUrl = currentProductData?.images[timeStep];
 
   return (
     <>
@@ -67,43 +47,43 @@ const AvChartsOther = ({ data, fetchStatus }: Props) => {
         <label className="me-4 max-md:hidden">Domain:</label>
         {domainList.map((d, i) => (
           <Button
-            variant={charts.domain === d ? "selected" : "secondary"}
-            className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md"
+            variant={d.domain === domain ? "selected" : "secondary"}
+            className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-w-44"
             key={i}
             onClick={() => {
-              charts.setDomain(d);
+              setDomain(d.domain);
             }}
           >
-            {d.toUpperCase()}
+            <span className="md:hidden">{d.shortName}</span>
+            <span className="max-md:hidden">{d.longName}</span>
           </Button>
         ))}
       </nav>
       <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
         <label className="me-4">Forecasts:</label>
         <div>
-          {data?.map(
-            (p) =>
-              p.domain === charts.domain &&
-              p.images.map((u, i) => (
-                <Button
-                  className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                  variant={charts.timeStep === i ? "selected" : "secondary"}
-                  key={i}
-                  value={u}
-                  onClick={() => {
-                    charts.setTimeStep(i);
-                  }}
-                >
-                  T+
-                  {i *
-                    (charts.product === "sigwx" && charts.domain === "canada"
-                      ? charts.timeDelta / 2
-                      : charts.timeDelta)}
-                </Button>
-              )),
-          )}
+          {currentProduct &&
+            data?.map(
+              (p) =>
+                p.domain === currentProduct.domain &&
+                p.images.map((u, i) => (
+                  <Button
+                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                    variant={timeStep === i ? "selected" : "secondary"}
+                    key={i}
+                    value={u}
+                    onClick={() => {
+                      setTimeStep(i);
+                    }}
+                  >
+                    T+
+                    {i * currentProduct.timeDelta}
+                  </Button>
+                ))
+            )}
         </div>
       </nav>
+      {currentProduct && data && imageUrl && <AvImageContainer url={imageUrl} />}
     </>
   );
 };

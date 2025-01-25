@@ -33,8 +33,8 @@ export default function WeatherControls() {
             <MapIcon />
           </Button>
         </DrawerTrigger>
-        <DrawerContent className="border-black bg-accent text-white">
-          <div className="mx-auto my-4 w-full max-w-sm">
+        <DrawerContent className="border-black bg-neutral-800 text-white">
+          <div className="mx-auto my-4 w-full max-w-sm p-2 bg-white border-neutral-400 rounded-md border-px">
             <Tabs defaultValue="satellite" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="satellite">Satellite</TabsTrigger>
@@ -42,8 +42,10 @@ export default function WeatherControls() {
                 <TabsTrigger value="overlays">Overlays</TabsTrigger>
               </TabsList>
               <TabsContent value="satellite" className="mt-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="satellite-switch">Satellite</Label>
+                <div className="flex items-center justify-between p-2 rounded-md  text-black border border-input">
+                  <Label htmlFor="satellite-switch" className={mapConfig.showSatellite ? "" : "text-neutral-400"}>
+                    Show Satellite
+                  </Label>
                   <Switch
                     id="satellite-switch"
                     checked={mapConfig.showSatellite}
@@ -67,8 +69,10 @@ export default function WeatherControls() {
                 </Select>
               </TabsContent>
               <TabsContent value="radar" className="mt-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="radar-switch">Radar</Label>
+                <div className="flex items-center justify-between p-2 rounded-md  text-black border border-input">
+                  <Label htmlFor="radar-switch" className={mapConfig.showRadar ? "" : "text-neutral-400"}>
+                    Show Radar
+                  </Label>
                   <Switch
                     id="radar-switch"
                     checked={mapConfig.showRadar}
@@ -77,14 +81,14 @@ export default function WeatherControls() {
                 </div>
                 <div className="flex items-center">
                   <Button
-                    variant={mapConfig.radarProduct === "RADAR_1KM_RRAI" ? "default" : "secondary"}
+                    variant={mapConfig.radarProduct === "RADAR_1KM_RRAI" ? "selected" : "secondary"}
                     onClick={() => mapConfig.setRadarProduct!("RADAR_1KM_RRAI")}
                     className="w-full"
                   >
                     Rain
                   </Button>
                   <Button
-                    variant={mapConfig.radarProduct === "RADAR_1KM_RSNO" ? "default" : "secondary"}
+                    variant={mapConfig.radarProduct === "RADAR_1KM_RSNO" ? "selected" : "secondary"}
                     onClick={() => mapConfig.setRadarProduct!("RADAR_1KM_RSNO")}
                     className="w-full"
                   >
@@ -92,7 +96,7 @@ export default function WeatherControls() {
                   </Button>
                 </div>
               </TabsContent>
-              <TabsContent value="overlays" className="mt-4 space-y-4">
+              <TabsContent value="overlays" className="mt-4 space-y-4 text-black">
                 {["Lightning", "Surface Observations", "PIREPs", "SIGMETs", "AIRMETs"].map((item) => (
                   <div key={item} className="flex items-center space-x-2">
                     <Checkbox id={item.toLowerCase().replace(/\s+/g, "-")} />
