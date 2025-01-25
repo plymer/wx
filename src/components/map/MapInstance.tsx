@@ -26,7 +26,8 @@ interface Props {
 }
 
 const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, children }: Props) => {
-  const animation = useMap((state) => state.animation);
+  const animState = useMap((state) => state.animation.state);
+  const setAnimState = useMap((state) => state.animation.setState);
 
   const [baseMapLayers, setBaseMapLayers] = useState<string[]>();
   const [isMapLoading, setIsMapLoading] = useState(false);
@@ -78,7 +79,7 @@ const MapInstance = ({ width, height, defaultLon, defaultLat, defaultZoom, child
           setIsMapInitialized(true);
 
           // once no more source data is loading, allow the map to transistion to animating
-          if (animation.state === "loading") animation.setState("playing");
+          if (animState === "loading") setAnimState("playing");
         }}
         onMove={(e) => {
           setViewState({

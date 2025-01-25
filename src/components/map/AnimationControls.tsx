@@ -10,6 +10,8 @@ import { ANIM_CONTROLS, AnimationControlsList } from "@/config/animation";
 const AnimationControls = () => {
   const animation = useMap((state) => state.animation);
 
+  const maxFrame = animation.frameCount - 1;
+
   const [loopID, setLoopID] = useState<NodeJS.Timeout>();
 
   const doAnimateCommand = (control: AnimationControlsList) => {
@@ -24,7 +26,7 @@ const AnimationControls = () => {
 
       case "stop":
         animation.setState("stopped");
-        animation.setFrame(animation.frameCount - 1);
+        animation.setFrame(maxFrame);
         break;
 
       case "next":
@@ -94,8 +96,8 @@ const AnimationControls = () => {
    */
   useEffect(() => {
     // calculate the milliseconds per frame
-    // if wwe are on the last frame, hold for 2 seconds before starting the loop again
-    const delay: number = animation.frame === animation.frameCount - 1 ? 2000 : 1000 / animation.frameRate;
+    // if we are on the last frame, hold for 2 seconds before starting the loop again
+    const delay: number = animation.frame === maxFrame ? 2000 : 1000 / animation.frameRate;
 
     // console.log("delay:", delay);
     if (animation.state === "playing") {

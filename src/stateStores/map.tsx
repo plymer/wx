@@ -5,6 +5,7 @@ import { create } from "zustand";
 
 // type definition for better DX
 type MapState = {
+  view: {};
   rasterData: {
     satelliteProduct: SatelliteChannelsWMSName;
     showSatellite: boolean;
@@ -42,6 +43,7 @@ type MapState = {
 
 // create and export the stateStore, including default values and data mutation methods
 export const useMap = create<MapState>((set) => ({
+  view: {},
   rasterData: {
     satelliteProduct: "1km_DayCloudType-NightMicrophysics",
     showSatellite: true,
