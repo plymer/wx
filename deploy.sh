@@ -4,7 +4,7 @@ APP_NAME="beta.prairiewx.ca"
 
 # Stop the CloudLinux Node.js app
 echo "Stopping App: '$APP_NAME'..."
-cloudlinux-selector stop --json --interpreter nodejs --app-root ~/$APP_NAME
+cloudlinux-selector stop --json --interpreter nodejs --app-root ~/$APP_NAME/dist
 
 # Check if 'dist' directory exists
 if [ -d "dist" ]; then
@@ -20,8 +20,8 @@ source /home/ryanpimi/nodevenv/$APP_NAME/20/bin/activate && cd /home/ryanpimi/$A
 echo "Deploying app..."
 npm run deploy
 
-cloudlinux-selector set --json --interpreter nodejs  --app-root ~/$APP_NAME --app-mode production  --startup-file ~/$APP_NAME/dist/main.js
+cloudlinux-selector set --json --interpreter nodejs  --app-root ~/$APP_NAME/dist --app-mode production  --startup-file main.js
 
 # Start the CloudLinux Node.js app
 echo "Starting app: '$APP_NAME'..."
-cloudlinux-selector start --json --interpreter nodejs --app-root ~/$APP_NAME
+cloudlinux-selector start --json --interpreter nodejs --app-root ~/$APP_NAME/dist
