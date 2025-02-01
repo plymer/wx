@@ -20,6 +20,8 @@ source /home/ryanpimi/nodevenv/$APP_NAME/20/bin/activate && cd /home/ryanpimi/$A
 echo "Deploying app..."
 npm run deploy
 
+cloudlinux-selector set --json --interpreter nodejs  --app-root ~/$APP_NAME --app-mode production  --startup-file dist/main.js
+
 # Start the CloudLinux Node.js app
 echo "Starting app: '$APP_NAME'..."
-cloudlinux-selector start --json --interpreter nodejs --app-root ~/$APP_NAME --startup-file dist/main.js
+cloudlinux-selector start --json --interpreter nodejs --app-root ~/$APP_NAME
