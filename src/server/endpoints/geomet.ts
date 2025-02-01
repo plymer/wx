@@ -19,10 +19,11 @@ const getTypes = (keywords: LiveNodeList) => {
 const route = new Hono();
 
 route.get("/geomet", validateParams("query", realtimeLayersSchema, {}), async (c) => {
+  // validate our inputs before proceeding
+  const { layers, mode, frames } = c.req.valid("query");
+
   try {
     const parser = new DOMParser();
-
-    const { layers, mode, frames } = c.req.valid("query");
 
     // parse the layers requested into separate strings
     const searches = layers.split(",");
@@ -70,9 +71,9 @@ route.get("/geomet", validateParams("query", realtimeLayersSchema, {}), async (c
           )
         : output;
 
-    c.json({ status: "success", ...formattedOutput }, 200);
+    return c.json({ status: "success", ...formattedOutput }, 200);
   } catch (error) {
-    c.json({ status: "error", message: error }, 400);
+    return c.json({ status: "error", message: error }, 400);
   }
 });
 

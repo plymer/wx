@@ -1,8 +1,11 @@
 // third-party dependencies
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
-import { serveStatic } from "@hono/node-server/serve-static";
 import { readFile } from "node:fs/promises";
+
+import { default as geomet } from "./endpoints/geomet.js";
+import { default as alpha } from "./endpoints/alphanumeric.js";
+import { default as charts } from "./endpoints/charts.js";
 
 // custom types and utilities
 import { injectViteDevServer } from "./lib/utils.js";
@@ -17,13 +20,15 @@ if (!isProd) html = injectViteDevServer(html);
 
 // create the server instance
 const app = new Hono();
-app.get("/", (c) => c.html(html));
 
 // <--- ADD ENDPOINTS BELOW THIS LINE ---> //
+app.get("/", (c) => c.html(html));
 
 app.get("/api/hello", (c) => c.json({ greeting: "hello" }));
 
-// this has to be last in registration order, so that our vite app is only served as the last-possible option
+app.route("/api", geomet);
+app.route("/api/alpha", alpha);
+app.route("/api/charts", charts);
 
 // <--- ADD ENDPOINTS ABOVE THIS LINE ---> //
 
