@@ -3,25 +3,29 @@
 APP_NAME="beta.prairiewx.ca"
 
 # Stop the CloudLinux Node.js app
-echo "Stopping App: '$APP_NAME'..."
-cloudlinux-selector stop --json --interpreter nodejs --app-root ~/$APP_NAME/dist
+printf "\nStopping App: '$APP_NAME'..."
+cloudlinux-selector stop --json --interpreter nodejs --app-root ~/$APP_NAME
 
 # Check if 'dist' directory exists
 if [ -d "dist" ]; then
-  echo "Removing previous deployment before continuing.."
+  printf "\nRemoving previous deployment before continuing.."
   rm -rf dist
 else
-  echo "No previous deployment found, continuing..."
+  printf "\nNo previous deployment found, continuing..."
 fi
 
+# Get the latest repo
+printf "\nPulling from git repo...\n"
 git pull
 
-source /home/ryanpimi/nodevenv/$APP_NAME/dist/20/bin/activate && cd /home/ryanpimi/$APP_NAME
+# Activate the virtual environment
+printf "\nActivating nodevenv...\n"
+source /home/ryanpimi/nodevenv/$APP_NAME/20/bin/activate && cd /home/ryanpimi/$APP_NAME
 
 # Run the npm deploy command
-echo "Deploying app..."
+printf "\nDeploying app...\n"
 npm run deploy
 
 # Start the CloudLinux Node.js app
-echo "Starting app: '$APP_NAME'..."
-cloudlinux-selector start --json --interpreter nodejs --app-root ~/$APP_NAME/dist
+printf "\nStarting app: '$APP_NAME'..."
+cloudlinux-selector start --json --interpreter nodejs --app-root ~/$APP_NAME
