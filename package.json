@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "cross-env NODE_ENV=development tsc --noEmit && vite build && tsc -b",
+    "lint": "tsc --noEmit",
+    "build": "cross-env NODE_ENV=development vite build && tsc -b",
     "start": "node /dist/main.js",
     "deploy": "cross-env NODE_ENV=development npm i && npm run build"
   },
