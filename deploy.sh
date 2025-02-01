@@ -22,4 +22,4 @@ npm run deploy
 
 # Start the CloudLinux Node.js app
 echo "Starting app: '$APP_NAME'..."
-cloudlinux-selector start --json --interpreter nodejs --app-root ~/$APP_NAME
+cloudlinux-selector start --json --interpreter nodejs --app-root ~/$APP_NAME --startup-file dist/main.js
