@@ -14,6 +14,8 @@ else
   echo "No previous deployment found, continuing..."
 fi
 
+git pull
+
 source /home/ryanpimi/nodevenv/$APP_NAME/20/bin/activate && cd /home/ryanpimi/$APP_NAME
 
 # Run the npm deploy command
