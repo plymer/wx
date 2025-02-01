@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build && tsc -b",
     "start": "node /dist/main.js",
-    "deploy": "npm i && npm run build && npm run start"
+    "deploy": "cross-env NODE_ENV=development npm i && npm run build"
   },
   "devDependencies": {
     "@hono/vite-dev-server": "^0.18.1",
@@ -45,6 +45,7 @@
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cross-env": "^7.0.3",
     "hono": "^4.6.20",
     "lucide-react": "^0.453.0",
     "maplibre-gl": "^5.0.1",
