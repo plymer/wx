@@ -3,6 +3,10 @@
 *.local
 *.log*
 
+#server things
+.htaccess
+tmp/
+
 # Dist
 node_modules
 dist/
