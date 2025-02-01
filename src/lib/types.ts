@@ -70,3 +70,22 @@ export type MapLayerConfig = {
   vector: string[] | "east" | "west" | "national";
   raster: string[];
 };
+
+// used to define the vector data (TODO: rename)
+export type VectorDataOption = {
+  name: string;
+  state: boolean;
+  toggle: () => void;
+};
+
+export type GeoJSON = {
+  features: {
+    geometry: {
+      coordinates: [number, number] | [number, number][];
+      type: "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon";
+    };
+    properties: Object;
+    type: "Feature";
+  }[];
+  type: "FeatureCollection";
+};

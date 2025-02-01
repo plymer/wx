@@ -15,11 +15,10 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Description } from "@radix-ui/react-dialog";
 import { SATELLITE_CHANNELS, SatelliteChannelsList, SatelliteChannelsWMSName } from "@/config/map";
-
-import { useMap } from "@/stateStores/map";
+import { useRasterData } from "@/stateStores/map/rasterData";
 
 export default function WeatherControls() {
-  const rasterData = useMap((state) => state.rasterData);
+  const rasterData = useRasterData((state) => state);
   const [isOpen, setIsOpen] = useState(false);
 
   return (

@@ -1,11 +1,21 @@
-import RasterDataLayer from "./RasterDataLayer";
-
+// third-party libraries
 import { useEffect, useState } from "react";
-import useAPI from "@/hooks/useAPI";
+
+// types and hooks
 import { GeoMetData, LayerData } from "@/lib/types";
 
+import useAPI from "@/hooks/useAPI";
+
+// data layers
+import RasterDataLayer from "./data-layers/RasterDataLayer";
+
+// configuration
 import { SATELLITES } from "@/config/map";
-import { useMap } from "@/stateStores/map";
+
+// state management
+import { useAnimation } from "@/stateStores/map/animation";
+import { useRasterData } from "@/stateStores/map/rasterData";
+import { useVectorData } from "@/stateStores/map/vectorData";
 
 interface Props {
   baseLayers: string[];
@@ -20,49 +30,51 @@ function generateLayerId(type: string, domain: string) {
   return `layer-${type}-${domain}`;
 }
 
-const LayerManager = ({ baseLayers }: Props) => {
-  const rasterDataStore = useMap((state) => state.rasterData);
-  const animation = useMap((state) => state.animation);
+/*
 
+need to look into how to pause/queue the loading of the next layer in the manager until the previous layer has been loaded
+
+*/
+
+const LayerManager = ({ baseLayers }: Props) => {
+  const animation = useAnimation();
+  const rasterDataStore = useRasterData();
+
+  // controls when the map re-initialzes its layers
   const [layersChanging, setLayersChanging] = useState<boolean>(true);
 
   // this is passed to the api endpoint as a searchParam value (comma-separated)
   const [rasterSearchString, setRasterSearchString] = useState<string>();
-  // this keeps track of the layerIds for each raster dataset being shown on the map
-  const [rasterLayerManifest, setRasterLayerManifest] = useState<string[]>();
 
-  // set the layers for drawing logic - vector must be the highest basemap layer and raster the lowest
-  const [layerConstraints, setLayerConstraints] = useState<LayerConstraints | undefined>({
-    vector: baseLayers[baseLayers.length - 1],
-    raster: baseLayers[0],
-  });
   // keep track of the api raster data response
   const [apiRasterData, setApiRasterData] = useState<LayerData[]>();
 
-  const enableFetch = rasterSearchString ? true : false;
+  // set the layers for drawing logic - vector must be the highest basemap layer and raster the lowest
+  const layerConstraints: LayerConstraints | undefined = {
+    vector: baseLayers[baseLayers.length - 1],
+    raster: baseLayers[0],
+  };
+
+  // we want to store the status of each layer type so we know whether to add it to the map yet
+  // const layerStatus = [
+  //   { layer: "satellite", isPending: false },
+  //   { layer: "radar", isPending: false },
+  // ];
+
+  const params = {
+    layers: rasterSearchString,
+    frames: animation.frameCount,
+    mode: animation.state !== "stopped" ? "loop" : "current",
+  };
 
   // data fetching
-  const { data: rasterData, fetchStatus: rasterFetchStatus } = useAPI<GeoMetData>(
-    "geomet",
-    [
-      {
-        param: "layers",
-        value: rasterSearchString,
-      },
-      {
-        param: "frames",
-        value: animation.frameCount,
-      },
+  const { data: rasterData, fetchStatus: rasterFetchStatus } = useAPI<GeoMetData>("/geomet", params, {
+    queryName: "geomet",
+  });
 
-      {
-        param: "mode",
-        value: animation.state !== "stopped" ? "loop" : "",
-      },
-    ],
-    "geomet",
-    1,
-    enableFetch
-  );
+  // const vectorData: VectorDataList = {
+  //   lightning: geoJson,
+  // };
 
   // create a search string to query the API any time our satellite channels or radar product changes
   useEffect(() => {
@@ -76,8 +88,6 @@ const LayerManager = ({ baseLayers }: Props) => {
     // do some string sanitization so that we don't have any leading or trailing commas
     if (search.charAt(search.length - 1) === ",") search = search.slice(0, search.length - 1);
     if (search.charAt(0) === ",") search = search.slice(1, search.length);
-
-    // console.log(search);
 
     setRasterSearchString(search);
 
@@ -96,16 +106,6 @@ const LayerManager = ({ baseLayers }: Props) => {
     };
   }, [rasterDataStore.showRadar, rasterDataStore.showSatellite]);
 
-  // store our layer constraints whenever the baselayers of the map change
-  useEffect(() => {
-    if (!baseLayers) return;
-    setLayerConstraints({ vector: baseLayers[baseLayers.length - 1], raster: baseLayers[0] });
-
-    return () => {
-      setLayerConstraints(undefined);
-    };
-  }, [baseLayers]);
-
   // store the raster layer data for later use, and update the mapConfig animation settings whenever
   //   the API returns new data
   useEffect(() => {
@@ -116,49 +116,66 @@ const LayerManager = ({ baseLayers }: Props) => {
     animation.setDeltaTime(rasterData.timeStep);
 
     return () => {
-      setApiRasterData(undefined);
+      setApiRasterData([]);
     };
   }, [rasterFetchStatus]);
 
   // update the list of raster layerIds whenever we have stored new data from API
   useEffect(() => {
     if (!apiRasterData) return;
-    setRasterLayerManifest(apiRasterData.map((d) => generateLayerId(d.type, d.domain)));
+    rasterDataStore.setManifest(apiRasterData.map((d) => generateLayerId(d.type, d.domain)));
     setLayersChanging(false);
 
     return () => {
       setLayersChanging(true);
-      setRasterLayerManifest(undefined);
     };
   }, [apiRasterData]);
 
   // draw the layers if we have a list of layerIds and we aren't in the middle of toggling on/off a data layer
   return (
-    rasterLayerManifest &&
-    !layersChanging && (
-      <>
-        {apiRasterData?.map((d, i) => (
-          <div key={i}>
-            {d.type === "satellite" && rasterDataStore.showSatellite && (
-              <>
+    <>
+      {rasterDataStore.manifest && !layersChanging && (
+        <>
+          {apiRasterData?.map((d, i) => (
+            <div key={i}>
+              {d.type === "satellite" && rasterDataStore.showSatellite && (
                 <RasterDataLayer
                   key={`raster-${i}`}
                   apiData={d}
-                  belowLayer={i === 0 ? layerConstraints?.raster : rasterLayerManifest[i - 1] + "-0"}
+                  belowLayer={i === 0 ? layerConstraints?.raster : rasterDataStore.manifest[i - 1] + "-0"}
                 />
-              </>
-            )}
-            {d.type === "radar" && rasterDataStore.showRadar && (
-              <RasterDataLayer
-                key={`raster-${i}`}
-                apiData={d}
-                belowLayer={i === 0 ? layerConstraints?.raster : rasterLayerManifest[i - 1] + "-0"}
-              />
-            )}
-          </div>
-        ))}
-      </>
-    )
+              )}
+              {d.type === "radar" && rasterDataStore.showRadar && (
+                <RasterDataLayer
+                  key={`raster-${i}`}
+                  apiData={d}
+                  belowLayer={i === 0 ? layerConstraints?.raster : rasterDataStore.manifest[i - 1] + "-0"}
+                />
+              )}
+            </div>
+          ))}
+        </>
+      )}
+      {/* {vectorDataStore.showLightning && (
+        <VectorDataLayer dataType="lightning" jsonData={vectorData["lightning"]} belowLayer={layerConstraints.vector} />
+      )} 
+       {vectorDataStore.showObs && (
+        <VectorDataLayer
+          dataType="surfaceObs"
+          jsonData={vectorData["surfaceObs"]}
+          belowLayer={layerConstraints.vector}
+        />
+      )}
+      {vectorDataStore.showAIRMETs && (
+        <VectorDataLayer dataType="airmets" jsonData={vectorData["airmets"]} belowLayer={layerConstraints.vector} />
+      )}
+      {vectorDataStore.showSIGMETs && (
+        <VectorDataLayer dataType="sigmets" jsonData={vectorData["sigmets"]} belowLayer={layerConstraints.vector} />
+      )}
+      {vectorDataStore.showPIREPs && (
+        <VectorDataLayer dataType="pireps" jsonData={vectorData["pireps"]} belowLayer={layerConstraints.vector} />
+      )} */}
+    </>
   );
 };
 

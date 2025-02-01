@@ -2,9 +2,8 @@ import type { RasterSource } from "@vis.gl/react-maplibre";
 import { Layer, Source } from "@vis.gl/react-maplibre";
 
 import { LayerData } from "@/lib/types";
-import { GEOMET_GETMAP, GOES_EAST_BOUNDS, GOES_WEST_BOUNDS, MAP_BOUNDS } from "@/lib/constants";
-
-import { useMap } from "@/stateStores/map";
+import { useAnimation } from "@/stateStores/map/animation";
+import { GEOMET_GETMAP, GOES_EAST_BOUNDS, GOES_WEST_BOUNDS, MAP_BOUNDS } from "@/config/map";
 
 interface Props {
   belowLayer?: string;
@@ -12,8 +11,8 @@ interface Props {
 }
 
 const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
-  const frame = useMap((state) => state.animation.frame);
-  const animationState = useMap((state) => state.animation.state);
+  const frame = useAnimation((state) => state.frame);
+  const animationState = useAnimation((state) => state.state);
 
   const layerId = "layer-" + apiData.type + "-" + apiData.domain;
 

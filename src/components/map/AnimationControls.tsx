@@ -1,58 +1,80 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 
 import AnimationControlButton from "./AnimationControlButton";
 
 import { makeISOTimeStamp } from "@/lib/utils";
-import { Slider } from "@/components/ui/slider";
-import { useMap } from "@/stateStores/map";
-import { ANIM_CONTROLS, AnimationControlsList } from "@/config/animation";
+// import { Slider } from "../../ui/Slider";
+import { useAnimation } from "@/stateStores/map/animation";
+import { ANIM_CONTROLS, AnimationControlsList, MAX_FRAMERATE, MIN_FRAMERATE } from "@/config/animation";
 
 const AnimationControls = () => {
-  const animation = useMap((state) => state.animation);
+  const animation = useAnimation();
 
   const maxFrame = animation.frameCount - 1;
 
-  const [loopID, setLoopID] = useState<NodeJS.Timeout>();
-
+  /**
+   * controls the animation based on user input
+   * @param control the string passed as the command for the animation
+   */
   const doAnimateCommand = (control: AnimationControlsList) => {
     switch (control) {
       case "play":
-        animation.setState("loading");
+        if (animation.state === "loading" || animation.state === "paused") {
+          // if we're stopped or paused at the maxFrame, we don't want to wait the standard 2 second delay so we set our frame to zero and then start playing
+          // if we are anywhere else in the loop, just start playing
+          if (animation.frame === maxFrame) animation.setFrame(0);
+          animation.play();
+        } else {
+          animation.load();
+        }
         break;
 
       case "pause":
-        animation.setState("paused");
+        clearTimeout(animation.loopId);
+        animation.pause();
         break;
 
       case "stop":
-        animation.setState("stopped");
+        // we want to:
+        // 1) stop the animation (incrementing of our frame number)
+        // 2) stop all network transactions
+        // 3) clear the timeout so that no more loops occur even if they are queued
+        // 4) set our frame back to the most-recent time
+        animation.stop();
+        window.stop();
+        clearTimeout(animation.loopId);
         animation.setFrame(maxFrame);
         break;
 
       case "next":
-        animation.setState("paused");
+        animation.pause();
         animation.nextFrame();
         break;
 
       case "prev":
-        animation.setState("paused");
-        animation.prevFrame();
+        animation.pause();
+        animation.previousFrame();
         break;
 
       case "first":
-        animation.setState("paused");
+        animation.pause();
         animation.firstFrame();
         break;
 
       case "last":
-        animation.setState("paused");
+        animation.pause();
         animation.lastFrame();
         break;
     }
   };
 
-  const translateKeyboardInput = (code: KeyboardEvent): AnimationControlsList | undefined => {
-    switch (code.toString()) {
+  /**
+   *  Used to translate keyboard input into a useable command string to animate the data
+   * @param code a string returned by a KeyboardEvent.code that pertains to the key pressed by the user
+   * @returns a string that can be used by the doAnimateCommand method to change the animation state and timestep
+   */
+  const translateKeyboardInput = (event: KeyboardEvent): AnimationControlsList | undefined => {
+    switch (event.code) {
       case "Space":
         if (animation.state === "paused" || animation.state === "loading" || animation.state === "stopped")
           return "play";
@@ -96,41 +118,38 @@ const AnimationControls = () => {
    */
   useEffect(() => {
     // calculate the milliseconds per frame
-    // if we are on the last frame, hold for 2 seconds before starting the loop again
-    const delay: number = animation.frame === maxFrame ? 2000 : 1000 / animation.frameRate;
+    // if wwe are on the last frame, hold for 2 seconds before starting the loop again
+    const delay: number = animation.frame === maxFrame ? 2_000 : 1_000 / animation.frameRate;
 
-    // console.log("delay:", delay);
     if (animation.state === "playing") {
-      console.log(animation.frame, delay);
-      setLoopID(setInterval(() => animation.nextFrame(), delay));
-    } else {
-      clearInterval(loopID);
+      animation.setLoopId(setTimeout(() => animation.nextFrame(), delay));
     }
 
-    return () => {
-      clearInterval(loopID);
-    };
+    return () => clearTimeout(animation.loopId);
   }, [animation.state, animation.frame]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 md:my-1">
-      <div>
-        <div className="mt-2 flex justify-between font-mono">
-          <span>{makeISOTimeStamp(animation.startTime, "display")}</span>
-          <span>{makeISOTimeStamp(animation.endTime, "display")}</span>
-        </div>
-
-        <Slider
-          max={animation.endTime - animation.deltaTime}
-          min={animation.startTime}
-          step={animation.deltaTime}
-          value={[animation.startTime + animation.deltaTime * animation.frame]}
-          onValueChange={(e) => {
-            animation.setFrame((e[0] - animation.startTime) / animation.deltaTime);
-          }}
-          className="my-2 bg-gray-800"
-        />
+    <div className="grid grid-cols-1">
+      <div className="mt-2 flex justify-between font-mono">
+        <span>{animation.startTime ? makeISOTimeStamp(animation.startTime, "display") : ""}</span>
+        <span>
+          {animation.startTime
+            ? makeISOTimeStamp(animation.startTime + animation.deltaTime * animation.frame, "display")
+            : ""}
+        </span>
+        <span>{animation.endTime ? makeISOTimeStamp(animation.endTime, "display") : ""}</span>
       </div>
+
+      {/* <Slider
+        max={animation.endTime}
+        min={animation.startTime}
+        step={animation.deltaTime}
+        value={[animation.startTime + animation.deltaTime * animation.frame]}
+        onValueChange={(e) => {
+          animation.setFrame((e[0] - animation.startTime) / animation.deltaTime);
+        }}
+        className="my-2 bg-gray-800"
+      /> */}
 
       <div className="my-2 inline-flex">
         <div className="inline-flex">
@@ -138,9 +157,9 @@ const AnimationControls = () => {
             <AnimationControlButton
               key={index}
               type={c}
+              animationState={animation.state}
               onClick={() => doAnimateCommand(c)}
               className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-              animationState={animation.state}
             />
           ))}
         </div>
@@ -151,11 +170,14 @@ const AnimationControls = () => {
           <input
             id="framerate"
             className="rounded ps-2 text-black bg-secondary"
-            max={20}
-            min={2}
+            max={MAX_FRAMERATE}
+            min={MIN_FRAMERATE}
             defaultValue={animation.frameRate}
             type="number"
-            onChange={(e) => animation.setFrameRate(parseInt(e.target.value))}
+            onChange={(e) => {
+              console.log(e);
+              animation.setFrameRate(parseInt(e.target.value));
+            }}
           />
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { Play, Pause, ChevronFirst, ChevronLeft, ChevronLast, ChevronRight, Square } from "lucide-react";
+
+import { AnimationControlsList, AnimationState } from "@/config/animation";
 import { Button } from "../ui/button";
-import { AnimationControlsList } from "@/config/animation";
-import { AnimationState } from "@/lib/types";
 
 interface Props {
   onClick: () => void;
@@ -27,11 +27,11 @@ const AnimationControlButton = ({ onClick, type, className, animationState }: Pr
       onClick={onClick}
       className={`${
         type !== "pause" && type !== "play"
-          ? className
+          ? className // easy case, not the play or pause button
           : (type === "pause" && animationState === "playing") || (type === "pause" && animationState === "loading")
-          ? className
-          : type === "play" && animationState === "stopped"
-          ? className
+          ? className // only show pause if we are playing or loading
+          : (type === "play" && animationState === "stopped") || (type === "play" && animationState === "paused")
+          ? className // only show if we are stopped or paused
           : "hidden"
       }`}
     >

@@ -2,54 +2,64 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect } from "react";
 
+import { API_CONFIG, EndpointUrls } from "@/config/api";
+
 // define the search params shape
-type SearchParam = {
-  param: string;
-  value: string | number | undefined;
+type SearchParams = {
+  [key: string]: string | number | undefined;
 };
 
-const apiUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://api.prairiewx.ca";
+type FetchConfig = {
+  interval?: number;
+  queryName?: string;
+  enabled?: boolean;
+};
 
 // configure axios behaviour
-const api = axios.create({ baseURL: apiUrl });
+const api = axios.create({ baseURL: API_CONFIG.baseUrl });
 
 /**
  *
- * @param endpoint specify the API endpoint you are retrieving data from ex. `"alpha/metars"` or `"charts/sigwx"`
- * @param searchParams an array of objects in the format of `[{param: "param", value: "value"}]`
- * ex. `[{param: "site", value: "cyeg"}, {param: "hrs", value: 24}]`
- * @returns a react-query object
+ * @param endpoint a string that specifies the API endpoint you are retrieving data from ex. `"/alpha/metars"`
+ * @param searchParams an object containing the search params we
+ * @param fetchConfig an object containing the configuration for refetch interval, the query name, and the enabled/disabled status of the query. Defaults to `{ interval: 5, queryName: endpoint, enabled: true }`
+ * @returns the data, error status, and fetch status from react-query
  */
 
 const useAPI = <T>(
-  endpoint: string,
-  searchParams: SearchParam[],
-  queryName?: string,
-  interval?: number,
-  isEnabled?: boolean
+  endpoint: EndpointUrls,
+  searchParams: SearchParams,
+  fetchConfig: FetchConfig = { interval: 5, queryName: endpoint, enabled: true }
 ) => {
-  // build the url that will query the api, creating a valid queryParam string
-  const url = `/${endpoint}?` + searchParams.map((p) => `${p.param}=${p.value}`).join("&");
+  // destructure the fetch configuration
+  const { interval, queryName, enabled } = fetchConfig;
 
-  // the function that returns the data
+  // this is the function that returns the data
   const getData = async () => {
-    const data: T = await api.get(url).then((res) => res.data);
-    return data;
+    const data = await api
+      .request({
+        method: "get",
+        url: endpoint,
+        params: searchParams,
+      })
+      .then((res) => res.data);
+
+    return data as T;
   };
 
   // destructure the queryObject from react-query to give us access to the params and methods we need
   const { data, error, fetchStatus, refetch } = useQuery({
-    queryKey: [queryName ?? endpoint], // defaults to the api endpoint requested
+    queryKey: [queryName], // defaults to the api endpoint requested
     queryFn: getData,
-    refetchInterval: interval ? interval * 1000 * 60 : 5 * 1000 * 60, // default is 5 minutes
+    refetchInterval: interval! * 6_000, // interval defaults to 5 minutes
     retry: true,
-    enabled: isEnabled,
+    enabled: enabled,
   });
 
-  // set up to refetch the data whenever the search string changes
+  // set up to refetch the data whenever the endpoint, search params, or enabled status changes
   useEffect(() => {
     refetch();
-  }, [url]);
+  }, [endpoint, searchParams, enabled]);
 
   // return all of the relevant data and methods for the UI
   return { data, error, fetchStatus };

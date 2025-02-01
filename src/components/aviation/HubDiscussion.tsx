@@ -10,8 +10,8 @@ const HubDiscussion = () => {
   const hub = useAviation((state) => state.hub);
   const setHub = useAviation((state) => state.setHub);
 
-  const { data: hubData, fetchStatus: hubFetchStatus } = useAPI<HubData>("alpha/hubs", [{ param: "site", value: hub }]);
-  const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("alpha/taf", [{ param: "site", value: hub }]);
+  const { data: hubData, fetchStatus: hubFetchStatus } = useAPI<HubData>("/alpha/hubs", { site: hub });
+  const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("/alpha/taf", { site: hub });
 
   const HUBS = [
     { ident: "cyvr", name: "Vancouver Intl Airport" },
@@ -50,10 +50,10 @@ const HubDiscussion = () => {
           <LoadingIndicator displayText="Loading Discussion" />
         ) : (
           <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">
-            {hubData?.hubData.header}
+            {hubData?.hubData?.header}
             <br />
             <br />
-            {hubData?.hubData.discussion.trim()}
+            {hubData?.hubData?.discussion.trim()}
           </div>
         )}
       </div>
@@ -68,7 +68,7 @@ const HubDiscussion = () => {
             <LoadingIndicator displayText="Loading Outlook" />
           ) : (
             <div className="font-mono p-4 py-2 bg-muted text-black whitespace-pre-wrap">
-              {hubData?.hubData.outlook.trim()}
+              {hubData?.hubData?.outlook.trim()}
             </div>
           )}
         </div>
@@ -82,7 +82,7 @@ const HubDiscussion = () => {
             <LoadingIndicator displayText="Loading Forecaster" />
           ) : (
             <div className="font-mono px-4 py-2 bg-muted text-black whitespace-pre-wrap">
-              {hubData?.hubData.forecaster}/{hubData?.hubData.office}
+              {hubData?.hubData?.forecaster}/{hubData?.hubData?.office}
             </div>
           )}
         </div>

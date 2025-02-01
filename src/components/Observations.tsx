@@ -32,18 +32,14 @@ export default function Observations() {
   const HOURS: number[] = [6, 12, 18, 24, 36, 48, 96];
 
   // fetch all data within the route and then pass it to the child components for each data type
-  const { data: metarData, fetchStatus: metarFetchStatus } = useAPI<METAR>("alpha/metars", [
-    { param: "site", value: obs.site },
-    { param: "hrs", value: obs.hours },
-  ]);
+  const { data: metarData, fetchStatus: metarFetchStatus } = useAPI<METAR>("/alpha/metars", {
+    site: obs.site,
+    hrs: obs.hours,
+  });
 
-  const { data: metaData, fetchStatus: metaFetchStatus } = useAPI<SiteData>("alpha/sitedata", [
-    { param: "site", value: obs.site },
-  ]);
+  const { data: metaData, fetchStatus: metaFetchStatus } = useAPI<SiteData>("/alpha/sitedata", { site: obs.site });
 
-  const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("alpha/taf", [
-    { param: "site", value: obs.site },
-  ]);
+  const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("/alpha/taf", { site: obs.site });
 
   // validate the input and mutate the search string, passing it to the context and then it will propagate to the child components
   //   to show the user the data they have requested
