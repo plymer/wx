@@ -1,29 +1,25 @@
 #!/bin/bash
 
-APP_NAME="wx"
-
-# cloudlinux-selector set --json --interpreter nodejs --selector-status enabled
-
-# cloudlinux-selector set --json --interpreter nodejs --default-version 20
-
-# cloudlinux-selector set --json --interpreter nodejs --app-root apps_dir/app1 
+APP_NAME="beta.prairiewx.ca"
 
 # Stop the CloudLinux Node.js app
-echo "Stopping CloudLinux app '$APP_NAME'..."
-sc stop $APP_NAME
+echo "Stopping App: '$APP_NAME'..."
+cloudlinux-selector stop --json --interpreter nodejs --app-root ~/$APP_NAME
 
 # Check if 'dist' directory exists
 if [ -d "dist" ]; then
-  echo "'dist' directory found, deleting it..."
+  echo "Removing previous deployment before continuing.."
   rm -rf dist
 else
-  echo "'dist' directory does not exist."
+  echo "No previous deployment found, continuing..."
 fi
 
+source /home/ryanpimi/nodevenv/$APP_NAME/20/bin/activate && cd /home/ryanpimi/$APP_NAME
+
 # Run the npm deploy command
-echo "Running 'npm run deploy'..."
+echo "Deploying app..."
 npm run deploy
 
 # Start the CloudLinux Node.js app
-echo "Starting CloudLinux app '$APP_NAME'..."
-sc start $APP_NAME
+echo "Starting app: '$APP_NAME'..."
+cloudlinux-selector start --json --interpreter nodejs --app-root ~/$APP_NAME
