@@ -31,7 +31,7 @@ source /home/ryanpimi/nodevenv/$APP_NAME/20/bin/activate && cd /home/ryanpimi/$A
 printf "\nDeploying app...\n"
 npm run deploy
 
-cp /home/ryanpimi/$APP_STAGING/dist/* /home/ryanpimi/$APP_NAME
+cp /home/ryanpimi/$APP_STAGING/dist /home/ryanpimi/$APP_NAME
 
 cd /home/ryanpimi/$APP_NAME
 
