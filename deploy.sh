@@ -16,13 +16,11 @@ fi
 
 git pull
 
-source /home/ryanpimi/nodevenv/$APP_NAME/20/bin/activate && cd /home/ryanpimi/$APP_NAME
+source /home/ryanpimi/nodevenv/$APP_NAME/dist/20/bin/activate && cd /home/ryanpimi/$APP_NAME
 
 # Run the npm deploy command
 echo "Deploying app..."
 npm run deploy
-
-cloudlinux-selector set --json --interpreter nodejs  --app-root ~/$APP_NAME/dist --app-mode production  --startup-file main.js
 
 # Start the CloudLinux Node.js app
 echo "Starting app: '$APP_NAME'..."
