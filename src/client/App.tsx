@@ -20,7 +20,7 @@ export const App = () => {
   const [appMode, setAppMode] = useState<AppMode>("obs");
 
   return (
-    <>
+    <main className="w-full max-w-(--breakpoint-2xl) mx-auto">
       {/* large-screen nav bar */}
       <nav className="flex justify-between px-4 mt-2 place-items-center max-md:hidden">
         <img src="/site-icon.svg" className="w-10 h-10 inline" />
@@ -49,6 +49,6 @@ export const App = () => {
       {appMode === "otlk" && <Outlooks />}
 
       {/* <ReactQueryDevtools /> */}
-    </>
+    </main>
   );
 };

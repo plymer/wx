@@ -8,8 +8,8 @@ export default function WxMap() {
   // };
 
   return (
-    <div className="bg-neutral-800 pt-2">
-      <MapInstance className="">
+    <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height)">
+      <MapInstance>
         <WeatherControls />
       </MapInstance>
       <div className="w-full flex justify-center border-t-2  border-black bg-accent px-2 text-white max-md:pb-8">

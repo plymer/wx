@@ -55,7 +55,7 @@ route.get("/gfa", async (c) => {
   }
 });
 
-route.get("/", async (c) => {
+route.get("/sigwx", async (c) => {
   try {
     const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=SIG_WX//MID_LEVEL/*";
 
@@ -101,7 +101,7 @@ route.get("/", async (c) => {
   }
 });
 
-route.get("/", async (c) => {
+route.get("/hlt", async (c) => {
   try {
     const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=TURBULENCE";
 
@@ -147,7 +147,7 @@ route.get("/", async (c) => {
   }
 });
 
-route.get("/", async (c) => {
+route.get("/lgf", async (c) => {
   try {
     const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CZVR&image=LGF";
 
@@ -183,7 +183,7 @@ route.get("/", async (c) => {
   }
 });
 
-route.get("/", async (c) => {
+route.get("/navcan", async (c) => {
   try {
     // base url for all navcan images
     const RESOURCE_URL = "https://plan.navcanada.ca/weather/images/";

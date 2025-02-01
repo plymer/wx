@@ -16,7 +16,7 @@ export default defineConfig({
       entry: "/src/server/main.ts",
       exclude: [
         /.*\.tsx?($|\?)/,
-        /.*\.(s?css|less)($|\?)/,
+        /.*\.(css)($|\?)/,
         /.*\.(svg|png|json)($|\?)/,
         /^\/@.+$/,
         /^\/favicon\.ico$/,

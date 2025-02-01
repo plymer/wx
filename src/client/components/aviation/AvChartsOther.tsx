@@ -47,7 +47,7 @@ const AvChartsOther = ({ product, data }: Props) => {
         {domainList.map((d, i) => (
           <Button
             variant={d.domain === domain ? "selected" : "secondary"}
-            className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-w-44"
+            className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-w-96"
             key={i}
             onClick={() => {
               setDomain(d.domain);

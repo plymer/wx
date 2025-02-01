@@ -35,11 +35,9 @@ const AnimationControls = () => {
       case "stop":
         // we want to:
         // 1) stop the animation (incrementing of our frame number)
-        // 2) stop all network transactions
-        // 3) clear the timeout so that no more loops occur even if they are queued
-        // 4) set our frame back to the most-recent time
+        // 2) clear the timeout so that no more loops occur even if they are queued
+        // 3) set our frame back to the most-recent time
         animation.stop();
-        window.stop();
         clearTimeout(animation.loopId);
         animation.setFrame(maxFrame);
         break;
@@ -173,7 +171,6 @@ const AnimationControls = () => {
             defaultValue={animation.frameRate}
             type="number"
             onChange={(e) => {
-              console.log(e);
               animation.setFrameRate(parseInt(e.target.value));
             }}
           />
