@@ -51,8 +51,7 @@ route.get("/gfa", async (c) => {
 
     return c.json(output, 200);
   } catch (error) {
-    console.log(error);
-    c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 400);
   }
 });
 
@@ -98,8 +97,7 @@ route.get("/", async (c) => {
 
     return c.json(output, 200);
   } catch (error) {
-    console.log(error);
-    c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 400);
   }
 });
 
@@ -145,8 +143,7 @@ route.get("/", async (c) => {
 
     return c.json(output, 200);
   } catch (error) {
-    console.log(error);
-    c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 400);
   }
 });
 
@@ -182,8 +179,7 @@ route.get("/", async (c) => {
 
     return c.json(output, 200);
   } catch (error) {
-    console.log(error);
-    c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 400);
   }
 });
 
@@ -276,7 +272,7 @@ route.get("/", async (c) => {
 
     return c.json(output, 200);
   } catch (error) {
-    c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 400);
   }
 });
 

@@ -39,7 +39,6 @@ route.get("/metars", validateParams("query", metarSchema, {}), async (c) => {
       return c.json({ status: "success", metars: output }, 200);
     }
   } catch (error) {
-    console.log(error);
     return c.json({ status: "error", error: error }, 400);
   }
 });
@@ -106,8 +105,7 @@ route.get("/sitedata", validateParams("query", singleSiteSchema, {}), async (c) 
       );
     }
   } catch (error) {
-    console.log(error);
-    c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 400);
   }
 });
 
@@ -157,8 +155,7 @@ route.get("/taf", validateParams("query", singleSiteSchema, {}), async (c) => {
       );
     }
   } catch (error) {
-    console.log(error);
-    c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 400);
   }
 });
 
@@ -205,8 +202,7 @@ route.get("/hubs", validateParams("query", singleSiteSchema, {}), async (c) => {
       200
     );
   } catch (error) {
-    console.log(error);
-    c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 400);
   }
 });
 
