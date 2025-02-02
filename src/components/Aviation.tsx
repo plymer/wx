@@ -24,10 +24,10 @@ export default function Aviation() {
   const product = useAviation((state) => state.product);
   const setProduct = useAviation((state) => state.setProduct);
 
-  const { data: gfaData, fetchStatus: gfaFetchStatus } = useAPI<GFAData[]>("charts/gfa", []);
-  const { data: lgfData, fetchStatus: lgfFetchStatus } = useAPI<OtherChartData[]>(`charts/lgf`, []);
-  const { data: hltData, fetchStatus: hltFetchStatus } = useAPI<OtherChartData[]>(`charts/hlt`, []);
-  const { data: sigwxData, fetchStatus: sigwxFetchStatus } = useAPI<OtherChartData[]>(`charts/sigwx`, []);
+  const { data: gfaData, fetchStatus: gfaFetchStatus } = useAPI<GFAData[]>("/charts/gfa");
+  const { data: lgfData, fetchStatus: lgfFetchStatus } = useAPI<OtherChartData[]>(`/charts/lgf`);
+  const { data: hltData, fetchStatus: hltFetchStatus } = useAPI<OtherChartData[]>(`/charts/hlt`);
+  const { data: sigwxData, fetchStatus: sigwxFetchStatus } = useAPI<OtherChartData[]>(`/charts/sigwx`);
 
   console.log(gfaFetchStatus, lgfFetchStatus, hltFetchStatus, sigwxFetchStatus);
 

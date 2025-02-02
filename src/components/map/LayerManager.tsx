@@ -15,7 +15,7 @@ import { SATELLITES } from "@/config/map";
 // state management
 import { useAnimation } from "@/stateStores/map/animation";
 import { useRasterData } from "@/stateStores/map/rasterData";
-import { useVectorData } from "@/stateStores/map/vectorData";
+// import { useVectorData } from "@/stateStores/map/vectorData";
 
 interface Props {
   baseLayers: string[];
