@@ -14,7 +14,7 @@ import { injectViteDevServer } from "./lib/utils.js";
 const isProd = process.env.NODE_ENV === "production";
 
 // get the content of the index.html so we can serve it from the root
-let html = readFileSync(isProd ? "dist/index.html" : "index.html", "utf8");
+let html = readFileSync("index.html", "utf8");
 
 // inject vite dev server if we're not in production mode
 if (!isProd) html = injectViteDevServer(html);
