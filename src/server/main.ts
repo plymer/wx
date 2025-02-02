@@ -22,13 +22,13 @@ if (!isProd) html = injectViteDevServer(html);
 // create the server instance
 const app = new Hono();
 
-// serve the SPA page
-app.get("/", (c) => c.html(html));
-
 // add our api routes here
 app.route("/api", geomet);
 app.route("/api/alpha", alpha);
 app.route("/api/charts", charts);
+
+// serve the SPA page
+app.get("/", (c) => c.html(html));
 
 // if we are in production, serve the app
 if (isProd)
