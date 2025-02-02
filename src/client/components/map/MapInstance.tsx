@@ -38,7 +38,7 @@ const MapInstance = ({ children }: Props) => {
       zoom={viewState.zoom}
       bearing={viewState.bearing}
       pitch={viewState.pitch}
-      // projection={"globe"}
+      projection={"globe"}
       attributionControl={false}
       dragRotate={false}
       pitchWithRotate={false}
