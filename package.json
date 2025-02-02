@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "lint": "tsc --noEmit",
+    "compile": "tsc -b",
     "build": "vite build && tsc -b",
     "start": "node /dist/main.js",
     "deploy": "npm install --include=dev && npm run build"

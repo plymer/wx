@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
+    "target": "ES2022",
     "useDefineForClassFields": true,
     "allowJs": false,
     "incremental": false,
@@ -9,8 +9,8 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "CommonJS",
+    "removeComments": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "outDir": "./dist"
