@@ -28,10 +28,12 @@ const api = axios.create({ baseURL: API_CONFIG.baseUrl });
 const useAPI = <T>(
   endpoint: EndpointUrls,
   searchParams?: SearchParams,
-  fetchConfig: FetchConfig = { interval: 5, queryName: endpoint, enabled: true }
+  fetchConfig: FetchConfig = { interval: 5, enabled: true }
 ) => {
   // destructure the fetch configuration
-  const { interval, queryName, enabled } = fetchConfig;
+  let { interval, queryName, enabled } = fetchConfig;
+
+  if (!queryName) queryName = endpoint;
 
   // this is the function that returns the data
   const getData = async () => {
