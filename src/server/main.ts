@@ -14,6 +14,7 @@ import { injectViteDevServer } from "./lib/utils.js";
 const isProd = process.env.NODE_ENV === "production";
 
 // get the content of the index.html so we can serve it from the root
+// TODO :: set this up to serve all files out of /dist just like in the HubWx implementation
 let html = readFileSync("index.html", "utf8");
 
 // inject vite dev server if we're not in production mode

@@ -7,6 +7,7 @@ export default function WxMap() {
   //   alert("clicked!");
   // };
 
+  // TODO :: fix the small gap of a few px when the map is first loading because the wrapper div below does not actually cover the entire height of the map
   return (
     <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height)">
       <MapInstance>
