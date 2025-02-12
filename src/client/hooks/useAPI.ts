@@ -27,7 +27,7 @@ const api = axios.create({ baseURL: API_CONFIG.baseUrl });
 
 const useAPI = <T>(
   endpoint: EndpointUrls,
-  searchParams: SearchParams,
+  searchParams?: SearchParams,
   fetchConfig: FetchConfig = { interval: 5, queryName: endpoint, enabled: true }
 ) => {
   // destructure the fetch configuration
