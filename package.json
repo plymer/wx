@@ -3,19 +3,24 @@
   "version": "2.0.0",
   "private": true,
   "type": "module",
+  "main": "main.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "serve": "vite preview"
+    "compile": "tsc -b",
+    "build": "vite build && tsc -b",
+    "start": "node /dist/main.js",
+    "deploy": "npm install --include=dev && npm run build"
   },
   "devDependencies": {
+    "@hono/vite-dev-server": "^0.18.1",
     "@tailwindcss/vite": "^4.0.0",
     "@tanstack/eslint-plugin-query": "^5.59.7",
     "@types/node": "^22.7.7",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
+    "@types/suncalc": "^1.9.2",
     "@vitejs/plugin-react": "^4.3.4",
-    "postcss": "^8.4.47",
+    "babel-plugin-react-compiler": "^19.0.0-beta-e552027-20250112",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^4.0.0",
     "tailwindcss-animate": "^1.0.7",
@@ -24,6 +29,8 @@
     "vite-plugin-pwa": "^0.21.1"
   },
   "dependencies": {
+    "@hono/node-server": "^1.13.8",
+    "@hono/zod-validator": "^0.4.2",
     "@radix-ui/react-checkbox": "^1.1.3",
     "@radix-ui/react-dialog": "^1.1.4",
     "@radix-ui/react-label": "^2.1.1",
@@ -36,15 +43,18 @@
     "@tanstack/react-query": "^5.64.1",
     "@tanstack/react-query-devtools": "^5.64.1",
     "@vis.gl/react-maplibre": "^1.0.0-alpha.4",
+    "@xmldom/xmldom": "^0.9.7",
     "axios": "^1.7.7",
-    "babel-plugin-react-compiler": "^19.0.0-beta-e552027-20250112",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "hono": "^4.6.20",
     "lucide-react": "^0.453.0",
     "maplibre-gl": "^5.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "suncalc": "^1.9.0",
     "vaul": "^1.1.2",
+    "zod": "^3.24.1",
     "zustand": "^5.0.3"
   }
 }
