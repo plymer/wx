@@ -1,7 +1,13 @@
 import { StyleSpecification } from "react-map-gl/maplibre";
 
 const pathDetails = new URL(import.meta.url);
-export const PUBLIC_URL = `${pathDetails.protocol}//${pathDetails.hostname}${pathDetails.port ? `:${pathDetails.port}` : ""}${process.env.NODE_ENV === "production" ? "/cmacw/wxmap" : pathDetails.pathname.replace("src/assets/map-styles/positron-wxmap.ts", "")}`;
+export const PUBLIC_URL = `${pathDetails.protocol}//${pathDetails.hostname}${
+  pathDetails.port ? `:${pathDetails.port}` : ""
+}${
+  process.env.NODE_ENV === "production"
+    ? ""
+    : pathDetails.pathname.replace("src/assets/map-styles/positron-wxmap.ts", "")
+}`;
 
 export const positronWxMap: StyleSpecification = {
   version: 8,
