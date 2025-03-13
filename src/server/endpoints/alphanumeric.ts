@@ -36,7 +36,7 @@ route.get("/metars", validateParams("query", metarSchema, {}), async (c) => {
     // if our returned value is an object, we know we have valid output
     if (typeof metarObjects === "object") {
       const output = metarObjects.reverse().map((m: MetarObject) => m.rawOb);
-      return c.json({ status: "success", metars: output }, 200);
+      return c.json({ status: "success", data: { metars: output } }, 200);
     }
   } catch (error) {
     return c.json({ status: "error", error: error }, 400);
@@ -73,18 +73,18 @@ route.get("/sitedata", validateParams("query", singleSiteSchema, {}), async (c) 
       // set sunrise and sunset times to "---" when the sun doesn't rise or set today
       const riseString: string =
         times.sunrise.getUTCHours().toString() !== "NaN"
-          ? leadZero(times.sunrise.getUTCHours()) + ":" + leadZero(times.sunrise.getUTCMinutes()) + "Z"
+          ? leadZero(times.sunrise.getUTCHours(), 2) + ":" + leadZero(times.sunrise.getUTCMinutes(), 2) + "Z"
           : "---";
       const setString: string =
         times.sunsetStart.getUTCHours().toString() !== "NaN"
-          ? leadZero(times.sunsetStart.getUTCHours()) + ":" + leadZero(times.sunsetStart.getUTCMinutes()) + "Z"
+          ? leadZero(times.sunsetStart.getUTCHours(), 2) + ":" + leadZero(times.sunsetStart.getUTCMinutes(), 2) + "Z"
           : "---";
 
       // return the site data object
       return c.json(
         {
           status: "success",
-          metadata: {
+          data: {
             icaoId: siteData[0].icaoId,
             location: siteData[0].site + ", " + siteData[0].state,
             lat:
@@ -131,24 +131,11 @@ route.get("/taf", validateParams("query", singleSiteSchema, {}), async (c) => {
     }
 
     if (typeof tafObject === "object") {
-      // we have a valid TAF to return, so begin data mutation to our desired output format
-      const rawTAF = tafObject[0].rawTAF.replaceAll(/(FM|TEMPO|BECMG|PROB|RMK)/g, "\n$1");
-
-      const tafMain = rawTAF.match(
-        /((TAF\s)?(AMD\s)?(\w{4}\s\d{6}Z\s\d{4}\/\d{4}\s)(\d{5}|VRB\d{2})(G\d{2})?(KT.+))/g
-      ) as string[];
-
-      const partPeriods = [...rawTAF.matchAll(/(TEMPO.+|PROB30.+|PROB40.+|BECMG.+|FM\d{6}.+)/g)].map((pp) =>
-        pp[0].trim()
-      );
-
       return c.json(
         {
           status: "success",
-          taf: {
-            main: tafMain[0].trim(),
-            partPeriods: partPeriods,
-            rmk: tafObject[0].remarks,
+          data: {
+            taf: tafObject[0].rawTAF,
           },
         },
         200
@@ -190,7 +177,7 @@ route.get("/hubs", validateParams("query", singleSiteSchema, {}), async (c) => {
     return c.json(
       {
         status: "success",
-        hubData: {
+        data: {
           siteName: HubSites[site],
           header: hubData.strheaders,
           discussion: hubData.strdiscussion,

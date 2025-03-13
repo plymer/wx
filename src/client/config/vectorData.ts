@@ -8,16 +8,15 @@
 
 */
 
-import { GeoJSON } from "../lib/types";
-
-export const VECTOR_DATA_TYPES = ["lightning", "surfaceObs", "pireps", "airmets", "sigmets"] as const;
+export const VECTOR_DATA_TYPES = ["lightning", "surfaceObs", "pirep", "airmet", "sigmet"] as const;
 export type VectorDataTypes = (typeof VECTOR_DATA_TYPES)[number];
 
 export type VectorConfig = {
   paint: Object;
-  type: "circle";
+  type: "circle" | "fill";
 };
 
+// TODO :: this will be deprecated since we are moving to a 'threat polygon' method of showing lightning
 export const LIGHTNING_DISPLAY: VectorConfig = {
   paint: {
     "circle-radius": 10, // this will need some turf-ing for proper sizing based on lat/lon/zoom
@@ -28,12 +27,40 @@ export const LIGHTNING_DISPLAY: VectorConfig = {
   type: "circle",
 };
 
+export const SIGMET_DISPLAY: VectorConfig = {
+  paint: {
+    "fill-color": "rgb(255,0,0)",
+    "fill-outline-color": "rgb(255,255,255)",
+    "fill-opacity": 0.5,
+  },
+  type: "fill",
+};
+
+export const AIRMET_DISPLAY: VectorConfig = {
+  paint: {
+    "fill-color": "rgb(255,255,0)",
+    "fill-outline-color": "rgb(255,255,255)",
+    "fill-opacity": 0.5,
+  },
+  type: "fill",
+};
+
+export const PIREP_DISPLAY: VectorConfig = {
+  paint: {
+    "fill-color": "rgb(0,255,255)",
+    "fill-outline-color": "rgb(255,255,255)",
+    "fill-opacity": 0.5,
+  },
+  type: "fill",
+};
+
 export type VectorDisplayConfig = {
   [K in VectorDataTypes]?: VectorConfig;
 };
 
-export type VectorDataList = {
-  [K in VectorDataTypes]?: GeoJSON;
+export const VECTOR_DISPLAY_CONFIGS: VectorDisplayConfig = {
+  lightning: LIGHTNING_DISPLAY,
+  sigmet: SIGMET_DISPLAY,
+  airmet: AIRMET_DISPLAY,
+  pirep: PIREP_DISPLAY,
 };
-
-export const VECTOR_DISPLAY_CONFIGS: VectorDisplayConfig = { lightning: LIGHTNING_DISPLAY };

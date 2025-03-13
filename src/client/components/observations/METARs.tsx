@@ -3,35 +3,38 @@ import { useEffect, useRef } from "react";
 import { FetchStatus } from "@tanstack/react-query";
 import { METAR } from "../../lib/types";
 import LoadingIndicator from "../ui/LoadingIndicator";
+import { useHighlightSigWx } from "../../hooks/useHighlightSigWx";
 
 interface Props {
   site: string;
-  data?: METAR;
+  data?: string[];
   fetchStatus: FetchStatus;
 }
 
 const METARs = ({ site, data, fetchStatus }: Props) => {
   const scrollTargetRef = useRef<null | HTMLDivElement>(null);
 
+  const highlightSigWx = useHighlightSigWx().highlightSigWx;
+
   useEffect(() => {
     scrollTargetRef.current?.scrollIntoView({ behavior: "instant" });
-  }, [data, fetchStatus]);
+  }, [data]);
 
-  if (fetchStatus !== "idle") return <LoadingIndicator displayText="Loading METARs" />;
+  if (!data && fetchStatus !== "idle") return <LoadingIndicator displayText="Loading METARs" />;
 
   // return the JSX elements
-  if (site && data && data.status === "success") {
+  if (site && data) {
     return (
       <div>
-        {data.metars.map((m: string, i: number) => (
+        {data.map((m: string, i: number) => (
           <div className="font-mono px-6 odd:bg-muted even:bg-muted-foreground ps-10 -indent-8" key={i}>
-            {m}
+            {highlightSigWx(m)}
           </div>
         ))}
         <div ref={scrollTargetRef}></div>
       </div>
     );
-  } else if (site && data && data.status === "error") {
+  } else if (site && !data) {
     return (
       <div className="px-6 py-2 bg-muted">
         <OctagonAlert className="inline" /> No METARs available for '{site.toUpperCase()}'

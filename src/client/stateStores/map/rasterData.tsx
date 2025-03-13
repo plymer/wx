@@ -1,6 +1,7 @@
+import { RadarProductsWMSName, SatelliteChannelsWMSName, SATELLITE_CHANNELS } from "../../config/map";
+
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { RadarProductsWMSName, SATELLITE_CHANNELS, SatelliteChannelsWMSName } from "../../config/map";
 
 interface RasterStateStore {
   satelliteProduct: SatelliteChannelsWMSName;
@@ -8,16 +9,17 @@ interface RasterStateStore {
   showSatellite: boolean;
   showRadar: boolean;
   manifest: string[];
-
-  setSatelliteProduct: (product: SatelliteChannelsWMSName) => void;
-  setRadarProduct: (product: RadarProductsWMSName) => void;
-  toggleSatellite: () => void;
-  toggleRadar: () => void;
-  clearManifest: () => void;
-  setManifest: (layerList: string[]) => void;
+  actions: {
+    setSatelliteProduct: (product: SatelliteChannelsWMSName) => void;
+    setRadarProduct: (product: RadarProductsWMSName) => void;
+    toggleSatellite: () => void;
+    toggleRadar: () => void;
+    clearManifest: () => void;
+    setManifest: (layerList: string[]) => void;
+  };
 }
 
-export const useRasterData = create<RasterStateStore>()(
+const useRasterData = create<RasterStateStore>()(
   persist(
     (set) => ({
       // initial values
@@ -26,14 +28,15 @@ export const useRasterData = create<RasterStateStore>()(
       showSatellite: true,
       showRadar: true,
       manifest: [],
-
-      // declare methods to change animation state
-      setSatelliteProduct: (newProduct: SatelliteChannelsWMSName) => set(() => ({ satelliteProduct: newProduct })),
-      setRadarProduct: (newProduct: RadarProductsWMSName) => set(() => ({ radarProduct: newProduct })),
-      toggleSatellite: () => set((state) => ({ showSatellite: !state.showSatellite })),
-      toggleRadar: () => set((state) => ({ showRadar: !state.showRadar })),
-      clearManifest: () => set(() => ({ manifest: [] })),
-      setManifest: (newLayerList: string[]) => set(() => ({ manifest: newLayerList })),
+      actions: {
+        // declare methods to change animation state
+        setSatelliteProduct: (newProduct: SatelliteChannelsWMSName) => set(() => ({ satelliteProduct: newProduct })),
+        setRadarProduct: (newProduct: RadarProductsWMSName) => set(() => ({ radarProduct: newProduct })),
+        toggleSatellite: () => set((state) => ({ showSatellite: !state.showSatellite })),
+        toggleRadar: () => set((state) => ({ showRadar: !state.showRadar })),
+        clearManifest: () => set(() => ({ manifest: [] })),
+        setManifest: (newLayerList: string[]) => set(() => ({ manifest: newLayerList })),
+      },
     }),
     {
       partialize: (state) =>
@@ -49,3 +52,10 @@ export const useRasterData = create<RasterStateStore>()(
     }
   )
 );
+
+export const useSatelliteProduct = () => useRasterData((state) => state.satelliteProduct);
+export const useRadarProduct = () => useRasterData((state) => state.radarProduct);
+export const useShowSatellite = () => useRasterData((state) => state.showSatellite);
+export const useShowRadar = () => useRasterData((state) => state.showRadar);
+export const useRasterManifest = () => useRasterData((state) => state.manifest);
+export const useRasterStateActions = () => useRasterData((state) => state.actions);

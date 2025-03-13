@@ -5,18 +5,19 @@ import { useAviation } from "../stateStores/aviation";
 import AvChartsGFA from "./aviation/AvChartsGFA";
 import AvChartsOther from "./aviation/AvChartsOther";
 import HubDiscussion from "./aviation/HubDiscussion";
-import { Button } from "./ui/button";
+import Button from "./ui/button";
 
 export const PRODUCTS = ["gfa", "lgf", "hlt", "sigwx", "hubs"];
 
 export default function Aviation() {
   const product = useAviation((state) => state.product);
   const setProduct = useAviation((state) => state.setProduct);
+  const hub = useAviation((state) => state.hub);
 
-  const { data: gfaData, fetchStatus: gfaFetchStatus } = useAPI<GFAData[]>("/charts/gfa");
-  const { data: lgfData, fetchStatus: lgfFetchStatus } = useAPI<OtherChartData[]>(`/charts/lgf`);
-  const { data: hltData, fetchStatus: hltFetchStatus } = useAPI<OtherChartData[]>(`/charts/hlt`);
-  const { data: sigwxData, fetchStatus: sigwxFetchStatus } = useAPI<OtherChartData[]>(`/charts/sigwx`);
+  const { data: gfaData, fetchStatus: gfaFetchStatus } = useAPI<GFAData[]>("/charts/gfa", {});
+  const { data: lgfData, fetchStatus: lgfFetchStatus } = useAPI<OtherChartData[]>(`/charts/lgf`, {});
+  const { data: hltData, fetchStatus: hltFetchStatus } = useAPI<OtherChartData[]>(`/charts/hlt`, {});
+  const { data: sigwxData, fetchStatus: sigwxFetchStatus } = useAPI<OtherChartData[]>(`/charts/sigwx`, {});
 
   console.log(gfaFetchStatus, lgfFetchStatus, hltFetchStatus, sigwxFetchStatus);
 
@@ -50,7 +51,7 @@ export default function Aviation() {
         {product === "sigwx" && <AvChartsOther product={product} data={sigwxData} />}
 
         {/* hub discussion section */}
-        {product === "hubs" && <HubDiscussion />}
+        {product === "hubs" && <HubDiscussion hub={hub} />}
       </div>
     </>
   );

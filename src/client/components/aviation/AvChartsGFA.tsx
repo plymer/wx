@@ -1,16 +1,18 @@
 import { AVIATION_PRODUCTS, ProductDomains, Products } from "../../config/aviationProducts";
-import { GFAData } from "../../lib/types";
+import { APIResponse, GFAData } from "../../lib/types";
 import { useAviation } from "../../stateStores/aviation";
-import { Button } from "../ui/button";
+import Button from "../ui/button";
 
 import AvImageContainer from "./AvImageContainer";
 
 interface Props {
   product: Products;
-  data?: GFAData[];
+  data?: APIResponse<GFAData[]>;
 }
 
 const AvChartsGFA = ({ product, data }: Props) => {
+  if (!data || !data.data) return;
+
   // get our state variables and mutation
   const domain = useAviation((state) => state.domain);
   const setDomain = useAviation((state) => state.setDomain);
@@ -32,7 +34,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
   // default it back to the first domain in the domainList
   !currentProduct && domainList[0] && setDomain(domainList[0].domain);
 
-  const currentProductData = data?.find((d) => d.domain === domain);
+  const currentProductData = data.data.find((d) => d.domain === domain);
 
   // build the image url
   const imageUrl = currentProductData && currentProductData[subProduct][timeStep];
@@ -56,7 +58,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
         <label className="me-4">Clouds & Weather:</label>
         <div>
           {currentProduct &&
-            data?.map(
+            data.data.map(
               (p) =>
                 p.domain === domain &&
                 p.cldwx.map((u, i) => (
@@ -80,7 +82,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
         <label className="me-4">Turbulence & Icing:</label>
         <div>
           {currentProduct &&
-            data?.map(
+            data.data.map(
               (p) =>
                 p.domain === domain &&
                 p.turbc.map((u, i) => (

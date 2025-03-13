@@ -1,8 +1,10 @@
 import suncalc, { GetTimesResult } from "suncalc";
+import * as turf from "@turf/turf";
 import { LatLon, SunTimes } from "./common.types.js";
-import { GeoMetModes, LayerProperties } from "./geomet.types.js";
 
 export const FEET_PER_METRE = 3.28084;
+export const HOUR = 3_600_000;
+export const MINUTE = 60_000;
 
 export function injectViteDevServer(fileContents: string): string {
   var output = fileContents.replace(
@@ -22,142 +24,21 @@ window.__vite_plugin_react_preamble_installed__ = true
   return output;
 }
 
-export function leadZero(input: number): string {
+/**
+ *
+ * @param input the number that needs to have zeroes prepended to it
+ * @param minLength the number of digits that the output should to contain
+ * @returns a string of the minimum length that represents the input prepended with a number of zeroes
+ */
+export function leadZero(input: number, minLength: number): string {
   const inputString: string = input.toString();
-  return inputString.length < 2 ? "0" + inputString : inputString;
-}
+  let leader: string = "";
 
-type TempLayer = Omit<LayerProperties, "Dimension"> & {
-  start?: number;
-  startString?: string;
-  end?: number;
-  endString?: string;
-  delta?: number;
-  deltaString?: string;
-  duration?: number;
-};
-
-export function coordinateTimes(layers: LayerProperties[], numOfFrames: number, mode: GeoMetModes) {
-  // this will hold our temp data for our 'race'
-  var temp: TempLayer[] = [];
-
-  var output: LayerProperties[] = [];
-
-  // loop over all the layers passed to us to generate our temp data
-  layers.forEach((l, i) => {
-    const timeArray = l.dimension!.split("/");
-
-    const startTime = Date.parse(timeArray[0]);
-    const endTime = Date.parse(timeArray[1]);
-    const delta = parseInt(timeArray[2].replace(/[a-zA-Z]/g, "")) * 60 * 1000;
-    const duration = endTime - startTime > 3 * 60 * 60 * 1000 ? 3 * 60 * 60 * 1000 : endTime - startTime;
-
-    temp[i] = {
-      ...l,
-      start: startTime,
-      end: endTime,
-      delta: delta,
-      duration: duration / (60 * 60 * 1000),
-    };
-  });
-
-  // of the layers selected, this is the largest delta (timestep) and we will use this to drive our animation
-  // we may move this logic to the client as a parameter that can be selected
-  let largestDelta = 0;
-
-  // find the largest time delta
-  temp.forEach((l) => {
-    if (l.delta! > largestDelta) {
-      largestDelta = l.delta!;
-    }
-  });
-
-  // set the start time and then iterate backwards from there to generate the realTimeArray
-  // realTimeArray will contain timesteps that will be used to find the 'best data' to display at that time
-
-  const currentTime = new Date();
-  const deltaMinutes = largestDelta / 60000;
-  const deltaModulo = currentTime.getUTCMinutes() % deltaMinutes;
-
-  const realStartTime =
-    mode === "loop"
-      ? Date.UTC(
-          currentTime.getUTCFullYear(),
-          currentTime.getUTCMonth(),
-          currentTime.getUTCDate(),
-          currentTime.getUTCHours(),
-          currentTime.getUTCMinutes() - deltaModulo
-        )
-      : Date.UTC(
-          currentTime.getUTCFullYear(),
-          currentTime.getUTCMonth(),
-          currentTime.getUTCDate(),
-          currentTime.getUTCHours(),
-          currentTime.getUTCMinutes()
-        );
-
-  // initialize and populate our array that tracks what our timesteps are
-  let realTimeArray: number[] = [];
-  for (let i = 0; i < numOfFrames; i++) {
-    realTimeArray.push(realStartTime - i * largestDelta);
+  for (let i = 0; i < minLength - inputString.length; i++) {
+    leader += "0";
   }
 
-  // loop through all of our layers and generate valid timesteps for each,
-  //   using our temporary layer objects
-  temp.forEach((layer) => {
-    // store our valid UTC timestamps that we calculate
-    let layerFrameTimes: string[] = [];
-    // initialize some offsets for our for-loop
-    let frameOffset = 0;
-    let syncOffset = 0;
-
-    for (let i = 0; i < numOfFrames; i++) {
-      if (mode === "loop") {
-        // calculate the current time for the layer based on
-        //  a) its end time defined in geomet
-        //  b) its frameOffset depending on how many frames ahead of the main timestep it is
-        //  c) its syncOffset depending on if we need to 'hold' frames in the animation
-        //  d) its internal timestep
-        let currentLayerTime = layer.end! - (i + frameOffset - syncOffset) * layer.delta!;
-
-        // add a frame offset to allow us to skip frames that don't change at the same
-        //   rate that the main timestep does
-        while (currentLayerTime > realTimeArray[i]) {
-          frameOffset++;
-          currentLayerTime = layer.end! - (i + frameOffset) * layer.delta!;
-        }
-
-        // if our layer is behind the main time defined in the realTimeArray,
-        //   and we haven't had to add any frame offsets because our data doesn't
-        //   have a different time step, we need to sync up with the main flow
-        //   of time, so add a time offset to catch up
-        if (currentLayerTime < realTimeArray[i] && frameOffset === 0) {
-          syncOffset++;
-        }
-
-        // push our calculated timestep to the output for the layer
-        layerFrameTimes.push(makeISOTimeStamp(currentLayerTime));
-      } else {
-        layerFrameTimes.push(makeISOTimeStamp(layer.end!));
-      }
-    }
-
-    delete layer.start;
-    delete layer.end;
-    delete layer.delta;
-    delete layer.duration;
-    delete layer.dimension;
-
-    // we want to make sure that the layerFrameTimes here are 'reversed' such that the array
-    //   of timesteps has the oldest times at the zeroth index
-    output.push({ ...layer, timeSteps: layerFrameTimes.reverse() });
-  });
-
-  return {
-    timeStep: largestDelta,
-    timesAvailable: realTimeArray.reverse(),
-    layers: output,
-  };
+  return leader + inputString;
 }
 
 export function makeISOTimeStamp(time: number, mode: "display" | "data" = "data") {
@@ -171,23 +52,54 @@ export function makeISOTimeStamp(time: number, mode: "display" | "data" = "data"
         .replace(/.\d+Z$/g, "Z"); // remove the milliseconds
 }
 
-export function getSunTimes(lat: number, lon: number): SunTimes {
+/**
+ *
+ * @param lat the latitude of the point that the sun times are calculated for
+ * @param lon the longitude of the point that the sun times are calculated for
+ * @returns an object of type SunTimes containing a string for the sunrise and sunset in the format of "HH:mmZ" or "---" if the sun never rises or sets
+ */
+export function getSunTimes(latLon: LatLon): SunTimes {
   // create a suncalc time object
-  const times: GetTimesResult = suncalc.getTimes(new Date(), lat, lon);
+  const times: GetTimesResult = suncalc.getTimes(new Date(), latLon.lat, latLon.lon);
 
   // set sunrise and sunset times to "---" when the sun doesn't rise or set today
   const riseString: string =
     times.sunrise.getUTCHours().toString() !== "NaN"
-      ? leadZero(times.sunrise.getUTCHours()) + ":" + leadZero(times.sunrise.getUTCMinutes()) + "Z"
+      ? leadZero(times.sunrise.getUTCHours(), 2) + ":" + leadZero(times.sunrise.getUTCMinutes(), 2) + "Z"
       : "---";
   const setString: string =
     times.sunsetStart.getUTCHours().toString() !== "NaN"
-      ? leadZero(times.sunsetStart.getUTCHours()) + ":" + leadZero(times.sunsetStart.getUTCMinutes()) + "Z"
+      ? leadZero(times.sunsetStart.getUTCHours(), 2) + ":" + leadZero(times.sunsetStart.getUTCMinutes(), 2) + "Z"
       : "---";
 
   return { rise: riseString, set: setString };
 }
+/**
+ *
+ * @param dim a string from the GetCapabilities document that represents the start time, end time, and time step interval in for format of `2025-02-19T01:30:00Z/2025-02-19T04:30:00Z/PT6M`
+ * @returns an array of objects with a single key `validTime` that contains the epoch milliseconds of the time step
+ */
+export function processDimensionString(dim: string) {
+  //2025-02-19T01:30:00Z/2025-02-19T04:30:00Z/PT6M
+  const dimArray = dim.split("/");
+  const start = new Date(dimArray[0]).getTime();
+  const end = new Date(dimArray[1]).getTime();
+  const interval = parseInt(dimArray[2].replace("PT", "").replace("M", "")) * MINUTE;
 
+  // create an array of timestamps from the start time to the end time at the given interval
+  const timesteps = [];
+  for (let i = start; i <= end; i += interval) {
+    timesteps.push({ validTime: i });
+  }
+
+  return timesteps;
+}
+
+/**
+ *
+ * @param dir a string representing a cardinal direction, such as "N" or "SSW", or a "-"" for no direction
+ * @returns a number representing the direction in degrees, such as 0 or 202.5
+ */
 export function cardinalToDegrees(dir: string): number {
   const directionMap: { [key: string]: number } = {
     N: 0,
@@ -211,6 +123,59 @@ export function cardinalToDegrees(dir: string): number {
 
   // Return the degree corresponding to the given direction
   return directionMap[dir.toUpperCase()];
+}
+
+/**
+ *
+ * @param shape the string representing the type of shape defined in the database
+ * @param bufferSize the size of the resulting feature, as a radius or width from a central point or line
+ * @param coords the input coordinates in the format of [[lon, lat], [lon, lat], ...]
+ * @returns a Position object that contains the coordinates of the resulting shape, formatted for injection into a GeoJSON object
+ */
+export function processCoordinates(shape: string, bufferSize: number, coords: number[][]) {
+  if (shape === "Canceled") return undefined;
+
+  let output;
+
+  switch (shape) {
+    case "circle":
+      // buffer our point to create a circle
+      const circle = turf.circle(coords[0], bufferSize, { steps: 24, units: "nauticalmiles" });
+
+      // return the coordinates of the circle polygon
+      output = circle.geometry.coordinates;
+      break;
+    case "line_corridor":
+      // we need to build two line offsets from the original line, and then weld them back together into a polygon
+      // there should end up being 2n + 1 points in the output polygon, where n is the number of points in the input line
+      const offsetA = turf.lineOffset(turf.lineString(coords), bufferSize, { units: "nauticalmiles" });
+      const offsetB = turf.lineOffset(turf.lineString(coords), -bufferSize, { units: "nauticalmiles" });
+
+      // TODO :: this is not 100% accurate so we will need to re-build our normals-generator function and use that logic to build the accurate offset lines
+
+      // combine the coordinates of both offsets into a single array
+      const offsetACoords = offsetA.geometry.coordinates;
+      const offsetBCoords = offsetB.geometry.coordinates;
+
+      // create a closed polygon by connecting both offset lines, and adding the first point of the first line to the end of the second line
+      const coordinates = [...offsetACoords, ...offsetBCoords.reverse(), offsetACoords[0]];
+
+      // create a polygon from the combined coordinates
+      const polygon = turf.polygon([coordinates]);
+
+      output = polygon.geometry.coordinates;
+
+      break;
+    case "closed_polygon":
+      if (coords.length < 4) {
+        throw new Error("A closed polygon must have at least 4 points");
+      } else {
+        output = [coords];
+      }
+      break;
+  }
+
+  return output;
 }
 
 export function computeCoordinates(

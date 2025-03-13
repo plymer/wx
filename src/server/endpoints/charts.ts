@@ -49,7 +49,7 @@ route.get("/gfa", async (c) => {
     // @ts-ignore
     Object.keys(results).forEach((d) => output.push({ domain: d, cldwx: results[d].cldwx, turbc: results[d].turbc }));
 
-    return c.json(output, 200);
+    return c.json({ status: "success", data: output }, 200);
   } catch (error) {
     return c.json({ status: "error", error: error }, 400);
   }
@@ -95,7 +95,7 @@ route.get("/sigwx", async (c) => {
     // @ts-ignore
     let output: SigWxList[] = [{ domain: "atlantic", images: results.sig_wx.atlantic },{ domain: "canada", images: results.sig_wx.canada }]; // prettier-ignore
 
-    return c.json(output, 200);
+    return c.json({ status: "success", data: output }, 200);
   } catch (error) {
     return c.json({ status: "error", error: error }, 400);
   }
@@ -141,7 +141,7 @@ route.get("/hlt", async (c) => {
     // @ts-ignore
     let output: HLTList[] = [{ domain: "canada", images: results.turbulence.canada },{ domain: "north_atlantic", images: results.turbulence.north_atlantic },]; // prettier-ignore
 
-    return c.json(output, 200);
+    return c.json({ status: "success", data: output }, 200);
   } catch (error) {
     return c.json({ status: "error", error: error }, 400);
   }
@@ -177,7 +177,7 @@ route.get("/lgf", async (c) => {
     // @ts-ignore
     Object.keys(results).forEach((p) => output.push({ domain: p, images: results[p] }));
 
-    return c.json(output, 200);
+    return c.json({ status: "success", data: output }, 200);
   } catch (error) {
     return c.json({ status: "error", error: error }, 400);
   }
@@ -270,7 +270,7 @@ route.get("/navcan", async (c) => {
       }
     });
 
-    return c.json(output, 200);
+    return c.json({ status: "success", data: output }, 200);
   } catch (error) {
     return c.json({ status: "error", error: error }, 400);
   }

@@ -1,16 +1,19 @@
 import { FetchStatus } from "@tanstack/react-query";
 
 import { Loader2, OctagonAlert, OctagonX, Skull } from "lucide-react";
-import { TAFData } from "../../lib/types";
+import { ParsedTAF, TAFData } from "../../lib/types";
+import { useHighlightSigWx } from "../../hooks/useHighlightSigWx";
 
 interface Props {
   site: string;
-  data?: TAFData;
+  data?: ParsedTAF;
   fetchStatus: FetchStatus;
 }
 
 const TAF = ({ site, data, fetchStatus }: Props) => {
-  if (fetchStatus !== "idle") {
+  const highlightSigWx = useHighlightSigWx().highlightSigWx;
+
+  if (!data && fetchStatus !== "idle") {
     return (
       <div className="px-6 py-2 bg-secondary text-black">
         <Loader2 className="inline animate-spin" /> Loading TAF...
@@ -18,20 +21,20 @@ const TAF = ({ site, data, fetchStatus }: Props) => {
     );
   }
   // return the JSX elements
-  if (site && data?.status === "success") {
+  if (site && data) {
     return (
       <div className="px-8 py-4 bg-muted text-black font-mono ">
-        <div>{data.taf.main}</div>
-        {data.taf.partPeriods &&
-          data.taf.partPeriods.map((p, i) => (
+        <div>{highlightSigWx(data.main)}</div>
+        {data.partPeriods &&
+          data.partPeriods.map((p, i) => (
             <div className="ms-8 -indent-4" key={i}>
-              {p}
+              {highlightSigWx(p)}
             </div>
           ))}
-        <div>{data.taf.rmk}</div>
+        <div>{data.rmk}</div>
       </div>
     );
-  } else if (site && data && data.status === "error") {
+  } else if (site && !data) {
     return (
       <div className="px-6 py-2 bg-muted text-black">
         <OctagonAlert className="inline" /> No TAF available for '{site.toUpperCase()}'

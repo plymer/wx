@@ -3,17 +3,21 @@ import { useRef } from "react";
 import { RefreshCw, Search } from "lucide-react";
 import { useObservations } from "../stateStores/observations";
 import useAPI from "../hooks/useAPI";
-import { METAR, SiteData, TAFData } from "../lib/types";
+import { METAR, ParsedTAF, SiteData, TAFData } from "../lib/types";
 import { Input } from "./ui/input";
-import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import METARs from "./observations/METARs";
 import SiteMetadata from "./observations/SiteMetadata";
 import TAF from "./observations/TAF";
+import { useHighlightSigWx } from "../hooks/useHighlightSigWx";
+import { formatSigWx } from "../lib/utils";
+import Button from "./ui/button";
 
 export default function Observations() {
   // create a ref to the siteId text input
   const siteId = useRef("");
+
+  const highlightSigWx = useHighlightSigWx().highlightSigWx;
 
   // use a context to store state so that when we come back to this tab it restores our obs/taf search
   const obs = useObservations((state) => state);
@@ -30,6 +34,10 @@ export default function Observations() {
   const { data: metaData, fetchStatus: metaFetchStatus } = useAPI<SiteData>("/alpha/sitedata", { site: obs.site });
 
   const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("/alpha/taf", { site: obs.site });
+
+  const parsedMetars =
+    metarData && metarData.data && (metarData.data.metars.map((m) => formatSigWx(m, "metar")) as string[]);
+  const parsedTaf = tafData && tafData.data && (formatSigWx(tafData.data.taf, "taf") as ParsedTAF);
 
   // validate the input and mutate the search string, passing it to the context and then it will propagate to the child components
   //   to show the user the data they have requested
@@ -92,9 +100,9 @@ export default function Observations() {
       </div>
 
       <div className="overflow-y-scroll" style={{ height: "calc(100svh - 6.5rem)" }}>
-        <METARs site={obs.site} data={metarData} fetchStatus={metarFetchStatus} />
-        <SiteMetadata site={obs.site} data={metaData} fetchStatus={metaFetchStatus} />
-        <TAF site={obs.site} data={tafData} fetchStatus={tafFetchStatus} />
+        {metarData && <METARs site={obs.site} data={parsedMetars} fetchStatus={metarFetchStatus} />}
+        {metaData && <SiteMetadata site={obs.site} data={metaData.data} fetchStatus={metaFetchStatus} />}
+        {tafData && <TAF site={obs.site} data={parsedTaf} fetchStatus={tafFetchStatus} />}
       </div>
     </>
   );

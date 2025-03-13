@@ -89,8 +89,8 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --max-md-map-height: calc(100svh - 10.6rem);
-    --md-map-height: calc(100svh - 9.1rem);
+    --max-md-map-height: calc(100svh - 12.1rem);
+    --md-map-height: calc(100svh - 10.6rem);
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -126,4 +126,19 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* override styles for attribution button */
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  background-color: #1e2939;
+  color: var(--popover);
+}
+
+.maplibregl-ctrl-attrib-button {
+  color: var(--popover);
+  filter: invert(1);
+}
+
+.maplibregl-ctrl-attrib-inner a {
+  color: var(--popover);
 }

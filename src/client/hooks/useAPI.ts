@@ -1,11 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useEffect } from "react";
+
 import { API_CONFIG, EndpointUrls } from "../config/api";
+import { APIResponse } from "../lib/types";
 
 // define the search params shape
 type SearchParams = {
-  [key: string]: string | number | undefined;
+  [key: string]: any;
 };
 
 type FetchConfig = {
@@ -20,24 +21,25 @@ const api = axios.create({ baseURL: API_CONFIG.baseUrl });
 /**
  *
  * @param endpoint a string that specifies the API endpoint you are retrieving data from ex. `"/alpha/metars"`
- * @param searchParams an object containing the search params we
+ * @param searchParams an object containing the search params we are sending to the API
  * @param fetchConfig an object containing the configuration for refetch interval, the query name, and the enabled/disabled status of the query. Defaults to `{ interval: 5, queryName: endpoint, enabled: true }`
  * @returns the data, error status, and fetch status from react-query
  */
 
-const useAPI = <T>(
+const useAPI = <TData>(
   endpoint: EndpointUrls,
-  searchParams?: SearchParams,
+  searchParams: SearchParams,
   fetchConfig: FetchConfig = { interval: 5, enabled: true }
 ) => {
   // destructure the fetch configuration
   let { interval, queryName, enabled } = fetchConfig;
 
+  // set our queryName to the endpoint if it is not provided
   if (!queryName) queryName = endpoint;
 
   // this is the function that returns the data
   const getData = async () => {
-    const data = await api
+    const response = await api
       .request({
         method: "get",
         url: endpoint,
@@ -45,25 +47,29 @@ const useAPI = <T>(
       })
       .then((res) => res.data);
 
-    return data as T;
+    return response as APIResponse<TData>;
   };
 
+  const searchParamKeys = Object.keys(searchParams);
+
+  // make a unique query name for queries that need to be invalidated when the searchParams change
+  const queryKey =
+    searchParamKeys.includes("site") || searchParamKeys.includes("layers")
+      ? [queryName, JSON.stringify(searchParams)]
+      : [queryName];
+
   // destructure the queryObject from react-query to give us access to the params and methods we need
-  const { data, error, fetchStatus, refetch } = useQuery({
-    queryKey: [queryName], // defaults to the api endpoint requested
+  return useQuery({
+    queryKey: queryKey, // Add searchParams to queryKey
     queryFn: getData,
-    refetchInterval: interval! * 6_000, // interval defaults to 5 minutes
+    refetchInterval: interval! * 60_000, // interval defaults to 5 minutes
     retry: true,
     enabled: enabled,
+    refetchIntervalInBackground: true,
+    placeholderData: keepPreviousData,
+    staleTime: interval! * 50_000,
+    gcTime: 1.5 * interval! * 60_000,
   });
-
-  // set up to refetch the data whenever the endpoint, search params, or enabled status changes
-  useEffect(() => {
-    refetch();
-  }, [endpoint, searchParams, enabled]);
-
-  // return all of the relevant data and methods for the UI
-  return { data, error, fetchStatus };
 };
 
 export default useAPI;

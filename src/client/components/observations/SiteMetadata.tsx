@@ -22,7 +22,7 @@ interface Props {
 }
 
 const SiteMetadata = ({ site, data, fetchStatus }: Props) => {
-  if (fetchStatus !== "idle") {
+  if (!data && fetchStatus !== "idle") {
     return (
       <div className="bg-neutral-800 py-2 text-white border-y-2 border-black">
         <Loader2 className="inline animate-spin" /> Loading metadata...
@@ -31,34 +31,34 @@ const SiteMetadata = ({ site, data, fetchStatus }: Props) => {
   }
 
   // return the JSX elements
-  if (site && data && data.status === "success") {
+  if (site && data) {
     return (
       <div className="text-center bg-neutral-800 py-2 text-white border-y-2 border-black">
         <h2 className="text-xl font-bold">
           <TowerControl className="inline me-2" />
-          {data.metadata.location}
+          {data.location}
         </h2>
         <div className="inline me-4 place-items-center text-sm">
           <Globe className="inline me-2 w-4 h-4" />
-          {data.metadata.lat} {data.metadata.lon}
+          {data.lat} {data.lon}
         </div>
         <div className="inline me-4 place-items-center text-sm">
           <MountainSnow className="inline me-2 w-4 h-4" />
-          {data.metadata.elev_f} / {data.metadata.elev_m}
+          {data.elev_f} / {data.elev_m}
         </div>
         <div>
           <div className="inline me-4 place-items-center text-sm">
             <Sunrise className="inline me-2 w-4 h-4" />
-            {data.metadata.sunrise}
+            {data.sunrise}
           </div>
           <div className="inline me-4 place-items-center text-sm">
             <Sunset className="inline me-2 w-4 h-4" />
-            {data.metadata.sunset}
+            {data.sunset}
           </div>
         </div>
       </div>
     );
-  } else if (site && data && data.status === "error") {
+  } else if (site && !data) {
     return (
       <div className="px-6 py-2 bg-neutral-800 text-white">
         <OctagonAlert className="inline" /> No site metadata available for site '{site.toUpperCase()}'

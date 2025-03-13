@@ -1,12 +1,26 @@
+// third-party libraries
+import { Hono } from "hono";
 import { DOMParser, LiveNodeList } from "@xmldom/xmldom";
 import axios from "axios";
-import { coordinateTimes } from "../lib/utils.js";
 
-import { Hono } from "hono";
+// data-shapes
+import { LayerProperties } from "../lib/geomet.types.js";
+
+// utility functions
+
+// configuration files
+
+// input validation
 import { validateParams } from "../lib/zod-validator.js";
 import { realtimeLayersSchema } from "../validationSchemas/geomet.zod.js";
-import { LayerProperties } from "../lib/geomet.types.js";
+
+// endpoint documentation
+import { processDimensionString } from "../lib/utils.js";
 import { GEOMET_GETCAPABILITIES_RT } from "../config/geomet.config.js";
+
+// create a new hono instance that we will bind our endpoints to
+// don't forget to add 'export default route' at the bottom of this file
+const route = new Hono();
 
 const getTypes = (keywords: LiveNodeList) => {
   const results = [...keywords].map((kw) => [...kw.childNodes].map((cn) => cn.nodeValue).toString());
@@ -14,14 +28,9 @@ const getTypes = (keywords: LiveNodeList) => {
   return results.filter((kw) => kw === "Satellite images" || kw === "Radar").toString();
 };
 
-// create the route
-
-const route = new Hono();
-
-route.get("/geomet", validateParams("query", realtimeLayersSchema, {}), async (c) => {
-  // validate our inputs before proceeding
-  const { layers, mode, frames } = c.req.valid("query");
-
+route.get("/geomet", validateParams("query", realtimeLayersSchema, {}), async (ctx) => {
+  // get our validated query parameters from our GET request context
+  const { layers } = ctx.req.valid("query");
   try {
     const parser = new DOMParser();
 
@@ -36,17 +45,19 @@ route.get("/geomet", validateParams("query", realtimeLayersSchema, {}), async (c
       .getElementsByTagName("Layer");
 
     const capabilities = [...options]
-      .map((l, i) =>
-        l.getAttribute("opaque") && l.hasChildNodes() && l.getElementsByTagName("Dimension")
+      .map((layer, i) =>
+        layer.getAttribute("opaque") && layer.hasChildNodes() && layer.getElementsByTagName("Dimension")
           ? {
-              name: l.getElementsByTagName("Name")[0].childNodes[0].nodeValue,
-              dimension: l.getElementsByTagName("Dimension")[0].childNodes[0].nodeValue,
+              name: layer.getElementsByTagName("Name")[0].childNodes[0].nodeValue,
+              dimension: layer.getElementsByTagName("Dimension")[0].childNodes[0].nodeValue,
               domain:
-                l.parentElement?.getElementsByTagName("Name")[0].childNodes[0].nodeValue?.toLowerCase() ===
-                "north american radar composite [1 km]"
+                layer.parentElement?.getElementsByTagName("Name")[0].childNodes[0].nodeValue?.toLowerCase() ===
+                  "north american radar composite [1 km]" ||
+                layer.parentElement?.getElementsByTagName("Name")[0].childNodes[0].nodeValue?.toLowerCase() ===
+                  "north american radar surface precipitation type [1 km]"
                   ? "national"
-                  : l.parentElement?.getElementsByTagName("Name")[0].childNodes[0].nodeValue?.toLowerCase(),
-              type: getTypes(l.getElementsByTagName("Keyword")) === "Satellite images" ? "satellite" : "radar",
+                  : layer.parentElement?.getElementsByTagName("Name")[0].childNodes[0].nodeValue?.toLowerCase(),
+              type: getTypes(layer.getElementsByTagName("Keyword")) === "Satellite images" ? "satellite" : "radar",
             }
           : ""
       )
@@ -54,27 +65,27 @@ route.get("/geomet", validateParams("query", realtimeLayersSchema, {}), async (c
 
     // console.log(capabilities);
 
-    // give the option to search all possible layers with a search param of 'layers=all'\
+    // give the option to search all possible layers with a search param of 'layers=all'
     // otherwise, return the requested layer details
-    let output =
+    const layerCollection: LayerProperties[] =
       layers === "all"
         ? capabilities
         : (searches.map((layer) => capabilities.find((c) => c.name === layer)) as LayerProperties[]);
 
-    // if we have chosen to coordinate all of the layer times, do that now
-    let formattedOutput =
-      layers !== "all"
-        ? coordinateTimes(
-            output.map((l) => l),
-            frames,
-            mode
-          )
-        : output;
+    // build out the time steps the layers in the output
+    const output: LayerProperties[] =
+      layerCollection &&
+      layerCollection.map((layer) => ({
+        ...layer,
+        timeSteps: layer?.dimension ? processDimensionString(layer.dimension) : [],
+      }));
 
-    return c.json({ status: "success", ...formattedOutput }, 200);
+    return ctx.json({ status: "success", data: output }, 200);
   } catch (error) {
-    return c.json({ status: "error", message: error }, 400);
+    return ctx.json({ status: "error", message: error }, 200);
   }
 });
 
+// create all endpoints above this export
+// it is used in the /src/main.ts file and bound to the main hono instance
 export default route;

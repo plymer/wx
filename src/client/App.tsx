@@ -2,7 +2,7 @@
 import { useState } from "react";
 
 // ui components
-import { Button } from "./components/ui/button";
+import Button from "./components/ui/button";
 
 // app mode components
 import Observations from "./components/Observations";

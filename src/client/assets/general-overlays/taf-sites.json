@@ -1,0 +1,4471 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -75.4333333,40.65 ]
+     },
+     "properties": {
+     "siteId":"KABE",
+     "name":"ALLENTOWN-BETHLEHEM"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -99.6833333,32.4166667 ]
+     },
+     "properties": {
+     "siteId":"KABI",
+     "name":"ABILENE MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -97.2333333,31.6166667 ]
+     },
+     "properties": {
+     "siteId":"KACT",
+     "name":"WACO-MADISON COOPER"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -74.5666667,39.45 ]
+     },
+     "properties": {
+     "siteId":"KACY",
+     "name":"ATLANTIC CITY INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -79.9333333,40.35 ]
+     },
+     "properties": {
+     "siteId":"KAGC",
+     "name":"PITTSBURGH/ALLEGHEN"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -81.9666667,33.3666667 ]
+     },
+     "properties": {
+     "siteId":"KAGS",
+     "name":"AUGUSTA/BUSH FIELD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -73.8,42.75 ]
+     },
+     "properties": {
+     "siteId":"KALB",
+     "name":"ALBANY COUNTY ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -101.7,35.2166667 ]
+     },
+     "properties": {
+     "siteId":"KAMA",
+     "name":"AMARILLO ARPT(AWOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -83.5666667,45.0666667 ]
+     },
+     "properties": {
+     "siteId":"KAPN",
+     "name":"ALPENA CO. REGIONAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -84.4166667,33.65 ]
+     },
+     "properties": {
+     "siteId":"KATL",
+     "name":"ATLANTA INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -97.7,30.3 ]
+     },
+     "properties": {
+     "siteId":"KAUS",
+     "name":"AUSTIN/MUELLER MUNI (ASOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -75.7333333,41.3333333 ]
+     },
+     "properties": {
+     "siteId":"KAVP",
+     "name":"WILKES-BARRE/SCRANTON"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -72.6833333,41.9333333 ]
+     },
+     "properties": {
+     "siteId":"KBDL",
+     "name":"HARTFORD/BRADLEY"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -122.3,47.5333333 ]
+     },
+     "properties": {
+     "siteId":"KBFI",
+     "name":"SEATTLE/BOEING FLD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -68.8333333,44.8 ]
+     },
+     "properties": {
+     "siteId":"KBGR",
+     "name":"BANGOR INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -86.75,33.5666667 ]
+     },
+     "properties": {
+     "siteId":"KBHM",
+     "name":"BIRMINGHAM MUNI"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -108.5333333,45.8 ]
+     },
+     "properties": {
+     "siteId":"KBIL",
+     "name":"BILLINGS/LOGAN INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -86.6833333,36.1333333 ]
+     },
+     "properties": {
+     "siteId":"KBNA",
+     "name":"NASHVILLE METRO"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -116.2166667,43.5666667 ]
+     },
+     "properties": {
+     "siteId":"KBOI",
+     "name":"BOISE MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -71.0166667,42.3666667 ]
+     },
+     "properties": {
+     "siteId":"KBOS",
+     "name":"BOSTON/LOGAN INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -94.0166667,29.95 ]
+     },
+     "properties": {
+     "siteId":"KBPT",
+     "name":"BEAUMONT/PORT ARTHUR"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -112.5,45.95 ]
+     },
+     "properties": {
+     "siteId":"KBTM",
+     "name":"BUTTE/BERT MOONEY"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -91.15,30.5333333 ]
+     },
+     "properties": {
+     "siteId":"KBTR",
+     "name":"BATON ROUGE/RYAN"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -73.15,44.4666667 ]
+     },
+     "properties": {
+     "siteId":"KBTV",
+     "name":"BURLINGTON INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -78.7333333,42.9333333 ]
+     },
+     "properties": {
+     "siteId":"KBUF",
+     "name":"BUFFALO INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -86.4166667,36.9666667 ]
+     },
+     "properties": {
+     "siteId":"KBWG",
+     "name":"BOWLING GREEN"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -76.6666667,39.1833333 ]
+     },
+     "properties": {
+     "siteId":"KBWI",
+     "name":"BALTIMORE/WASH INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -81.4333333,40.9166667 ]
+     },
+     "properties": {
+     "siteId":"KCAK",
+     "name":"AKRON-CANTON RGNL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -85.2,35.0333333 ]
+     },
+     "properties": {
+     "siteId":"KCHA",
+     "name":"CHATTANOOGA/LOVELL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -80.0333333,32.9 ]
+     },
+     "properties": {
+     "siteId":"KCHS",
+     "name":"CHARLESTOWN MUNI"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -81.8666667,41.4166667 ]
+     },
+     "properties": {
+     "siteId":"KCLE",
+     "name":"CLEVELAND/HOPKINS"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -96.3666667,30.5833333 ]
+     },
+     "properties": {
+     "siteId":"KCLL",
+     "name":"COLLEGE STATION"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -80.9333333,35.2166667 ]
+     },
+     "properties": {
+     "siteId":"KCLT",
+     "name":"CHARLOTTE/DOUGLAS"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -82.8833333,40 ]
+     },
+     "properties": {
+     "siteId":"KCMH",
+     "name":"PORT COLUMBUS INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -109.0166667,44.5166667 ]
+     },
+     "properties": {
+     "siteId":"KCOD",
+     "name":"CODY MUNI (AWOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -106.4666667,42.9 ]
+     },
+     "properties": {
+     "siteId":"KCPR",
+     "name":"CASPER/NATRONA INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -84.6666667,39.05 ]
+     },
+     "properties": {
+     "siteId":"KCVG",
+     "name":"CINCINNATI/COVINGTO"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -104.8166667,41.15 ]
+     },
+     "properties": {
+     "siteId":"KCYS",
+     "name":"CHEYENNE/WARREN AFB"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -96.85,32.85 ]
+     },
+     "properties": {
+     "siteId":"KDAL",
+     "name":"DALLAS/LOVE FIELD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -84.2,39.9 ]
+     },
+     "properties": {
+     "siteId":"KDAY",
+     "name":"DAYTON/JAMES M COX"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -90.7,42.4 ]
+     },
+     "properties": {
+     "siteId":"KDBQ",
+     "name":"DUBUQUE MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.0333333,38.85 ]
+     },
+     "properties": {
+     "siteId":"KDCA",
+     "name":"WASHINGTON/NATIONAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -88.8666667,39.8333333 ]
+     },
+     "properties": {
+     "siteId":"KDEC",
+     "name":"DECATUR AIRPORT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -104.6666667,39.8666667 ]
+     },
+     "properties": {
+     "siteId":"KDEN",
+     "name":"DENVER INTNL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -97.0333333,32.9 ]
+     },
+     "properties": {
+     "siteId":"KDFW",
+     "name":"DALLAS/FT WORTH"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -92.1833333,46.85 ]
+     },
+     "properties": {
+     "siteId":"KDLH",
+     "name":"DULUTH INTL AIRPORT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -93.65,41.5333333 ]
+     },
+     "properties": {
+     "siteId":"KDSM",
+     "name":"DES MOINES INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -83.3333333,42.2333333 ]
+     },
+     "properties": {
+     "siteId":"KDTW",
+     "name":"DETROIT METRO WAYNE (ASOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -91.4833333,44.8666667 ]
+     },
+     "properties": {
+     "siteId":"KEAU",
+     "name":"EAU CLAIRE CO. ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -80.1833333,42.0833333 ]
+     },
+     "properties": {
+     "siteId":"KERI",
+     "name":"ERIE INTL AIRPORT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -123.2166667,44.1166667 ]
+     },
+     "properties": {
+     "siteId":"KEUG",
+     "name":"EUGENE/MAHLON SWEET"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -87.5333333,38.05 ]
+     },
+     "properties": {
+     "siteId":"KEVV",
+     "name":"EVANSVILLE REGIONAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -74.1666667,40.7 ]
+     },
+     "properties": {
+     "siteId":"KEWR",
+     "name":"NEWARK INTL AIRPORT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -96.8,46.9 ]
+     },
+     "properties": {
+     "siteId":"KFAR",
+     "name":"FARGO/HECTOR FIELD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -119.7166667,36.7666667 ]
+     },
+     "properties": {
+     "siteId":"KFAT",
+     "name":"FRESNO AIR TERMINAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -78.8833333,34.9833333 ]
+     },
+     "properties": {
+     "siteId":"KFAY",
+     "name":"FAYETTEVILLE RGNL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -111.6666667,35.1333333 ]
+     },
+     "properties": {
+     "siteId":"KFLG",
+     "name":"FLAGSTAFF (AMOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -95.6666667,38.95 ]
+     },
+     "properties": {
+     "siteId":"KFOE",
+     "name":"TOPEKA/FORBES FIELD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -85.2,41 ]
+     },
+     "properties": {
+     "siteId":"KFWA",
+     "name":"FORT WAYNE/BAER FLD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -100.7166667,37.9333333 ]
+     },
+     "properties": {
+     "siteId":"KGCK",
+     "name":"GARDEN CITY MUNI"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -112.15,35.95 ]
+     },
+     "properties": {
+     "siteId":"KGCN",
+     "name":"GRAND CANYON PARK"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -117.5333333,47.6333333 ]
+     },
+     "properties": {
+     "siteId":"KGEG",
+     "name":"SPOKANE INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -97.1833333,47.95 ]
+     },
+     "properties": {
+     "siteId":"KGFK",
+     "name":"GRAND FORKS INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -108.5333333,39.1333333 ]
+     },
+     "properties": {
+     "siteId":"KGJT",
+     "name":"GRAND JUNCTION"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -89.0666667,30.4 ]
+     },
+     "properties": {
+     "siteId":"KGPT",
+     "name":"GULFPORT-BILOXI"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -88.1333333,44.4833333 ]
+     },
+     "properties": {
+     "siteId":"KGRB",
+     "name":"GREEN BAY/STRAUBEL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -85.5166667,42.8833333 ]
+     },
+     "properties": {
+     "siteId":"KGRR",
+     "name":"GRAND RAPIDS INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -79.95,36.0833333 ]
+     },
+     "properties": {
+     "siteId":"KGSO",
+     "name":"GREENSBORO/PIEDMONT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -82.2166667,34.8833333 ]
+     },
+     "properties": {
+     "siteId":"KGSP",
+     "name":"GREENVILLE/SPARTANB"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -111.3666667,47.4833333 ]
+     },
+     "properties": {
+     "siteId":"KGTF",
+     "name":"GREAT FALLS INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -122.95,45.5333333 ]
+     },
+     "properties": {
+     "siteId":"KHIO",
+     "name":"PORTLAND/HILLSBORO"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -90.2333333,32.3333333 ]
+     },
+     "properties": {
+     "siteId":"KHKS",
+     "name":"HAWKINS FLD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -112,46.6 ]
+     },
+     "properties": {
+     "siteId":"KHLN",
+     "name":"HELENA REGIONAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -95.2833333,29.65 ]
+     },
+     "properties": {
+     "siteId":"KHOU",
+     "name":"HOUSTON/WILL HOBBY"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -73.7,41.0666667 ]
+     },
+     "properties": {
+     "siteId":"KHPN",
+     "name":"WHITE PLAINS"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -97.65,26.2333333 ]
+     },
+     "properties": {
+     "siteId":"KHRL",
+     "name":"HARLINGEN INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -86.7666667,34.65 ]
+     },
+     "properties": {
+     "siteId":"KHSV",
+     "name":"HUNTSVILLE/MADISON"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -67.8,46.1166667 ]
+     },
+     "properties": {
+     "siteId":"KHUL",
+     "name":"HOULTON INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -72.8833333,41.2666667 ]
+     },
+     "properties": {
+     "siteId":"KHVN",
+     "name":"NEW HAVEN/TWEED"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.45,38.95 ]
+     },
+     "properties": {
+     "siteId":"KIAD",
+     "name":"WASHINGTON/DULLES"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -78.95,43.1 ]
+     },
+     "properties": {
+     "siteId":"KIAG",
+     "name":"NIAGARA FALLS INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -95.35,29.9666667 ]
+     },
+     "properties": {
+     "siteId":"KIAH",
+     "name":"HOUSTON/INTERCONTIN"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -97.4333333,37.65 ]
+     },
+     "properties": {
+     "siteId":"KICT",
+     "name":"WICHITA/CONTINE(AW)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -112.0666667,43.5166667 ]
+     },
+     "properties": {
+     "siteId":"KIDA",
+     "name":"IDAHO FALLS/FANNING"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -113.95,35.2666667 ]
+     },
+     "properties": {
+     "siteId":"KIGM",
+     "name":"KINGMAN (AMOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.9,34.2666667 ]
+     },
+     "properties": {
+     "siteId":"KILM",
+     "name":"WILMINGTON/NEW HAN"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -83.8,39.4333333 ]
+     },
+     "properties": {
+     "siteId":"KILN",
+     "name":"WILMINGTON AIRPARK"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -86.2666667,39.7333333 ]
+     },
+     "properties": {
+     "siteId":"KIND",
+     "name":"INDIANAPOLIS INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -110.7333333,35.0166667 ]
+     },
+     "properties": {
+     "siteId":"KINW",
+     "name":"WINSLOW MUNI (ASOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -110.7333333,43.6 ]
+     },
+     "properties": {
+     "siteId":"KJAC",
+     "name":"JACKSON HOLE (AWOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -90.0833333,32.3166667 ]
+     },
+     "properties": {
+     "siteId":"KJAN",
+     "name":"JACKSON/THOMPSON"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -73.7833333,40.65 ]
+     },
+     "properties": {
+     "siteId":"KJFK",
+     "name":"NEW YORK/JF KENNEDY"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -86.9333333,40.4166667 ]
+     },
+     "properties": {
+     "siteId":"KLAF",
+     "name":"LAFAYETTE/PURDUE U"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -115.1666667,36.0833333 ]
+     },
+     "properties": {
+     "siteId":"KLAS",
+     "name":"LAS VEGAS/MCCARRAN"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -118.4,33.9333333 ]
+     },
+     "properties": {
+     "siteId":"KLAX",
+     "name":"LOS ANGELES INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -100.9666667,37.05 ]
+     },
+     "properties": {
+     "siteId":"KLBL",
+     "name":"LIBERAL MUNI (AWOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -72.3,43.6333333 ]
+     },
+     "properties": {
+     "siteId":"KLEB",
+     "name":"LEBANON MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -84.6,38.05 ]
+     },
+     "properties": {
+     "siteId":"KLEX",
+     "name":"LEXINGTON/BLUEGRASS"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -91.9833333,30.2 ]
+     },
+     "properties": {
+     "siteId":"KLFT",
+     "name":"LAFAYETTE REGIONAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -73.9,40.7666667 ]
+     },
+     "properties": {
+     "siteId":"KLGA",
+     "name":"NEW YORK/LA GUARDIA"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -118.15,33.8166667 ]
+     },
+     "properties": {
+     "siteId":"KLGB",
+     "name":"LONG BEACH AIRPORT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -111.85,41.7833333 ]
+     },
+     "properties": {
+     "siteId":"KLGU",
+     "name":"LOGAN-CACHE AIRPORT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -92.2333333,34.7333333 ]
+     },
+     "properties": {
+     "siteId":"KLIT",
+     "name":"LITTLE ROCK/ADAMS"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -99.4666667,27.55 ]
+     },
+     "properties": {
+     "siteId":"KLRD",
+     "name":"LAREDO INTL AIRPORT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -94.7333333,39.3 ]
+     },
+     "properties": {
+     "siteId":"KMCI",
+     "name":"KANSAS CITY INTL (ASOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -83.65,32.7 ]
+     },
+     "properties": {
+     "siteId":"KMCN",
+     "name":"MACON/LEWIS WILSON"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -76.7666667,40.2 ]
+     },
+     "properties": {
+     "siteId":"KMDT",
+     "name":"MIDDLETOWN/OLMSTED"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -87.75,41.7833333 ]
+     },
+     "properties": {
+     "siteId":"KMDW",
+     "name":"CHICAGO/MIDWAY"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -88.75,32.3333333 ]
+     },
+     "properties": {
+     "siteId":"KMEI",
+     "name":"MERIDIAN/KEY FIELD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -90,35.05 ]
+     },
+     "properties": {
+     "siteId":"KMEM",
+     "name":"MEMPHIS INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -82.5166667,40.8166667 ]
+     },
+     "properties": {
+     "siteId":"KMFD",
+     "name":"MANSFIELD/LAHM MUNI"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -86.4,32.3 ]
+     },
+     "properties": {
+     "siteId":"KMGM",
+     "name":"MONTGOMERY/DANNELLY (ASOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -71.4333333,42.9333333 ]
+     },
+     "properties": {
+     "siteId":"KMHT",
+     "name":"MANCHESTER AIRPARK"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -94.6,39.1166667 ]
+     },
+     "properties": {
+     "siteId":"KMKC",
+     "name":"KANSAS CITY MUNI"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -87.9,42.95 ]
+     },
+     "properties": {
+     "siteId":"KMKE",
+     "name":"MILWAUKEE/MITCHELL INTL (ASOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -88.25,30.6833333 ]
+     },
+     "properties": {
+     "siteId":"KMOB",
+     "name":"MOBILE/BATES FIELD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -101.2833333,48.2666667 ]
+     },
+     "properties": {
+     "siteId":"KMOT",
+     "name":"MINOT INTL AIRPORT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -89.35,43.1333333 ]
+     },
+     "properties": {
+     "siteId":"KMSN",
+     "name":"MADISON/DANE RGNL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -114.0833333,46.9166667 ]
+     },
+     "properties": {
+     "siteId":"KMSO",
+     "name":"MISSOULA/BELL FIELD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -93.2166667,44.8833333 ]
+     },
+     "properties": {
+     "siteId":"KMSP",
+     "name":"MINNEAPOLIS-ST PAUL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -74.85,44.9333333 ]
+     },
+     "properties": {
+     "siteId":"KMSS",
+     "name":"MASSENA/RICHARDS"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -90.25,29.9833333 ]
+     },
+     "properties": {
+     "siteId":"KMSY",
+     "name":"NEW ORLEANS/MOISANT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -107.9,38.5 ]
+     },
+     "properties": {
+     "siteId":"KMTJ",
+     "name":"MONTROSE CO. ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -88.5666667,32.55 ]
+     },
+     "properties": {
+     "siteId":"KNMM",
+     "name":"MERIDIAN (NAS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -122.2166667,37.7333333 ]
+     },
+     "properties": {
+     "siteId":"KOAK",
+     "name":"OAKLAND"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -112.0166667,41.2 ]
+     },
+     "properties": {
+     "siteId":"KOGD",
+     "name":"OGDEN-HINCKLEY MUNI"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -97.6,35.4 ]
+     },
+     "properties": {
+     "siteId":"KOKC",
+     "name":"OKLAHOMA CITY(AWOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -95.9,41.3 ]
+     },
+     "properties": {
+     "siteId":"KOMA",
+     "name":"OMAHA/EPPLEY FIELD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -117.6,34.05 ]
+     },
+     "properties": {
+     "siteId":"KONT",
+     "name":"ONTARIO INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -87.9,41.9833333 ]
+     },
+     "properties": {
+     "siteId":"KORD",
+     "name":"CHICAGO/O'HARE ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -76.2,36.9 ]
+     },
+     "properties": {
+     "siteId":"KORF",
+     "name":"NORFOLK INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -122.6,45.6 ]
+     },
+     "properties": {
+     "siteId":"KPDX",
+     "name":"PORTLAND INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -76.5,37.1333333 ]
+     },
+     "properties": {
+     "siteId":"KPHF",
+     "name":"NEWPORT NEWS"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -75.25,39.8833333 ]
+     },
+     "properties": {
+     "siteId":"KPHL",
+     "name":"PHILADELPHIA INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -112.0166667,33.4333333 ]
+     },
+     "properties": {
+     "siteId":"KPHX",
+     "name":"PHOENIX/SKY HARBOR"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -112.5666667,42.9166667 ]
+     },
+     "properties": {
+     "siteId":"KPIH",
+     "name":"POCATELLO MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -80.2166667,40.5 ]
+     },
+     "properties": {
+     "siteId":"KPIT",
+     "name":"PITTSBURGH INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -84.8,45.5666667 ]
+     },
+     "properties": {
+     "siteId":"KPLN",
+     "name":"PELLSTON/EMMET CO."
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -68.05,46.6833333 ]
+     },
+     "properties": {
+     "siteId":"KPQI",
+     "name":"PRESQUE ISLE (AWOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -70.8166667,43.0833333 ]
+     },
+     "properties": {
+     "siteId":"KPSM",
+     "name":"PEASE AFB/PORTSMOUT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -116.5,33.8333333 ]
+     },
+     "properties": {
+     "siteId":"KPSP",
+     "name":"PALM SPRINGS RGNL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -71.4333333,41.7333333 ]
+     },
+     "properties": {
+     "siteId":"KPVD",
+     "name":"PROVIDENCE/GREEN"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -70.3166667,43.65 ]
+     },
+     "properties": {
+     "siteId":"KPWM",
+     "name":"PORTLAND INTL JET"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -78.7833333,35.8666667 ]
+     },
+     "properties": {
+     "siteId":"KRDU",
+     "name":"RALEIGH-DURHAM"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.3333333,37.5 ]
+     },
+     "properties": {
+     "siteId":"KRIC",
+     "name":"RICHMOND/BYRD FIELD"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -109.0666667,41.6 ]
+     },
+     "properties": {
+     "siteId":"KRKS",
+     "name":"ROCK SPRINGS"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -119.7833333,39.5 ]
+     },
+     "properties": {
+     "siteId":"KRNO",
+     "name":"RENO/CANNON INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -79.9666667,37.3166667 ]
+     },
+     "properties": {
+     "siteId":"KROA",
+     "name":"ROANOKE MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.6666667,43.1166667 ]
+     },
+     "properties": {
+     "siteId":"KROC",
+     "name":"ROCHESTER/MONROE CO"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -92.5,43.9166667 ]
+     },
+     "properties": {
+     "siteId":"KRST",
+     "name":"ROCHESTER MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -117.1666667,32.7333333 ]
+     },
+     "properties": {
+     "siteId":"KSAN",
+     "name":"SAN DIEGO/LINDBERG"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -98.4666667,29.5333333 ]
+     },
+     "properties": {
+     "siteId":"KSAT",
+     "name":"SAN ANTONIO INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -81.2,32.1166667 ]
+     },
+     "properties": {
+     "siteId":"KSAV",
+     "name":"SAVANNAH MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -86.3166667,41.7 ]
+     },
+     "properties": {
+     "siteId":"KSBN",
+     "name":"SOUTH BEND/ST. JOE"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -75.5166667,38.3333333 ]
+     },
+     "properties": {
+     "siteId":"KSBY",
+     "name":"SALISBURY REGIONAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -85.7333333,38.1833333 ]
+     },
+     "properties": {
+     "siteId":"KSDF",
+     "name":"LOUISVILLE/STANDIFO"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -122.3,47.45 ]
+     },
+     "properties": {
+     "siteId":"KSEA",
+     "name":"SEATTLE-TACOMA INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -122.3833333,37.6166667 ]
+     },
+     "properties": {
+     "siteId":"KSFO",
+     "name":"SAN FRANCISCO INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -93.8166667,32.4666667 ]
+     },
+     "properties": {
+     "siteId":"KSHV",
+     "name":"SHREVEPORT REGIONAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -121.9333333,37.3666667 ]
+     },
+     "properties": {
+     "siteId":"KSJC",
+     "name":"SAN JOSE INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -111.9666667,40.7833333 ]
+     },
+     "properties": {
+     "siteId":"KSLC",
+     "name":"SALT LAKE CITY INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -121.5833333,38.7 ]
+     },
+     "properties": {
+     "siteId":"KSMF",
+     "name":"SACRAMENTO METRO"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -98.5,33.9833333 ]
+     },
+     "properties": {
+     "siteId":"KSPS",
+     "name":"WICHITA FALLS/SHEP"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -94.0666667,45.55 ]
+     },
+     "properties": {
+     "siteId":"KSTC",
+     "name":"ST. CLOUD MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -90.3666667,38.75 ]
+     },
+     "properties": {
+     "siteId":"KSTL",
+     "name":"ST. LOUIS/LAMBERT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -90.65,38.6666667 ]
+     },
+     "properties": {
+     "siteId":"KSUS",
+     "name":"SPIRIT OF ST LOUIS"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -74.1,41.5 ]
+     },
+     "properties": {
+     "siteId":"KSWF",
+     "name":"NEWBURGH/STEWART"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -76.1166667,43.1166667 ]
+     },
+     "properties": {
+     "siteId":"KSYR",
+     "name":"SYRACUSE/HANCOCK"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -74.0666667,40.85 ]
+     },
+     "properties": {
+     "siteId":"KTEB",
+     "name":"TETERBORO AIRPORT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -83.8,41.6 ]
+     },
+     "properties": {
+     "siteId":"KTOL",
+     "name":"TOLEDO EXPRESS"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -95.8833333,36.2 ]
+     },
+     "properties": {
+     "siteId":"KTUL",
+     "name":"TULSA INTL ARPT(AW)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -85.5833333,44.7333333 ]
+     },
+     "properties": {
+     "siteId":"KTVC",
+     "name":"TRAVERSE CITY/CHERR"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -114.4833333,42.4833333 ]
+     },
+     "properties": {
+     "siteId":"KTWF",
+     "name":"TWIN FALLS/JOSLIN"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -93.9833333,33.45 ]
+     },
+     "properties": {
+     "siteId":"KTXK",
+     "name":"TEXARKANA RGNL/WEBB"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -83.9833333,35.8166667 ]
+     },
+     "properties": {
+     "siteId":"KTYS",
+     "name":"KNOXVILLE MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -96.9166667,28.85 ]
+     },
+     "properties": {
+     "siteId":"KVCT",
+     "name":"VICTORIA REGIONAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -120.5333333,46.5666667 ]
+     },
+     "properties": {
+     "siteId":"KYKM",
+     "name":"YAKIMA AIR TERMINAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -80.6666667,41.2666667 ]
+     },
+     "properties": {
+     "siteId":"KYNG",
+     "name":"YOUNGSTOWN MUNI"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -134.5833333,58.3666667 ]
+     },
+     "properties": {
+     "siteId":"PAJN",
+     "name":"JUNEAU INTL AIRPORT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -150.0166667,61.1666667 ]
+     },
+     "properties": {
+     "siteId":"PANC",
+     "name":"ANCHORAGE INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -135.35,57.0666667 ]
+     },
+     "properties": {
+     "siteId":"PASI",
+     "name":"SITKA/JAPONSKI ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -139.6666667,59.5166667 ]
+     },
+     "properties": {
+     "siteId":"PAYA",
+     "name":"YAKUTAT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -123.1833333,49.2 ]
+     },
+     "properties": {
+     "siteId":"CYVR",
+     "name":"VANCOUVER INTL ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -122.3666667,49.0333333 ]
+     },
+     "properties": {
+     "siteId":"CYXX",
+     "name":"ABBOTSFORD ARPT (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -123.4333333,48.65 ]
+     },
+     "properties": {
+     "siteId":"CYYJ",
+     "name":"VICTORIA INTL ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -123.3833333,48.4166667 ]
+     },
+     "properties": {
+     "siteId":"CYWH",
+     "name":"VICTORIA HARBOUR (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -120.45,50.7 ]
+     },
+     "properties": {
+     "siteId":"CYKA",
+     "name":"KAMLOOPS ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -119.4,49.95 ]
+     },
+     "properties": {
+     "siteId":"CYLW",
+     "name":"KELOWNA ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -119.6,49.4666667 ]
+     },
+     "properties": {
+     "siteId":"CYYF",
+     "name":"PENTICTON ARPT (WS3/ATO)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -117.6333333,49.3 ]
+     },
+     "properties": {
+     "siteId":"CYCG",
+     "name":"CASTLEGAR ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -115.7833333,49.6166667 ]
+     },
+     "properties": {
+     "siteId":"CYXC",
+     "name":"CRANBROOK ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -123.8666667,49.05 ]
+     },
+     "properties": {
+     "siteId":"CYCD",
+     "name":"NANAIMO ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -113.5833333,53.3166667 ]
+     },
+     "properties": {
+     "siteId":"CYEG",
+     "name":"EDMONTON INTL (WO4)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -113.85,53.6666667 ]
+     },
+     "properties": {
+     "siteId":"CZVL",
+     "name":"EDMONTON/VILLENEUVE (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -115.7833333,54.15 ]
+     },
+     "properties": {
+     "siteId":"CYZU",
+     "name":"WHITECOURT ARPT (FSS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -110.0666667,53.3166667 ]
+     },
+     "properties": {
+     "siteId":"CYLL",
+     "name":"LLOYDMINSTER ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -113.9,52.1833333 ]
+     },
+     "properties": {
+     "siteId":"CYQF",
+     "name":"RED DEER ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -114.0166667,51.1166667 ]
+     },
+     "properties": {
+     "siteId":"CYYC",
+     "name":"CALGARY INTL ARPT (CON/AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -112.8,49.6333333 ]
+     },
+     "properties": {
+     "siteId":"CYQL",
+     "name":"LETHBRIDGE ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -117.1666667,58.6166667 ]
+     },
+     "properties": {
+     "siteId":"CYOJ",
+     "name":"HIGH LEVEL ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -111.2166667,56.65 ]
+     },
+     "properties": {
+     "siteId":"CYMM",
+     "name":"FORT MCMURRAY (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -105.6166667,57.25 ]
+     },
+     "properties": {
+     "siteId":"CYKJ",
+     "name":"KEY LAKE NCA"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -108.4333333,55.8333333 ]
+     },
+     "properties": {
+     "siteId":"CYVT",
+     "name":"BUFFALO NARROWS ARPT (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -114.3666667,51.1 ]
+     },
+     "properties": {
+     "siteId":"CYBW",
+     "name":"CALGARY/SPRINGBANK (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -117.45,56.2333333 ]
+     },
+     "properties": {
+     "siteId":"CYPE",
+     "name":"PEACE RIVER ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -118.8833333,55.1833333 ]
+     },
+     "properties": {
+     "siteId":"CYQU",
+     "name":"GRANDE PRAIRIE ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -114.7833333,55.3 ]
+     },
+     "properties": {
+     "siteId":"CYZH",
+     "name":"SLAVE LAKE (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -110.7166667,50.0166667 ]
+     },
+     "properties": {
+     "siteId":"CYXH",
+     "name":"MEDICINE HAT NCA"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -97.2333333,49.9166667 ]
+     },
+     "properties": {
+     "siteId":"CYWG",
+     "name":"WINNIPEG/RICHARDSON ARPT (ATI/AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -99.95,49.9166667 ]
+     },
+     "properties": {
+     "siteId":"CYBR",
+     "name":"BRANDON ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -100.05,51.1 ]
+     },
+     "properties": {
+     "siteId":"CYDN",
+     "name":"DAUPHIN ARPT NCA"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -101.0833333,56.8666667 ]
+     },
+     "properties": {
+     "siteId":"CYYL",
+     "name":"LYNN LAKE ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -97.8666667,55.8 ]
+     },
+     "properties": {
+     "siteId":"CYTH",
+     "name":"THOMPSON ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -94.7,56.3666667 ]
+     },
+     "properties": {
+     "siteId":"CYGX",
+     "name":"GILLAM ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -101.1,53.9666667 ]
+     },
+     "properties": {
+     "siteId":"CYQD",
+     "name":"THE PAS (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -97.85,53.9666667 ]
+     },
+     "properties": {
+     "siteId":"CYNE",
+     "name":"NORWAY HOUSE (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -94.65,53.85 ]
+     },
+     "properties": {
+     "siteId":"CYIV",
+     "name":"ISLAND LAKE ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -94.0666667,58.7333333 ]
+     },
+     "properties": {
+     "siteId":"CYYQ",
+     "name":"CHURCHILL (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -105.6666667,53.2166667 ]
+     },
+     "properties": {
+     "siteId":"CYPA",
+     "name":"PRINCE ALBERT ARPT (WO4/ATO/CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -105.2666667,55.15 ]
+     },
+     "properties": {
+     "siteId":"CYVC",
+     "name":"LA RONGE ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -107.6833333,50.3 ]
+     },
+     "properties": {
+     "siteId":"CYYN",
+     "name":"SWIFT CURRENT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -104.6666667,50.4333333 ]
+     },
+     "properties": {
+     "siteId":"CYQR",
+     "name":"REGINA ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -102.9666667,49.2166667 ]
+     },
+     "properties": {
+     "siteId":"CYEN",
+     "name":"ESTEVAN ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -102.4666667,51.2666667 ]
+     },
+     "properties": {
+     "siteId":"CYQV",
+     "name":"YORKTON ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -106.7166667,52.1666667 ]
+     },
+     "properties": {
+     "siteId":"CYXE",
+     "name":"SASKATOON DIFFENBAKER INT'L A (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -108.25,52.7666667 ]
+     },
+     "properties": {
+     "siteId":"CYQW",
+     "name":"NORTH BATTLEFORD (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -128.5833333,54.4666667 ]
+     },
+     "properties": {
+     "siteId":"CYXT",
+     "name":"TERRACE ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -135.0666667,60.7166667 ]
+     },
+     "properties": {
+     "siteId":"CYXY",
+     "name":"WHITEHORSE ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -139.1333333,64.05 ]
+     },
+     "properties": {
+     "siteId":"CYDA",
+     "name":"DAWSON ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -123.1333333,55.3 ]
+     },
+     "properties": {
+     "siteId":"CYZY",
+     "name":"MACKENZIE NCA"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -122.6,58.8333333 ]
+     },
+     "properties": {
+     "siteId":"CYYE",
+     "name":"FORT NELSON ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -128.8166667,60.1166667 ]
+     },
+     "properties": {
+     "siteId":"CYQH",
+     "name":"WATSON LAKE ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -122.05,52.1833333 ]
+     },
+     "properties": {
+     "siteId":"CYWL",
+     "name":"WILLIAMS LAKE ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -133.3666667,62.2 ]
+     },
+     "properties": {
+     "siteId":"CZFA",
+     "name":"FARO ARPT (AWS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -130.0333333,58.4166667 ]
+     },
+     "properties": {
+     "siteId":"CYDL",
+     "name":"DEASE LAKE (AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -135.8666667,63.6166667 ]
+     },
+     "properties": {
+     "siteId":"CYMA",
+     "name":"MAYO ARPT (AWS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -122.5166667,53.0166667 ]
+     },
+     "properties": {
+     "siteId":"CYQZ",
+     "name":"QUESNEL NCA"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -120.1833333,55.75 ]
+     },
+     "properties": {
+     "siteId":"CYDQ",
+     "name":"DAWSON CREEK ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -132.75,60.1666667 ]
+     },
+     "properties": {
+     "siteId":"CYZW",
+     "name":"TESLIN ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -127.1833333,54.8333333 ]
+     },
+     "properties": {
+     "siteId":"CYYD",
+     "name":"SMITHERS ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -122.6833333,53.8833333 ]
+     },
+     "properties": {
+     "siteId":"CYXS",
+     "name":"PRINCE GEORGE ARPT (WO4)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -139.8333333,67.5666667 ]
+     },
+     "properties": {
+     "siteId":"CYOC",
+     "name":"OLD CROW ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -139.05,61.3666667 ]
+     },
+     "properties": {
+     "siteId":"CYDB",
+     "name":"BURWASH ARPT (CARS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -120.7333333,56.2333333 ]
+     },
+     "properties": {
+     "siteId":"CYXJ",
+     "name":"FORT ST. JOHN ARPT (W04\\ATO)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -110.6833333,62.4166667 ]
+     },
+     "properties": {
+     "siteId":"CYLK",
+     "name":"LUTSEL KE ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -110.6166667,64.7 ]
+     },
+     "properties": {
+     "siteId":"CYOA",
+     "name":"EKATI (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -121.2333333,61.75 ]
+     },
+     "properties": {
+     "siteId":"CYFS",
+     "name":"FORT SIMPSON ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -117.3166667,64.1166667 ]
+     },
+     "properties": {
+     "siteId":"CYRA",
+     "name":"GAMETI A"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -134.8666667,67.4 ]
+     },
+     "properties": {
+     "siteId":"CZFM",
+     "name":"FORT MCPHERSON ARPT (AWS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -133.4833333,68.3 ]
+     },
+     "properties": {
+     "siteId":"CYEV",
+     "name":"INUVIK ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -123.4333333,65.2166667 ]
+     },
+     "properties": {
+     "siteId":"CYWJ",
+     "name":"DELINE ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -133.0166667,69.4333333 ]
+     },
+     "properties": {
+     "siteId":"CYUB",
+     "name":"TUKTOYAKTUK ARPT (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -114.45,62.4666667 ]
+     },
+     "properties": {
+     "siteId":"CYZF",
+     "name":"YELLOWKNIFE ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -117.8,70.7666667 ]
+     },
+     "properties": {
+     "siteId":"CYHI",
+     "name":"ULUKHAKTOK"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -114.0666667,64.1833333 ]
+     },
+     "properties": {
+     "siteId":"CYWE",
+     "name":"WEKWEETI  (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -128.65,66.2333333 ]
+     },
+     "properties": {
+     "siteId":"CYGH",
+     "name":"FORT GOOD HOPE ARPT (MCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -124.0833333,69.3666667 ]
+     },
+     "properties": {
+     "siteId":"CYPC",
+     "name":"PAULATUK ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -126.8,65.2833333 ]
+     },
+     "properties": {
+     "siteId":"CYVQ",
+     "name":"NORMAN WELLS ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -125.2666667,72 ]
+     },
+     "properties": {
+     "siteId":"CYSY",
+     "name":"SACHS HARBOUR ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -115.7833333,60.8333333 ]
+     },
+     "properties": {
+     "siteId":"CYHY",
+     "name":"HAY RIVER ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -111.1166667,58.7666667 ]
+     },
+     "properties": {
+     "siteId":"CYPY",
+     "name":"FORT CHIPEWYAN ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -105.8333333,59.25 ]
+     },
+     "properties": {
+     "siteId":"CYSF",
+     "name":"STONY RAPIDS ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -111.9666667,60.0166667 ]
+     },
+     "properties": {
+     "siteId":"CYSM",
+     "name":"FORT SMITH ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -115.15,67.8166667 ]
+     },
+     "properties": {
+     "siteId":"CYCO",
+     "name":"KUGLUKTUK (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -105.1333333,69.1 ]
+     },
+     "properties": {
+     "siteId":"CYCB",
+     "name":"CAMBRIDGE BAY ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -68.55,63.75 ]
+     },
+     "properties": {
+     "siteId":"CYFB",
+     "name":"IQALUIT ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -76.5333333,64.2333333 ]
+     },
+     "properties": {
+     "siteId":"CYTE",
+     "name":"CAPE DORSET (AWS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -83.3666667,64.2 ]
+     },
+     "properties": {
+     "siteId":"CYZS",
+     "name":"CORAL HARBOUR ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -86.2166667,66.5166667 ]
+     },
+     "properties": {
+     "siteId":"CYUT",
+     "name":"REPULSE BAY ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -81.25,68.7833333 ]
+     },
+     "properties": {
+     "siteId":"CYUX",
+     "name":"HALL BEACH ARPT (AWS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -81.8166667,69.3666667 ]
+     },
+     "properties": {
+     "siteId":"CYGT",
+     "name":"IGLOOLIK ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -68.5166667,70.4833333 ]
+     },
+     "properties": {
+     "siteId":"CYCY",
+     "name":"CLYDE ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -64.0333333,67.55 ]
+     },
+     "properties": {
+     "siteId":"CYVM",
+     "name":"QIKIQTARJUAQ (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -65.7,66.1333333 ]
+     },
+     "properties": {
+     "siteId":"CYXP",
+     "name":"PANGNIRTUNG (AWS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.2833333,60.05 ]
+     },
+     "properties": {
+     "siteId":"CYPX",
+     "name":"PUVIRNITUQ (AWS/CAR)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -89.8,68.5333333 ]
+     },
+     "properties": {
+     "siteId":"CYBB",
+     "name":"KUGAARUK ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.9666667,72.6833333 ]
+     },
+     "properties": {
+     "siteId":"CYIO",
+     "name":"POND INLET ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -85.0333333,73 ]
+     },
+     "properties": {
+     "siteId":"CYAB",
+     "name":"ARCTIC BAY (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -85.8166667,80 ]
+     },
+     "properties": {
+     "siteId":"CYEU",
+     "name":"EUREKA (MAN)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -94.9833333,74.7166667 ]
+     },
+     "properties": {
+     "siteId":"CYRB",
+     "name":"RESOLUTE ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -95.85,68.6333333 ]
+     },
+     "properties": {
+     "siteId":"CYHK",
+     "name":"GJOA HAVEN ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -93.5833333,69.55 ]
+     },
+     "properties": {
+     "siteId":"CYYH",
+     "name":"TALOYOAK ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -92.1166667,62.8 ]
+     },
+     "properties": {
+     "siteId":"CYRT",
+     "name":"RANKIN INLET ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -96.0833333,64.3 ]
+     },
+     "properties": {
+     "siteId":"CYBK",
+     "name":"BAKER LAKE ARPT (CARS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -94.0666667,61.1 ]
+     },
+     "properties": {
+     "siteId":"CYEK",
+     "name":"ARVIAT ARPT (AWS/AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.95,62.4166667 ]
+     },
+     "properties": {
+     "siteId":"CYIK",
+     "name":"IVUJIVIK ARPT(SAWR)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -75.6666667,62.1833333 ]
+     },
+     "properties": {
+     "siteId":"CYZG",
+     "name":"SALLUIT ARPT (AWS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -71.9166667,61.5833333 ]
+     },
+     "properties": {
+     "siteId":"CYKG",
+     "name":"KANGIQSUJUAQ (WAKEHAM BAY)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -70,60.0166667 ]
+     },
+     "properties": {
+     "siteId":"CYAS",
+     "name":"KANGIRSUK (SAWR)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -127.3833333,50.6833333 ]
+     },
+     "properties": {
+     "siteId":"CYZT",
+     "name":"PORT HARDY ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -131.8166667,53.25 ]
+     },
+     "properties": {
+     "siteId":"CYZP",
+     "name":"SANDSPIT NCA"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -125.7666667,49.0833333 ]
+     },
+     "properties": {
+     "siteId":"CYAZ",
+     "name":"TOFINO ARPT (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -125.2666667,49.95 ]
+     },
+     "properties": {
+     "siteId":"CYBL",
+     "name":"CAMPBELL RIVER ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -130.45,54.2833333 ]
+     },
+     "properties": {
+     "siteId":"CYPR",
+     "name":"PRINCE RUPERT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -128.15,52.1833333 ]
+     },
+     "properties": {
+     "siteId":"CBBC",
+     "name":"BELLA BELLA (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -132.1166667,54.0166667 ]
+     },
+     "properties": {
+     "siteId":"CZMT",
+     "name":"MASSET (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -75.6666667,45.3166667 ]
+     },
+     "properties": {
+     "siteId":"CYOW",
+     "name":"OTTAWA INTL (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -75.5666667,45.5166667 ]
+     },
+     "properties": {
+     "siteId":"CYND",
+     "name":"GATINEAU (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -74.0333333,45.6833333 ]
+     },
+     "properties": {
+     "siteId":"CYMX",
+     "name":"MONTREAL/MIRABEL INTL A QC"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -73.75,45.4666667 ]
+     },
+     "properties": {
+     "siteId":"CYUL",
+     "name":"MONTREAL/PIERRE ELLIOTT TRUDEAU INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -73.4166667,45.5166667 ]
+     },
+     "properties": {
+     "siteId":"CYHU",
+     "name":"MONTREAL / ST-HUBERT A"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -71.4,46.8 ]
+     },
+     "properties": {
+     "siteId":"CYQB",
+     "name":"QUEBEC (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -72.6833333,46.35 ]
+     },
+     "properties": {
+     "siteId":"CYRQ",
+     "name":"TROIS-RIVIERES (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -79.3,44.9666667 ]
+     },
+     "properties": {
+     "siteId":"CYQA",
+     "name":"MUSKOKA ARPT NCA"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -76.6,44.2333333 ]
+     },
+     "properties": {
+     "siteId":"CYGK",
+     "name":"KINGSTON (MAN)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -87.6833333,56.0166667 ]
+     },
+     "properties": {
+     "siteId":"CYER",
+     "name":"FORT SEVERN (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -82.4333333,52.9333333 ]
+     },
+     "properties": {
+     "siteId":"CYAT",
+     "name":"ATTAWAPISKAT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -69.95,58.6666667 ]
+     },
+     "properties": {
+     "siteId":"CYTQ",
+     "name":"TASIUJAQ ARPT (AWS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -72.2666667,48.5166667 ]
+     },
+     "properties": {
+     "siteId":"CYRJ",
+     "name":"ROBERVAL (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -74.5333333,49.7666667 ]
+     },
+     "properties": {
+     "siteId":"CYMT",
+     "name":"CHIBOUGAMAU-CHAPAIS ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -94.3666667,49.7833333 ]
+     },
+     "properties": {
+     "siteId":"CYQK",
+     "name":"KENORA ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -92.75,49.8333333 ]
+     },
+     "properties": {
+     "siteId":"CYHD",
+     "name":"DRYDEN REGIONAL NCA"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -91.9,50.1166667 ]
+     },
+     "properties": {
+     "siteId":"CYXL",
+     "name":"SIOUX LOOKOUT ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -93.8,51.0666667 ]
+     },
+     "properties": {
+     "siteId":"CYRL",
+     "name":"RED LAKE ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -93.35,53.0666667 ]
+     },
+     "properties": {
+     "siteId":"CZSJ",
+     "name":"SANDY LAKE (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -91.7666667,53.4333333 ]
+     },
+     "properties": {
+     "siteId":"CZMD",
+     "name":"MUSKRAT DAM (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -89.3333333,48.3666667 ]
+     },
+     "properties": {
+     "siteId":"CYQT",
+     "name":"THUNDER BAY ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -86.9333333,49.7833333 ]
+     },
+     "properties": {
+     "siteId":"CYGQ",
+     "name":"GERALDTON/GREENSTONE RGNL (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -89.9,53.8166667 ]
+     },
+     "properties": {
+     "siteId":"CYTL",
+     "name":"BIG TROUT LAKE A (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -73.6833333,53.75 ]
+     },
+     "properties": {
+     "siteId":"CYAH",
+     "name":"LA GRANDE IV ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -90.2166667,51.45 ]
+     },
+     "properties": {
+     "siteId":"CYPL",
+     "name":"PICKLE LAKE (WS1)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -52.75,47.6166667 ]
+     },
+     "properties": {
+     "siteId":"CYYT",
+     "name":"SAINT JOHN'S ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -54.5666667,48.95 ]
+     },
+     "properties": {
+     "siteId":"CYQX",
+     "name":"GANDER INTL ARPT (WO4)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -58.55,48.55 ]
+     },
+     "properties": {
+     "siteId":"CYJT",
+     "name":"STEPHENVILLE ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -63.5166667,44.8833333 ]
+     },
+     "properties": {
+     "siteId":"CYHZ",
+     "name":"HALIFAX INTL ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -64.6833333,46.1166667 ]
+     },
+     "properties": {
+     "siteId":"CYQM",
+     "name":"MONCTON ARPT (WO4/ATO)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -66.2666667,50.2166667 ]
+     },
+     "properties": {
+     "siteId":"CYZV",
+     "name":"SEPT-ILES ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -66.5333333,45.8666667 ]
+     },
+     "properties": {
+     "siteId":"CYFC",
+     "name":"FREDERICTON ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -65.8833333,45.3166667 ]
+     },
+     "properties": {
+     "siteId":"CYSJ",
+     "name":"SAINT JOHN ARPT (ATO)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -66.0833333,43.8333333 ]
+     },
+     "properties": {
+     "siteId":"CYQI",
+     "name":"YARMOUTH ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -63.1333333,46.2833333 ]
+     },
+     "properties": {
+     "siteId":"CYYG",
+     "name":"CHARLOTTETOWN ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -60.05,46.1666667 ]
+     },
+     "properties": {
+     "siteId":"CYQY",
+     "name":"SYDNEY ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -68.2,49.1333333 ]
+     },
+     "properties": {
+     "siteId":"CYBC",
+     "name":"BAIE COMEAU (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -68.2166667,48.6166667 ]
+     },
+     "properties": {
+     "siteId":"CYYY",
+     "name":"MONT JOLI ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -64.4833333,48.7833333 ]
+     },
+     "properties": {
+     "siteId":"CYGP",
+     "name":"GASPE ARPT (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -63.6166667,50.2833333 ]
+     },
+     "properties": {
+     "siteId":"CYGV",
+     "name":"HAVRE ST-PIERRE (AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -61.7833333,50.1833333 ]
+     },
+     "properties": {
+     "siteId":"CYNA",
+     "name":"NATASHQUAN"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -59.9666667,43.9333333 ]
+     },
+     "properties": {
+     "siteId":"CWSA",
+     "name":"SABLE ISLAND"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -65.75,47.6333333 ]
+     },
+     "properties": {
+     "siteId":"CZBF",
+     "name":"BATHURST ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -61.7833333,47.4166667 ]
+     },
+     "properties": {
+     "siteId":"CYGR",
+     "name":"ILES DE LA MADELEINE (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -84.5166667,46.4833333 ]
+     },
+     "properties": {
+     "siteId":"CYAM",
+     "name":"SAULT STE. MARIE (WO4)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -80.7833333,46.6166667 ]
+     },
+     "properties": {
+     "siteId":"CYSB",
+     "name":"SUDBURY ARPT (WO4)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -79.4166667,46.3666667 ]
+     },
+     "properties": {
+     "siteId":"CYYB",
+     "name":"NORTH BAY (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -78.8333333,48.2 ]
+     },
+     "properties": {
+     "siteId":"CYUY",
+     "name":"ROUYN ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.7833333,48.05 ]
+     },
+     "properties": {
+     "siteId":"CYVO",
+     "name":"VAL D'OR ARPT (FSS/NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -81.3833333,48.5666667 ]
+     },
+     "properties": {
+     "siteId":"CYTS",
+     "name":"TIMMINS ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -82.4666667,49.4166667 ]
+     },
+     "properties": {
+     "siteId":"CYYU",
+     "name":"KAPUSKASING ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -82.9666667,42.2666667 ]
+     },
+     "properties": {
+     "siteId":"CYQG",
+     "name":"WINDSOR ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -81.15,43.0333333 ]
+     },
+     "properties": {
+     "siteId":"CYXU",
+     "name":"LONDON ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -79.9333333,43.1666667 ]
+     },
+     "properties": {
+     "siteId":"CYHM",
+     "name":"HAMILTON ARPT (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -79.6,43.6666667 ]
+     },
+     "properties": {
+     "siteId":"CYYZ",
+     "name":"TORONTO/PEARSON INTL (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -79.4,43.6333333 ]
+     },
+     "properties": {
+     "siteId":"CYTZ",
+     "name":"TORONTO CITY CENTRE (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -78.9,43.9166667 ]
+     },
+     "properties": {
+     "siteId":"CYOO",
+     "name":"OSHAWA NCA"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -80.3833333,43.4666667 ]
+     },
+     "properties": {
+     "siteId":"CYKF",
+     "name":"KITCHENER/WATERLO NCA"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -80.6,51.2833333 ]
+     },
+     "properties": {
+     "siteId":"CYMO",
+     "name":"MOOSONEE ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -78.75,51.4833333 ]
+     },
+     "properties": {
+     "siteId":"CYKQ",
+     "name":"WASKAGANISH ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.7,53.6333333 ]
+     },
+     "properties": {
+     "siteId":"CYGL",
+     "name":"LA GRANDE RIVIERE"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.7666667,55.2833333 ]
+     },
+     "properties": {
+     "siteId":"CYGW",
+     "name":"KUUJJUARAPIK ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -78.0833333,58.4666667 ]
+     },
+     "properties": {
+     "siteId":"CYPH",
+     "name":"INUKJUAK (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -68.4166667,58.1166667 ]
+     },
+     "properties": {
+     "siteId":"CYVP",
+     "name":"KUUJJUAQ ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -82.5666667,45.8833333 ]
+     },
+     "properties": {
+     "siteId":"CYZE",
+     "name":"GORE BAY ARPT (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -79.85,47.7 ]
+     },
+     "properties": {
+     "siteId":"CYXR",
+     "name":"EARLTON ARPT (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -84.7833333,47.9666667 ]
+     },
+     "properties": {
+     "siteId":"CYXZ",
+     "name":"WAWA ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -86.35,48.75 ]
+     },
+     "properties": {
+     "siteId":"CYSP",
+     "name":"MARATHON A (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -83.35,47.8166667 ]
+     },
+     "properties": {
+     "siteId":"CYLD",
+     "name":"CHAPLEAU ARPT (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -79.1666667,43.2 ]
+     },
+     "properties": {
+     "siteId":"CYSN",
+     "name":"ST. CATHARINES ARPT (WO4/ATO)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -82.3166667,43 ]
+     },
+     "properties": {
+     "siteId":"CYZR",
+     "name":"SARNIA ARPT (AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -81.1,44.75 ]
+     },
+     "properties": {
+     "siteId":"CYVV",
+     "name":"WIARTON ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -71.6833333,45.4333333 ]
+     },
+     "properties": {
+     "siteId":"CYSC",
+     "name":"SHERBROOKE ARPT (ATI/AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -78.3666667,44.2333333 ]
+     },
+     "properties": {
+     "siteId":"CYPQ",
+     "name":"PETERBOROUGH (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -57.3833333,49.2166667 ]
+     },
+     "properties": {
+     "siteId":"CYDF",
+     "name":"DEER LAKE ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -56.1,51.3833333 ]
+     },
+     "properties": {
+     "siteId":"CYAY",
+     "name":"ST ANTHONY ARPT (ATI)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -57.1833333,51.45 ]
+     },
+     "properties": {
+     "siteId":"CYBX",
+     "name":"BLANC SABLON ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -55.8333333,52.3166667 ]
+     },
+     "properties": {
+     "siteId":"CYMH",
+     "name":"MARY'S HARBOUR (NC)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -57.0333333,53.6833333 ]
+     },
+     "properties": {
+     "siteId":"CYCA",
+     "name":"CARTWRIGHT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -66.8,54.8 ]
+     },
+     "properties": {
+     "siteId":"CYKL",
+     "name":"SCHEFFERVILLE (AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -61.6833333,56.55 ]
+     },
+     "properties": {
+     "siteId":"CYDP",
+     "name":"NAIN ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -66.8666667,52.9333333 ]
+     },
+     "properties": {
+     "siteId":"CYWK",
+     "name":"WABUSH LAKE ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -64.1,53.5666667 ]
+     },
+     "properties": {
+     "siteId":"CZUM",
+     "name":"CHURCHILL FALLS (AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -110.2833333,54.4 ]
+     },
+     "properties": {
+     "siteId":"CYOD",
+     "name":"COLD LAKE"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -79.9166667,44.2666667 ]
+     },
+     "properties": {
+     "siteId":"CYBN",
+     "name":"BORDEN (WSD/AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -62.2833333,82.5166667 ]
+     },
+     "properties": {
+     "siteId":"CYLT",
+     "name":"ALERT ARPT (AW5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -124.9,49.7166667 ]
+     },
+     "properties": {
+     "siteId":"CYQQ",
+     "name":"COMOX"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.3166667,45.95 ]
+     },
+     "properties": {
+     "siteId":"CYWA",
+     "name":"PETAWAWA (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -64.9166667,44.9833333 ]
+     },
+     "properties": {
+     "siteId":"CYZX",
+     "name":"GREENWOOD ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -66.4333333,45.8333333 ]
+     },
+     "properties": {
+     "siteId":"CYCX",
+     "name":"GAGETOWN (WSD/AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -71,48.3333333 ]
+     },
+     "properties": {
+     "siteId":"CYBG",
+     "name":"BAGOTVILLE"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -77.5333333,44.1166667 ]
+     },
+     "properties": {
+     "siteId":"CYTR",
+     "name":"TRENTON"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -60.3666667,53.3 ]
+     },
+     "properties": {
+     "siteId":"CYYR",
+     "name":"GOOSE BAY ARPT (WS2)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -71.5,46.9 ]
+     },
+     "properties": {
+     "siteId":"CYOY",
+     "name":"VALCARTIER (WSD/AU5)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -98.2666667,49.9 ]
+     },
+     "properties": {
+     "siteId":"CYPG",
+     "name":"PORTAGE LA PRAIRIE/SOUTHPORT (CON)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -105.5666667,50.3333333 ]
+     },
+     "properties": {
+     "siteId":"CYMJ",
+     "name":"MOOSE JAW"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -109.7666667,48.55 ]
+     },
+     "properties": {
+     "siteId":"KHVR",
+     "name":"HAVRE (AMOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -106.6166667,48.2166667 ]
+     },
+     "properties": {
+     "siteId":"KGGW",
+     "name":"GLASGOW INTL ARPT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -105.5833333,48.1 ]
+     },
+     "properties": {
+     "siteId":"KOLF",
+     "name":"WOLF POINT INTL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -103.6,48.1666667 ]
+     },
+     "properties": {
+     "siteId":"KISN",
+     "name":"WILLISTON/SLOULIN"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -116.8166667,47.7666667 ]
+     },
+     "properties": {
+     "siteId":"KCOE",
+     "name":"COEUR D'ALENE(AWOS)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -105.8666667,46.4333333 ]
+     },
+     "properties": {
+     "siteId":"KMLS",
+     "name":"MILES CITY"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -102.8,46.8 ]
+     },
+     "properties": {
+     "siteId":"KDIK",
+     "name":"DICKINSON MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -100.75,46.7666667 ]
+     },
+     "properties": {
+     "siteId":"KBIS",
+     "name":"BISMARCK MUNICIPAL"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -93.3833333,48.5666667 ]
+     },
+     "properties": {
+     "siteId":"KINL",
+     "name":"INTERNATIONAL FALLS"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -92.8333333,47.3833333 ]
+     },
+     "properties": {
+     "siteId":"KHIB",
+     "name":"HIBBING-CHISHOLM"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -82.0833333,42.3 ]
+     },
+     "properties": {
+     "siteId":"CYCK",
+     "name":"CHATHAM-KENT"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -120.5166667,49.4666667 ]
+     },
+     "properties": {
+     "siteId":"CYDC",
+     "name":"PRINCETON ARPT (NCH)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -121.5833333,50.2333333 ]
+     },
+     "properties": {
+     "siteId":"CWLY",
+     "name":"LYTTON (NCA)"
+     }
+   },
+   {
+     "type": "Feature",
+     "geometry": {
+        "type": "Point",
+        "coordinates":  [ -121.4833333,49.3666667 ]
+     },
+     "properties": {
+     "siteId":"CYHE",
+     "name":"HOPE ARPT (AU5)"
+     }
+   }
+ ]
+ }

@@ -13,6 +13,11 @@ const buttonVariants = cva(
         selected: "bg-accent text-accent-foreground hover:bg-accent/40",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        drawer:
+          "bg-neutral-200 w-full text-black hover:bg-accent hover:text-white [&.active]:bg-accent  [&.active]:text-white rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md",
+        expandingIcon:
+          "bg-primary text-white whitespace-nowrap overflow-hidden w-fit not-hover:w-10 h-10 items-center not-hover:*:me-6 border-1 border-neutral-400",
+        ghost: "bg-transparent text-primary-foreground hover:text-accent",
       },
       size: {
         default: "min-h-10 px-4 py-2",
@@ -28,6 +33,10 @@ const buttonVariants = cva(
   }
 );
 
+// helper type for button variants
+export type ButtonVariantList = NonNullable<VariantProps<typeof buttonVariants>["variant"]>;
+export type ButtonSizeList = NonNullable<VariantProps<typeof buttonVariants>["size"]>;
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
@@ -42,4 +51,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
-export { Button, buttonVariants };
+export default Button;

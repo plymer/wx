@@ -75,3 +75,18 @@ export const GEOMET_GETMAP: string =
   "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&LAYERS_REFRESH_RATE=PT1M&layers=";
 export const GEOMET_GETCAPABILITIES: string =
   "https://geo.weather.gc.ca/geomet/?lang=en&service=WMS&request=GetCapabilities&version=1.3.0&LAYERS_REFRESH_RATE=PT1M&layers=";
+
+export const MAP_PROJECTIONS = ["mercator", "globe"] as const;
+export type MapProjections = (typeof MAP_PROJECTIONS)[number];
+
+export const MAP_LINES = ["gfa", "lgf", "fir", "tafs", "bedposts", "publicRegions", "marineRegions"] as const;
+export type MapLines = (typeof MAP_LINES)[number];
+
+export const MAP_OPTIONS_TABS = ["projection", "overlays"] as const;
+export type MapOptionsTabs = (typeof MAP_OPTIONS_TABS)[number];
+
+export const LAYER_TABS = ["satellite", "radar", "other"] as const;
+export type LayerTabs = (typeof LAYER_TABS)[number];
+
+export const ZOOM_THRESHOLDS = { mini: 2.25, reduced: 4.5, maximum: 6 } as const;
+export type ZoomThresholds = keyof typeof ZOOM_THRESHOLDS;

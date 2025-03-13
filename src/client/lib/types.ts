@@ -1,69 +1,67 @@
 // custom type definitions
 
+import { MapLines } from "../config/map";
+import { VectorDataTypes } from "../config/vectorData";
+
 export type AnimationState = "playing" | "loading" | "paused" | "stopped";
 
-export type APIResponse = {
+export type APIResponse<TData> = {
   status: "error" | "success";
+  error?: any;
+  data?: TData;
 };
 
-export type SiteData = APIResponse & {
-  metadata: {
-    icaoId: string;
-    location: string;
-    lat: string;
-    lon: string;
-    elev_f: string;
-    elev_m: string;
-    sunrise: string;
-    sunset: string;
-  };
+export type SiteData = {
+  icaoId: string;
+  location: string;
+  lat: string;
+  lon: string;
+  elev_f: string;
+  elev_m: string;
+  sunrise: string;
+  sunset: string;
 };
 
-export type TAFData = APIResponse & {
-  taf: {
-    main: string;
-    partPeriods: string[];
-    rmk: string;
-  };
+export type TAFData = {
+  taf: string;
 };
 
-export type METAR = APIResponse & {
+export type ParsedTAF = {
+  main: string | undefined;
+  partPeriods: string[] | undefined;
+  rmk: string | undefined;
+};
+
+export type METAR = {
   metars: string[];
 };
 
-export type GFAData = APIResponse & {
+export type GFAData = {
   domain: string;
   cldwx: string[];
   turbc: string[];
 };
 
-export type OtherChartData = APIResponse & {
+export type OtherChartData = {
   domain: string;
   images: string[];
 };
 
-export type HubData = APIResponse & {
-  hubData: {
-    siteName: string;
-    header: string;
-    discussion: string;
-    outlook: string;
-    forecaster: string;
-    office: string;
-  };
+export type HubData = {
+  siteName: string;
+  header: string;
+  discussion: string;
+  outlook: string;
+  forecaster: string;
+  office: string;
 };
 
-export type GeoMetData = APIResponse & {
-  timeStep: number;
-  timesAvailable: number[];
-  layers: LayerData[];
-};
-
-export type LayerData = {
+// this replaces 'LayerData' for the raster layers
+export type RasterLayerData = {
   name: string;
   domain: "national" | "west" | "east";
   type: string;
-  timeSteps: string[];
+  timeSteps: { validTime: number }[];
 };
 
 export type MapLayerConfig = {
@@ -72,20 +70,36 @@ export type MapLayerConfig = {
 };
 
 // used to define the vector data (TODO: rename)
-export type VectorDataOption = {
+export type ToggleDataOption = {
+  type: VectorDataTypes | MapLines;
   name: string;
   state: boolean;
   toggle: () => void;
 };
 
 export type GeoJSON = {
-  features: {
-    geometry: {
-      coordinates: [number, number] | [number, number][];
-      type: "Point" | "LineString" | "Polygon" | "MultiPoint" | "MultiLineString" | "MultiPolygon";
-    };
-    properties: Object;
-    type: "Feature";
-  }[];
+  features: GeoJSONFeature[];
   type: "FeatureCollection";
+};
+
+export type GeoJSONFeature = {
+  geometry: {
+    coordinates: number[] | number[][] | number[][][][];
+    type: GeoJSONFeatureTypes;
+  };
+  properties: Record<string, any>;
+  type: "Feature";
+};
+
+export type GeoJSONFeatureTypes =
+  | "Point"
+  | "LineString"
+  | "Polygon"
+  | "MultiPoint"
+  | "MultiLineString"
+  | "MultiPolygon";
+
+export type OverlayOptions = {
+  layout?: Object;
+  paint?: Object;
 };

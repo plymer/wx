@@ -7,15 +7,16 @@ interface VectorStateStore {
   showPIREPs: boolean;
   showSIGMETs: boolean;
   showAIRMETs: boolean;
-
-  toggleLightning: () => void;
-  toggleObs: () => void;
-  togglePIREPs: () => void;
-  toggleSIGMETs: () => void;
-  toggleAIRMETs: () => void;
+  actions: {
+    toggleLightning: () => void;
+    toggleObs: () => void;
+    togglePIREPs: () => void;
+    toggleSIGMETs: () => void;
+    toggleAIRMETs: () => void;
+  };
 }
 
-export const useVectorData = create<VectorStateStore>()(
+const useVectorData = create<VectorStateStore>()(
   persist(
     (set) => ({
       // initial values
@@ -24,14 +25,13 @@ export const useVectorData = create<VectorStateStore>()(
       showPIREPs: true,
       showSIGMETs: true,
       showAIRMETs: true,
-
-      // declare methods to change animation state
-
-      toggleLightning: () => set((state) => ({ showLightning: !state.showLightning })),
-      toggleObs: () => set((state) => ({ showObs: !state.showObs })),
-      togglePIREPs: () => set((state) => ({ showPIREPs: !state.showPIREPs })),
-      toggleSIGMETs: () => set((state) => ({ showSIGMETs: !state.showSIGMETs })),
-      toggleAIRMETs: () => set((state) => ({ showAIRMETs: !state.showAIRMETs })),
+      actions: {
+        toggleLightning: () => set((state) => ({ showLightning: !state.showLightning })),
+        toggleObs: () => set((state) => ({ showObs: !state.showObs })),
+        togglePIREPs: () => set((state) => ({ showPIREPs: !state.showPIREPs })),
+        toggleSIGMETs: () => set((state) => ({ showSIGMETs: !state.showSIGMETs })),
+        toggleAIRMETs: () => set((state) => ({ showAIRMETs: !state.showAIRMETs })),
+      },
     }),
     {
       partialize: (state) =>
@@ -41,10 +41,17 @@ export const useVectorData = create<VectorStateStore>()(
           showPIREPs: state.showPIREPs,
           showAIRMETs: state.showAIRMETs,
           showSIGMETs: state.showSIGMETs,
-        }) as Partial<VectorStateStore>,
+        } as Partial<VectorStateStore>),
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as VectorStateStore) }),
       name: "vectorDataOptions",
       storage: createJSONStorage(() => localStorage),
-    },
-  ),
+    }
+  )
 );
+
+export const useShowLightning = () => useVectorData((state) => state.showLightning);
+export const useShowObs = () => useVectorData((state) => state.showObs);
+export const useShowPIREPs = () => useVectorData((state) => state.showPIREPs);
+export const useShowSIGMETs = () => useVectorData((state) => state.showSIGMETs);
+export const useShowAIRMETs = () => useVectorData((state) => state.showAIRMETs);
+export const useVectorActions = () => useVectorData((state) => state.actions);

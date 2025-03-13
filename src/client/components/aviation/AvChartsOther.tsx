@@ -1,16 +1,18 @@
 import { AVIATION_PRODUCTS, Products } from "../../config/aviationProducts";
-import { OtherChartData } from "../../lib/types";
+import { APIResponse, OtherChartData } from "../../lib/types";
 import { useAviation } from "../../stateStores/aviation";
-import { Button } from "../ui/button";
+import Button from "../ui/button";
 
 import AvImageContainer from "./AvImageContainer";
 
 interface Props {
   product: Products;
-  data?: OtherChartData[];
+  data?: APIResponse<OtherChartData[]>;
 }
 
 const AvChartsOther = ({ product, data }: Props) => {
+  if (!data || !data.data) return;
+
   // get our state variables and mutation
   const domain = useAviation((state) => state.domain);
   const setDomain = useAviation((state) => state.setDomain);
@@ -29,7 +31,7 @@ const AvChartsOther = ({ product, data }: Props) => {
   // default it back to the first domain in the domainList
   !currentProduct && domainList[0] && setDomain(domainList[0].domain);
 
-  const currentProductData = data?.find((d) => d.domain === domain);
+  const currentProductData = data.data.find((d) => d.domain === domain);
 
   // if our current timeStep is greater than the number of timeSteps available in our data layer
   // default it back to the highest available timeStep
@@ -62,7 +64,7 @@ const AvChartsOther = ({ product, data }: Props) => {
         <label className="me-4">Forecasts:</label>
         <div>
           {currentProduct &&
-            data?.map(
+            data.data.map(
               (p) =>
                 p.domain === currentProduct.domain &&
                 p.images.map((u, i) => (
