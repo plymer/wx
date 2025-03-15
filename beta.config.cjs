@@ -7,7 +7,6 @@ module.exports = {
       script: path.resolve(__dirname, "dist/main.js"),
       instances: "max", // Use 'max' to scale to all available CPU cores
       exec_mode: "cluster",
-      watch: true,
       log_date_format: "YYYY-MM-DD HH:mm Z",
       error_file: "./logs/app-error.log",
       out_file: "./logs/app-out.log",
