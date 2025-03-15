@@ -16,7 +16,7 @@ const isProd = process.env.NODE_ENV === "production";
 
 // get the content of the index.html so we can serve it from the root
 // TODO :: set this up to serve all files out of /dist just like in the HubWx implementation
-let html = readFileSync(isProd ? "/dist/index.html" : "index.html", "utf8");
+let html = readFileSync(isProd ? "dist/index.html" : "index.html", "utf8");
 
 // inject vite dev server if we're not in production mode
 if (!isProd) html = injectViteDevServer(html);
@@ -25,6 +25,7 @@ if (!isProd) html = injectViteDevServer(html);
 const app = new Hono({ strict: false });
 
 app.get("/assets/*", serveStatic({ root: isProd ? "./dist" : "./" }));
+app.get("/*", serveStatic({root: isProd ? "./dist" : "./"}));
 
 // add our api routes here
 app.route("/api", geomet);
