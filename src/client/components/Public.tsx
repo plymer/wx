@@ -46,7 +46,7 @@ export default function Public() {
   });
 
   return (
-    <div className="p-2 bg-neutral-800 text-white">
+    <div className="p-2 bg-neutral-800 text-white text-sm">
       <div className="flex items-center ">
         <h3 className="inline-block">Office:</h3>
         <div className="ms-2 min-w-fit w-full inline-block">
@@ -87,8 +87,8 @@ export default function Public() {
 
       {productList[(productCode + issuerCode) as keyof typeof productList] && data && data.data ? (
         <pre
-          className="overflow-y-scroll whitespace-pre-wrap text-sm md:px-6"
-          style={{ height: "calc(100svh - 11.2rem)" }}
+          className="overflow-y-scroll whitespace-pre-wrap md:px-6 max-md:pb-12"
+          style={{ height: "calc(100svh - 10.75rem)" }}
         >
           {data.data.trim()}
         </pre>

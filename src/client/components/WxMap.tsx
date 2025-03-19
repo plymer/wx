@@ -35,7 +35,7 @@ export default function WxMap() {
 
   // TODO :: fix the small gap of a few px when the map is first loading because the wrapper div below does not actually cover the entire height of the map
   return (
-    <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height)">
+    <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height) text-sm">
       <MapInstance viewState={viewState} mapProjection={projection} animationState={animationState} basemap={mapStyle}>
         <>
           <AttributionControl compact position="top-right" />
@@ -46,7 +46,7 @@ export default function WxMap() {
           {loadingState && (
             <LoadingIndicator
               displayText="Loading"
-              className="absolute top-0 left-0 ms-2 mt-2 text-white bg-transparent"
+              className="absolute top-0 left-0 ms-2 mt-2 text-white bg-transparent drop-shadow-lg"
             />
           )}
         </>

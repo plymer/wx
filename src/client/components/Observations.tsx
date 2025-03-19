@@ -56,7 +56,7 @@ export default function Observations() {
 
   return (
     <>
-      <div className="flex justify-around bg-neutral-800 text-white p-2">
+      <div className="flex justify-around bg-neutral-800 text-white p-2 text-sm">
         <div className="flex place-items-center">
           <label htmlFor="site" className="text-white flex place-items-center">
             <Search className="w-4 h-4 me-2 inline" />
@@ -67,7 +67,7 @@ export default function Observations() {
             type="text"
             minLength={2}
             maxLength={4}
-            className="ms-2 w-24 text-black text-center text-base uppercase rounded-e-none font-mono"
+            className="ms-2 w-24 text-black text-center text-sm uppercase rounded-e-none font-mono"
             autoComplete="off"
             autoCorrect="false"
             spellCheck="false"
@@ -100,7 +100,7 @@ export default function Observations() {
         </div>
       </div>
 
-      <div className="overflow-y-scroll" style={{ height: "calc(100svh - 6.5rem)" }}>
+      <div className="overflow-y-scroll text-sm" style={{ height: "calc(100svh - 6.5rem)" }}>
         {metarData && <METARs site={site} data={parsedMetars} fetchStatus={metarFetchStatus} />}
         {metaData && <SiteMetadata site={site} data={metaData.data} fetchStatus={metaFetchStatus} />}
         {tafData && <TAF site={site} data={parsedTaf} fetchStatus={tafFetchStatus} />}
