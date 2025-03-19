@@ -14,6 +14,7 @@ import {
 } from "../stateStores/map/mapView";
 import { AttributionControl, ViewState } from "react-map-gl/maplibre";
 import LoadingIndicator from "./ui/LoadingIndicator";
+import MapOptions from "./map/MapOptions";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -38,7 +39,10 @@ export default function WxMap() {
       <MapInstance viewState={viewState} mapProjection={projection} animationState={animationState} basemap={mapStyle}>
         <>
           <AttributionControl compact position="top-right" />
-          <RealtimeOptions className="absolute bottom-0 left-0 m-2" />
+          <div className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
+            <RealtimeOptions />
+            <MapOptions />
+          </div>
           {loadingState && (
             <LoadingIndicator
               displayText="Loading"

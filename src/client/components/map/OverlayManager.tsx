@@ -61,6 +61,7 @@ const OverlayManager = () => {
     <>
       {firOverlay && (
         <MapOverlay
+          key={"firBoundaries"}
           id="fir-boundaries"
           // @ts-ignore
           data={firBoundaries}
@@ -70,6 +71,7 @@ const OverlayManager = () => {
       )}
       {gfaOverlay && (
         <MapOverlay
+          key={"gfaBoundaries"}
           id="gfa-boundaries"
           // @ts-ignore
           data={gfaBoundaries}
@@ -79,6 +81,7 @@ const OverlayManager = () => {
       )}
       {lgfOverlay && (
         <MapOverlay
+          key={"lgfBoundaries"}
           id="lgf-boundaries"
           // @ts-ignore
           data={lgfBoundaries}
@@ -87,21 +90,39 @@ const OverlayManager = () => {
         />
       )}
       {bedpostsOverlay && (
-        // @ts-ignore
-        <MapOverlay id="bedposts" data={bedposts} overlayType="symbol" overlayOptions={BEDPOST_OVERLAY} />
-      )}
-      {tafsOverlay && (
-        // @ts-ignore
-        <MapOverlay id="tafSites" data={tafSites} overlayType="symbol" overlayOptions={TAF_OVERLAY} />
+        <MapOverlay
+          key={"bedposts"}
+          id="bedposts"
+          // @ts-ignore
+          data={bedposts}
+          overlayType="symbol"
+          overlayOptions={BEDPOST_OVERLAY}
+        />
       )}
       {publicRegionsOverlay && (
-        // @ts-ignore
-        <MapOverlay id="publicRegions" data={publicRegions} overlayType="line" overlayOptions={PUBLIC_OVERLAY} />
+        <MapOverlay
+          key={"publicRegions"}
+          id="publicRegions"
+          // @ts-ignore
+          data={publicRegions}
+          overlayType="line"
+          overlayOptions={PUBLIC_OVERLAY}
+        />
       )}
 
       {marineRegionsOverlay && (
+        <MapOverlay
+          key={"marineRegions"}
+          id="marineRegions"
+          // @ts-ignore
+          data={marineRegions}
+          overlayType="line"
+          overlayOptions={MARINE_OVERLAY}
+        />
+      )}
+      {tafsOverlay && (
         // @ts-ignore
-        <MapOverlay id="marineRegions" data={marineRegions} overlayType="line" overlayOptions={MARINE_OVERLAY} />
+        <MapOverlay key={"tafSites"} id="tafSites" data={tafSites} overlayType="symbol" overlayOptions={TAF_OVERLAY} />
       )}
 
       {/* {popupData && (

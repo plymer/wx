@@ -1,7 +1,7 @@
 // third-party libraries
 import { useRef } from "react";
 import { RefreshCw, Search } from "lucide-react";
-import { useObservations } from "../stateStores/observations";
+import { useHours, useObsActions, useSite } from "../stateStores/observations";
 import useAPI from "../hooks/useAPI";
 import { METAR, ParsedTAF, SiteData, TAFData } from "../lib/types";
 import { Input } from "./ui/input";
@@ -17,23 +17,23 @@ export default function Observations() {
   // create a ref to the siteId text input
   const siteId = useRef("");
 
-  const highlightSigWx = useHighlightSigWx().highlightSigWx;
-
   // use a context to store state so that when we come back to this tab it restores our obs/taf search
-  const obs = useObservations((state) => state);
+  const actions = useObsActions();
+  const site = useSite();
+  const hours = useHours();
 
   // hours that are available as options in the dropdown list
   const HOURS: number[] = [6, 12, 18, 24, 36, 48, 96];
 
   // fetch all data within the route and then pass it to the child components for each data type
   const { data: metarData, fetchStatus: metarFetchStatus } = useAPI<METAR>("/alpha/metars", {
-    site: obs.site,
-    hrs: obs.hours,
+    site: site,
+    hrs: hours,
   });
 
-  const { data: metaData, fetchStatus: metaFetchStatus } = useAPI<SiteData>("/alpha/sitedata", { site: obs.site });
+  const { data: metaData, fetchStatus: metaFetchStatus } = useAPI<SiteData>("/alpha/sitedata", { site: site });
 
-  const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("/alpha/taf", { site: obs.site });
+  const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("/alpha/taf", { site: site });
 
   const parsedMetars =
     metarData && metarData.data && (metarData.data.metars.map((m) => formatSigWx(m, "metar")) as string[]);
@@ -46,11 +46,11 @@ export default function Observations() {
     // for 2-letter idents, assume we are doing a major canadian site and prepend with "cy"
     // for 3-letter idents, assume we are doing a canadian site and prepend with "c"
     if (input.length === 4) {
-      obs.setSite(input);
+      actions.setSite(input);
     } else if (input.length === 3) {
-      obs.setSite("c" + input);
+      actions.setSite("c" + input);
     } else if (input.length === 2) {
-      obs.setSite("cy" + input);
+      actions.setSite("cy" + input);
     }
   }
 
@@ -68,9 +68,10 @@ export default function Observations() {
             minLength={2}
             maxLength={4}
             className="ms-2 w-24 text-black text-center text-base uppercase rounded-e-none font-mono"
-            autoComplete="false"
+            autoComplete="off"
+            autoCorrect="false"
             spellCheck="false"
-            defaultValue={obs.site}
+            defaultValue={site}
             onChange={(e) => (siteId.current = e.currentTarget.value)}
             onKeyDown={(e) => (e.key === "Enter" ? handleInputText(e.currentTarget.value) : "")}
             onClick={(e) => (e.currentTarget.value = "")}
@@ -84,9 +85,9 @@ export default function Observations() {
             <RefreshCw className="w-4 h-4 me-2 inline" />
             Load
           </Button>
-          <Select onValueChange={(e) => obs.setHours(parseInt(e))} defaultValue={obs.hours.toString()}>
+          <Select onValueChange={(e) => actions.setHours(parseInt(e))} defaultValue={hours.toString()}>
             <SelectTrigger className="text-black">
-              <SelectValue placeholder={obs.hours + " hrs"} />
+              <SelectValue placeholder={hours + " hrs"} />
             </SelectTrigger>
             <SelectContent>
               {HOURS.map((h, i) => (
@@ -100,9 +101,9 @@ export default function Observations() {
       </div>
 
       <div className="overflow-y-scroll" style={{ height: "calc(100svh - 6.5rem)" }}>
-        {metarData && <METARs site={obs.site} data={parsedMetars} fetchStatus={metarFetchStatus} />}
-        {metaData && <SiteMetadata site={obs.site} data={metaData.data} fetchStatus={metaFetchStatus} />}
-        {tafData && <TAF site={obs.site} data={parsedTaf} fetchStatus={tafFetchStatus} />}
+        {metarData && <METARs site={site} data={parsedMetars} fetchStatus={metarFetchStatus} />}
+        {metaData && <SiteMetadata site={site} data={metaData.data} fetchStatus={metaFetchStatus} />}
+        {tafData && <TAF site={site} data={parsedTaf} fetchStatus={tafFetchStatus} />}
       </div>
     </>
   );

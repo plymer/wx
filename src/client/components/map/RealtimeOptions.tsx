@@ -98,8 +98,8 @@ export default function RealtimeOptions({ className }: Props) {
         <DrawerTitle content="Realtime Data Options" />
         <DrawerDescription content="Change how and what realtime data is being displayed" />
         <DrawerTrigger asChild>
-          <Button variant={"default"} className={className}>
-            <MapIcon />
+          <Button variant="floatingIcon" className={className}>
+            <Layers />
           </Button>
         </DrawerTrigger>
         <DrawerContent className="border-black bg-gray-800 text-white">

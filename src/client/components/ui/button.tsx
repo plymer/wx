@@ -15,8 +15,7 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         drawer:
           "bg-neutral-200 w-full text-black hover:bg-accent hover:text-white [&.active]:bg-accent  [&.active]:text-white rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md",
-        expandingIcon:
-          "bg-primary text-white whitespace-nowrap overflow-hidden w-fit not-hover:w-10 h-10 items-center not-hover:*:me-6 border-1 border-neutral-400",
+        floatingIcon: "bg-primary hover:bg-accent text-white w-10 h-10 items-center border-1 border-neutral-400",
         ghost: "bg-transparent text-primary-foreground hover:text-accent",
       },
       size: {

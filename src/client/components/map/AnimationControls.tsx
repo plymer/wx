@@ -199,7 +199,7 @@ const AnimationControls = () => {
                 );
             })}
           </div>
-          <div className="ms-2 inline-flex items-center">
+          {/* <div className="ms-2 inline-flex items-center">
             <label htmlFor="framerate" className="me-2">
               FPS:
             </label>
@@ -214,7 +214,7 @@ const AnimationControls = () => {
                 animationActions.setFrameRate(parseInt(e.target.value));
               }}
             />
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="flex py-4 ps-4 place-items-center">
@@ -222,7 +222,7 @@ const AnimationControls = () => {
           animationState="realtime"
           onClick={() => doAnimateCommand("realtime")}
           type="realtime"
-          text="Realtime Mode"
+          text="Now"
         />
       </div>
     </div>
