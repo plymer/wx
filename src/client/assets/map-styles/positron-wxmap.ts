@@ -39,7 +39,7 @@ export const positronWxMap: StyleSpecification = {
   },
   sprite: [
     { id: "default", url: "https://openmaptiles.github.io/positron-gl-style/sprite" },
-    { id: "windbarbs", url: `${PUBLIC_URL}/sprites/windbarbs` },
+    // { id: "windbarbs", url: `${PUBLIC_URL}/sprites/windbarbs` },
   ],
   glyphs: "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=xDuB4axhGsuzLiFvvDiF",
   layers: [
