@@ -20,3 +20,6 @@ dist/
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# other stuff
+*.tsbuildinfo
