@@ -14,12 +14,10 @@ export default function Aviation() {
   const hub = useHub();
   const actions = useAviationActions();
 
-  const { data: gfaData, fetchStatus: gfaFetchStatus } = useAPI<GFAData[]>("/charts/gfa", {});
-  const { data: lgfData, fetchStatus: lgfFetchStatus } = useAPI<OtherChartData[]>(`/charts/lgf`, {});
-  const { data: hltData, fetchStatus: hltFetchStatus } = useAPI<OtherChartData[]>(`/charts/hlt`, {});
-  const { data: sigwxData, fetchStatus: sigwxFetchStatus } = useAPI<OtherChartData[]>(`/charts/sigwx`, {});
-
-  console.log(gfaFetchStatus, lgfFetchStatus, hltFetchStatus, sigwxFetchStatus);
+  const { data: gfaData, fetchStatus: _gfaFetchStatus } = useAPI<GFAData[]>("/charts/gfa", {});
+  const { data: lgfData, fetchStatus: _lgfFetchStatus } = useAPI<OtherChartData[]>(`/charts/lgf`, {});
+  const { data: hltData, fetchStatus: _hltFetchStatus } = useAPI<OtherChartData[]>(`/charts/hlt`, {});
+  const { data: sigwxData, fetchStatus: _sigwxFetchStatus } = useAPI<OtherChartData[]>(`/charts/sigwx`, {});
 
   return (
     <>
