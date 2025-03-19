@@ -221,6 +221,10 @@ route.get("/public/bulletin", validateParams("query", publicBulletinSchema, {}),
       // because we're returning HTML, we need to actually yoink out the text between the two pre tags
       const bulletinText = bulletinData.match(/<pre>[\s\S]*?<\/pre>/g);
       bulletinData = bulletinText ? bulletinText[0].replace(/<pre>/g, "").replace(/<\/pre>/g, "") : "";
+
+      // if the bulletin contains any of the elevation references, remove those
+      const refPattern = /(\n[-]{2,})\n?((.+)\n){1,}([-]{2,})/g;
+      bulletinData = bulletinData.replace(refPattern, "");
     }
 
     return c.json(
