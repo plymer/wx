@@ -8,3 +8,5 @@ images/b737.png
 images/paspc.jpg
 images/source
 data/
+node_modules
+dist
