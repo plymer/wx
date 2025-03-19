@@ -66,7 +66,7 @@ export default function Public() {
       </div>
       <h3 className="border-b-2 border-white mb-2">Product Text:</h3>
       {Object.keys(productList).length !== 0 && data && data.data ? (
-        <pre className="overflow-y-scroll" style={{ height: "calc(100svh - 15.3rem)" }}>
+        <pre className="overflow-y-scroll whitespace-pre-wrap" style={{ height: "calc(100svh - 15.3rem)" }}>
           {data.data.trim()}
         </pre>
       ) : (
