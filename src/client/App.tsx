@@ -13,11 +13,13 @@ import Public from "./components/Public";
 
 // app mode configuration
 import { APP_MODES_LIST, AppMode } from "./config/modes";
+import { useAppMode, useSetAppMode } from "./stateStores/app";
 
 const appModesList: AppMode[] = Object.keys(APP_MODES_LIST).map((k) => k as AppMode);
 
 export const App = () => {
-  const [appMode, setAppMode] = useState<AppMode>("obs");
+  const appMode = useAppMode();
+  const setAppMode = useSetAppMode();
 
   return (
     <main className="w-full max-w-(--breakpoint-2xl) mx-auto">
