@@ -67,7 +67,8 @@ export default function Observations() {
             type="text"
             minLength={2}
             maxLength={4}
-            className="ms-2 w-24 text-black text-center text-sm uppercase rounded-e-none font-mono"
+            // text-base is required so that the mobile experience doesn't zoom to the input
+            className="ms-2 w-24 text-black text-center text-base uppercase rounded-e-none font-mono"
             autoComplete="off"
             autoCorrect="false"
             spellCheck="false"
