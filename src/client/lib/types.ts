@@ -1,6 +1,7 @@
 // custom type definitions
 
 import { MapLines } from "../config/map";
+import { PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { VectorDataTypes } from "../config/vectorData";
 
 export type AnimationState = "playing" | "loading" | "paused" | "stopped";
@@ -103,3 +104,7 @@ export type OverlayOptions = {
   layout?: Object;
   paint?: Object;
 };
+
+export type PublicBulletin = string;
+
+export type PublicForecastOffice = keyof typeof PUBLIC_FORECAST_CONFIG;

@@ -50,13 +50,10 @@ const useAPI = <TData>(
     return response as APIResponse<TData>;
   };
 
-  const searchParamKeys = Object.keys(searchParams);
+  // const searchParamKeys = Object.keys(searchParams);
 
   // make a unique query name for queries that need to be invalidated when the searchParams change
-  const queryKey =
-    searchParamKeys.includes("site") || searchParamKeys.includes("layers")
-      ? [queryName, JSON.stringify(searchParams)]
-      : [queryName];
+  const queryKey = [queryName, JSON.stringify(searchParams)];
 
   // destructure the queryObject from react-query to give us access to the params and methods we need
   return useQuery({

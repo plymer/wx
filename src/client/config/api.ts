@@ -58,6 +58,12 @@ export const API_CONFIG = {
       description: "returns a list of layers, with their valid times coordinated",
       params: [],
     },
+    {
+      data: "public bulletins",
+      url: "/alpha/public/bulletin",
+      description: "returns the public bulletin requested",
+      params: ["office", "bulletin"],
+    },
   ],
 } as const;
 
