@@ -2,7 +2,7 @@ import { Binoculars, Notebook, Pencil, Plane } from "lucide-react";
 import LoadingIndicator from "../ui/LoadingIndicator";
 
 import TAF from "../observations/TAF";
-import { useAviation } from "../../stateStores/aviation";
+import { useAviationActions } from "../../stateStores/aviation";
 import useAPI from "../../hooks/useAPI";
 import { HubData, ParsedTAF, TAFData } from "../../lib/types";
 import { formatSigWx } from "../../lib/utils";
@@ -13,7 +13,7 @@ interface Props {
 }
 
 const HubDiscussion = ({ hub }: Props) => {
-  const setHub = useAviation((state) => state.setHub);
+  const setHub = useAviationActions().setHub;
 
   const { data: hubData, fetchStatus: hubFetchStatus } = useAPI<HubData>("/alpha/hubs", { site: hub });
   const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>(

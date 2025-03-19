@@ -1,7 +1,7 @@
 import { Products } from "../config/aviationProducts";
 import useAPI from "../hooks/useAPI";
 import { GFAData, OtherChartData } from "../lib/types";
-import { useAviation } from "../stateStores/aviation";
+import { useAviationActions, useHub, useProduct } from "../stateStores/aviation";
 import AvChartsGFA from "./aviation/AvChartsGFA";
 import AvChartsOther from "./aviation/AvChartsOther";
 import HubDiscussion from "./aviation/HubDiscussion";
@@ -10,9 +10,9 @@ import Button from "./ui/button";
 export const PRODUCTS = ["gfa", "lgf", "hlt", "sigwx", "hubs"];
 
 export default function Aviation() {
-  const product = useAviation((state) => state.product);
-  const setProduct = useAviation((state) => state.setProduct);
-  const hub = useAviation((state) => state.hub);
+  const product = useProduct();
+  const hub = useHub();
+  const actions = useAviationActions();
 
   const { data: gfaData, fetchStatus: gfaFetchStatus } = useAPI<GFAData[]>("/charts/gfa", {});
   const { data: lgfData, fetchStatus: lgfFetchStatus } = useAPI<OtherChartData[]>(`/charts/lgf`, {});
@@ -31,7 +31,7 @@ export default function Aviation() {
               className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5"
               variant={product === c ? "selected" : "secondary"}
               key={i}
-              onClick={() => setProduct(c as Products)}
+              onClick={() => actions.setProduct(c as Products)}
             >
               {c.toUpperCase()}
             </Button>

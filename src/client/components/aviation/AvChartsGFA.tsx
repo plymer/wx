@@ -1,6 +1,6 @@
 import { AVIATION_PRODUCTS, ProductDomains, Products } from "../../config/aviationProducts";
 import { APIResponse, GFAData } from "../../lib/types";
-import { useAviation } from "../../stateStores/aviation";
+import { useAviationActions, useDomain, useSubProduct, useTimeStep } from "../../stateStores/aviation";
 import Button from "../ui/button";
 
 import AvImageContainer from "./AvImageContainer";
@@ -14,14 +14,10 @@ const AvChartsGFA = ({ product, data }: Props) => {
   if (!data || !data.data) return;
 
   // get our state variables and mutation
-  const domain = useAviation((state) => state.domain);
-  const setDomain = useAviation((state) => state.setDomain);
-
-  const subProduct = useAviation((state) => state.subProduct);
-  const setSubProduct = useAviation((state) => state.setSubProduct);
-
-  const timeStep = useAviation((state) => state.timeStep);
-  const setTimeStep = useAviation((state) => state.setTimeStep);
+  const domain = useDomain();
+  const subProduct = useSubProduct();
+  const timeStep = useTimeStep();
+  const actions = useAviationActions();
 
   // get our available domains for our currently selected product
   // we will use this to build the ui to switch between the different domains
@@ -32,7 +28,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
 
   // if our currentProduct is undefined, our current domain is not in the domainList
   // default it back to the first domain in the domainList
-  !currentProduct && domainList[0] && setDomain(domainList[0].domain);
+  !currentProduct && domainList[0] && actions.setDomain(domainList[0].domain);
 
   const currentProductData = data.data.find((d) => d.domain === domain);
 
@@ -48,7 +44,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
             variant={domain === r.domain ? "selected" : "secondary"}
             className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md"
             key={i}
-            onClick={() => setDomain(("gfacn3" + (i + 1).toString()) as ProductDomains)}
+            onClick={() => actions.setDomain(("gfacn3" + (i + 1).toString()) as ProductDomains)}
           >
             {r.domain.replace("gfacn", "gfa ").toUpperCase()}
           </Button>
@@ -68,8 +64,8 @@ const AvChartsGFA = ({ product, data }: Props) => {
                     key={i}
                     value={u}
                     onClick={() => {
-                      setSubProduct!("cldwx");
-                      setTimeStep(i);
+                      actions.setSubProduct!("cldwx");
+                      actions.setTimeStep(i);
                     }}
                   >
                     T+{i * currentProduct.timeDelta}
@@ -92,8 +88,8 @@ const AvChartsGFA = ({ product, data }: Props) => {
                     key={i}
                     value={u}
                     onClick={() => {
-                      setSubProduct!("turbc");
-                      setTimeStep(i);
+                      actions.setSubProduct!("turbc");
+                      actions.setTimeStep(i);
                     }}
                   >
                     T+{i * currentProduct.timeDelta}

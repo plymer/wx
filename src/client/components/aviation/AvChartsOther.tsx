@@ -1,6 +1,6 @@
 import { AVIATION_PRODUCTS, Products } from "../../config/aviationProducts";
 import { APIResponse, OtherChartData } from "../../lib/types";
-import { useAviation } from "../../stateStores/aviation";
+import { useAviationActions, useDomain, useTimeStep } from "../../stateStores/aviation";
 import Button from "../ui/button";
 
 import AvImageContainer from "./AvImageContainer";
@@ -14,11 +14,9 @@ const AvChartsOther = ({ product, data }: Props) => {
   if (!data || !data.data) return;
 
   // get our state variables and mutation
-  const domain = useAviation((state) => state.domain);
-  const setDomain = useAviation((state) => state.setDomain);
-
-  const timeStep = useAviation((state) => state.timeStep);
-  const setTimeStep = useAviation((state) => state.setTimeStep);
+  const domain = useDomain();
+  const timeStep = useTimeStep();
+  const actions = useAviationActions();
 
   // get our available domains for our currently selected product
   // we will use this to build the ui to switch between the different domains
@@ -29,7 +27,7 @@ const AvChartsOther = ({ product, data }: Props) => {
 
   // if our currentProduct is undefined, our current domain is not in the domainList
   // default it back to the first domain in the domainList
-  !currentProduct && domainList[0] && setDomain(domainList[0].domain);
+  !currentProduct && domainList[0] && actions.setDomain(domainList[0].domain);
 
   const currentProductData = data.data.find((d) => d.domain === domain);
 
@@ -37,7 +35,7 @@ const AvChartsOther = ({ product, data }: Props) => {
   // default it back to the highest available timeStep
   currentProductData &&
     timeStep > currentProductData.images.length - 1 &&
-    setTimeStep(currentProductData.images.length - 1);
+    actions.setTimeStep(currentProductData.images.length - 1);
 
   // build the image url
   const imageUrl = currentProductData?.images[timeStep];
@@ -52,7 +50,7 @@ const AvChartsOther = ({ product, data }: Props) => {
             className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-w-96"
             key={i}
             onClick={() => {
-              setDomain(d.domain);
+              actions.setDomain(d.domain);
             }}
           >
             <span className="md:hidden">{d.shortName}</span>
@@ -74,7 +72,7 @@ const AvChartsOther = ({ product, data }: Props) => {
                     key={i}
                     value={u}
                     onClick={() => {
-                      setTimeStep(i);
+                      actions.setTimeStep(i);
                     }}
                   >
                     T+
