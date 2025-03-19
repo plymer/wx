@@ -25,7 +25,7 @@ export const App = () => {
     <main className="w-full max-w-(--breakpoint-2xl) mx-auto">
       {/* large-screen nav bar */}
       <nav className="flex justify-between px-4 mt-2 place-items-center max-md:hidden">
-        <img src="/site-icon.svg" className="w-10 h-10 inline" />
+        <img src="/site-icon.svg" className="w-10 h-10 inline me-2" />
         {appModesList.map((l, i) => (
           <Button key={i} variant={"menuTab"} className={appMode === l ? "active " : ""} onClick={() => setAppMode(l)}>
             {APP_MODES_LIST[l].longName}
@@ -34,7 +34,7 @@ export const App = () => {
       </nav>
 
       {/* small-screen nav bar */}
-      <nav className="flex justify-between px-4 place-items-center md:hidden ">
+      <nav className="flex justify-between px-2 place-items-center md:hidden ">
         <img src="/site-icon.svg" className="w-6 h-6 inline" />
         {appModesList.map((l, i) => (
           <Button key={i} variant={"menuTab"} className={appMode === l ? "active " : ""} onClick={() => setAppMode(l)}>
