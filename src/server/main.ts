@@ -21,13 +21,11 @@ let html = readFileSync(isProd ? "dist/index.html" : "index.html", "utf8");
 // inject vite dev server if we're not in production mode
 if (!isProd) html = injectViteDevServer(html);
 
-console.log("hello from the server");
-
 // create the server instance
 const app = new Hono({ strict: false });
 
 app.get("/assets/*", serveStatic({ root: isProd ? "./dist" : "./" }));
-app.get("/*", serveStatic({root: isProd ? "./dist" : "./"}));
+app.get("/*", serveStatic({ root: isProd ? "./dist" : "./" }));
 
 // add our api routes here
 app.route("/api", geomet);

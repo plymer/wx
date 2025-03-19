@@ -2,7 +2,7 @@ import axios from "axios";
 import { Hono } from "hono";
 import suncalc, { GetTimesResult } from "suncalc";
 import { validateParams } from "../lib/zod-validator.js";
-import { metarSchema, singleSiteSchema } from "../validationSchemas/alphanumeric.zod.js";
+import { metarSchema, publicBulletinSchema, singleSiteSchema } from "../validationSchemas/alphanumeric.zod.js";
 import { HubDiscussion, MetarObject, StationObject, TafObject } from "../lib/alphanumeric.types.js";
 import { FEET_PER_METRE, leadZero } from "../lib/utils.js";
 
@@ -185,6 +185,48 @@ route.get("/hubs", validateParams("query", singleSiteSchema, {}), async (c) => {
           forecaster: hubData.strforecaster,
           office: hubData.stroffice,
         },
+      },
+      200
+    );
+  } catch (error) {
+    return c.json({ status: "error", error: error }, 400);
+  }
+});
+
+route.get("/public/bulletin", validateParams("query", publicBulletinSchema, {}), async (c) => {
+  const { bulletin, office } = c.req.valid("query");
+
+  let searchURL = `https://weather.gc.ca/forecast/public_bulletins_e.html?Bulletin=${bulletin}.${office}`;
+
+  if (bulletin === "focn45" && office === "cwwg") {
+    searchURL = "https://tgftp.nws.noaa.gov/data/raw/fo/focn45.cwwg..txt";
+  }
+
+  console.log("requesting bulletin from:", searchURL);
+
+  try {
+    let bulletinData: string = await axios.get(searchURL).then((bulletin) => bulletin.data);
+
+    if (bulletinData.length === 0) {
+      return c.json(
+        {
+          status: "error",
+          error: `no bulletin found for '${bulletin.toUpperCase()} ${office.toUpperCase()}'`,
+        },
+        400
+      );
+    }
+
+    if (bulletin !== "focn45") {
+      // because we're returning HTML, we need to actually yoink out the text between the two pre tags
+      const bulletinText = bulletinData.match(/<pre>[\s\S]*?<\/pre>/g);
+      bulletinData = bulletinText ? bulletinText[0].replace(/<pre>/g, "").replace(/<\/pre>/g, "") : "";
+    }
+
+    return c.json(
+      {
+        status: "success",
+        data: bulletinData,
       },
       200
     );
