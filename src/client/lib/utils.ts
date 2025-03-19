@@ -84,8 +84,6 @@ export function parseTaf(taf: string): ParsedTAF | undefined {
 export function formatSigWx(alphaString: string | undefined, mode: "taf" | "metar"): ParsedTAF | string | undefined {
   if (!alphaString) return undefined;
 
-  if (mode === "taf") console.log(alphaString);
-
   // Check for significant weather
   const sigCloud = alphaString.match(SIGWX_REGEX.cloudPattern);
   const sigFzPrecip = alphaString.match(SIGWX_REGEX.fzPrecipitation);
