@@ -1,5 +1,7 @@
 import { z } from "zod";
 
-export const realtimeLayersSchema = z.object({
-  layers: z.string().trim(),
-});
+export const realtimeLayersSchema = z
+  .object({
+    layers: z.string().trim().optional(),
+  })
+  .strict();

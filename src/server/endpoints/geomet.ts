@@ -1,84 +1,87 @@
 // third-party libraries
 import { Hono } from "hono";
-import { DOMParser, LiveNodeList } from "@xmldom/xmldom";
+import { XMLParser } from "fast-xml-parser";
 import axios from "axios";
 
 // data-shapes
 import { LayerProperties } from "../lib/geomet.types.js";
 
 // utility functions
+import { processDimensionString, transformName } from "../lib/utils.js";
 
 // configuration files
+import { GEOMET_GETCAPABILITIES } from "../config/geomet.config.js";
 
 // input validation
 import { validateParams } from "../lib/zod-validator.js";
 import { realtimeLayersSchema } from "../validationSchemas/geomet.zod.js";
 
-// endpoint documentation
-import { processDimensionString } from "../lib/utils.js";
-import { GEOMET_GETCAPABILITIES_RT } from "../config/geomet.config.js";
-
 // create a new hono instance that we will bind our endpoints to
 // don't forget to add 'export default route' at the bottom of this file
 const route = new Hono();
-
-const getTypes = (keywords: LiveNodeList) => {
-  const results = [...keywords].map((kw) => [...kw.childNodes].map((cn) => cn.nodeValue).toString());
-
-  return results.filter((kw) => kw === "Satellite images" || kw === "Radar").toString();
-};
 
 route.get("/geomet", validateParams("query", realtimeLayersSchema, {}), async (ctx) => {
   // get our validated query parameters from our GET request context
   const { layers } = ctx.req.valid("query");
   try {
-    const parser = new DOMParser();
+    // configure the XML parser to make traversing the XML easier
+    const newParser = new XMLParser({
+      removeNSPrefix: true,
+      ignoreAttributes: false,
+      textNodeName: "value",
+      attributeNamePrefix: "",
+      transformAttributeName: (attrName) => transformName(attrName),
+      transformTagName: (tagName) => transformName(tagName),
+    });
 
     // parse the layers requested into separate strings
-    const searches = layers.split(",");
+    const searches = layers ? layers.split(",") : undefined;
 
-    const xml = await axios.get(GEOMET_GETCAPABILITIES_RT).then((response) => response.data);
+    // fetch and parse the xml from the GET_CAPABILITIES endpoint on GeoMet
+    const xml = await axios
+      .get(GEOMET_GETCAPABILITIES)
+      .then((response) => response.data)
+      .then((data) => newParser.parse(data));
 
-    const options = parser
-      .parseFromString(xml, "application/xml")
-      .getElementsByTagName("Capability")[0]
-      .getElementsByTagName("Layer");
+    // find all of the layer categories available on the server
+    const layerCategories = xml.WMS_Capabilities.Capability.Layer.Layer.map((layer: any) => layer.Layer)
+      .flat()
+      .map((cat: any) => cat);
 
-    const capabilities = [...options]
-      .map((layer, i) =>
-        layer.getAttribute("opaque") && layer.hasChildNodes() && layer.getElementsByTagName("Dimension")
-          ? {
-              name: layer.getElementsByTagName("Name")[0].childNodes[0].nodeValue,
-              dimension: layer.getElementsByTagName("Dimension")[0].childNodes[0].nodeValue,
-              domain:
-                layer.parentElement?.getElementsByTagName("Name")[0].childNodes[0].nodeValue?.toLowerCase() ===
-                  "north american radar composite [1 km]" ||
-                layer.parentElement?.getElementsByTagName("Name")[0].childNodes[0].nodeValue?.toLowerCase() ===
-                  "north american radar surface precipitation type [1 km]"
-                  ? "national"
-                  : layer.parentElement?.getElementsByTagName("Name")[0].childNodes[0].nodeValue?.toLowerCase(),
-              type: getTypes(layer.getElementsByTagName("Keyword")) === "Satellite images" ? "satellite" : "radar",
-            }
-          : ""
-      )
-      .filter((v) => v !== "") as LayerProperties[];
+    // filter out the layers that pertain to the radar and build the list object
+    const radarLayers = layerCategories
+      .filter((layers: any) => layers.Name === "North American radar composite [1 km]")
+      .flat()[0]
+      .Layer.map((layer: any) => {
+        return { name: layer.Name, dimension: layer.Dimension.value, domain: "national", type: "radar" };
+      });
 
-    // console.log(capabilities);
+    // filter out the layers that pertain to the satellite and build the list object
+    // the logic here differs because the satellite layers are nested by domain (east/west)
+    const satelliteLayers = layerCategories
+      .filter((layers: any) => layers.Name === "Geostationary Operational Environmental Satellite (GOES)")
+      .flat()[0]
+      .Layer.map((domain: any) => domain)
+      .map((domain: any) => {
+        const props = { domain: domain.Name.toLowerCase(), type: "satellite" };
+        return domain.Layer.map((layer: any) => {
+          return { name: layer.Name, dimension: layer.Dimension.value, ...props };
+        });
+      })
+      .flat();
 
-    // give the option to search all possible layers with a search param of 'layers=all'
-    // otherwise, return the requested layer details
-    const layerCollection: LayerProperties[] =
-      layers === "all"
-        ? capabilities
-        : (searches.map((layer) => capabilities.find((c) => c.name === layer)) as LayerProperties[]);
+    // combine all of our filtered layer list objects into a single array
+    const allLayers = [...radarLayers, ...satelliteLayers];
 
-    // build out the time steps the layers in the output
-    const output: LayerProperties[] =
-      layerCollection &&
-      layerCollection.map((layer) => ({
-        ...layer,
-        timeSteps: layer?.dimension ? processDimensionString(layer.dimension) : [],
-      }));
+    // filter out the layers that were requested by the user and calculate the time steps
+    const output = searches
+      ? allLayers
+          .filter((layer: LayerProperties) => searches.includes(layer.name))
+          .map((layer) => {
+            const timesSteps = processDimensionString(layer.dimension);
+            return { ...layer, timeSteps: timesSteps };
+          })
+      : allLayers;
 
     return ctx.json({ status: "success", data: output }, 200);
   } catch (error) {

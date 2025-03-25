@@ -53,6 +53,23 @@ export function makeISOTimeStamp(time: number, mode: "display" | "data" = "data"
 }
 
 /**
+ * transform a tag or attribute name into camelCase so that it can be used as a key in a JSON object
+ * @param name a tag or attribute name that we want to transform
+ * @returns a camelCase version of the tag or attribute name supplied
+ */
+export function transformName(name: string) {
+  // if we don't have a dash, return the name as is
+  if (!name.includes("-") || !name.includes("#")) return name;
+
+  // otherwise, lets find the location of the dash and then capitalize the letter after it, and then strip out the dash
+  const index = name.indexOf("-") || name.indexOf("#");
+  const output = name.slice(0, index) + name.charAt(index + 1).toUpperCase() + name.slice(index + 2);
+
+  // call this recursively to handle multiple dashes
+  return transformName(output);
+}
+
+/**
  *
  * @param lat the latitude of the point that the sun times are calculated for
  * @param lon the longitude of the point that the sun times are calculated for
