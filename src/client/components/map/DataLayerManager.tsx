@@ -140,7 +140,7 @@ const DataLayerManager = ({ baseLayers }: Props) => {
 
           return (
             <RasterDataLayer
-              key={d.domain}
+              key={`${d.type}-${d.domain}-${i}`}
               apiData={d}
               {...(i === 0 || raster.manifest[i - 1] ? { belowLayer: belowLayerId } : {})}
             />

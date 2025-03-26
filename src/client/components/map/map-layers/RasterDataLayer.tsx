@@ -29,7 +29,12 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
     deltaTime: useDeltaTime(),
   };
 
+  // safety checks
   if (!belowLayer) return;
+
+  if (!apiData || !apiData.timeSteps || apiData.timeSteps.length === 0) {
+    return null; // Return null if we don't have valid data
+  }
 
   const currentTime = animation.startTime + animation.deltaTime * animation.currentFrame;
 
