@@ -1,5 +1,4 @@
 // third-party libraries
-import { useState } from "react";
 
 // ui components
 import Button from "./components/ui/button";
