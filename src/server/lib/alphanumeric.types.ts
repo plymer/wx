@@ -119,9 +119,7 @@ export type HubDiscussionData = {
   dtLastModified: number;
 };
 
-export type HubDiscussion = {
-  [key: string]: HubDiscussionData;
-};
+export type HubDiscussion = Record<string, HubDiscussionData>;
 
 export type NavCanResponse = {
   meta: {
