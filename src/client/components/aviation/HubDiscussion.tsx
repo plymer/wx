@@ -22,7 +22,7 @@ const HubDiscussion = ({ hub }: Props) => {
     { queryName: "hub-taf" }
   );
 
-  const parsedTaf = tafData?.status === "success" && (formatSigWx(tafData.data.taf, "taf") as ParsedTAF);
+  const parsedTaf = tafData?.status === "success" && (formatSigWx(tafData.data, "taf") as ParsedTAF);
 
   const HUBS = [
     { ident: "cyvr", name: "Vancouver Intl Airport" },

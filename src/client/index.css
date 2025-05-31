@@ -89,8 +89,8 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --max-md-map-height: calc(100svh - 12.1rem);
-    --md-map-height: calc(100svh - 10.4rem);
+    --max-md-map-height: calc(100svh - 11.85rem);
+    --md-map-height: calc(100svh - 10.35rem);
   }
   .dark {
     --background: 0 0% 3.9%;
