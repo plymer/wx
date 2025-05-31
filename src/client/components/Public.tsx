@@ -84,12 +84,10 @@ export default function Public() {
         </div>
       </div>
 
-      {productList[(productCode + issuerCode) as keyof typeof productList] &&
-      data?.status === "success" &&
-      data.data ? (
+      {productList[(productCode + issuerCode) as keyof typeof productList] && data?.status === "success" ? (
         <pre
-          className="overflow-y-scroll whitespace-pre-wrap md:px-6 max-md:pb-12"
-          style={{ height: "calc(100svh - 10.75rem)" }}
+          className="overflow-y-scroll whitespace-pre-wrap md:px-6 max-md:pb-12 max-w-fit mx-auto"
+          style={{ height: "calc(100svh - 10.7rem)" }}
         >
           {data.data.trim()}
         </pre>
