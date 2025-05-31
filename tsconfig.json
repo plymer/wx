@@ -5,7 +5,13 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["src/client/*"],
+      "@assets/*": ["src/client/assets/*"],
+      "@components/*": ["src/client/components/*"],
+      "@lib/*": ["src/client/lib/*"],
+      "@config/*": ["src/client/config/*"],
+      "@hooks/*": ["src/client/hooks/*"],
+      "@stateStores/*": ["src/client/stateStores/*"]
     }
   }
 }

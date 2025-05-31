@@ -8,7 +8,7 @@ import { FEET_PER_METRE, leadZero } from "../lib/utils.js";
 
 const route = new Hono();
 
-route.get("/metars", validateParams("query", metarSchema, {}), async (c) => {
+route.get("/metars", validateParams("query", metarSchema), async (c) => {
   try {
     // we might need to mutate the site variable
     let { site, hrs } = c.req.valid("query");
@@ -24,26 +24,20 @@ route.get("/metars", validateParams("query", metarSchema, {}), async (c) => {
     // check for the presence of valid data, otherwise return an error message
     if (metarObjects.length === 0 || metarObjects === "error retrieving data") {
       // we do not have any METARs that we can return, so send an empty response
-      return c.json(
-        {
-          status: "error",
-          error: `no METARs found for '${site?.toString().toUpperCase()}'`,
-        },
-        200
-      );
+      return c.json({ status: "noData" }, 200);
     }
 
     // if our returned value is an object, we know we have valid output
     if (typeof metarObjects === "object") {
       const output = metarObjects.reverse().map((m: MetarObject) => m.rawOb);
-      return c.json({ status: "success", data: { metars: output } }, 200);
+      return c.json({ status: "success", data: output }, 200);
     }
   } catch (error) {
-    return c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 500);
   }
 });
 
-route.get("/sitedata", validateParams("query", singleSiteSchema, {}), async (c) => {
+route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
   // we might need to mutate the site variable
   let { site } = c.req.valid("query");
   try {
@@ -57,13 +51,7 @@ route.get("/sitedata", validateParams("query", singleSiteSchema, {}), async (c) 
     // check for the presence of valid data, otherwise return an error message
     if (siteData.length === 0) {
       // we do not have any site data that we can return, so send an empty response
-      return c.json(
-        {
-          status: "error",
-          error: `no Site Data found for '${site?.toString().toUpperCase()}'`,
-        },
-        200
-      );
+      return c.json({ status: "noData" }, 200);
     }
 
     if (typeof siteData === "object") {
@@ -105,11 +93,11 @@ route.get("/sitedata", validateParams("query", singleSiteSchema, {}), async (c) 
       );
     }
   } catch (error) {
-    return c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 500);
   }
 });
 
-route.get("/taf", validateParams("query", singleSiteSchema, {}), async (c) => {
+route.get("/taf", validateParams("query", singleSiteSchema), async (c) => {
   // we may need to mutate the site variable
   let { site } = c.req.valid("query");
   try {
@@ -124,29 +112,24 @@ route.get("/taf", validateParams("query", singleSiteSchema, {}), async (c) => {
     // returns a string of "error retrieving data"
     if (tafObject.length === 0 || tafObject === "error retrieving data") {
       // we do not have a TAF that we can return, so send an empty response
-      return c.json({
-        status: "error",
-        error: `no TAF found for '${site?.toString().toUpperCase()}'`,
-      });
+      return c.json({ status: "noData" }, 200);
     }
 
     if (typeof tafObject === "object") {
       return c.json(
         {
           status: "success",
-          data: {
-            taf: tafObject[0].rawTAF,
-          },
+          data: tafObject[0].rawTAF,
         },
         200
       );
     }
   } catch (error) {
-    return c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 500);
   }
 });
 
-route.get("/hubs", validateParams("query", singleSiteSchema, {}), async (c) => {
+route.get("/hubs", validateParams("query", singleSiteSchema), async (c) => {
   const { site } = c.req.valid("query");
   try {
     type SiteName = {
@@ -168,7 +151,7 @@ route.get("/hubs", validateParams("query", singleSiteSchema, {}), async (c) => {
 
     // check to see if the site id exists in the resulting json, return an error message if it doesnt
     if (!Object.hasOwn(hubs, site.toUpperCase())) {
-      return c.json({ status: "error", error: `${site} does not currently have a forecast discussion` }, 200);
+      return c.json({ status: "noData" }, 200);
     }
 
     // ready our data to be returned
@@ -189,11 +172,11 @@ route.get("/hubs", validateParams("query", singleSiteSchema, {}), async (c) => {
       200
     );
   } catch (error) {
-    return c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 500);
   }
 });
 
-route.get("/public/bulletin", validateParams("query", publicBulletinSchema, {}), async (c) => {
+route.get("/public/bulletin", validateParams("query", publicBulletinSchema), async (c) => {
   const { bulletin, office } = c.req.valid("query");
 
   let searchURL = `https://weather.gc.ca/forecast/public_bulletins_e.html?Bulletin=${bulletin}.${office}`;
@@ -208,13 +191,7 @@ route.get("/public/bulletin", validateParams("query", publicBulletinSchema, {}),
     let bulletinData: string = await axios.get(searchURL).then((bulletin) => bulletin.data);
 
     if (bulletinData.length === 0) {
-      return c.json(
-        {
-          status: "error",
-          error: `no bulletin found for '${bulletin.toUpperCase()} ${office.toUpperCase()}'`,
-        },
-        400
-      );
+      return c.json({ status: "noData" }, 200);
     }
 
     if (bulletin !== "focn45") {
@@ -235,7 +212,7 @@ route.get("/public/bulletin", validateParams("query", publicBulletinSchema, {}),
       200
     );
   } catch (error) {
-    return c.json({ status: "error", error: error }, 400);
+    return c.json({ status: "error", error: error }, 500);
   }
 });
 

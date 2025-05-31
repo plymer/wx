@@ -1,6 +1,6 @@
 {
   "name": "prairie-wx",
-  "version": "0.37.0",
+  "version": "0.38.0",
   "private": true,
   "type": "module",
   "main": "main.js",
@@ -53,6 +53,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-map-gl": "^8.0.4",
+    "sonner": "^2.0.4",
     "suncalc": "^1.9.0",
     "vaul": "^1.1.2",
     "zod": "^3.25.42",

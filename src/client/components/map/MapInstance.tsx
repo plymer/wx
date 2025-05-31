@@ -8,20 +8,20 @@ import { Loader2 } from "lucide-react";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 // helpers
-import { MAP_BOUNDS } from "../../config/map";
-// import { AlphaDataTypes, CursorTypes, PopupData } from "../../lib/types";
+import { MAP_BOUNDS } from "@config/map";
+// import { AlphaDataTypes, CursorTypes, PopupData } from "@lib/types";
 
 // layer managers
 import DataLayerManager from "./DataLayerManager";
 import OverlayManager from "./OverlayManager";
 
 // global state stores
-import { useAnimationActions } from "../../stateStores/map/animation";
-import { useMapStateActions } from "../../stateStores/map/mapView";
+import { useAnimationActions } from "@stateStores/map/animation";
+import { useMapStateActions } from "@stateStores/map/mapView";
 // import { useAlphaDataActions, useIsPopoutOpen } from "@/stateStores/alphaData";
 // import usePopoutChannel from "@/hooks/usePopoutChannel";
-import { useUpdateMapViewstate } from "../../hooks/useUpdateMapViewstate";
-import { AnimationState, MapProjections } from "../../lib/types";
+import { useUpdateMapViewstate } from "@hooks/useUpdateMapViewstate";
+import { AnimationState, MapProjections } from "@lib/types";
 
 interface Props {
   viewState: Partial<ViewState>;

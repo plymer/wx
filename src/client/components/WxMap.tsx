@@ -1,8 +1,8 @@
 import RealtimeOptions from "./map/RealtimeOptions";
 import AnimationControls from "./map/AnimationControls";
 import MapInstance from "./map/MapInstance";
-import { positronWxMap } from "../assets/map-styles/positron-wxmap";
-import { useAnimationState } from "../stateStores/map/animation";
+import { positronWxMap } from "@assets/map-styles/positron-wxmap";
+import { useAnimationState } from "@stateStores/map/animation";
 import {
   useBearing,
   useLatitude,
@@ -11,7 +11,7 @@ import {
   usePitch,
   useProjection,
   useZoom,
-} from "../stateStores/map/mapView";
+} from "@stateStores/map/mapView";
 import { AttributionControl, ViewState } from "react-map-gl/maplibre";
 import LoadingIndicator from "./ui/LoadingIndicator";
 import MapOptions from "./map/MapOptions";
@@ -38,7 +38,11 @@ export default function WxMap() {
     <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height) text-sm">
       <MapInstance viewState={viewState} mapProjection={projection} animationState={animationState} basemap={mapStyle}>
         <>
-          <AttributionControl compact position="top-right" />
+          <AttributionControl
+            compact
+            position="top-right"
+            style={{ backgroundColor: "#475569", color: "var(--secondary)", border: "1px solid var(--primary)" }}
+          />
           <div className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
             <RealtimeOptions />
             <MapOptions />

@@ -129,16 +129,20 @@
 }
 
 /* override styles for attribution button */
-.maplibregl-ctrl-attrib.maplibregl-compact {
-  background-color: #1e2939;
-  color: var(--popover);
-}
+/* .maplibregl-ctrl-attrib.maplibregl-compact {
+  background-color: var(--secondary);
+  color: var(--primary);
+} */
 
 .maplibregl-ctrl-attrib-button {
-  color: var(--popover);
   filter: invert(1);
 }
 
 .maplibregl-ctrl-attrib-inner a {
-  color: var(--popover);
+  color: white !important;
 }
+
+/* .maplibregl-ctrl-attrib-inner {
+  background-color: var(--primary);
+  color: red;
+} */

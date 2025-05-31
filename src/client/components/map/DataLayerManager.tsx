@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 
 // types, utilities, and hooks
-import { RasterLayerData, GeoJSON } from "../../lib/types";
+import { RasterLayerData, GeoJSON } from "@lib/types";
 // import { MINUTE, tempCircleBuilder } from "@/lib/utils";
 
 // data layers
@@ -12,7 +12,7 @@ import RasterDataLayer from "./map-layers/RasterDataLayer";
 // import PirepData from "./map-layers/PirepData";
 
 // configuration
-import { SATELLITES } from "../../config/map";
+import { SATELLITES } from "@config/map";
 
 // state management
 import {
@@ -22,11 +22,11 @@ import {
   useSatelliteProduct,
   useShowRadar,
   useShowSatellite,
-} from "../../stateStores/map/rasterData";
-import useAPI from "../../hooks/useAPI";
+} from "@stateStores/map/rasterData";
+import useAPI from "@hooks/useAPI";
 // import { useShowObs, useShowPIREPs, useShowSIGMETs, useShowAIRMETs } from "@/stateStores/vectorData";
-// import { useDeltaTime, useFrame, useStartTime } from "../../stateStores/map/animation";
-// import { useViewportBounds, useZoom } from "../../stateStores/map/mapView";
+// import { useDeltaTime, useFrame, useStartTime } from "@stateStores/map/animation";
+// import { useViewportBounds, useZoom } from "@stateStores/map/mapView";
 
 interface Props {
   baseLayers: string[];

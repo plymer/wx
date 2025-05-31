@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Globe, Globe2, List, Map, ScanEye } from "lucide-react";
 
-import { ToggleDataOption } from "../../lib/types";
+import { ToggleDataOption } from "@lib/types";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/Drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
 import { Label } from "../ui/Label";
@@ -17,9 +17,9 @@ import {
   usePublicRegionsOverlay,
   useTAFsOverlay,
   useVectorOverlayActions,
-} from "../../stateStores/map/vectorOverlays";
-import { useMapStateActions, useProjection } from "../../stateStores/map/mapView";
-import { useMapOptionsTab, useUIActions } from "../../stateStores/map/ui";
+} from "@stateStores/map/vectorOverlays";
+import { useMapStateActions, useProjection } from "@stateStores/map/mapView";
+import { useMapOptionsTab, useUIActions } from "@stateStores/map/ui";
 
 interface Props {
   className?: string;

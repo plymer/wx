@@ -1,8 +1,8 @@
 // custom type definitions
 
-import { ANIM_CONTROLS, ANIMATION_STATES } from "../config/animation";
-import { API_CONFIG } from "../config/api";
-import { AVIATION_PRODUCTS } from "../config/aviationProducts";
+import { ANIM_CONTROLS, ANIMATION_STATES } from "@config/animation";
+import { API_CONFIG } from "@config/api";
+import { AVIATION_PRODUCTS } from "@config/aviationProducts";
 import {
   LAYER_TABS,
   MAP_LINES,
@@ -12,10 +12,10 @@ import {
   SATELLITE_CHANNELS,
   SATELLITES,
   ZOOM_THRESHOLDS,
-} from "../config/map";
-import { APP_MODES_LIST } from "../config/modes";
-import { PUBLIC_FORECAST_CONFIG } from "../config/public";
-import { VECTOR_DATA_TYPES } from "../config/vectorData";
+} from "@config/map";
+import { APP_MODES_LIST } from "@config/modes";
+import { PUBLIC_FORECAST_CONFIG } from "@config/public";
+import { VECTOR_DATA_TYPES } from "@config/vectorData";
 
 export type AppMode = keyof typeof APP_MODES_LIST;
 export type AnimationState = (typeof ANIMATION_STATES)[number];
@@ -68,18 +68,13 @@ export type SiteData = {
   sunset: string;
 };
 
-export type TAFData = {
-  taf: string;
-};
+export type METAR = string[];
+export type TAFData = string;
 
 export type ParsedTAF = {
   main: string | undefined;
   partPeriods: string[] | undefined;
   rmk: string | undefined;
-};
-
-export type METAR = {
-  metars: string[];
 };
 
 export type GFAData = {

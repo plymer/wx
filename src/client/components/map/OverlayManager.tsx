@@ -6,17 +6,17 @@ import {
   useMarineRegionsOverlay,
   usePublicRegionsOverlay,
   useTAFsOverlay,
-} from "../../stateStores/map/vectorOverlays";
+} from "@stateStores/map/vectorOverlays";
 import MapOverlay from "./map-layers/MapOverlay";
 
 // vector overlay data
-import gfaBoundaries from "../../assets/cmac-product-overlays/gfa-boundaries.json";
-import lgfBoundaries from "../../assets/cmac-product-overlays/lgf-boundaries.json";
-import firBoundaries from "../../assets/general-overlays/fir-boundaries.json";
-import tafSites from "../../assets/general-overlays/taf-sites.json";
-import bedposts from "../../assets/general-overlays/bedposts.json";
-import publicRegions from "../../assets/general-overlays/public-regions.json";
-import marineRegions from "../../assets/general-overlays/marine-regions.json";
+import gfaBoundaries from "@assets/cmac-product-overlays/gfa-boundaries.json";
+import lgfBoundaries from "@assets/cmac-product-overlays/lgf-boundaries.json";
+import firBoundaries from "@assets/general-overlays/fir-boundaries.json";
+import tafSites from "@assets/general-overlays/taf-sites.json";
+import bedposts from "@assets/general-overlays/bedposts.json";
+import publicRegions from "@assets/general-overlays/public-regions.json";
+import marineRegions from "@assets/general-overlays/marine-regions.json";
 
 // overlay configurations
 import {
@@ -27,7 +27,7 @@ import {
   GFA_OVERLAY,
   PUBLIC_OVERLAY,
   MARINE_OVERLAY,
-} from "../../config/overlays";
+} from "@config/overlays";
 
 // import { ParsedTaf, PopupData } from "@/lib/types";
 // import { Popup, useMap } from "react-map-gl/maplibre";

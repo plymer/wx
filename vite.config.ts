@@ -37,9 +37,12 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      "@ui": path.resolve(__dirname, "./src/client/components/ui"),
-      "@client": path.resolve(__dirname, "./src/client"),
-      "@server": path.resolve(__dirname, "./src/server"),
+      "@components": path.resolve(__dirname, "src/client/components/"),
+      "@hooks": path.resolve(__dirname, "src/client/hooks/"),
+      "@lib": path.resolve(__dirname, "src/client/lib/"),
+      "@stateStores": path.resolve(__dirname, "src/client/stateStores/"),
+      "@config": path.resolve(__dirname, "src/client/config/"),
+      "@assets": path.resolve(__dirname, "src/client/assets/"),
     },
   },
 });

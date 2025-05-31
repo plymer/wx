@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import { CloudLightning, Layers, MapIcon, Radar, Satellite } from "lucide-react";
+import { CloudLightning, Layers, Radar, Satellite } from "lucide-react";
 
-import { SATELLITE_CHANNELS } from "../../config/map";
+import { SATELLITE_CHANNELS } from "@config/map";
 
 import {
   useRadarProduct,
@@ -10,7 +10,7 @@ import {
   useSatelliteProduct,
   useShowRadar,
   useShowSatellite,
-} from "../../stateStores/map/rasterData";
+} from "@stateStores/map/rasterData";
 import {
   useShowAIRMETs,
   useShowLightning,
@@ -18,9 +18,9 @@ import {
   useShowPIREPs,
   useShowSIGMETs,
   useVectorActions,
-} from "../../stateStores/map/vectorData";
-import { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "../../lib/types";
-import { useLayersTab, useUIActions } from "../../stateStores/map/ui";
+} from "@stateStores/map/vectorData";
+import { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@lib/types";
+import { useLayersTab, useUIActions } from "@stateStores/map/ui";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/Drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
 import { Label } from "../ui/Label";

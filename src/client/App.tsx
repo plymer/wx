@@ -1,19 +1,20 @@
 // third-party libraries
 
 // ui components
-import Button from "./components/ui/Button";
+import Button from "@components/ui/Button";
 
 // app mode components
-import Observations from "./components/Observations";
-import WxMap from "./components/WxMap";
-import Aviation from "./components/Aviation";
-import Outlooks from "./components/Outlooks";
-import Public from "./components/Public";
+import Observations from "@components/Observations";
+import WxMap from "@components/WxMap";
+import Aviation from "@components/Aviation";
+import Outlooks from "@components/Outlooks";
+import Public from "@components/Public";
 
 // app mode configuration
-import { APP_MODES_LIST } from "./config/modes";
-import { useAppMode, useSetAppMode } from "./stateStores/app";
-import { AppMode } from "./lib/types";
+import { APP_MODES_LIST } from "@config/modes";
+import { useAppMode, useSetAppMode } from "@stateStores/app";
+import { AppMode } from "@lib/types";
+import { Toaster } from "@components/ui/Sonner";
 
 const appModesList: AppMode[] = Object.keys(APP_MODES_LIST).map((k) => k as AppMode);
 
@@ -49,6 +50,8 @@ export const App = () => {
       {appMode === "obs" && <Observations />}
       {appMode === "map" && <WxMap />}
       {appMode === "otlk" && <Outlooks />}
+
+      <Toaster toastOptions={{ className: "bg-neutral-800 text-white" }} />
 
       {/* <ReactQueryDevtools /> */}
     </main>

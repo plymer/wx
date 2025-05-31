@@ -1,17 +1,18 @@
 // third-party libraries
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { RefreshCw, Search } from "lucide-react";
-import { useHours, useObsActions, useSite } from "../stateStores/observations";
-import useAPI from "../hooks/useAPI";
-import { METAR, ParsedTAF, SiteData, TAFData } from "../lib/types";
+import { useHours, useObsActions, useSite } from "@stateStores/observations";
+import useAPI from "@hooks/useAPI";
+import { METAR, ParsedTAF, SiteData, TAFData } from "@lib/types";
 import { Input } from "./ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 import METARs from "./observations/METARs";
 import SiteMetadata from "./observations/SiteMetadata";
 import TAF from "./observations/TAF";
-import { useHighlightSigWx } from "../hooks/useHighlightSigWx";
-import { formatSigWx } from "../lib/utils";
+import { formatSigWx } from "@lib/utils";
 import Button from "./ui/Button";
+
+import { toast } from "sonner";
 
 export default function Observations() {
   // create a ref to the siteId text input
@@ -21,6 +22,14 @@ export default function Observations() {
   const actions = useObsActions();
   const site = useSite();
   const hours = useHours();
+
+  // when we mount the component, we want to set the siteId to the current site
+  useEffect(() => {
+    siteId.current = site;
+    return () => {
+      siteId.current = "";
+    };
+  }, []);
 
   // hours that are available as options in the dropdown list
   const HOURS: number[] = [6, 12, 18, 24, 36, 48, 96];
@@ -36,10 +45,8 @@ export default function Observations() {
   const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("/alpha/taf", { site: site });
 
   const parsedMetars =
-    metarData?.status === "success"
-      ? (metarData.data.metars.map((m) => formatSigWx(m, "metar")) as string[])
-      : undefined;
-  const parsedTaf = tafData?.status === "success" ? (formatSigWx(tafData.data.taf, "taf") as ParsedTAF) : undefined;
+    metarData?.status === "success" ? (metarData.data.map((m) => formatSigWx(m, "metar")) as string[]) : undefined;
+  const parsedTaf = tafData?.status === "success" ? (formatSigWx(tafData.data, "taf") as ParsedTAF) : undefined;
 
   // validate the input and mutate the search string, passing it to the context and then it will propagate to the child components
   //   to show the user the data they have requested
@@ -47,12 +54,24 @@ export default function Observations() {
     // we want to allow 2, 3, and 4-letter idents to be used
     // for 2-letter idents, assume we are doing a major canadian site and prepend with "cy"
     // for 3-letter idents, assume we are doing a canadian site and prepend with "c"
+
     if (input.length === 4) {
       actions.setSite(input);
     } else if (input.length === 3) {
       actions.setSite("c" + input);
     } else if (input.length === 2) {
       actions.setSite("cy" + input);
+    } else {
+      // we want to add a toast/popup here to inform the user that the input is invalid
+      toast.error("Please enter a valid site ID (2-4 characters).", {
+        position: "top-center",
+        description: "If you are looking for Toronto, you can type 'YZ', 'YYZ', or 'CYYZ'.",
+        duration: 2500,
+        action: {
+          label: "OK",
+          onClick: () => toast.dismiss(),
+        },
+      });
     }
   }
 

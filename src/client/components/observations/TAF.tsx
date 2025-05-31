@@ -1,8 +1,8 @@
 import { FetchStatus } from "@tanstack/react-query";
 
 import { Loader2, OctagonAlert, OctagonX, Skull } from "lucide-react";
-import { ParsedTAF, TAFData } from "../../lib/types";
-import { useHighlightSigWx } from "../../hooks/useHighlightSigWx";
+import { ParsedTAF } from "@lib/types";
+import { useHighlightSigWx } from "@hooks/useHighlightSigWx";
 
 interface Props {
   site: string;

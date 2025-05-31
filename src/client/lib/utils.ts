@@ -59,7 +59,7 @@ export function findNearestTimeStep(data: RasterLayerData, currentTime: number) 
  * @param taf the raw TAF string to parse
  * @returns a TAFData object with main, partPeriods, and rmk properties
  */
-export function parseTaf(taf: string): ParsedTAF | undefined {
+export function parseTaf(taf: string): ParsedTAF {
   // Split into main and parts without breaking the main TAF
   const parts = taf.split(/(FM\d{6}|TEMPO|BECMG|PROB\d{2}|RMK)/);
   const main = parts[0].trim();
@@ -81,7 +81,7 @@ export function parseTaf(taf: string): ParsedTAF | undefined {
  * @param tafData the TafData object to parse
  * @returns Formatted TAF/METAR with significant weather wrapped in parentheses, or the original if no significant weather
  */
-export function formatSigWx(alphaString: string | undefined, mode: "taf" | "metar"): ParsedTAF | string | undefined {
+export function formatSigWx(alphaString: string | undefined, mode: "taf" | "metar") {
   if (!alphaString) return undefined;
 
   // Check for significant weather

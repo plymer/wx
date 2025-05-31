@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { Rabbit, Snail, User } from "lucide-react";
 
 import AnimationControlButton from "./AnimationControlButton";
 import {
@@ -12,10 +11,10 @@ import {
   useFrameRate,
   useLoopId,
   useStartTime,
-} from "../../stateStores/map/animation";
-import { ANIM_CONTROLS } from "../../config/animation";
-import { AnimationControlsList } from "../../lib/types";
-import { makeISOTimeStamp } from "../../lib/utils";
+} from "@stateStores/map/animation";
+import { ANIM_CONTROLS } from "@config/animation";
+import { AnimationControlsList } from "@lib/types";
+import { makeISOTimeStamp } from "@lib/utils";
 import { Slider } from "../ui/Slider";
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}

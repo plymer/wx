@@ -1,7 +1,7 @@
-export type LayerProperties = {
+export type GeoMetLayer = {
   name: string;
   dimension: string;
-  type: string;
   domain: string;
-  timeSteps: { validTime: number }[];
+  type: "radar" | "satellite";
+  timeSteps?: { validTime: number }[];
 };
