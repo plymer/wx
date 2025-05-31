@@ -116,6 +116,8 @@ const WxMap = ({ viewState, animationState, mapProjection, children, basemap, se
   return (
     <Map
       // cursor={cursor}
+      maxTileCacheSize={512}
+      maxTileCacheZoomLevels={10}
       fadeDuration={0}
       latitude={viewState.latitude}
       longitude={viewState.longitude}
