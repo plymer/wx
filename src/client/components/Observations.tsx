@@ -83,6 +83,7 @@ export default function Observations() {
           <Button
             className="me-2 rounded-e-md rounded-s-none flex place-items-center"
             onClick={() => handleInputText(siteId.current)}
+            variant="alternate"
           >
             <RefreshCw className="w-4 h-4 me-2 inline" />
             Load

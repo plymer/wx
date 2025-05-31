@@ -27,7 +27,7 @@ export default function Aviation() {
             <Button
               className={`${
                 product === c ? "active" : ""
-              }rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
+              } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
               key={i}
               onClick={() => actions.setProduct(c as Products)}
             >

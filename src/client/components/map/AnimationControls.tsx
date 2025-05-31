@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Rabbit, Snail, User } from "lucide-react";
 
 import AnimationControlButton from "./AnimationControlButton";
@@ -13,13 +13,14 @@ import {
   useLoopId,
   useStartTime,
 } from "../../stateStores/map/animation";
-import { Slider } from "@radix-ui/react-slider";
 import { ANIM_CONTROLS } from "../../config/animation";
 import { AnimationControlsList } from "../../lib/types";
 import { makeISOTimeStamp } from "../../lib/utils";
-import ButtonWithTooltip from "../ui/ButtonWithTooltip";
+import { Slider } from "../ui/Slider";
 
-const AnimationControls = () => {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {}
+
+const AnimationControls = ({ ...props }: Props) => {
   const animationActions = useAnimationActions();
 
   const animation = {
@@ -146,14 +147,14 @@ const AnimationControls = () => {
   }, [animation.state, animation.frame]);
 
   return (
-    <div className="flex">
-      <div className="grid grid-cols-1">
-        <div className="mt-2 flex justify-center font-mono">
-          <span>Display Time: {makeISOTimeStamp(currentTime, "display")}</span>
+    <div {...props}>
+      <div className="flex justify-center flex-col w-full max-w-80">
+        <div className="mt-2 flex justify-center font-mono ">
+          Display Time: {makeISOTimeStamp(currentTime, "display")}
         </div>
 
         <div className="flex justify-between font-mono place-items-center">
-          <span className="me-2">{makeISOTimeStamp(animation.startTime, "display", true)}</span>
+          <div className="me-2 text-xs">{makeISOTimeStamp(animation.startTime, "display", true)}</div>
           <Slider
             onClick={() => animationActions.pause()}
             max={animation.endTime}
@@ -165,47 +166,19 @@ const AnimationControls = () => {
             }}
             className="my-2"
           />
-          <span className="ms-2">{makeISOTimeStamp(animation.endTime, "display", true)}</span>
+          <div className="ms-2 text-xs">{makeISOTimeStamp(animation.endTime, "display", true)}</div>
         </div>
 
-        <div className="my-2 inline-flex">
-          <div className="inline-flex">
-            {ANIM_CONTROLS.map((c, index) => (
-              <AnimationControlButton
-                key={index}
-                buttonType={c}
-                animationState={animation.state}
-                onClick={() => doAnimateCommand(c)}
-                variant={"animation"}
-              />
-            ))}
-          </div>
-          {/* <div className="ms-2 inline-flex items-center">
-            <ButtonWithTooltip
-              tooltipText="slow (0.5x) speed"
+        <div className="m-2 inline-flex justify-center">
+          {ANIM_CONTROLS.map((c, index) => (
+            <AnimationControlButton
+              key={index}
+              buttonType={c}
+              animationState={animation.state}
+              onClick={() => doAnimateCommand(c)}
               variant={"animation"}
-              onClick={() => animationActions.setFrameRate(5)}
-              className={`rounded-none rounded-s-md ${animation.frameRate === 5 ? "active" : ""}`}
-            >
-              <Snail />
-            </ButtonWithTooltip>
-            <ButtonWithTooltip
-              tooltipText="normal (1.0x) speed"
-              variant={"animation"}
-              onClick={() => animationActions.setFrameRate(10)}
-              className={`rounded-none ${animation.frameRate === 10 ? "active" : ""}`}
-            >
-              <User />
-            </ButtonWithTooltip>
-            <ButtonWithTooltip
-              tooltipText="fast (2.0x) speed"
-              variant={"animation"}
-              onClick={() => animationActions.setFrameRate(20)}
-              className={`rounded-none rounded-e-md ${animation.frameRate === 20 ? "active" : ""}`}
-            >
-              <Rabbit />
-            </ButtonWithTooltip>
-          </div> */}
+            />
+          ))}
         </div>
       </div>
     </div>

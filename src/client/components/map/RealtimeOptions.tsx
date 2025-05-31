@@ -98,7 +98,7 @@ export default function RealtimeOptions({ className }: Props) {
         <DrawerTitle content="Realtime Data Options" />
         <DrawerDescription content="Change how and what realtime data is being displayed" />
         <DrawerTrigger asChild>
-          <Button className={className}>
+          <Button variant="floating" className={className}>
             <Layers />
           </Button>
         </DrawerTrigger>

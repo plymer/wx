@@ -100,7 +100,7 @@ export default function RealtimeOptions({ className }: Props) {
         <DrawerTitle content="Map View Options" />
         <DrawerDescription content="Change the map projection and what types of overlays are displayed" />
         <DrawerTrigger asChild>
-          <Button className={className}>
+          <Button variant={"floating"} className={className}>
             <Globe2 />
           </Button>
         </DrawerTrigger>
