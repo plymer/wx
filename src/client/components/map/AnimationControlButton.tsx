@@ -1,46 +1,44 @@
-import { Play, Pause, ChevronFirst, ChevronLeft, ChevronLast, ChevronRight, Clock } from "lucide-react";
+import { Play, Pause, ChevronFirst, ChevronLeft, ChevronLast, ChevronRight } from "lucide-react";
+import { ButtonProps } from "../ui/Button";
 
-import { AnimationControlsList, AnimationState } from "../../config/animation";
-import Button from "../ui/button";
+import { AnimationControlsList, AnimationState } from "../../lib/types";
+import ButtonWithTooltip from "../ui/ButtonWithTooltip";
 
-interface Props {
-  onClick: () => void;
-  type: AnimationControlsList;
-  className?: string;
+interface Props extends ButtonProps {
+  buttonType: AnimationControlsList;
   animationState: AnimationState;
   text?: string;
 }
 
-// icons to display inside the button depending on which 'type' of button it is (the action it performs)
+// icons to display inside the button depending on which 'buttonType' of button it is (the action it performs)
 const Icons = {
   last: <ChevronFirst />,
   prev: <ChevronLeft />,
-  realtime: <Clock />,
   play: <Play />,
   pause: <Pause />,
   next: <ChevronRight />,
   first: <ChevronLast />,
 };
 
-const AnimationControlButton = ({ onClick, type, className, animationState, text }: Props) => {
+const AnimationControlButton = ({ buttonType, animationState, text, ...buttonProps }: Props) => {
   return (
-    <Button
-      type="button"
-      onClick={onClick}
+    <ButtonWithTooltip
+      {...buttonProps}
+      tooltipText={buttonType}
       className={`${
-        type !== "pause" && type !== "play"
-          ? className // easy case, not the play or pause button
-          : (type === "pause" && animationState === "playing") || (type === "pause" && animationState === "loading")
-          ? className // only show pause if we are playing or loading
-          : (type === "play" && animationState === "realtime") || (type === "play" && animationState === "paused")
-          ? className // only show if we are showing realtime data or the loop is paused
+        buttonType !== "pause" && buttonType !== "play"
+          ? "" // easy case, not the play or pause button
+          : buttonType === "pause" && animationState === "playing"
+          ? "" // only show pause if we are playing or loading
+          : buttonType === "play" && animationState === "paused"
+          ? "" // only show if we are showing realtime data or the loop is paused
           : "hidden"
       }`}
     >
-      {Icons[type]}
-      <span className="sr-only">{type}</span>
+      {Icons[buttonType]}
+      <span className="sr-only">{buttonType}</span>
       {text && <span className="ms-2">{text}</span>}
-    </Button>
+    </ButtonWithTooltip>
   );
 };
 

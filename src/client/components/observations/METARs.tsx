@@ -7,7 +7,7 @@ import { useHighlightSigWx } from "../../hooks/useHighlightSigWx";
 
 interface Props {
   site: string;
-  data?: string[];
+  data: string[];
   fetchStatus: FetchStatus;
 }
 

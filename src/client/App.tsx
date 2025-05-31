@@ -1,7 +1,7 @@
 // third-party libraries
 
 // ui components
-import Button from "./components/ui/button";
+import Button from "./components/ui/Button";
 
 // app mode components
 import Observations from "./components/Observations";
@@ -11,8 +11,9 @@ import Outlooks from "./components/Outlooks";
 import Public from "./components/Public";
 
 // app mode configuration
-import { APP_MODES_LIST, AppMode } from "./config/modes";
+import { APP_MODES_LIST } from "./config/modes";
 import { useAppMode, useSetAppMode } from "./stateStores/app";
+import { AppMode } from "./lib/types";
 
 const appModesList: AppMode[] = Object.keys(APP_MODES_LIST).map((k) => k as AppMode);
 

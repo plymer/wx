@@ -125,7 +125,7 @@ const DataLayerManager = ({ baseLayers }: Props) => {
 
   // update the list of raster layerIds whenever we have stored new data from API
   useEffect(() => {
-    if (!rasterData || !rasterData.data || rasterData.data.length === 0) return;
+    if (!rasterData || rasterData.status !== "success") return;
     rasterActions.setManifest(rasterData.data.map((d) => generateLayerId(d.type, d.domain)));
 
     return () => rasterActions.setManifest([]);
@@ -135,7 +135,8 @@ const DataLayerManager = ({ baseLayers }: Props) => {
   return (
     <>
       {raster.manifest &&
-        rasterData?.data?.map((d, i) => {
+        rasterData?.status === "success" &&
+        rasterData.data.map((d, i) => {
           const belowLayerId = i === 0 ? layerConstraints.raster : raster.manifest[i - 1] + "-0";
 
           return (

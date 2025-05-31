@@ -1,30 +1,3 @@
-// the shape of the data that defines the properties of each "member" of each product
-type SingleAviationProduct = {
-  domain: ProductDomains;
-  shortName: string;
-  longName: string;
-  timeDelta?: number;
-  timeSteps?: number;
-  subProducts?: string[];
-};
-
-// build a type definition based on our full product configuration
-type AviationProducts = typeof AVIATION_PRODUCTS;
-
-// contains a list of all of the products in our configuration defined below
-export type Products = keyof AviationProducts;
-
-// helper 'type function' to extract all of the domains from the full product list without needing to manually extract the domains in an intermediate step
-type ExtractDomains<T extends Products> = AviationProducts[T][number];
-
-// export all of the product domains using our 'type function' from above
-export type ProductDomains = ExtractDomains<Products>["domain"];
-
-// the main export type that defines our fully-inferred data shape
-export type AviationProductList = {
-  [K in Products]: SingleAviationProduct[];
-};
-
 // this is the full list of all of our products available to us
 export const AVIATION_PRODUCTS = {
   gfa: [

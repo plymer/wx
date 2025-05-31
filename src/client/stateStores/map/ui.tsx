@@ -1,6 +1,6 @@
-import { LayerTabs, MapOptionsTabs } from "../../config/map";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { MapOptionsTabs, LayerTabs } from "../../lib/types";
 
 interface UIStateStore {
   panelSizes: number[];

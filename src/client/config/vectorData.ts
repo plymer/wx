@@ -1,5 +1,7 @@
 // contains configuration for how to display/draw the vector data on the map
 
+import { VectorConfig, VectorDisplayConfig } from "../lib/types";
+
 /*
 -- need to incorporate turf library to draw properly-sized circles of spatial dimensions
 
@@ -9,12 +11,6 @@
 */
 
 export const VECTOR_DATA_TYPES = ["lightning", "surfaceObs", "pirep", "airmet", "sigmet"] as const;
-export type VectorDataTypes = (typeof VECTOR_DATA_TYPES)[number];
-
-export type VectorConfig = {
-  paint: Object;
-  type: "circle" | "fill";
-};
 
 // TODO :: this will be deprecated since we are moving to a 'threat polygon' method of showing lightning
 export const LIGHTNING_DISPLAY: VectorConfig = {
@@ -52,10 +48,6 @@ export const PIREP_DISPLAY: VectorConfig = {
     "fill-opacity": 0.5,
   },
   type: "fill",
-};
-
-export type VectorDisplayConfig = {
-  [K in VectorDataTypes]?: VectorConfig;
 };
 
 export const VECTOR_DISPLAY_CONFIGS: VectorDisplayConfig = {

@@ -6,7 +6,7 @@ import { useAviationActions } from "../../stateStores/aviation";
 import useAPI from "../../hooks/useAPI";
 import { HubData, ParsedTAF, TAFData } from "../../lib/types";
 import { formatSigWx } from "../../lib/utils";
-import Button from "../ui/button";
+import Button from "../ui/Button";
 
 interface Props {
   hub: string;
@@ -22,7 +22,7 @@ const HubDiscussion = ({ hub }: Props) => {
     { queryName: "hub-taf" }
   );
 
-  const parsedTaf = tafData && tafData.data && (formatSigWx(tafData.data.taf, "taf") as ParsedTAF);
+  const parsedTaf = tafData?.status === "success" && (formatSigWx(tafData.data.taf, "taf") as ParsedTAF);
 
   const HUBS = [
     { ident: "cyvr", name: "Vancouver Intl Airport" },
@@ -37,8 +37,9 @@ const HubDiscussion = ({ hub }: Props) => {
         <h2 className="md:inline max-md:hidden me-2">Hub Discussions:</h2>
         {HUBS.map((h, i) => (
           <Button
-            variant={hub === h.ident ? "selected" : "secondary"}
-            className="md:mt-2 rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/4"
+            className={`${
+              hub === h.ident ? "active" : ""
+            } md:mt-2 rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/4`}
             key={i}
             onClick={() => {
               setHub(h.ident);
@@ -57,15 +58,17 @@ const HubDiscussion = ({ hub }: Props) => {
             {hub.toUpperCase()}:
           </h3>
         </div>
-        {!hubData && hubFetchStatus !== "idle" ? (
+        {hubData?.status !== "success" && hubFetchStatus !== "idle" ? (
           <LoadingIndicator displayText="Loading Discussion" />
-        ) : (
+        ) : hubData?.status === "success" ? (
           <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">
             {hubData?.data?.header}
             <br />
             <br />
             {hubData?.data?.discussion.trim()}
           </div>
+        ) : (
+          <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">There was an error</div>
         )}
       </div>
 
@@ -75,12 +78,14 @@ const HubDiscussion = ({ hub }: Props) => {
             <Binoculars className="inline" />
             <h3 className="text-bold p-2 inline">Outlook:</h3>
           </div>
-          {!hubData && hubFetchStatus !== "idle" ? (
+          {hubData?.status !== "success" && hubFetchStatus !== "idle" ? (
             <LoadingIndicator displayText="Loading Outlook" />
-          ) : (
+          ) : hubData?.status === "success" ? (
             <div className="font-mono p-4 py-2 bg-muted text-black whitespace-pre-wrap">
               {hubData?.data?.outlook.trim()}
             </div>
+          ) : (
+            <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">There was an error</div>
           )}
         </div>
 
@@ -89,12 +94,14 @@ const HubDiscussion = ({ hub }: Props) => {
             <Pencil className="inline" />
             <h3 className="text-bold p-2 inline">Forecaster:</h3>
           </div>
-          {!hubData && hubFetchStatus !== "idle" ? (
+          {hubData?.status !== "success" && hubFetchStatus !== "idle" ? (
             <LoadingIndicator displayText="Loading Forecaster" />
-          ) : (
+          ) : hubData?.status === "success" ? (
             <div className="font-mono px-4 py-2 bg-muted text-black whitespace-pre-wrap">
               {hubData?.data?.forecaster}/{hubData?.data?.office}
             </div>
+          ) : (
+            <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">There was an error</div>
           )}
         </div>
         <div className="md:col-start-2 md:row-start-1 md:row-span-2 md:border-s-2 md:border-black ">
@@ -103,7 +110,7 @@ const HubDiscussion = ({ hub }: Props) => {
             <h3 className="text-bold p-2 inline">TAF</h3>
           </div>
 
-          <TAF site={hub} data={parsedTaf} fetchStatus={tafFetchStatus} />
+          {parsedTaf && <TAF site={hub} data={parsedTaf} fetchStatus={tafFetchStatus} />}
         </div>
       </div>
     </>

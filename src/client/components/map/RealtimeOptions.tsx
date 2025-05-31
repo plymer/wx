@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { CloudLightning, Layers, MapIcon, Radar, Satellite } from "lucide-react";
 
-import { SATELLITE_CHANNELS, SatelliteChannelsList, SatelliteChannelsWMSName } from "../../config/map";
+import { SATELLITE_CHANNELS } from "../../config/map";
 
 import {
   useRadarProduct,
@@ -19,14 +19,14 @@ import {
   useShowSIGMETs,
   useVectorActions,
 } from "../../stateStores/map/vectorData";
-import { ToggleDataOption } from "../../lib/types";
+import { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "../../lib/types";
 import { useLayersTab, useUIActions } from "../../stateStores/map/ui";
-import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/drawer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Label } from "../ui/label";
-import { Switch } from "../ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import Button from "../ui/button";
+import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/Drawer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
+import { Label } from "../ui/Label";
+import { Switch } from "../ui/Switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/Select";
+import Button from "../ui/Button";
 
 interface Props {
   className?: string;
@@ -98,7 +98,7 @@ export default function RealtimeOptions({ className }: Props) {
         <DrawerTitle content="Realtime Data Options" />
         <DrawerDescription content="Change how and what realtime data is being displayed" />
         <DrawerTrigger asChild>
-          <Button variant="floatingIcon" className={className}>
+          <Button className={className}>
             <Layers />
           </Button>
         </DrawerTrigger>

@@ -1,22 +1,23 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
+
 import { cn } from "../../lib/utils";
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-wrap= rounded-md text-sm font-medium hover:cursor-pointer ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+export const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-wrap rounded-md text-sm font-medium hover:cursor-pointer ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        default: "bg-primary text-primary-foreground hover:bg-accent/60 ",
         menuTab: "rounded-none rounded-t-md [&.active]:bg-neutral-800 [&.active]:text-white",
-        selected: "bg-accent text-accent-foreground hover:bg-accent/40",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         drawer:
           "bg-neutral-200 w-full text-black hover:bg-accent hover:text-white [&.active]:bg-accent  [&.active]:text-white rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md",
-        floatingIcon: "bg-primary hover:bg-accent text-white w-10 h-10 items-center border-1 border-neutral-400",
-        ghost: "bg-transparent text-primary-foreground hover:text-accent",
+        expandingIcon:
+          "bg-primary text-white whitespace-nowrap overflow-hidden w-fit not-hover:w-10 h-10 items-center not-hover:*:me-6 border-1 border-neutral-400",
+        animation:
+          "bg-primary text-primary-foreground hover:bg-accent/60 rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md [&.active]:bg-accent [&.active]:text-white",
       },
       size: {
         default: "min-h-10 px-4 py-2",

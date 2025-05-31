@@ -1,11 +1,10 @@
-import { Products } from "../config/aviationProducts";
 import useAPI from "../hooks/useAPI";
-import { GFAData, OtherChartData } from "../lib/types";
+import { GFAData, OtherChartData, Products } from "../lib/types";
 import { useAviationActions, useHub, useProduct } from "../stateStores/aviation";
 import AvChartsGFA from "./aviation/AvChartsGFA";
 import AvChartsOther from "./aviation/AvChartsOther";
 import HubDiscussion from "./aviation/HubDiscussion";
-import Button from "./ui/button";
+import Button from "./ui/Button";
 
 export const PRODUCTS = ["gfa", "lgf", "hlt", "sigwx", "hubs"];
 
@@ -26,8 +25,9 @@ export default function Aviation() {
           <label className="me-2 max-md:hidden">Product:</label>
           {PRODUCTS.map((c, i) => (
             <Button
-              className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5"
-              variant={product === c ? "selected" : "secondary"}
+              className={`${
+                product === c ? "active" : ""
+              }rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
               key={i}
               onClick={() => actions.setProduct(c as Products)}
             >

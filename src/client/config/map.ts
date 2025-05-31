@@ -2,7 +2,6 @@ import { LngLatBoundsLike } from "maplibre-gl";
 
 // define which satellites we have access to
 export const SATELLITES = ["GOES-East", "GOES-West"] as const;
-export type SatelliteList = (typeof SATELLITES)[number];
 
 // available satellite products
 export const SATELLITE_CHANNELS = {
@@ -30,11 +29,6 @@ export const SATELLITE_CHANNELS = {
   nightIr: { menuName: "Night IR", wms: "2km_NightIR" },
 } as const;
 
-// helper types for satellite
-export type SatelliteChannelsList = keyof typeof SATELLITE_CHANNELS;
-export type SatelliteChannelsWMSName = (typeof SATELLITE_CHANNELS)[keyof typeof SATELLITE_CHANNELS]["wms"];
-export type SatelliteChannelsMenuName = (typeof SATELLITE_CHANNELS)[keyof typeof SATELLITE_CHANNELS]["menuName"];
-
 // define our radar products
 export const RADAR_PRODUCTS = {
   rain: {
@@ -46,10 +40,6 @@ export const RADAR_PRODUCTS = {
     wms: "RADAR_1KM_RSNO",
   },
 } as const;
-// helper types for radar
-export type RadarProducts = typeof RADAR_PRODUCTS;
-export type RadarProductsWMSName = RadarProducts[keyof RadarProducts]["wms"];
-export type RadarProductsMenuName = RadarProducts[keyof RadarProducts]["menuName"];
 
 // map object constants
 const MAX_WEST: number = -180;
@@ -77,16 +67,11 @@ export const GEOMET_GETCAPABILITIES: string =
   "https://geo.weather.gc.ca/geomet/?lang=en&service=WMS&request=GetCapabilities&version=1.3.0&LAYERS_REFRESH_RATE=PT1M&layers=";
 
 export const MAP_PROJECTIONS = ["mercator", "globe"] as const;
-export type MapProjections = (typeof MAP_PROJECTIONS)[number];
 
 export const MAP_LINES = ["gfa", "lgf", "fir", "tafs", "bedposts", "publicRegions", "marineRegions"] as const;
-export type MapLines = (typeof MAP_LINES)[number];
 
 export const MAP_OPTIONS_TABS = ["projection", "overlays"] as const;
-export type MapOptionsTabs = (typeof MAP_OPTIONS_TABS)[number];
 
 export const LAYER_TABS = ["satellite", "radar", "other"] as const;
-export type LayerTabs = (typeof LAYER_TABS)[number];
 
 export const ZOOM_THRESHOLDS = { mini: 2.25, reduced: 4.5, maximum: 6 } as const;
-export type ZoomThresholds = keyof typeof ZOOM_THRESHOLDS;

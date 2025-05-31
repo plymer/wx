@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 
 import type { Map } from "maplibre-gl";
 import { PaddingOptions, ViewState } from "react-map-gl/maplibre";
-import { MapProjections } from "../../config/map";
+import { MapProjections } from "../../lib/types";
 
 interface MapStateStore extends ViewState {
   mapRef: Map | null;

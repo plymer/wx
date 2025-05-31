@@ -6,7 +6,7 @@ import { useHighlightSigWx } from "../../hooks/useHighlightSigWx";
 
 interface Props {
   site: string;
-  data?: ParsedTAF;
+  data: ParsedTAF;
   fetchStatus: FetchStatus;
 }
 

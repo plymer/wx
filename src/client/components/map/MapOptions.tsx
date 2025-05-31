@@ -1,13 +1,13 @@
 import { useState } from "react";
 
-import { Database, Globe, Globe2, List, Map, ScanEye } from "lucide-react";
+import { Globe, Globe2, List, Map, ScanEye } from "lucide-react";
 
 import { ToggleDataOption } from "../../lib/types";
-import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/drawer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { Label } from "../ui/label";
-import { Switch } from "../ui/switch";
-import Button from "../ui/button";
+import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/Drawer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
+import { Label } from "../ui/Label";
+import { Switch } from "../ui/Switch";
+import Button from "../ui/Button";
 import {
   useBedpostsOverlay,
   useFIROverlay,
@@ -100,7 +100,7 @@ export default function RealtimeOptions({ className }: Props) {
         <DrawerTitle content="Map View Options" />
         <DrawerDescription content="Change the map projection and what types of overlays are displayed" />
         <DrawerTrigger asChild>
-          <Button variant="floatingIcon" className={className}>
+          <Button className={className}>
             <Globe2 />
           </Button>
         </DrawerTrigger>

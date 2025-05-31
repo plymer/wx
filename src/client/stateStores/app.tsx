@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { AppMode } from "../config/modes";
+import { AppMode } from "../lib/types";
 
 // type definition for better DX
 type AppState = {
@@ -21,7 +21,7 @@ const useAppState = create<AppState>()(
           appMode: state.appMode,
         } as Partial<AppState>),
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as AppState) }),
-      name: "aviationOptions",
+      name: "appOptions",
       storage: createJSONStorage(() => localStorage),
     }
   )

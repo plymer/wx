@@ -3,9 +3,8 @@ import { useBulletin, useOffice, usePublicActions } from "../stateStores/public"
 import { PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { PublicBulletin } from "../lib/types";
 import useAPI from "../hooks/useAPI";
-import Button from "./ui/button";
 import { useEffect, useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 
 export default function Public() {
   const office = useOffice();
@@ -85,7 +84,9 @@ export default function Public() {
         </div>
       </div>
 
-      {productList[(productCode + issuerCode) as keyof typeof productList] && data && data.data ? (
+      {productList[(productCode + issuerCode) as keyof typeof productList] &&
+      data?.status === "success" &&
+      data.data ? (
         <pre
           className="overflow-y-scroll whitespace-pre-wrap md:px-6 max-md:pb-12"
           style={{ height: "calc(100svh - 10.75rem)" }}

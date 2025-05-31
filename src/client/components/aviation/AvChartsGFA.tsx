@@ -1,7 +1,7 @@
-import { AVIATION_PRODUCTS, ProductDomains, Products } from "../../config/aviationProducts";
-import { APIResponse, GFAData } from "../../lib/types";
+import { AVIATION_PRODUCTS } from "../../config/aviationProducts";
+import { APIResponse, GFAData, ProductDomains, Products } from "../../lib/types";
 import { useAviationActions, useDomain, useSubProduct, useTimeStep } from "../../stateStores/aviation";
-import Button from "../ui/button";
+import Button from "../ui/Button";
 
 import AvImageContainer from "./AvImageContainer";
 
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const AvChartsGFA = ({ product, data }: Props) => {
-  if (!data || !data.data) return;
+  if (!data || data.status !== "success") return;
 
   // get our state variables and mutation
   const domain = useDomain();
@@ -41,8 +41,9 @@ const AvChartsGFA = ({ product, data }: Props) => {
         <label className="me-4 max-md:hidden">Domain:</label>
         {domainList.map((r, i) => (
           <Button
-            variant={domain === r.domain ? "selected" : "secondary"}
-            className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md"
+            className={`rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md ${
+              domain === r.domain ? "active" : ""
+            }`}
             key={i}
             onClick={() => actions.setDomain(("gfacn3" + (i + 1).toString()) as ProductDomains)}
           >
@@ -59,8 +60,9 @@ const AvChartsGFA = ({ product, data }: Props) => {
                 p.domain === domain &&
                 p.cldwx.map((u, i) => (
                   <Button
-                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                    variant={subProduct === "cldwx" && timeStep === i ? "selected" : "secondary"}
+                    className={`rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md ${
+                      subProduct === "cldwx" && timeStep === i ? "active" : ""
+                    }`}
                     key={i}
                     value={u}
                     onClick={() => {
@@ -83,8 +85,9 @@ const AvChartsGFA = ({ product, data }: Props) => {
                 p.domain === domain &&
                 p.turbc.map((u, i) => (
                   <Button
-                    variant={subProduct === "turbc" && timeStep === i ? "selected" : "secondary"}
-                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
+                    className={`rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md ${
+                      subProduct === "turbc" && timeStep === i ? "active" : ""
+                    }`}
                     key={i}
                     value={u}
                     onClick={() => {

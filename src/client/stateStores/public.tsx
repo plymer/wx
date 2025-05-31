@@ -26,7 +26,7 @@ const usePublicState = create<PublicState>()(
     {
       partialize: (state) => ({ office: state.office, bulletin: state.bulletin } as Partial<PublicState>),
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as PublicState) }),
-      name: "observationOptions",
+      name: "publicOptions",
       storage: createJSONStorage(() => localStorage),
     }
   )

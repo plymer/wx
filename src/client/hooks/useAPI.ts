@@ -1,8 +1,8 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
-import { API_CONFIG, EndpointUrls } from "../config/api";
-import { APIResponse } from "../lib/types";
+import { API_CONFIG } from "../config/api";
+import { APIResponse, EndpointUrls } from "../lib/types";
 
 // define the search params shape
 type SearchParams = {

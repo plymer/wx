@@ -66,7 +66,3 @@ export const API_CONFIG = {
     },
   ],
 } as const;
-
-export type EndpointParams = keyof (typeof API_CONFIG)["endpoints"][number];
-
-export type EndpointUrls = (typeof API_CONFIG)["endpoints"][number]["url"];

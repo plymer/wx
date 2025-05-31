@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-import { AnimationState, DEFAULT_MAX_FRAMES } from "../../config/animation";
+import { DEFAULT_MAX_FRAMES } from "../../config/animation";
 import { HOUR, MINUTE } from "../../lib/utils";
+import { AnimationState } from "../../lib/types";
 
 interface AnimationStateStore {
   frame: number;
@@ -20,9 +21,7 @@ interface AnimationStateStore {
     firstFrame: () => void;
     lastFrame: () => void;
     pause: () => void;
-    stop: () => void;
     play: () => void;
-    load: () => void;
     setFrameRate: (frameRate: number) => void;
     setStartTime: (time: number) => void;
     setEndTime: (time: number) => void;
@@ -38,7 +37,7 @@ const useAnimation = create<AnimationStateStore>()(
       frame: DEFAULT_MAX_FRAMES,
       frameCount: DEFAULT_MAX_FRAMES + 1,
       frameRate: 10,
-      state: "realtime",
+      state: "paused",
       endTime: Date.now(),
       startTime: Date.now() - 3 * HOUR,
       deltaTime: 10 * MINUTE,
@@ -51,9 +50,7 @@ const useAnimation = create<AnimationStateStore>()(
         firstFrame: () => set((state) => ({ frame: state.frameCount - 1 })),
         lastFrame: () => set(() => ({ frame: 0 })),
         pause: () => set(() => ({ state: "paused" })),
-        stop: () => set(() => ({ state: "realtime" })),
         play: () => set(() => ({ state: "playing" })),
-        load: () => set(() => ({ state: "loading" })),
         setFrameRate: (newFrameRate: number) => set(() => ({ frameRate: newFrameRate })),
         setEndTime: (newTime: number) => set(() => ({ endTime: newTime })),
         setStartTime: (newTime: number) => set(() => ({ startTime: newTime })),

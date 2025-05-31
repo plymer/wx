@@ -1,14 +1,14 @@
 // third-party libraries
 import { ReactElement, useCallback, useState } from "react";
 import Map, { ViewState } from "react-map-gl/maplibre";
-import { MapLayerMouseEvent, StyleSpecification } from "maplibre-gl";
+import { StyleSpecification } from "maplibre-gl";
 import { Loader2 } from "lucide-react";
 
 // map css
 import "maplibre-gl/dist/maplibre-gl.css";
 
 // helpers
-import { MAP_BOUNDS, MapProjections } from "../../config/map";
+import { MAP_BOUNDS } from "../../config/map";
 // import { AlphaDataTypes, CursorTypes, PopupData } from "../../lib/types";
 
 // layer managers
@@ -19,9 +19,9 @@ import OverlayManager from "./OverlayManager";
 import { useAnimationActions } from "../../stateStores/map/animation";
 import { useMapStateActions } from "../../stateStores/map/mapView";
 // import { useAlphaDataActions, useIsPopoutOpen } from "@/stateStores/alphaData";
-import { AnimationState } from "../../config/animation";
 // import usePopoutChannel from "@/hooks/usePopoutChannel";
 import { useUpdateMapViewstate } from "../../hooks/useUpdateMapViewstate";
+import { AnimationState, MapProjections } from "../../lib/types";
 
 interface Props {
   viewState: Partial<ViewState>;
@@ -163,8 +163,6 @@ const WxMap = ({ viewState, animationState, mapProjection, children, basemap, se
         mapState.setLoadingState(false);
 
         isMapInitialized && getWxLayers(e.target.getLayersOrder());
-        // once no more source data is loading, allow the map to transistion to animating
-        animationState === "loading" && animation.play();
       }}
       onMove={onMove}
     >

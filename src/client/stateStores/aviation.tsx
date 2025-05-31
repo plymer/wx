@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { ProductDomains, Products } from "../config/aviationProducts";
+import { Products, ProductDomains } from "../lib/types";
 
 // type definition for better DX
 type AviationState = {

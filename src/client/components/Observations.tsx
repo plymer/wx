@@ -4,14 +4,14 @@ import { RefreshCw, Search } from "lucide-react";
 import { useHours, useObsActions, useSite } from "../stateStores/observations";
 import useAPI from "../hooks/useAPI";
 import { METAR, ParsedTAF, SiteData, TAFData } from "../lib/types";
-import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Input } from "./ui/Input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 import METARs from "./observations/METARs";
 import SiteMetadata from "./observations/SiteMetadata";
 import TAF from "./observations/TAF";
 import { useHighlightSigWx } from "../hooks/useHighlightSigWx";
 import { formatSigWx } from "../lib/utils";
-import Button from "./ui/button";
+import Button from "./ui/Button";
 
 export default function Observations() {
   // create a ref to the siteId text input
@@ -36,8 +36,10 @@ export default function Observations() {
   const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("/alpha/taf", { site: site });
 
   const parsedMetars =
-    metarData && metarData.data && (metarData.data.metars.map((m) => formatSigWx(m, "metar")) as string[]);
-  const parsedTaf = tafData && tafData.data && (formatSigWx(tafData.data.taf, "taf") as ParsedTAF);
+    metarData?.status === "success"
+      ? (metarData.data.metars.map((m) => formatSigWx(m, "metar")) as string[])
+      : undefined;
+  const parsedTaf = tafData?.status === "success" ? (formatSigWx(tafData.data.taf, "taf") as ParsedTAF) : undefined;
 
   // validate the input and mutate the search string, passing it to the context and then it will propagate to the child components
   //   to show the user the data they have requested
@@ -80,7 +82,6 @@ export default function Observations() {
           />
           <Button
             className="me-2 rounded-e-md rounded-s-none flex place-items-center"
-            variant={"secondary"}
             onClick={() => handleInputText(siteId.current)}
           >
             <RefreshCw className="w-4 h-4 me-2 inline" />
@@ -102,9 +103,11 @@ export default function Observations() {
       </div>
 
       <div className="overflow-y-scroll text-sm" style={{ height: "calc(100svh - 6.5rem)" }}>
-        {metarData && <METARs site={site} data={parsedMetars} fetchStatus={metarFetchStatus} />}
-        {metaData && <SiteMetadata site={site} data={metaData.data} fetchStatus={metaFetchStatus} />}
-        {tafData && <TAF site={site} data={parsedTaf} fetchStatus={tafFetchStatus} />}
+        {parsedMetars && <METARs site={site} data={parsedMetars} fetchStatus={metarFetchStatus} />}
+        {metaData?.status === "success" && (
+          <SiteMetadata site={site} data={metaData.data} fetchStatus={metaFetchStatus} />
+        )}
+        {parsedTaf && <TAF site={site} data={parsedTaf} fetchStatus={tafFetchStatus} />}
       </div>
     </>
   );

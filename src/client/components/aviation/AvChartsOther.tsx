@@ -1,7 +1,7 @@
-import { AVIATION_PRODUCTS, Products } from "../../config/aviationProducts";
-import { APIResponse, OtherChartData } from "../../lib/types";
+import { AVIATION_PRODUCTS } from "../../config/aviationProducts";
+import { APIResponse, OtherChartData, Products } from "../../lib/types";
 import { useAviationActions, useDomain, useTimeStep } from "../../stateStores/aviation";
-import Button from "../ui/button";
+import Button from "../ui/Button";
 
 import AvImageContainer from "./AvImageContainer";
 
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const AvChartsOther = ({ product, data }: Props) => {
-  if (!data || !data.data) return;
+  if (!data || data.status !== "success") return;
 
   // get our state variables and mutation
   const domain = useDomain();
@@ -46,8 +46,9 @@ const AvChartsOther = ({ product, data }: Props) => {
         <label className="me-4 max-md:hidden">Domain:</label>
         {domainList.map((d, i) => (
           <Button
-            variant={d.domain === domain ? "selected" : "secondary"}
-            className="rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-w-96"
+            className={`rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-w-96 ${
+              d.domain === domain ? "active" : ""
+            }`}
             key={i}
             onClick={() => {
               actions.setDomain(d.domain);
@@ -67,8 +68,9 @@ const AvChartsOther = ({ product, data }: Props) => {
                 p.domain === currentProduct.domain &&
                 p.images.map((u, i) => (
                   <Button
-                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                    variant={timeStep === i ? "selected" : "secondary"}
+                    className={`rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md ${
+                      timeStep === i ? "active" : ""
+                    }`}
                     key={i}
                     value={u}
                     onClick={() => {

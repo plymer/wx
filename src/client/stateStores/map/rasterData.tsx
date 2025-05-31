@@ -1,7 +1,7 @@
-import { RadarProductsWMSName, SatelliteChannelsWMSName, SATELLITE_CHANNELS } from "../../config/map";
-
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { SATELLITE_CHANNELS } from "../../config/map";
+import { SatelliteChannelsWMSName, RadarProductsWMSName } from "../../lib/types";
 
 interface RasterStateStore {
   satelliteProduct: SatelliteChannelsWMSName;

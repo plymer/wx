@@ -1,9 +1,7 @@
 import { useEffect } from "react";
+import { Rabbit, Snail, User } from "lucide-react";
 
 import AnimationControlButton from "./AnimationControlButton";
-
-import { makeISOTimeStamp } from "../../lib/utils";
-
 import {
   useAnimationActions,
   useAnimationState,
@@ -15,10 +13,11 @@ import {
   useLoopId,
   useStartTime,
 } from "../../stateStores/map/animation";
-import { ANIM_CONTROLS, AnimationControlsList, MAX_FRAMERATE, MIN_FRAMERATE } from "../../config/animation";
-import { CircleHelp } from "lucide-react";
-import Button from "../ui/button";
-import { Slider } from "../ui/slider";
+import { Slider } from "@radix-ui/react-slider";
+import { ANIM_CONTROLS } from "../../config/animation";
+import { AnimationControlsList } from "../../lib/types";
+import { makeISOTimeStamp } from "../../lib/utils";
+import ButtonWithTooltip from "../ui/ButtonWithTooltip";
 
 const AnimationControls = () => {
   const animationActions = useAnimationActions();
@@ -44,14 +43,15 @@ const AnimationControls = () => {
   const doAnimateCommand = (control: AnimationControlsList) => {
     switch (control) {
       case "play":
-        if (animation.state === "loading" || animation.state === "paused") {
-          // if we're stopped or paused at the maxFrame, we don't want to wait the standard 2 second delay so we set our frame to zero and then start playing
-          // if we are anywhere else in the loop, just start playing
-          if (animation.frame === maxFrame) animationActions.setFrame(0);
-          animationActions.play();
-        } else {
-          animationActions.load();
-        }
+        // if (animation.state === "loading" || animation.state === "paused") {
+        //   // if we're stopped or paused at the maxFrame, we don't want to wait the standard 2 second delay so we set our frame to zero and then start playing
+        //   // if we are anywhere else in the loop, just start playing
+        if (animation.frame === maxFrame) animationActions.setFrame(0);
+        //   animationActions.play();
+        // } else {
+        //   animationActions.load();
+        // }
+        animationActions.play();
         break;
 
       case "pause":
@@ -59,34 +59,26 @@ const AnimationControls = () => {
         animationActions.pause();
         break;
 
-      case "realtime":
-        // we want to:
-        // 1) stop the animation (incrementing of our frame number)
-        // 2) stop all network transactions
-        // 3) clear the timeout so that no more loops occur even if they are queued
-        // 4) set our frame back to the most-recent time
-        animationActions.stop();
-        window.stop();
-        clearTimeout(animation.loopId);
-        animationActions.setFrame(maxFrame);
-        break;
-
       case "next":
+        clearTimeout(animation.loopId);
         animationActions.pause();
         animationActions.nextFrame();
         break;
 
       case "prev":
+        clearTimeout(animation.loopId);
         animationActions.pause();
         animationActions.previousFrame();
         break;
 
       case "first":
+        clearTimeout(animation.loopId);
         animationActions.pause();
         animationActions.firstFrame();
         break;
 
       case "last":
+        clearTimeout(animation.loopId);
         animationActions.pause();
         animationActions.lastFrame();
         break;
@@ -178,52 +170,43 @@ const AnimationControls = () => {
 
         <div className="my-2 inline-flex">
           <div className="inline-flex">
-            {
-              <div>
-                <Button variant={"ghost"} onClick={() => alert("tips and best practices for animation")}>
-                  <CircleHelp />
-                </Button>
-              </div>
-            }
-            {ANIM_CONTROLS.map((c, index) => {
-              if (c === "realtime") return;
-              else
-                return (
-                  <AnimationControlButton
-                    key={index}
-                    type={c}
-                    animationState={animation.state}
-                    onClick={() => doAnimateCommand(c)}
-                    className="rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md"
-                  />
-                );
-            })}
+            {ANIM_CONTROLS.map((c, index) => (
+              <AnimationControlButton
+                key={index}
+                buttonType={c}
+                animationState={animation.state}
+                onClick={() => doAnimateCommand(c)}
+                variant={"animation"}
+              />
+            ))}
           </div>
           {/* <div className="ms-2 inline-flex items-center">
-            <label htmlFor="framerate" className="me-2">
-              FPS:
-            </label>
-            <input
-              id="framerate"
-              className="rounded ps-2 text-black bg-secondary"
-              max={MAX_FRAMERATE}
-              min={MIN_FRAMERATE}
-              defaultValue={animation.frameRate}
-              type="number"
-              onChange={(e) => {
-                animationActions.setFrameRate(parseInt(e.target.value));
-              }}
-            />
+            <ButtonWithTooltip
+              tooltipText="slow (0.5x) speed"
+              variant={"animation"}
+              onClick={() => animationActions.setFrameRate(5)}
+              className={`rounded-none rounded-s-md ${animation.frameRate === 5 ? "active" : ""}`}
+            >
+              <Snail />
+            </ButtonWithTooltip>
+            <ButtonWithTooltip
+              tooltipText="normal (1.0x) speed"
+              variant={"animation"}
+              onClick={() => animationActions.setFrameRate(10)}
+              className={`rounded-none ${animation.frameRate === 10 ? "active" : ""}`}
+            >
+              <User />
+            </ButtonWithTooltip>
+            <ButtonWithTooltip
+              tooltipText="fast (2.0x) speed"
+              variant={"animation"}
+              onClick={() => animationActions.setFrameRate(20)}
+              className={`rounded-none rounded-e-md ${animation.frameRate === 20 ? "active" : ""}`}
+            >
+              <Rabbit />
+            </ButtonWithTooltip>
           </div> */}
         </div>
-      </div>
-      <div className="flex py-4 ps-4 place-items-center">
-        <AnimationControlButton
-          animationState="realtime"
-          onClick={() => doAnimateCommand("realtime")}
-          type="realtime"
-          text="Now"
-        />
       </div>
     </div>
   );
