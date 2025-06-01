@@ -1,12 +1,12 @@
 import { Layer, RasterSourceSpecification, Source } from "react-map-gl/maplibre";
 import { useEffect, useRef, useState } from "react";
 
-import { RasterLayerData } from "@lib/types";
-import { useAnimationState, useDeltaTime, useFrame, useFrameCount, useStartTime } from "@stateStores/map/animation";
-import { GOES_WEST_BOUNDS, GOES_EAST_BOUNDS, MAP_BOUNDS, GEOMET_GETMAP } from "@config/map";
-import { makeISOTimeStamp } from "@lib/utils";
+import { RasterLayerData } from "@/lib/types";
+import { useAnimationState, useDeltaTime, useFrame, useFrameCount, useStartTime } from "@/stateStores/map/animation";
+import { GOES_WEST_BOUNDS, GOES_EAST_BOUNDS, MAP_BOUNDS, GEOMET_GETMAP } from "@/config/map";
+import { makeISOTimeStamp } from "@/lib/utils";
 // import PausibleSource from "./PausibleSource";
-// import { useIsMoving } from "@stateStores/mapView";
+// import { useIsMoving } from "@/stateStores/mapView";
 
 interface Props {
   belowLayer?: string;

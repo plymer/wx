@@ -1,8 +1,8 @@
 import { OctagonAlert, OctagonX, Skull } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { FetchStatus } from "@tanstack/react-query";
-import { useHighlightSigWx } from "@hooks/useHighlightSigWx";
-import LoadingIndicator from "@components/ui/LoadingIndicator";
+import { useHighlightSigWx } from "@/hooks/useHighlightSigWx";
+import LoadingIndicator from "@/components/ui/LoadingIndicator";
 
 interface Props {
   site: string;

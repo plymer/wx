@@ -1,6 +1,6 @@
-import { AVIATION_PRODUCTS } from "../../config/aviationProducts";
-import { APIResponse, GFAData, ProductDomains, Products } from "../../lib/types";
-import { useAviationActions, useDomain, useSubProduct, useTimeStep } from "../../stateStores/aviation";
+import { AVIATION_PRODUCTS } from "@/config/aviationProducts";
+import { APIResponse, GFAData, ProductDomains, Products } from "@/lib/types";
+import { useAviationActions, useDomain, useSubProduct, useTimeStep } from "@/stateStores/aviation";
 import Button from "../ui/Button";
 
 import AvImageContainer from "./AvImageContainer";

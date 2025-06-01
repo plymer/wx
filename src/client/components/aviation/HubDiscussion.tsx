@@ -2,10 +2,10 @@ import { Binoculars, Notebook, Pencil, Plane } from "lucide-react";
 import LoadingIndicator from "../ui/LoadingIndicator";
 
 import TAF from "../observations/TAF";
-import { useAviationActions } from "../../stateStores/aviation";
-import useAPI from "../../hooks/useAPI";
-import { HubData, ParsedTAF, TAFData } from "../../lib/types";
-import { formatSigWx } from "../../lib/utils";
+import { useAviationActions } from "@/stateStores/aviation";
+import useAPI from "@/hooks/useAPI";
+import { HubData, ParsedTAF, TAFData } from "@/lib/types";
+import { formatSigWx } from "@/lib/utils";
 import Button from "../ui/Button";
 
 interface Props {

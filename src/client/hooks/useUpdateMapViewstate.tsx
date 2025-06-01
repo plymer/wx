@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useMapRef, useMapStateActions, useViewportBounds } from "@stateStores/map/mapView";
+import { useMapRef, useMapStateActions, useViewportBounds } from "../stateStores/map/mapView";
 // import { SiteMetaData } from "../lib/types";
 // import { checkIfInBounds } from "@/lib/utils";
 import { Map } from "maplibre-gl";

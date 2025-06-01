@@ -1,8 +1,8 @@
-import { useBulletin, useOffice, usePublicActions } from "@stateStores/public";
+import { useBulletin, useOffice, usePublicActions } from "@/stateStores/public";
 
-import { PUBLIC_FORECAST_CONFIG } from "@config/public";
-import { PublicBulletin } from "@lib/types";
-import useAPI from "@hooks/useAPI";
+import { PUBLIC_FORECAST_CONFIG } from "../config/public";
+import { PublicBulletin } from "@/lib/types";
+import useAPI from "@/hooks/useAPI";
 import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 

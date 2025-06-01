@@ -1,7 +1,7 @@
 import { Play, Pause, ChevronFirst, ChevronLeft, ChevronLast, ChevronRight } from "lucide-react";
 import { ButtonProps } from "../ui/Button";
 
-import { AnimationControlsList, AnimationState } from "@lib/types";
+import { AnimationControlsList, AnimationState } from "@/lib/types";
 import ButtonWithTooltip from "../ui/ButtonWithTooltip";
 
 interface Props extends ButtonProps {

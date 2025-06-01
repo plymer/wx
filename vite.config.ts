@@ -1,4 +1,3 @@
-import path from "path";
 import { defineConfig } from "vite";
 
 // plugins
@@ -34,15 +33,5 @@ export default defineConfig({
     }),
     VitePWA({ registerType: "autoUpdate", manifest: false }),
   ],
-
-  resolve: {
-    alias: {
-      "@components": path.resolve(__dirname, "src/client/components/"),
-      "@hooks": path.resolve(__dirname, "src/client/hooks/"),
-      "@lib": path.resolve(__dirname, "src/client/lib/"),
-      "@stateStores": path.resolve(__dirname, "src/client/stateStores/"),
-      "@config": path.resolve(__dirname, "src/client/config/"),
-      "@assets": path.resolve(__dirname, "src/client/assets/"),
-    },
-  },
+  resolve: { alias: { "@": "/src/client" } },
 });

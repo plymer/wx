@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 import { DEFAULT_MAX_FRAMES } from "../../config/animation";
-import { HOUR, MINUTE } from "../../lib/utils";
 import { AnimationState } from "../../lib/types";
+import { HOUR, MINUTE } from "../../lib/utils";
 
 interface AnimationStateStore {
   frame: number;

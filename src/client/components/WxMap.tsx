@@ -1,20 +1,23 @@
 import RealtimeOptions from "./map/RealtimeOptions";
 import AnimationControls from "./map/AnimationControls";
 import MapInstance from "./map/MapInstance";
-import { positronWxMap } from "@assets/map-styles/positron-wxmap";
-import { useAnimationState } from "@stateStores/map/animation";
-import {
-  useBearing,
-  useLatitude,
-  useLoadingState,
-  useLongitude,
-  usePitch,
-  useProjection,
-  useZoom,
-} from "@stateStores/map/mapView";
+
+import { positronWxMap } from "../assets/map-styles/positron-wxmap.js";
+
 import { AttributionControl, ViewState } from "react-map-gl/maplibre";
 import LoadingIndicator from "./ui/LoadingIndicator";
 import MapOptions from "./map/MapOptions";
+import { GeoLocation } from "./map/GeoLocation";
+import { useAnimationState } from "../stateStores/map/animation";
+import {
+  useLoadingState,
+  useProjection,
+  useLatitude,
+  useLongitude,
+  useZoom,
+  useBearing,
+  usePitch,
+} from "../stateStores/map/mapView";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -43,9 +46,11 @@ export default function WxMap() {
             position="top-right"
             style={{ backgroundColor: "#475569", color: "var(--secondary)", border: "1px solid var(--primary)" }}
           />
-          <div className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
+
+          <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
             <RealtimeOptions />
             <MapOptions />
+            <GeoLocation />
           </div>
           {loadingState && (
             <LoadingIndicator

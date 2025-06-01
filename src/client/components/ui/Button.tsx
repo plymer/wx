@@ -2,7 +2,7 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
-import { cn } from "../../lib/utils";
+import { cn } from "@/lib/utils";
 
 export const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-wrap rounded-md text-sm font-medium hover:cursor-pointer ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -12,7 +12,7 @@ export const buttonVariants = cva(
         default: "bg-primary text-primary-foreground hover:bg-accent/60 [&.active]:bg-accent [&.active]:text-white",
         alternate: "bg-secondary text-secondary-foreground hover:bg-accent/60 hover:text-white",
         menuTab: "rounded-none rounded-t-md [&.active]:bg-neutral-800 [&.active]:text-white",
-        floating: "bg-primary text-primary-foreground hover:bg-accent rounded-md",
+        floating: "bg-primary text-primary-foreground hover:bg-accent p-2 rounded-md disabled:opacity-100",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         drawer:
           "bg-neutral-200 w-full text-black hover:bg-accent hover:text-white [&.active]:bg-accent  [&.active]:text-white rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md",

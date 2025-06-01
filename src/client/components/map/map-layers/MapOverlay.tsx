@@ -1,6 +1,6 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 
-import { GeoJSON, OverlayOptions } from "@lib/types";
+import { GeoJSON, OverlayOptions } from "@/lib/types";
 
 interface Props {
   id: string;

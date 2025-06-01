@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Globe, Globe2, List, Map, ScanEye } from "lucide-react";
 
-import { ToggleDataOption } from "@lib/types";
+import { ToggleDataOption } from "@/lib/types";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/Drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
 import { Label } from "../ui/Label";
@@ -17,9 +17,9 @@ import {
   usePublicRegionsOverlay,
   useTAFsOverlay,
   useVectorOverlayActions,
-} from "@stateStores/map/vectorOverlays";
-import { useMapStateActions, useProjection } from "@stateStores/map/mapView";
-import { useMapOptionsTab, useUIActions } from "@stateStores/map/ui";
+} from "@/stateStores/map/vectorOverlays";
+import { useMapStateActions, useProjection } from "@/stateStores/map/mapView";
+import { useMapOptionsTab, useUIActions } from "@/stateStores/map/ui";
 
 interface Props {
   className?: string;
@@ -100,7 +100,7 @@ export default function RealtimeOptions({ className }: Props) {
         <DrawerTitle content="Map View Options" />
         <DrawerDescription content="Change the map projection and what types of overlays are displayed" />
         <DrawerTrigger asChild>
-          <Button variant={"floating"} className={className}>
+          <Button size="icon" variant={"floating"} className={className}>
             <Globe2 />
           </Button>
         </DrawerTrigger>

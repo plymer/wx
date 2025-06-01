@@ -11,7 +11,7 @@ import {
   TowerControl,
 } from "lucide-react";
 import { FetchStatus } from "@tanstack/react-query";
-import { SiteData } from "@lib/types";
+import { SiteData } from "@/lib/types";
 
 // custom imports
 

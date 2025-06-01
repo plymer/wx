@@ -1,15 +1,15 @@
 // third-party libraries
 import { useEffect, useRef } from "react";
 import { RefreshCw, Search } from "lucide-react";
-import { useHours, useObsActions, useSite } from "@stateStores/observations";
-import useAPI from "@hooks/useAPI";
-import { METAR, ParsedTAF, SiteData, TAFData } from "@lib/types";
+import { useHours, useObsActions, useSite } from "@/stateStores/observations";
+import useAPI from "@/hooks/useAPI";
+import { METAR, ParsedTAF, SiteData, TAFData } from "@/lib/types";
 import { Input } from "./ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 import METARs from "./observations/METARs";
 import SiteMetadata from "./observations/SiteMetadata";
 import TAF from "./observations/TAF";
-import { formatSigWx } from "@lib/utils";
+import { formatSigWx } from "@/lib/utils";
 import Button from "./ui/Button";
 
 import { toast } from "sonner";
