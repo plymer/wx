@@ -35,34 +35,40 @@ export const API_CONFIG = {
       data: "geomet",
       url: "/charts/gfa",
       description: "returns a list of layers, with their valid times coordinated",
-      params: [],
+      params: null,
     },
 
     {
       data: "geomet",
       url: "/charts/lgf",
       description: "returns a list of layers, with their valid times coordinated",
-      params: [],
+      params: null,
     },
 
     {
       data: "geomet",
       url: "/charts/hlt",
       description: "returns a list of layers, with their valid times coordinated",
-      params: [],
+      params: null,
     },
 
     {
       data: "geomet",
       url: "/charts/sigwx",
       description: "returns a list of layers, with their valid times coordinated",
-      params: [],
+      params: null,
     },
     {
       data: "public bulletins",
       url: "/alpha/public/bulletin",
       description: "returns the public bulletin requested",
       params: ["office", "bulletin"],
+    },
+    {
+      data: "lightning",
+      url: "/lightning",
+      description: "returns lightning data for the last 3 hours",
+      params: null,
     },
   ],
 } as const;

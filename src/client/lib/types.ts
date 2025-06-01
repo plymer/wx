@@ -17,6 +17,8 @@ import { APP_MODES_LIST } from "../config/modes";
 import { PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { VECTOR_DATA_TYPES } from "../config/vectorData";
 
+import { FeatureCollection, MultiPoint } from "geojson";
+
 export type AppMode = keyof typeof APP_MODES_LIST;
 export type AnimationState = (typeof ANIMATION_STATES)[number];
 export type AnimationControlsList = (typeof ANIM_CONTROLS)[number];
@@ -67,6 +69,8 @@ export type SiteData = {
   sunrise: string;
   sunset: string;
 };
+
+export type LightningData = FeatureCollection<MultiPoint, { validTime: number }>;
 
 export type METAR = string[];
 export type TAFData = string;

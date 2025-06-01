@@ -2,12 +2,13 @@
 import { useEffect, useState } from "react";
 
 // types, utilities, and hooks
-import { RasterLayerData, GeoJSON } from "@/lib/types";
+import { RasterLayerData, GeoJSON, LightningData } from "@/lib/types";
 // import { MINUTE, tempCircleBuilder } from "@/lib/utils";
 
 // data layers
 import RasterDataLayer from "./map-layers/RasterDataLayer";
-// import VectorDataLayer from "./map-layers/VectorDataLayer";
+import VectorDataLayer from "./map-layers/VectorDataLayer";
+
 // import SurfaceData from "./map-layers/SurfaceData";
 // import PirepData from "./map-layers/PirepData";
 
@@ -24,9 +25,19 @@ import {
   useShowSatellite,
 } from "@/stateStores/map/rasterData";
 import useAPI from "@/hooks/useAPI";
+import {
+  useShowAIRMETs,
+  useShowLightning,
+  useShowObs,
+  useShowPIREPs,
+  useShowSIGMETs,
+} from "@/stateStores/map/vectorData";
+import { Feature } from "maplibre-gl";
 // import { useShowObs, useShowPIREPs, useShowSIGMETs, useShowAIRMETs } from "@/stateStores/vectorData";
 // import { useDeltaTime, useFrame, useStartTime } from "@stateStores/map/animation";
 // import { useViewportBounds, useZoom } from "@stateStores/map/mapView";
+
+import { FeatureCollection, MultiPoint } from "geojson";
 
 interface Props {
   baseLayers: string[];
@@ -48,13 +59,13 @@ const DataLayerManager = ({ baseLayers }: Props) => {
 
   // state store subscriptions
 
-  // const vector = {
-  //   // showLightning: useShowLightning(),
-  //   showObs: useShowObs(),
-  //   showPIREPs: useShowPIREPs(),
-  //   showSIGMETs: useShowSIGMETs(),
-  //   showAIRMETs: useShowAIRMETs(),
-  // };
+  const vector = {
+    showLightning: useShowLightning(),
+    showObs: useShowObs(),
+    showPIREPs: useShowPIREPs(),
+    showSIGMETs: useShowSIGMETs(),
+    showAIRMETs: useShowAIRMETs(),
+  };
 
   const raster = {
     showSatellite: useShowSatellite(),
@@ -90,6 +101,16 @@ const DataLayerManager = ({ baseLayers }: Props) => {
     },
     {
       queryName: "rasterData",
+      enabled: true,
+      interval: 1,
+    }
+  );
+
+  const { data: lightning } = useAPI<LightningData>(
+    "/lightning",
+    {},
+    {
+      queryName: "lightning",
       enabled: true,
       interval: 1,
     }
@@ -171,14 +192,15 @@ const DataLayerManager = ({ baseLayers }: Props) => {
 
       {/* {vector.showPIREPs && <PirepData key={"pirep"} currentTime={currentTime} viewportBounds={map.bounds} />} */}
 
-      {/* {vectorDataStore.showLightning && dummyLightning && (
+      {vector.showLightning && lightning?.status === "success" && (
         <VectorDataLayer
-          dataType="lightning"
+          id={"lightning"}
           key={"lightning"}
-          jsonData={{ status: "success", data: dummyLightning }}
+          data={lightning.data}
+          overlayType="circle"
           belowLayer={layerConstraints.vector}
         />
-      )} */}
+      )}
     </>
   );
 };

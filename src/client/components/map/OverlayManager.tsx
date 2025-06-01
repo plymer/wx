@@ -29,6 +29,18 @@ import {
   MARINE_OVERLAY,
 } from "@/config/overlays";
 
+import { FeatureCollection } from "geojson";
+
+const overlays = {
+  gfa: gfaBoundaries as FeatureCollection,
+  lgf: lgfBoundaries as FeatureCollection,
+  fir: firBoundaries as FeatureCollection,
+  taf: tafSites as FeatureCollection,
+  bedposts: bedposts as FeatureCollection,
+  publicRegions: publicRegions as FeatureCollection,
+  marineRegions: marineRegions as FeatureCollection,
+};
+
 // import { ParsedTaf, PopupData } from "@/lib/types";
 // import { Popup, useMap } from "react-map-gl/maplibre";
 // import { formatSigWx, popupAnchor } from "@/lib/utils";
@@ -63,8 +75,7 @@ const OverlayManager = () => {
         <MapOverlay
           key={"firBoundaries"}
           id="fir-boundaries"
-          // @ts-ignore
-          data={firBoundaries}
+          data={overlays.fir}
           overlayType="line"
           overlayOptions={FIR_OVERLAY}
         />
@@ -73,8 +84,7 @@ const OverlayManager = () => {
         <MapOverlay
           key={"gfaBoundaries"}
           id="gfa-boundaries"
-          // @ts-ignore
-          data={gfaBoundaries}
+          data={overlays.gfa}
           overlayType="line"
           overlayOptions={GFA_OVERLAY}
         />
@@ -83,8 +93,7 @@ const OverlayManager = () => {
         <MapOverlay
           key={"lgfBoundaries"}
           id="lgf-boundaries"
-          // @ts-ignore
-          data={lgfBoundaries}
+          data={overlays.lgf}
           overlayType="line"
           overlayOptions={LGF_OVERLAY}
         />
@@ -93,8 +102,7 @@ const OverlayManager = () => {
         <MapOverlay
           key={"bedposts"}
           id="bedposts"
-          // @ts-ignore
-          data={bedposts}
+          data={overlays.bedposts}
           overlayType="symbol"
           overlayOptions={BEDPOST_OVERLAY}
         />
@@ -103,8 +111,7 @@ const OverlayManager = () => {
         <MapOverlay
           key={"publicRegions"}
           id="publicRegions"
-          // @ts-ignore
-          data={publicRegions}
+          data={overlays.publicRegions}
           overlayType="line"
           overlayOptions={PUBLIC_OVERLAY}
         />
@@ -114,15 +121,19 @@ const OverlayManager = () => {
         <MapOverlay
           key={"marineRegions"}
           id="marineRegions"
-          // @ts-ignore
-          data={marineRegions}
+          data={overlays.marineRegions}
           overlayType="line"
           overlayOptions={MARINE_OVERLAY}
         />
       )}
       {tafsOverlay && (
-        // @ts-ignore
-        <MapOverlay key={"tafSites"} id="tafSites" data={tafSites} overlayType="symbol" overlayOptions={TAF_OVERLAY} />
+        <MapOverlay
+          key={"tafSites"}
+          id="tafSites"
+          data={overlays.taf}
+          overlayType="symbol"
+          overlayOptions={TAF_OVERLAY}
+        />
       )}
 
       {/* {popupData && (

@@ -1,13 +1,7 @@
 import { Hono } from "hono";
 import axios from "axios";
-import { Feature, FeatureCollection, MultiPoint, Point } from "geojson";
-
-interface LightningFC extends FeatureCollection {
-  timeStamp: string;
-  dateFrom: string;
-  dateTo: string;
-  totalBeforeCluster: number;
-}
+import { Feature, FeatureCollection, Point } from "geojson";
+import { LightningFC } from "../lib/lightning.types.js";
 
 const route = new Hono();
 
