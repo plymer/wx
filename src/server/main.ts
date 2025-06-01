@@ -8,6 +8,7 @@ import { readFileSync } from "fs";
 import { default as geomet } from "./endpoints/geomet.js";
 import { default as alpha } from "./endpoints/alphanumeric.js";
 import { default as charts } from "./endpoints/charts.js";
+import { default as lightning } from "./endpoints/lightning.js";
 
 // custom types and utilities
 import { injectViteDevServer } from "./lib/utils.js";
@@ -31,6 +32,17 @@ app.get("/*", serveStatic({ root: isProd ? "./dist" : "./" }));
 app.route("/api", geomet);
 app.route("/api/alpha", alpha);
 app.route("/api/charts", charts);
+app.route("/api", lightning);
+
+// we can pretty this up like we did internally at some point
+// return a list of all the API routes thay are active
+app.get("/api", (c) => {
+  const routes = app.routes.map((route) => route.path);
+  const uniqueRoutes = Array.from(new Set(routes))
+    .filter((r) => r.includes("/api"))
+    .sort();
+  return c.json(uniqueRoutes, 200);
+});
 
 // serve the SPA page
 app.get("/", (c) => c.html(html));
