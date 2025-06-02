@@ -12,7 +12,8 @@ export const buttonVariants = cva(
         default: "bg-primary text-primary-foreground hover:bg-accent/60 [&.active]:bg-accent [&.active]:text-white",
         alternate: "bg-secondary text-secondary-foreground hover:bg-accent/60 hover:text-white",
         menuTab: "rounded-none rounded-t-md [&.active]:bg-neutral-800 [&.active]:text-white",
-        floating: "bg-primary text-primary-foreground hover:bg-accent p-2 rounded-md disabled:opacity-100",
+        floating:
+          "bg-primary text-primary-foreground border-neutral-400 border-1 hover:bg-accent p-2 rounded-md disabled:opacity-100",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         drawer:
           "bg-neutral-200 w-full text-black hover:bg-accent hover:text-white [&.active]:bg-accent  [&.active]:text-white rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md",

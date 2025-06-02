@@ -32,12 +32,9 @@ import {
   useShowPIREPs,
   useShowSIGMETs,
 } from "@/stateStores/map/vectorData";
-import { Feature } from "maplibre-gl";
 // import { useShowObs, useShowPIREPs, useShowSIGMETs, useShowAIRMETs } from "@/stateStores/vectorData";
 // import { useDeltaTime, useFrame, useStartTime } from "@stateStores/map/animation";
 // import { useViewportBounds, useZoom } from "@stateStores/map/mapView";
-
-import { FeatureCollection, MultiPoint } from "geojson";
 
 interface Props {
   baseLayers: string[];

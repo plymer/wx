@@ -2,13 +2,12 @@ import RealtimeOptions from "./map/RealtimeOptions";
 import AnimationControls from "./map/AnimationControls";
 import MapInstance from "./map/MapInstance";
 
-import { positronWxMap } from "../assets/map-styles/positron-wxmap.js";
+import { positronWxMap } from "@/assets/map-styles/positron-wxmap.js";
 
 import { AttributionControl, ViewState } from "react-map-gl/maplibre";
 import LoadingIndicator from "./ui/LoadingIndicator";
 import MapOptions from "./map/MapOptions";
 import { GeoLocation } from "./map/GeoLocation";
-import { useAnimationState } from "../stateStores/map/animation";
 import {
   useLoadingState,
   useProjection,
@@ -17,13 +16,16 @@ import {
   useZoom,
   useBearing,
   usePitch,
-} from "../stateStores/map/mapView";
+} from "@/stateStores/map/mapView";
+import { useAnimationActions } from "@/stateStores/map/animation";
+
+import { useEffect } from "react";
 
 export default function WxMap() {
   // global state store subscriptions
-  const animationState = useAnimationState();
   const loadingState = useLoadingState();
   const projection = useProjection();
+  const animation = useAnimationActions();
 
   const viewState: Partial<ViewState> = {
     latitude: useLatitude(),
@@ -33,13 +35,20 @@ export default function WxMap() {
     pitch: usePitch(),
   };
 
+  useEffect(() => {
+    // on mount, make sure the animation is paused
+    // and set to the first frame
+    animation.pause();
+    animation.firstFrame();
+  }, []);
+
   // import the map style - this may need to change to allow different map styles in the future
   const mapStyle = positronWxMap;
 
   // TODO :: fix the small gap of a few px when the map is first loading because the wrapper div below does not actually cover the entire height of the map
   return (
     <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height) text-sm">
-      <MapInstance viewState={viewState} mapProjection={projection} animationState={animationState} basemap={mapStyle}>
+      <MapInstance viewState={viewState} mapProjection={projection} basemap={mapStyle}>
         <>
           <AttributionControl
             compact
@@ -55,7 +64,7 @@ export default function WxMap() {
           {loadingState && (
             <LoadingIndicator
               displayText="Loading"
-              className="absolute top-0 left-0 ms-2 mt-2 text-white bg-transparent drop-shadow-lg"
+              className="absolute top-0 left-0 rounded-md ms-2 mt-2 text-white bg-primary border-1 border-neutral-400 drop-shadow-lg"
             />
           )}
         </>

@@ -9,26 +9,21 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 // helpers
 import { MAP_BOUNDS } from "@/config/map";
-// import { AlphaDataTypes, CursorTypes, PopupData } from "@/lib/types";
 
 // layer managers
 import DataLayerManager from "./DataLayerManager";
 import OverlayManager from "./OverlayManager";
 
 // global state stores
-import { useAnimationActions } from "@/stateStores/map/animation";
 import { useMapStateActions } from "@/stateStores/map/mapView";
-// import { useAlphaDataActions, useIsPopoutOpen } from "@/stateStores/alphaData";
-// import usePopoutChannel from "@/hooks/usePopoutChannel";
 import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
 import { AnimationState, MapProjections } from "@/lib/types";
+import useMapClock from "@/hooks/useClock";
 
 interface Props {
   viewState: Partial<ViewState>;
-  animationState: AnimationState;
   mapProjection: MapProjections;
   basemap: StyleSpecification;
-  setSiteId?: (inputText: string) => void; // use this to coordinate the feature we click with the siteId displayed in the alphaData component
   interactiveLayers?: string[];
   children?: ReactElement<any, any>;
 }
@@ -40,17 +35,14 @@ function getWxLayers(layerList: string[]) {
   // console.log(wxLayers);
 }
 
-const WxMap = ({ viewState, animationState, mapProjection, children, basemap, setSiteId }: Props) => {
+const WxMap = ({ viewState, mapProjection, children, basemap }: Props) => {
   // subscribe to our global state stores
-  const animation = useAnimationActions();
   const mapState = useMapStateActions();
-  // const isPopoutOpen = useIsPopoutOpen();
-  // const popout = usePopoutChannel();
   const mapViewUpdater = useUpdateMapViewstate();
 
-  // const actions = useAlphaDataActions();
+  // set up our map clock so that our map animation is keeping up to date
+  useMapClock();
 
-  // const [cursor, setCursor] = useState<CursorTypes>("grab");
   // keep track of the basemap layers so that we can filter them out when adding our own data layers
   const [baseMapLayers, setBaseMapLayers] = useState<string[]>();
 
@@ -115,7 +107,6 @@ const WxMap = ({ viewState, animationState, mapProjection, children, basemap, se
 
   return (
     <Map
-      // cursor={cursor}
       maxTileCacheSize={512}
       maxTileCacheZoomLevels={10}
       fadeDuration={0}

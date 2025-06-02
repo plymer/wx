@@ -21,7 +21,7 @@ route.get("/lightning", async (ctx) => {
   // we want to loop back every 6 minutes for the last 3 hours and return all of the lightning data
   // we'll create an array of timestamps to fetch
   const timeStamps = [];
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 32; i++) {
     const time = new Date(searchStartTime.getTime() - i * 6 * 60 * 1000);
     const formattedTime = time
       .toISOString() //
