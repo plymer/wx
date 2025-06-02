@@ -161,7 +161,7 @@ export type VectorConfig = {
 };
 
 export type VectorDisplayConfig = {
-  [K in VectorDataTypes]?: VectorConfig;
+  [K in VectorDataTypes]: VectorConfig;
 };
 
 // helper types for satellite

@@ -7,7 +7,7 @@ import { RasterLayerData, GeoJSON, LightningData } from "@/lib/types";
 
 // data layers
 import RasterDataLayer from "./map-layers/RasterDataLayer";
-import VectorDataLayer from "./map-layers/VectorDataLayer";
+import LightningDataLayer from "./map-layers/LightningDataLayer";
 
 // import SurfaceData from "./map-layers/SurfaceData";
 // import PirepData from "./map-layers/PirepData";
@@ -193,13 +193,7 @@ const DataLayerManager = ({ baseLayers }: Props) => {
       {/* {vector.showPIREPs && <PirepData key={"pirep"} currentTime={currentTime} viewportBounds={map.bounds} />} */}
 
       {vector.showLightning && lightning?.status === "success" && (
-        <VectorDataLayer
-          id={"lightning"}
-          key={"lightning"}
-          data={lightning.data}
-          overlayType="circle"
-          belowLayer={layerConstraints.vector}
-        />
+        <LightningDataLayer key="lightning" data={lightning.data} belowLayer={layerConstraints.vector} />
       )}
     </>
   );
