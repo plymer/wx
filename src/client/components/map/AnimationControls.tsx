@@ -43,14 +43,8 @@ const AnimationControls = ({ ...props }: Props) => {
   const doAnimateCommand = (control: AnimationControlsList) => {
     switch (control) {
       case "play":
-        // if (animation.state === "loading" || animation.state === "paused") {
-        //   // if we're stopped or paused at the maxFrame, we don't want to wait the standard 2 second delay so we set our frame to zero and then start playing
-        //   // if we are anywhere else in the loop, just start playing
         if (animation.frame === maxFrame) animationActions.setFrame(0);
-        //   animationActions.play();
-        // } else {
-        //   animationActions.load();
-        // }
+
         animationActions.play();
         break;
 
@@ -86,51 +80,6 @@ const AnimationControls = ({ ...props }: Props) => {
   };
 
   /**
-   *  Used to translate keyboard input into a useable command string to animate the data
-   * @param code a string returned by a KeyboardEvent.code that pertains to the key pressed by the user
-   * @returns a string that can be used by the doAnimateCommand method to change the animation state and timestep
-   */
-  // const translateKeyboardInput = (event: KeyboardEvent): AnimationControlsList | undefined => {
-  //   switch (event.code) {
-  //     case "Space":
-  //       if (animation.state === "paused" || animation.state === "loading" || animation.state === "stopped")
-  //         return "play";
-  //       else return "pause";
-  //     case "Comma":
-  //       return "prev";
-  //     case "Period":
-  //       return "next";
-  //     case "Slash":
-  //       return "first";
-  //     case "KeyM":
-  //       return "last";
-  //   }
-  // };
-
-  /**
-   * set up the method that is called by the event listener for keyboard shortcuts in the app
-   */
-  // const handleKeyPress = useCallback(
-  //   (event: KeyboardEvent) => {
-  //     event.code === "Slash" && event.preventDefault();
-  //     const translated = translateKeyboardInput(event);
-  //     translated && doAnimateCommand(translated);
-  //   },
-  //   [animation.frame, animation.state],
-  // );
-
-  /**
-   * add the event listeners to the html document that listen for user keyboard input and send it to our callback
-   */
-  // useEffect(() => {
-  //   document.addEventListener("keydown", handleKeyPress);
-
-  //   return () => {
-  //     document.removeEventListener("keydown", handleKeyPress);
-  //   };
-  // }, [handleKeyPress]);
-
-  /**
    * create a setInterval that will be applied or removed as necessary depending on the animation state that the user has chosen
    */
   useEffect(() => {
@@ -147,12 +96,12 @@ const AnimationControls = ({ ...props }: Props) => {
 
   return (
     <div {...props}>
-      <div className="flex justify-center flex-col w-full max-w-80">
-        <div className="mt-2 flex justify-center font-mono ">
+      <div className="flex justify-center flex-col w-full max-w-90 ">
+        <div className="mt-2 flex justify-center font-mono drop-shadow-2xl">
           Display Time: {makeISOTimeStamp(currentTime, "display")}
         </div>
 
-        <div className="flex justify-between font-mono place-items-center">
+        <div className="flex justify-between font-mono place-items-center border-2 border-black rounded-md px-2 mt-2 bg-neutral-900 drop-shadow-2xl">
           <div className="me-2 text-xs">{makeISOTimeStamp(animation.startTime, "display", true)}</div>
           <Slider
             onClick={() => animationActions.pause()}
@@ -168,7 +117,7 @@ const AnimationControls = ({ ...props }: Props) => {
           <div className="ms-2 text-xs">{makeISOTimeStamp(animation.endTime, "display", true)}</div>
         </div>
 
-        <div className="m-2 inline-flex justify-center">
+        <div className="m-2 inline-flex justify-center drop-shadow-2xl">
           {ANIM_CONTROLS.map((c, index) => (
             <AnimationControlButton
               key={index}

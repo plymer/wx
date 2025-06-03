@@ -20,7 +20,7 @@ export const buttonVariants = cva(
         expandingIcon:
           "bg-primary text-white whitespace-nowrap overflow-hidden w-fit not-hover:w-10 h-10 items-center not-hover:*:me-6 border-1 border-neutral-400",
         animation:
-          "bg-primary text-primary-foreground hover:bg-accent/60 rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md [&.active]:bg-accent [&.active]:text-white",
+          "bg-primary text-primary-foreground hover:bg-accent/60 rounded-none border-y-2 border-s-2 last-of-type:border-e-2 border-black first-of-type:rounded-s-md last-of-type:rounded-e-md [&.active]:bg-accent [&.active]:text-white",
       },
       size: {
         default: "min-h-10 px-4 py-2",
