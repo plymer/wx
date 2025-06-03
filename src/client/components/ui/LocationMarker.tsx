@@ -11,7 +11,7 @@ const LocationMarker = ({ position }: Props) => {
     <Marker longitude={position.coords.longitude} latitude={position.coords.latitude}>
       <div
         key="position-dot-pulse"
-        className={`size-8 rounded-full animate-ping inset-0 bg-radial from bg-blue-500/50 to-bg-transparent ${centerMe}`}
+        className={`size-8 rounded-full animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] inset-0 bg-radial from bg-blue-500/50 to-bg-transparent ${centerMe}`}
       />
       <div key="position-dot-heading-cone" className={`${centerMe}`} />
       <div

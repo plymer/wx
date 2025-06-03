@@ -1,8 +1,6 @@
-import { OctagonAlert, OctagonX, Skull } from "lucide-react";
+import { OctagonAlert, Skull } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { FetchStatus } from "@tanstack/react-query";
 import { useHighlightSigWx } from "@/hooks/useHighlightSigWx";
-import AppLoadingIndicator from "@/components/ui/AppLoadingIndicator";
 import { APIResponse, METAR } from "@/lib/types";
 import { formatSigWx } from "@/lib/utils";
 

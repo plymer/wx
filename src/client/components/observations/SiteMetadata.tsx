@@ -1,15 +1,5 @@
 // 3rd party imports
-import {
-  Globe,
-  Loader2,
-  MountainSnow,
-  OctagonAlert,
-  OctagonX,
-  Skull,
-  Sunrise,
-  Sunset,
-  TowerControl,
-} from "lucide-react";
+import { Globe, MountainSnow, OctagonAlert, Skull, Sunrise, Sunset, TowerControl } from "lucide-react";
 import { APIResponse, SiteData } from "@/lib/types";
 
 // custom imports
@@ -36,28 +26,30 @@ const SiteMetadata = ({ site, data }: Props) => {
         </div>
       );
     case "success":
+      // cursed data structure, yes i know
+      const metaData = data.data;
       return (
         <div className="text-center bg-neutral-800 py-2 text-white border-y-2 border-black">
           <h2 className="text-xl font-bold">
             <TowerControl className="inline me-2" />
-            {data.data.location}
+            {metaData.location}
           </h2>
           <div className="inline me-4 place-items-center text-sm">
             <Globe className="inline me-2 w-4 h-4" />
-            {data.data.lat} {data.data.lon}
+            {metaData.lat} {metaData.lon}
           </div>
           <div className="inline me-4 place-items-center text-sm">
             <MountainSnow className="inline me-2 w-4 h-4" />
-            {data.data.elev_f} / {data.data.elev_m}
+            {metaData.elev_f} / {metaData.elev_m}
           </div>
           <div>
             <div className="inline me-4 place-items-center text-sm">
               <Sunrise className="inline me-2 w-4 h-4" />
-              {data.data.sunrise}
+              {metaData.sunrise}
             </div>
             <div className="inline me-4 place-items-center text-sm">
               <Sunset className="inline me-2 w-4 h-4" />
-              {data.data.sunset}
+              {metaData.sunset}
             </div>
           </div>
         </div>
