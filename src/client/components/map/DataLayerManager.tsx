@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 
 // types, utilities, and hooks
-import { RasterLayerData, GeoJSON, LightningData } from "@/lib/types";
+import { RasterLayerData, LightningData } from "@/lib/types";
 // import { MINUTE, tempCircleBuilder } from "@/lib/utils";
 
 // data layers
@@ -156,6 +156,10 @@ const DataLayerManager = ({ baseLayers }: Props) => {
         rasterData?.status === "success" &&
         rasterData.data.map((d, i) => {
           const belowLayerId = i === 0 ? layerConstraints.raster : raster.manifest[i - 1] + "-0";
+
+          // we need to check to see if the belowLayerId exists on the map
+          // the first layer added will be looking for 'wateroutline', but then it adds the 18th instance of that layer that is being added
+          // so we need to wait until the 0th instance of that layer is added before we move on to the next data type
 
           return (
             <RasterDataLayer

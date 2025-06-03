@@ -169,6 +169,9 @@ export type SatelliteList = (typeof SATELLITES)[number];
 export type SatelliteChannelsList = keyof typeof SATELLITE_CHANNELS;
 export type SatelliteChannelsWMSName = (typeof SATELLITE_CHANNELS)[keyof typeof SATELLITE_CHANNELS]["wms"];
 export type SatelliteChannelsMenuName = (typeof SATELLITE_CHANNELS)[keyof typeof SATELLITE_CHANNELS]["menuName"];
+
+export type SatelliteChannels = IIMT<typeof SATELLITE_CHANNELS, "channel">;
+
 // helper types for radar
 export type RadarProducts = typeof RADAR_PRODUCTS;
 export type RadarProductsWMSName = RadarProducts[keyof RadarProducts]["wms"];

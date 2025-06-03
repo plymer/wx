@@ -87,7 +87,7 @@ export default function Public() {
       {productList[(productCode + issuerCode) as keyof typeof productList] && data?.status === "success" ? (
         <pre
           className="overflow-y-scroll whitespace-pre-wrap md:px-6 max-md:pb-12 max-w-fit mx-auto"
-          style={{ height: "calc(100svh - 10.7rem)" }}
+          style={{ height: "calc(100svh - 11.2rem)" }}
         >
           {data.data.trim()}
         </pre>
