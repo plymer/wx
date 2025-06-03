@@ -10,72 +10,58 @@ import {
   Sunset,
   TowerControl,
 } from "lucide-react";
-import { FetchStatus } from "@tanstack/react-query";
-import { SiteData } from "@/lib/types";
+import { APIResponse, SiteData } from "@/lib/types";
 
 // custom imports
 
 interface Props {
   site: string;
-  data?: SiteData;
-  fetchStatus: FetchStatus;
+  data: APIResponse<SiteData> | undefined;
 }
 
-const SiteMetadata = ({ site, data, fetchStatus }: Props) => {
-  if (!data && fetchStatus !== "idle") {
-    return (
-      <div className="bg-neutral-800 py-2 text-white border-y-2 border-black">
-        <Loader2 className="inline animate-spin" /> Loading metadata...
-      </div>
-    );
-  }
+const SiteMetadata = ({ site, data }: Props) => {
+  if (!data) return;
 
-  // return the JSX elements
-  if (site && data) {
-    return (
-      <div className="text-center bg-neutral-800 py-2 text-white border-y-2 border-black">
-        <h2 className="text-xl font-bold">
-          <TowerControl className="inline me-2" />
-          {data.location}
-        </h2>
-        <div className="inline me-4 place-items-center text-sm">
-          <Globe className="inline me-2 w-4 h-4" />
-          {data.lat} {data.lon}
+  switch (data.status) {
+    case "noData":
+      return (
+        <div className="px-6 py-2 bg-neutral-800 text-white">
+          <OctagonAlert className="inline" /> No site metadata available for site '{site.toUpperCase()}'
         </div>
-        <div className="inline me-4 place-items-center text-sm">
-          <MountainSnow className="inline me-2 w-4 h-4" />
-          {data.elev_f} / {data.elev_m}
+      );
+    case "error":
+      return (
+        <div className="px-6 py-2 bg-neutral-800 text-destructive">
+          <Skull className="inline" /> {data.message || "There was an unknown error"}
         </div>
-        <div>
+      );
+    case "success":
+      return (
+        <div className="text-center bg-neutral-800 py-2 text-white border-y-2 border-black">
+          <h2 className="text-xl font-bold">
+            <TowerControl className="inline me-2" />
+            {data.data.location}
+          </h2>
           <div className="inline me-4 place-items-center text-sm">
-            <Sunrise className="inline me-2 w-4 h-4" />
-            {data.sunrise}
+            <Globe className="inline me-2 w-4 h-4" />
+            {data.data.lat} {data.data.lon}
           </div>
           <div className="inline me-4 place-items-center text-sm">
-            <Sunset className="inline me-2 w-4 h-4" />
-            {data.sunset}
+            <MountainSnow className="inline me-2 w-4 h-4" />
+            {data.data.elev_f} / {data.data.elev_m}
+          </div>
+          <div>
+            <div className="inline me-4 place-items-center text-sm">
+              <Sunrise className="inline me-2 w-4 h-4" />
+              {data.data.sunrise}
+            </div>
+            <div className="inline me-4 place-items-center text-sm">
+              <Sunset className="inline me-2 w-4 h-4" />
+              {data.data.sunset}
+            </div>
           </div>
         </div>
-      </div>
-    );
-  } else if (site && !data) {
-    return (
-      <div className="px-6 py-2 bg-neutral-800 text-white">
-        <OctagonAlert className="inline" /> No site metadata available for site '{site.toUpperCase()}'
-      </div>
-    );
-  } else if (!site) {
-    return (
-      <div className="px-6 py-2 bg-neutral-800 text-white">
-        <OctagonX className="inline" /> No site specified - Cannot retrieve metadata
-      </div>
-    );
-  } else {
-    return (
-      <div className="px-6 py-2 bg-neutral-800 text-destructive">
-        <Skull className="inline" /> There was an unknown error
-      </div>
-    );
+      );
   }
 };
 

@@ -129,11 +129,6 @@
 }
 
 /* override styles for attribution button */
-/* .maplibregl-ctrl-attrib.maplibregl-compact {
-  background-color: var(--secondary);
-  color: var(--primary);
-} */
-
 .maplibregl-ctrl-attrib-button {
   filter: invert(1);
 }
@@ -142,7 +137,14 @@
   color: white !important;
 }
 
-/* .maplibregl-ctrl-attrib-inner {
-  background-color: var(--primary);
-  color: red;
-} */
+@keyframes loadingSlide {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

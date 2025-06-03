@@ -1,12 +1,12 @@
-import RealtimeOptions from "./map/RealtimeOptions";
+import { useEffect } from "react";
+
 import AnimationControls from "./map/AnimationControls";
 import MapInstance from "./map/MapInstance";
 
 import { positronWxMap } from "@/assets/map-styles/positron-wxmap.js";
 
 import { AttributionControl, ViewState } from "react-map-gl/maplibre";
-import LoadingIndicator from "./ui/LoadingIndicator";
-import MapOptions from "./map/MapOptions";
+import MapLoadingIndicator from "./ui/MapLoadingIndicator";
 import { GeoLocation } from "./map/GeoLocation";
 import {
   useLoadingState,
@@ -19,7 +19,8 @@ import {
 } from "@/stateStores/map/mapView";
 import { useAnimationActions } from "@/stateStores/map/animation";
 
-import { useEffect } from "react";
+import OptionsMapOverlays from "./map/OptionsMapOverlays";
+import OptionsRealtimeData from "./map/OptionsRealtimeData";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -38,8 +39,8 @@ export default function WxMap() {
   useEffect(() => {
     // on mount, make sure the animation is paused
     // and set to the first frame
-    animation.pause();
     animation.firstFrame();
+    animation.pause();
   }, []);
 
   // import the map style - this may need to change to allow different map styles in the future
@@ -57,16 +58,11 @@ export default function WxMap() {
           />
 
           <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
-            <RealtimeOptions />
-            <MapOptions />
+            <OptionsRealtimeData />
+            <OptionsMapOverlays />
             <GeoLocation />
           </div>
-          {loadingState && (
-            <LoadingIndicator
-              displayText="Loading"
-              className="absolute top-0 left-0 rounded-md ms-2 mt-2 text-white bg-primary border-1 border-neutral-400 drop-shadow-lg"
-            />
-          )}
+          {loadingState && <MapLoadingIndicator />}
         </>
       </MapInstance>
       <AnimationControls className="w-full flex justify-center border-t-2 border-black bg-neutral-800 px-2 text-white max-md:pb-8" />

@@ -25,7 +25,7 @@ interface Props {
   className?: string;
 }
 
-export default function RealtimeOptions({ className }: Props) {
+export default function OptionsMapOverlays({ className }: Props) {
   // local state
   const [isOpen, setIsOpen] = useState<boolean>(false);
 

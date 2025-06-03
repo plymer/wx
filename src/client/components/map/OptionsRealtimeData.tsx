@@ -32,7 +32,7 @@ interface Props {
   className?: string;
 }
 
-export default function RealtimeOptions({ className }: Props) {
+export default function OptionsRealtimeData({ className }: Props) {
   // local state
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
