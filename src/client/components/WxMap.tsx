@@ -62,7 +62,7 @@ export default function WxMap() {
             <OptionsMapOverlays />
             <GeoLocation />
           </div>
-          {loadingState && <MapLoadingIndicator />}
+          <MapLoadingIndicator show={loadingState} />
         </>
       </MapInstance>
       <AnimationControls className="w-full flex justify-center border-t-2 border-black bg-neutral-800 px-2 text-white max-md:pb-8" />
