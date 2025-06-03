@@ -5,9 +5,7 @@ import { Globe, Globe2, List, Map, ScanEye } from "lucide-react";
 import { ToggleDataOption } from "@/lib/types";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/Drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
-import { Label } from "../ui/Label";
-import { Switch } from "../ui/Switch";
-import Button from "../ui/Button";
+import Button, { ButtonProps } from "../ui/Button";
 import {
   useBedpostsOverlay,
   useFIROverlay,
@@ -20,12 +18,9 @@ import {
 } from "@/stateStores/map/vectorOverlays";
 import { useMapStateActions, useProjection } from "@/stateStores/map/mapView";
 import { useMapOptionsTab, useUIActions } from "@/stateStores/map/ui";
+import DataToggle from "./DataToggle";
 
-interface Props {
-  className?: string;
-}
-
-export default function OptionsMapOverlays({ className }: Props) {
+export default function OptionsMapOverlays({ ...props }: ButtonProps) {
   // local state
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -100,13 +95,13 @@ export default function OptionsMapOverlays({ className }: Props) {
         <DrawerTitle content="Map View Options" />
         <DrawerDescription content="Change the map projection and what types of overlays are displayed" />
         <DrawerTrigger asChild>
-          <Button size="icon" variant={"floating"} className={className}>
+          <Button size="icon" variant={"floating"} {...props}>
             <Globe2 />
           </Button>
         </DrawerTrigger>
         <DrawerContent className="border-black bg-gray-800 text-white">
           <div className="text-black mx-auto my-4 w-full max-w-md p-2 bg-white border-neutral-400 rounded-md border-px">
-            <Tabs defaultValue={tab} className="w-full">
+            <Tabs defaultValue={tab} className="w-full min-h-[25svh]">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="projection" onClick={() => UIActions.setMapOptionsTab("projection")}>
                   <ScanEye className="me-2" />
@@ -141,24 +136,15 @@ export default function OptionsMapOverlays({ className }: Props) {
                 </div>
               </TabsContent>
               <TabsContent value="overlays">
-                {OVERLAYS.map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between p-2 rounded-md  text-black border border-input"
-                  >
-                    <Label
-                      htmlFor={item.name.toLowerCase().replace(/\s+/g, "-")}
-                      className={`${item.state ? "" : "text-neutral-400"} cursor-pointer`}
-                    >
-                      {item.name}
-                    </Label>
-                    <Switch
-                      id={item.name.toLowerCase().replace(/\s+/g, "-")}
-                      checked={item.state}
-                      onCheckedChange={() => item.toggle()}
+                <div className="grid grid-cols-2 gap-2">
+                  {OVERLAYS.map((item, i) => (
+                    <DataToggle
+                      key={i}
+                      dataOption={item}
+                      className="flex items-center justify-between p-2 rounded-md  text-black border border-input"
                     />
-                  </div>
-                ))}
+                  ))}
+                </div>
               </TabsContent>
             </Tabs>
           </div>

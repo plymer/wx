@@ -21,6 +21,7 @@ import { useAnimationActions } from "@/stateStores/map/animation";
 
 import OptionsMapOverlays from "./map/OptionsMapOverlays";
 import OptionsRealtimeData from "./map/OptionsRealtimeData";
+// import DataAttributions from "./map/DataAttributions";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -57,6 +58,7 @@ export default function WxMap() {
             style={{ backgroundColor: "#475569", color: "var(--secondary)", border: "1px solid var(--primary)" }}
           />
 
+          {/* <DataAttributions className="absolute bottom-0 right-0 bg-primary text-white m-2">Hello</DataAttributions> */}
           <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
             <OptionsRealtimeData />
             <OptionsMapOverlays />

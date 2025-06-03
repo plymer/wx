@@ -23,16 +23,11 @@ import { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } fro
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/Drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
-import { Label } from "../ui/Label";
-import { Switch } from "../ui/Switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/Select";
-import Button from "../ui/Button";
+import Button, { ButtonProps } from "../ui/Button";
+import DataToggle from "./DataToggle";
 
-interface Props {
-  className?: string;
-}
-
-export default function OptionsRealtimeData({ className }: Props) {
+export default function OptionsRealtimeData({ ...props }: ButtonProps) {
   // local state
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -98,13 +93,13 @@ export default function OptionsRealtimeData({ className }: Props) {
         <DrawerTitle content="Realtime Data Options" />
         <DrawerDescription content="Change how and what realtime data is being displayed" />
         <DrawerTrigger asChild>
-          <Button size="icon" variant="floating" className={className}>
+          <Button size="icon" variant="floating" {...props}>
             <Layers />
           </Button>
         </DrawerTrigger>
         <DrawerContent className="border-black bg-gray-800 text-white">
           <div className="text-black mx-auto my-4 w-full max-w-md p-2 bg-white border-neutral-400 rounded-md border-px">
-            <Tabs defaultValue={tab} className="w-full">
+            <Tabs defaultValue={tab} className="w-full min-h-[25svh]">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="other" onClick={() => UIActions.setLayersTab("other")}>
                   <CloudLightning className="me-2" />
@@ -120,19 +115,15 @@ export default function OptionsRealtimeData({ className }: Props) {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="satellite">
-                <div className="flex items-center justify-between p-2 rounded-md  text-black border border-input">
-                  <Label
-                    htmlFor="satellite-switch"
-                    className={`${raster.showSatellite ? "" : "text-neutral-400"} cursor-pointer`}
-                  >
-                    Show Satellite
-                  </Label>
-                  <Switch
-                    name="satellite-switch"
-                    checked={raster.showSatellite}
-                    onCheckedChange={() => rasterActions.toggleSatellite()}
-                  />
-                </div>
+                <DataToggle
+                  dataOption={{
+                    name: "Show Satellite",
+                    state: raster.showSatellite,
+                    toggle: rasterActions.toggleSatellite,
+                    type: "satellite",
+                  }}
+                  className="flex items-center justify-between p-2 rounded-md text-black border border-input"
+                />
                 <Select
                   defaultValue={raster.satelliteProduct}
                   onValueChange={(e) => rasterActions.setSatelliteProduct(e as SatelliteChannelsWMSName)}
@@ -150,19 +141,15 @@ export default function OptionsRealtimeData({ className }: Props) {
                 </Select>
               </TabsContent>
               <TabsContent value="radar">
-                <div className="flex items-center justify-between p-2 rounded-md  text-black border border-input">
-                  <Label
-                    htmlFor="radar-switch"
-                    className={`${raster.showRadar ? "" : "text-neutral-400"} cursor-pointer`}
-                  >
-                    Show Radar
-                  </Label>
-                  <Switch
-                    name="radar-switch"
-                    checked={raster.showRadar}
-                    onCheckedChange={() => rasterActions.toggleRadar()}
-                  />
-                </div>
+                <DataToggle
+                  dataOption={{
+                    name: "Show Radar",
+                    state: raster.showRadar,
+                    toggle: rasterActions.toggleRadar,
+                    type: "radar",
+                  }}
+                  className="flex items-center justify-between p-2 rounded-md text-black border border-input"
+                />
                 <div className="flex items-center">
                   <Button
                     type="button"
@@ -186,22 +173,11 @@ export default function OptionsRealtimeData({ className }: Props) {
               </TabsContent>
               <TabsContent value="other">
                 {VECTOR_DATA_OPTIONS.map((item, i) => (
-                  <div
+                  <DataToggle
                     key={i}
-                    className="flex items-center justify-between p-2 rounded-md  text-black border border-input"
-                  >
-                    <Label
-                      htmlFor={item.name.toLowerCase().replace(/\s+/g, "-")}
-                      className={`${item.state ? "" : "text-neutral-400"} cursor-pointer`}
-                    >
-                      {item.name}
-                    </Label>
-                    <Switch
-                      id={item.name.toLowerCase().replace(/\s+/g, "-")}
-                      checked={item.state}
-                      onCheckedChange={() => item.toggle()}
-                    />
-                  </div>
+                    dataOption={item}
+                    className="flex items-center justify-between p-2 rounded-md text-black border border-input"
+                  />
                 ))}
               </TabsContent>
             </Tabs>

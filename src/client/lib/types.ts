@@ -15,6 +15,7 @@ import {
 } from "../config/map";
 import { APP_MODES_LIST } from "../config/modes";
 import { PUBLIC_FORECAST_CONFIG } from "../config/public";
+import { RASTER_DATA_TYPES } from "../config/rasterData";
 import { VECTOR_DATA_TYPES } from "../config/vectorData";
 
 import { FeatureCollection, MultiPoint } from "geojson";
@@ -116,7 +117,7 @@ export type MapLayerConfig = {
 
 // used to define the vector data (TODO: rename)
 export type ToggleDataOption = {
-  type: VectorDataTypes | MapLines;
+  type: VectorDataTypes | MapLines | RasterDataTypes;
   name: string;
   state: boolean;
   toggle: () => void;
@@ -164,6 +165,8 @@ export type VectorDisplayConfig = {
   [K in VectorDataTypes]: VectorConfig;
 };
 
+export type RasterDataTypes = (typeof RASTER_DATA_TYPES)[number];
+
 // helper types for satellite
 export type SatelliteList = (typeof SATELLITES)[number];
 export type SatelliteChannelsList = keyof typeof SATELLITE_CHANNELS;
@@ -199,7 +202,7 @@ type AviationProducts = typeof AVIATION_PRODUCTS;
 export type Products = keyof AviationProducts;
 
 // helper 'type function' to extract all of the domains from the full product list without needing to manually extract the domains in an intermediate step
-type ExtractDomains<T extends Products> = AviationProducts[T][number];
+type ExtractDomains<T extends Products> = Prettify<AviationProducts[T][number]>;
 
 // export all of the product domains using our 'type function' from above
 export type ProductDomains = ExtractDomains<Products>["domain"];

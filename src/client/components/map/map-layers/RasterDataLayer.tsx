@@ -5,6 +5,7 @@ import { RasterLayerData } from "@/lib/types";
 import { useAnimationState, useDeltaTime, useFrame, useFrameCount, useStartTime } from "@/stateStores/map/animation";
 import { GOES_WEST_BOUNDS, GOES_EAST_BOUNDS, MAP_BOUNDS, GEOMET_GETMAP } from "@/config/map";
 import { makeISOTimeStamp } from "@/lib/utils";
+import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
 // import PausibleSource from "./PausibleSource";
 // import { useIsMoving } from "@/stateStores/mapView";
 
@@ -75,6 +76,7 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
   const layerId = "layer-" + apiData.type + "-" + apiData.domain;
 
   const source: RasterSourceSpecification = {
+    attribution: GEOMET_ATTRIBUTION["en"],
     type: "raster",
     tileSize: 256,
     bounds:
