@@ -62,7 +62,7 @@ export const MAP_TILE_CACHE_SIZE: number = 1024 * 1024 * 400; // in bytes
 // settings for data layers
 export const NUM_HRS_DATA: number = 3;
 export const GEOMET_GETMAP: string =
-  "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&LAYERS_REFRESH_RATE=PT1M&layers=";
+  "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&LAYERS_REFRESH_RATE=PT1M&TRANSPARENT=true&TILED=true&layers=";
 export const GEOMET_GETCAPABILITIES: string =
   "https://geo.weather.gc.ca/geomet/?lang=en&service=WMS&request=GetCapabilities&version=1.3.0&LAYERS_REFRESH_RATE=PT1M&layers=";
 
