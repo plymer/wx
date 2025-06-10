@@ -11,12 +11,12 @@ interface Props {
 }
 
 const AvChartsOther = ({ product, data }: Props) => {
-  if (!data || data.status !== "success") return;
-
   // get our state variables and mutation
   const domain = useDomain();
   const timeStep = useTimeStep();
   const actions = useAviationActions();
+
+  if (!data || data.status !== "success") return;
 
   // get our available domains for our currently selected product
   // we will use this to build the ui to switch between the different domains
@@ -27,14 +27,13 @@ const AvChartsOther = ({ product, data }: Props) => {
 
   // if our currentProduct is undefined, our current domain is not in the domainList
   // default it back to the first domain in the domainList
-  !currentProduct && domainList[0] && actions.setDomain(domainList[0].domain);
+  if (!currentProduct && domainList[0]) actions.setDomain(domainList[0].domain);
 
   const currentProductData = data.data.find((d) => d.domain === domain);
 
   // if our current timeStep is greater than the number of timeSteps available in our data layer
   // default it back to the highest available timeStep
-  currentProductData &&
-    timeStep > currentProductData.images.length - 1 &&
+  if (currentProductData && timeStep > currentProductData.images.length - 1)
     actions.setTimeStep(currentProductData.images.length - 1);
 
   // build the image url
@@ -80,7 +79,7 @@ const AvChartsOther = ({ product, data }: Props) => {
                     T+
                     {i * currentProduct.timeDelta}
                   </Button>
-                ))
+                )),
             )}
         </div>
       </nav>

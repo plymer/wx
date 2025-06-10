@@ -4,7 +4,7 @@ import { zValidator as zv } from "@hono/zod-validator";
 
 export const validateParams = <T extends ZodSchema, Target extends keyof ValidationTargets>(
   target: Target,
-  schema: T
+  schema: T,
 ) =>
   zv(target, schema, (result, c) => {
     if (!result.success) {
@@ -14,7 +14,7 @@ export const validateParams = <T extends ZodSchema, Target extends keyof Validat
           message: "invalid input",
           error: result.error.issues.map((i) => i),
         },
-        400
+        400,
       );
     }
   });

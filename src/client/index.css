@@ -141,7 +141,9 @@
 .slide-panel {
   transform: translateX(-100%);
   opacity: 0;
-  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  transition:
+    transform 0.5s ease-out,
+    opacity 0.5s ease-out;
 }
 
 /* Enter animation - slide in from left */
@@ -154,7 +156,9 @@
 .slide-panel.slide-exit-active {
   transform: translateX(-100%);
   opacity: 0;
-  transition: transform 0.5s ease-in, opacity 0.5s ease-in;
+  transition:
+    transform 0.5s ease-in,
+    opacity 0.5s ease-in;
 }
 
 /* Ensure smooth transitions */

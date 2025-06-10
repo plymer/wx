@@ -13,8 +13,9 @@ import TAF from "./observations/TAF";
 import Button from "./ui/Button";
 
 export default function Observations() {
-  // create a ref to the siteId text input
+  // create a refs to the siteId text input and the input debounce timeout
   const siteId = useRef("");
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // use a context to store state so that when we come back to this tab it restores our obs/taf search
   const actions = useObsActions();
@@ -26,8 +27,10 @@ export default function Observations() {
     siteId.current = site;
     return () => {
       siteId.current = "";
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     };
-  }, []);
+     
+  }, []); // this needs to only run on mount/unmount
 
   // hours that are available as options in the dropdown list
   const HOURS: number[] = [6, 12, 18, 24, 36, 48, 96];
@@ -47,6 +50,9 @@ export default function Observations() {
   // validate the input and mutate the search string, passing it to the context and then it will propagate to the child components
   //   to show the user the data they have requested
   function handleInputText(input: string) {
+    // check if we are currently debouncing an input change, clear the timeout if so
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
     // we want to allow 2, 3, and 4-letter idents to be used
     // for 2-letter idents, assume we are doing a major canadian site and prepend with "cy"
     // for 3-letter idents, assume we are doing a canadian site and prepend with "c"
@@ -71,6 +77,16 @@ export default function Observations() {
     }
   }
 
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // check if we are currently debouncing an input change, clear the timeout if so
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+    // set the new value after a debounce period
+    debounceTimeout.current = setTimeout(() => {
+      siteId.current = e.currentTarget.value;
+    }, 300); // 300ms debounce
+  };
+
   return (
     <>
       <div className="flex justify-around bg-neutral-800 text-white p-2 text-sm">
@@ -90,8 +106,10 @@ export default function Observations() {
             autoCorrect="false"
             spellCheck="false"
             defaultValue={site}
-            onChange={(e) => (siteId.current = e.currentTarget.value)}
-            onKeyDown={(e) => (e.key === "Enter" ? handleInputText(e.currentTarget.value) : "")}
+            onChange={(e) => handleOnChange(e)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleInputText(e.currentTarget.value);
+            }}
             onClick={(e) => (e.currentTarget.value = "")}
             autoFocus={true}
           />

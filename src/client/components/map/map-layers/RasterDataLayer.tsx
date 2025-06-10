@@ -67,7 +67,7 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
         fadeTimeout.current = undefined;
       }
     };
-  }, [animation.currentFrame, animation.state]);
+  }, [animation.currentFrame, animation.state, animation.frameCount]);
 
   // safety checks
 

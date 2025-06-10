@@ -39,7 +39,7 @@ export default function Public() {
     };
   }, [office, bulletin]);
 
-  const { data, fetchStatus } = useAPI<PublicBulletin>("/alpha/public/bulletin", {
+  const { data } = useAPI<PublicBulletin>("/alpha/public/bulletin", {
     office: issuerCode,
     bulletin: productCode,
   });

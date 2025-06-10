@@ -12,7 +12,7 @@ export const realtimeLayersSchema = z
               .split(",")
               .map((layer) => layer.trim())
               .filter(Boolean)
-          : undefined
+          : undefined,
       ),
   })
   .strict();

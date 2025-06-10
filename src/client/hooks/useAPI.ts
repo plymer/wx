@@ -29,13 +29,10 @@ const api = axios.create({ baseURL: API_CONFIG.baseUrl });
 const useAPI = <TData>(
   endpoint: EndpointUrls,
   searchParams: SearchParams,
-  fetchConfig: FetchConfig = { interval: 5, enabled: true }
+  fetchConfig: FetchConfig = { interval: 5, enabled: true },
 ) => {
   // destructure the fetch configuration
-  let { interval, queryName, enabled } = fetchConfig;
-
-  // set our queryName to the endpoint if it is not provided
-  if (!queryName) queryName = endpoint;
+  const { interval, queryName, enabled } = fetchConfig;
 
   // this is the function that returns the data
   const getData = async () => {
@@ -53,7 +50,7 @@ const useAPI = <TData>(
   // const searchParamKeys = Object.keys(searchParams);
 
   // make a unique query name for queries that need to be invalidated when the searchParams change
-  const queryKey = [queryName, JSON.stringify(searchParams)];
+  const queryKey = [queryName || endpoint, JSON.stringify(searchParams)];
 
   // destructure the queryObject from react-query to give us access to the params and methods we need
   return useQuery({

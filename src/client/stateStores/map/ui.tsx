@@ -33,12 +33,12 @@ const useUI = create<UIStateStore>()(
           panelSizes: state.panelSizes,
           mapOptionsTab: state.mapOptionsTab,
           layersTab: state.layersTab,
-        } as Partial<UIStateStore>),
+        }) as Partial<UIStateStore>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as UIStateStore) }),
       name: "uiOptions",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 export const usePanelSizes = () => useUI((state) => state.panelSizes);

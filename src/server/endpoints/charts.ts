@@ -15,39 +15,29 @@ route.get("/gfa", async (c) => {
 
     const rawList = ncAPIData.data.map((region) => JSON.parse(region.text) as NavCanImageList);
 
-    // i am too lazy to define this type-shape so we will ts-ignore the type assigment error below because this is a valid piece of code
-    let results = {};
+    const results: Record<string, { cldwx: string[]; turbc: string[] }> = {};
     rawList.forEach((gfa) => {
       if (Object.hasOwn(results, gfa.geography.toLowerCase())) {
         // the gfa is already in our results, but we need to add it's CLDWX or TURBC data to the results
-        //@ts-ignore
         Object.assign(results[gfa.geography.toLowerCase()], {
           [gfa.sub_product.toLowerCase()]: gfa.frame_lists[2].frames.map(
-            (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+            (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
           ),
         });
       } else {
         Object.assign(results, {
           [gfa.geography.toLowerCase()]: {
             [gfa.sub_product.toLowerCase()]: gfa.frame_lists[2].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
             ),
           },
         });
       }
     });
 
-    type GFAList = {
-      domain: string;
-      cldwx: string[];
-      turbc: string[];
-    };
-
-    let output: GFAList[] = [];
-
-    // continue to ts-ignore the non-shaped 'results' because eff that right now
-    // @ts-ignore
-    Object.keys(results).forEach((d) => output.push({ domain: d, cldwx: results[d].cldwx, turbc: results[d].turbc }));
+    const output = Object.keys(results).map((d) => {
+      return { domain: d, cldwx: results[d].cldwx, turbc: results[d].turbc };
+    });
 
     if (output.length === 0) return c.json({ status: "noData" }, 200);
 
@@ -67,35 +57,36 @@ route.get("/sigwx", async (c) => {
 
     const rawList = ncAPIData.data.map((region) => JSON.parse(region.text) as NavCanImageList);
 
-    // i am too lazy to define this type-shape so we will ts-ignore the type assigment error below because this is a valid piece of code
-    let results = {};
+    const results: Record<string, string[]> = {}; // we will only have two domains for sigwx, so we can predefine them
+
     rawList.forEach((p) => {
       const product = p.product.toLowerCase();
 
       if (Object.hasOwn(results, product)) {
         // the product is already in our results, but we need to add the other type of chart to the results
-        //@ts-ignore
         Object.assign(results[product], {
           [p.sub_geography.toLowerCase()]: p.frame_lists[0].frames.map(
-            (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+            (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
           ),
         });
       } else {
         Object.assign(results, {
           [product]: {
             [p.sub_geography.toLowerCase()]: p.frame_lists[0].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
             ),
           },
         });
       }
     });
 
-    type SigWxList = { domain: string; images: string[] };
-
-    // continue to ts-ignore the non-shaped 'results' because eff that right now
-    // @ts-ignore
-    let output: SigWxList[] = [{ domain: "atlantic", images: results.sig_wx.atlantic },{ domain: "canada", images: results.sig_wx.canada }]; // prettier-ignore
+    const output = Object.entries(results["sig_wx"]).reduce(
+      (acc: { domain: string; images: string[] }[], [key, val]) => {
+        acc.push({ domain: key, images: val as unknown as string[] });
+        return acc;
+      },
+      [],
+    );
 
     if (output.length === 0) return c.json({ status: "noData" }, 200);
 
@@ -115,35 +106,35 @@ route.get("/hlt", async (c) => {
 
     const rawList = ncAPIData.data.map((region) => JSON.parse(region.text) as NavCanImageList);
 
-    // i am too lazy to define this type-shape so we will ts-ignore the type assigment error below because this is a valid piece of code
-    let results = {};
+    const results: Record<string, string[]> = {};
     rawList.forEach((p) => {
       const product = p.product.toLowerCase();
 
       if (Object.hasOwn(results, product)) {
         // the product is already in our results, but we need to add the other type of chart to the results
-        //@ts-ignore
         Object.assign(results[product], {
           [p.geography.toLowerCase()]: p.frame_lists[0].frames.map(
-            (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+            (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
           ),
         });
       } else {
         Object.assign(results, {
           [product]: {
             [p.geography.toLowerCase()]: p.frame_lists[0].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
             ),
           },
         });
       }
     });
 
-    type HLTList = { domain: string; images: string[] };
-
-    // continue to ts-ignore the non-shaped 'results' because eff that right now
-    // @ts-ignore
-    let output: HLTList[] = [{ domain: "canada", images: results.turbulence.canada },{ domain: "north_atlantic", images: results.turbulence.north_atlantic },]; // prettier-ignore
+    const output = Object.entries(results["turbulence"]).reduce(
+      (acc: { domain: string; images: string[] }[], [key, val]) => {
+        acc.push({ domain: key, images: val as unknown as string[] });
+        return acc;
+      },
+      [],
+    );
 
     if (output.length === 0) return c.json({ status: "noData" }, 200);
 
@@ -163,25 +154,18 @@ route.get("/lgf", async (c) => {
 
     const rawList = ncAPIData.data.map((region) => JSON.parse(region.text) as NavCanImageList);
 
-    let results = {};
+    const results: Record<string, string[]> = {};
     rawList.forEach((lgf) => {
       Object.assign(results, {
         [lgf.geography.toLowerCase()]: lgf.frame_lists[lgf.frame_lists.length - 1].frames.map(
-          (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+          (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
         ),
       });
     });
 
-    type LGFList = {
-      domain: string;
-      images: string[];
-    };
-
-    let output: LGFList[] = [];
-
-    // continue to ts-ignore the non-shaped 'results' because eff that right now
-    // @ts-ignore
-    Object.keys(results).forEach((p) => output.push({ domain: p, images: results[p] }));
+    const output = Object.keys(results).map((p) => {
+      return { domain: p, images: results[p] };
+    });
 
     if (output.length === 0) return c.json({ status: "noData" }, 200);
 
@@ -204,12 +188,16 @@ route.get("/navcan", async (c) => {
 
     const rawList = ncAPIData.data.map((region) => JSON.parse(region.text) as NavCanImageList);
 
-    type GFAList = {
-      cldwx?: string[];
-      turbc?: string[];
-    };
+    type NavCanOutput = Record<
+      string,
+      | {
+          cldwx?: string[];
+          turbc?: string[];
+        }
+      | string[]
+    >;
 
-    let output: { [key: string]: GFAList | string[] } = {};
+    const output: NavCanOutput = {};
 
     rawList.forEach((item) => {
       switch (item.product) {
@@ -218,7 +206,7 @@ route.get("/navcan", async (c) => {
           if (Object.keys(output).includes(item.geography)) {
             Object.assign(output[item.geography], {
               [item.sub_product]: item.frame_lists[2].frames.map(
-                (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
               ),
             });
           } else {
@@ -226,7 +214,7 @@ route.get("/navcan", async (c) => {
             Object.assign(output, {
               [item.geography]: {
                 [item.sub_product]: item.frame_lists[2].frames.map(
-                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
                 ),
               },
             });
@@ -236,7 +224,7 @@ route.get("/navcan", async (c) => {
           if (Object.keys(output).includes("SIGWX")) {
             Object.assign(output["SIGWX"], {
               [item.sub_geography]: item.frame_lists[0].frames.map(
-                (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
               ),
             });
           } else {
@@ -244,7 +232,7 @@ route.get("/navcan", async (c) => {
             Object.assign(output, {
               ["SIGWX"]: {
                 [item.sub_geography]: item.frame_lists[0].frames.map(
-                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
                 ),
               },
             });
@@ -254,14 +242,14 @@ route.get("/navcan", async (c) => {
           if (Object.keys(output).includes("HLT")) {
             Object.assign(output["HLT"], {
               [item.geography]: item.frame_lists[0].frames.map(
-                (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
               ),
             });
           } else {
             Object.assign(output, {
               ["HLT"]: {
                 [item.geography]: item.frame_lists[0].frames.map(
-                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
                 ),
               },
             });
@@ -271,7 +259,7 @@ route.get("/navcan", async (c) => {
           // each lgf region will only appear in the navcan api output once
           Object.assign(output, {
             [item.geography]: item.frame_lists[0].frames.map(
-              (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+              (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
             ),
           });
           break;

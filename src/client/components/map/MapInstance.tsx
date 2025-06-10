@@ -17,7 +17,7 @@ import OverlayManager from "./OverlayManager";
 // global state stores
 import { useMapStateActions } from "@/stateStores/map/mapView";
 import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
-import { AnimationState, MapProjections } from "@/lib/types";
+import { MapProjections } from "@/lib/types";
 import useMapClock from "@/hooks/useClock";
 
 interface Props {
@@ -95,14 +95,14 @@ const WxMap = ({ viewState, mapProjection, children, basemap }: Props) => {
       setBaseMapLayers(e.target.getLayersOrder());
       setIsMapInitialized(true);
     },
-    [mapState]
+    [mapState],
   );
 
   const onMove = useCallback(
     (e: any) => {
       mapViewUpdater.updateFromMapEvent(e.target, e.viewState);
     },
-    [mapViewUpdater]
+    [mapViewUpdater],
   );
 
   return (
@@ -149,13 +149,15 @@ const WxMap = ({ viewState, mapProjection, children, basemap }: Props) => {
           alert("Public forecast extraction not yet implemented.");
         }
       }}
-      onSourceData={(e) =>
-        (e.sourceId.includes("satellite") || e.sourceId.includes("radar")) && mapState.setLoadingState(true)
-      }
+      onSourceData={(e) => {
+        if (e.sourceId.includes("satellite") || e.sourceId.includes("radar")) {
+          mapState.setLoadingState(true);
+        }
+      }}
       onIdle={(e) => {
         mapState.setLoadingState(false);
 
-        isMapInitialized && getWxLayers(e.target.getLayersOrder());
+        if (isMapInitialized) getWxLayers(e.target.getLayersOrder());
       }}
       onMove={onMove}
     >

@@ -59,15 +59,15 @@ const useMapViewState = create<MapStateStore>()(
           zoom: state.zoom,
           projection: state.projection,
           viewportBounds: state.viewportBounds,
-        } as Partial<MapStateStore>),
+        }) as Partial<MapStateStore>,
       merge: (persistedState, currentState) => ({
         ...currentState,
         ...(persistedState as MapStateStore),
       }),
       name: "mapViewState",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 // export hooks for state and actions

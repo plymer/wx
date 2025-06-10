@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useMapRef, useMapStateActions, useViewportBounds } from "../stateStores/map/mapView";
+import { useMapStateActions, useViewportBounds } from "../stateStores/map/mapView";
 // import { SiteMetaData } from "../lib/types";
 // import { checkIfInBounds } from "@/lib/utils";
 import { Map } from "maplibre-gl";
@@ -12,7 +12,6 @@ import { ViewState } from "react-map-gl/maplibre";
 export function useUpdateMapViewstate() {
   const mapActions = useMapStateActions();
   const viewport = useViewportBounds();
-  const mapRef = useMapRef();
 
   const viewportRef = useRef(viewport);
 
@@ -42,7 +41,7 @@ export function useUpdateMapViewstate() {
 
       mapActions.setViewportBounds(newViewport);
     },
-    [mapActions]
+    [mapActions],
   );
 
   // const recomputeViewport = useCallback(() => {

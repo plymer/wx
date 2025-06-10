@@ -43,12 +43,12 @@ const useAviation = create<AviationState>()(
           domain: state.domain,
           timeStep: state.timeStep,
           hub: state.hub,
-        } as Partial<AviationState>),
+        }) as Partial<AviationState>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as AviationState) }),
       name: "aviationOptions",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 // export the stateStore data accessors

@@ -4,7 +4,7 @@ import { useEndTime, useAnimationActions } from "@/stateStores/map/animation";
 
 function clockTick(
   setClockTimer: React.Dispatch<React.SetStateAction<NodeJS.Timeout>>,
-  actions: ReturnType<typeof useAnimationActions>
+  actions: ReturnType<typeof useAnimationActions>,
 ) {
   // update the time right away (since we have to wait 60 seconds until it updates on its own)
   const initialTime = new Date(Math.floor(Date.now() / MINUTE) * MINUTE).getTime();
@@ -19,7 +19,7 @@ function clockTick(
       const now = new Date(Math.floor(Date.now() / MINUTE) * MINUTE).getTime();
       actions.setEndTime(now);
       actions.setStartTime(now - 3 * HOUR);
-    }, MINUTE)
+    }, MINUTE),
   );
 }
 
@@ -43,7 +43,7 @@ const useMapClock = () => {
 
     // if we ever unmount this component, we clear our clock-ticker interval
     // so it doesn't run in the background
-    () => {
+    return () => {
       if (clockTimer) clearInterval(clockTimer);
       setClockTimer(undefined);
       return;

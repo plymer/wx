@@ -41,12 +41,12 @@ const useVectorData = create<VectorStateStore>()(
           showPIREPs: state.showPIREPs,
           showAIRMETs: state.showAIRMETs,
           showSIGMETs: state.showSIGMETs,
-        } as Partial<VectorStateStore>),
+        }) as Partial<VectorStateStore>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as VectorStateStore) }),
       name: "vectorDataOptions",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 export const useShowLightning = () => useVectorData((state) => state.showLightning);

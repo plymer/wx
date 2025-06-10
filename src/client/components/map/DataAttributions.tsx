@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React from "react";
 import { useMap } from "react-map-gl/maplibre";
 
 const DataAttributions = ({ ...props }: React.HTMLAttributes<HTMLDivElement>) => {

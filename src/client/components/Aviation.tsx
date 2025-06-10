@@ -5,18 +5,17 @@ import AvChartsGFA from "./aviation/AvChartsGFA";
 import AvChartsOther from "./aviation/AvChartsOther";
 import HubDiscussion from "./aviation/HubDiscussion";
 import Button from "./ui/Button";
-
-export const PRODUCTS = ["gfa", "lgf", "hlt", "sigwx", "hubs"];
+import { PRODUCTS } from "@/config/aviationProducts";
 
 export default function Aviation() {
   const product = useProduct();
   const hub = useHub();
   const actions = useAviationActions();
 
-  const { data: gfaData, fetchStatus: _gfaFetchStatus } = useAPI<GFAData[]>("/charts/gfa", {});
-  const { data: lgfData, fetchStatus: _lgfFetchStatus } = useAPI<OtherChartData[]>(`/charts/lgf`, {});
-  const { data: hltData, fetchStatus: _hltFetchStatus } = useAPI<OtherChartData[]>(`/charts/hlt`, {});
-  const { data: sigwxData, fetchStatus: _sigwxFetchStatus } = useAPI<OtherChartData[]>(`/charts/sigwx`, {});
+  const { data: gfaData } = useAPI<GFAData[]>("/charts/gfa", {});
+  const { data: lgfData } = useAPI<OtherChartData[]>(`/charts/lgf`, {});
+  const { data: hltData } = useAPI<OtherChartData[]>(`/charts/hlt`, {});
+  const { data: sigwxData } = useAPI<OtherChartData[]>(`/charts/sigwx`, {});
 
   return (
     <>

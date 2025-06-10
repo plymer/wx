@@ -234,11 +234,7 @@
       "source": "openmaptiles",
       "source-layer": "aeroway",
       "minzoom": 4,
-      "filter": [
-        "all",
-        ["==", "$type", "Polygon"],
-        ["in", "class", "runway", "taxiway"]
-      ],
+      "filter": ["all", ["==", "$type", "Polygon"], ["in", "class", "runway", "taxiway"]],
       "layout": { "visibility": "visible" },
       "paint": {
         "fill-color": "rgba(255, 255, 255, 1)",
@@ -258,11 +254,7 @@
       "source": "openmaptiles",
       "source-layer": "aeroway",
       "minzoom": 11,
-      "filter": [
-        "all",
-        ["in", "class", "runway"],
-        ["==", "$type", "LineString"]
-      ],
+      "filter": ["all", ["in", "class", "runway"], ["==", "$type", "LineString"]],
       "layout": {
         "line-cap": "round",
         "line-join": "round",
@@ -483,11 +475,7 @@
       "source": "openmaptiles",
       "source-layer": "place",
       "maxzoom": 12,
-      "filter": [
-        "all",
-        ["==", "$type", "Point"],
-        ["all", ["==", "capital", 2], ["==", "class", "city"]]
-      ],
+      "filter": ["all", ["==", "$type", "Point"], ["all", ["==", "capital", 2], ["==", "class", "city"]]],
       "layout": {
         "icon-image": {
           "base": 1,
@@ -530,12 +518,7 @@
       "filter": [
         "all",
         ["==", "$type", "Point"],
-        [
-          "all",
-          ["!=", "capital", 2],
-          ["<=", "rank", 3],
-          ["==", "class", "city"]
-        ]
+        ["all", ["!=", "capital", 2], ["<=", "rank", 3], ["==", "class", "city"]]
       ],
       "layout": {
         "icon-image": {

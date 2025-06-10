@@ -29,10 +29,10 @@ const AnimationControlButton = ({ buttonType, animationState, text, ...buttonPro
         buttonType !== "pause" && buttonType !== "play"
           ? "" // easy case, not the play or pause button
           : buttonType === "pause" && animationState === "playing"
-          ? "" // only show pause if we are playing or loading
-          : buttonType === "play" && animationState === "paused"
-          ? "" // only show if we are showing realtime data or the loop is paused
-          : "hidden"
+            ? "" // only show pause if we are playing or loading
+            : buttonType === "play" && animationState === "paused"
+              ? "" // only show if we are showing realtime data or the loop is paused
+              : "hidden"
       }`}
     >
       {Icons[buttonType]}

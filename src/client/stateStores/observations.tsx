@@ -23,12 +23,12 @@ const useObservations = create<ObservationsState>()(
       },
     }),
     {
-      partialize: (state) => ({ site: state.site, hours: state.hours } as Partial<ObservationsState>),
+      partialize: (state) => ({ site: state.site, hours: state.hours }) as Partial<ObservationsState>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as ObservationsState) }),
       name: "observationOptions",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 // export the stateStore data accessors

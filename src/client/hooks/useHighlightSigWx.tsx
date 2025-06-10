@@ -7,7 +7,7 @@ export function useHighlightSigWx() {
   const highlightSigWx = (text: string | undefined) => {
     if (!text) return null;
 
-    const parts = text.split(/([\(\)])/);
+    const parts = text.split(/([()])/);
     return parts.map((part, index) => {
       if (part === "(" || part === ")") return null;
 

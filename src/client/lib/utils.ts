@@ -1,7 +1,7 @@
 // tailwindcss boilerplate things
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { ParsedTAF, RasterLayerData, TAFData } from "./types";
+import { ParsedTAF, RasterLayerData } from "./types";
 import { SIGWX_REGEX } from "./regex";
 
 export function cn(...inputs: ClassValue[]) {
@@ -69,7 +69,7 @@ export function parseTaf(taf: string): ParsedTAF {
 
   // Use your existing period and remark extraction
   const partPeriods: string[] | undefined = [...rawTAF.matchAll(/(TEMPO.+|PROB30.+|PROB40.+|BECMG.+|FM\d{6}.+)/g)].map(
-    (pp) => pp[0].trim()
+    (pp) => pp[0].trim(),
   );
 
   const rmk: string | undefined = rawTAF.match(/(RMK.+)/g)?.[0];
@@ -95,7 +95,7 @@ export function formatSigWx(alphaString: string | undefined, mode: "taf" | "meta
   if (sigCloud || sigFzPrecip || sigWind || sigIfrWx || sigTs) {
     // Process as before...
     const ifrMatches = Array.from(alphaString.matchAll(SIGWX_REGEX.ifrWxPattern)).filter(
-      (match) => match.index !== undefined
+      (match) => match.index !== undefined,
     );
 
     const otherMatches = [

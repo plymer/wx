@@ -100,7 +100,7 @@ const DataLayerManager = ({ baseLayers }: Props) => {
       queryName: "rasterData",
       enabled: true,
       interval: 1,
-    }
+    },
   );
 
   const { data: lightning } = useAPI<LightningData>(
@@ -110,7 +110,7 @@ const DataLayerManager = ({ baseLayers }: Props) => {
       queryName: "lightning",
       enabled: true,
       interval: 1,
-    }
+    },
   );
 
   // const { data: sigmets } = useAPI<GeoJSON>(

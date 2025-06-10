@@ -10,19 +10,18 @@ interface Props {
 }
 
 const METARs = ({ site, data }: Props) => {
-  // if we have no data object, return nothing
-  if (!data) return;
-
   const scrollTargetRef = useRef<null | HTMLDivElement>(null);
-
-  const parsedMetars =
-    data.status === "success" ? (data.data.map((m) => formatSigWx(m, "metar")) as string[]) : undefined;
-
   const highlightSigWx = useHighlightSigWx().highlightSigWx;
 
   useEffect(() => {
     scrollTargetRef.current?.scrollIntoView({ behavior: "instant" });
   }, [data]);
+
+  // if we have no data object, return nothing
+  if (!data) return;
+
+  const parsedMetars =
+    data.status === "success" ? (data.data.map((m) => formatSigWx(m, "metar")) as string[]) : undefined;
 
   // return the JSX elements
   switch (data.status) {

@@ -146,8 +146,8 @@ export type GeoJSONFeatureTypes =
   | "MultiPolygon";
 
 export type OverlayOptions = {
-  layout?: Object;
-  paint?: Object;
+  layout?: object;
+  paint?: object;
 };
 
 export type PublicBulletin = string;
@@ -157,7 +157,7 @@ export type PublicForecastOffice = keyof typeof PUBLIC_FORECAST_CONFIG;
 export type VectorDataTypes = (typeof VECTOR_DATA_TYPES)[number];
 
 export type VectorConfig = {
-  paint: Object;
+  paint: object;
   type: "circle" | "fill";
 };
 

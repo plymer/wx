@@ -17,6 +17,6 @@ if (!rootElement.innerHTML) {
       <QueryClientProvider client={queryClient}>
         <App />
       </QueryClientProvider>
-    </StrictMode>
+    </StrictMode>,
   );
 }

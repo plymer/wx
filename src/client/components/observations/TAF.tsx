@@ -10,11 +10,10 @@ interface Props {
 }
 
 const TAF = ({ site, data }: Props) => {
-  if (!data) return;
-
-  const parsedTaf = data.status === "success" ? (formatSigWx(data.data, "taf") as ParsedTAF) : undefined;
-
   const highlightSigWx = useHighlightSigWx().highlightSigWx;
+
+  if (!data) return;
+  const parsedTaf = data.status === "success" ? (formatSigWx(data.data, "taf") as ParsedTAF) : undefined;
 
   switch (data.status) {
     case "noData":

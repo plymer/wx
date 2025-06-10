@@ -50,7 +50,7 @@ app.get("/", (c) => c.html(html));
 // if we are in production, serve the app
 if (isProd)
   serve({ ...app, port: 3000 }, (info) =>
-    console.log("\x1b[32m", `✅ server running at http://localhost:${info.port}\n`)
+    console.log("\x1b[32m", `✅ server running at http://localhost:${info.port}\n`),
   );
 
 // this is exported so that the vite dev server can access this hono instance

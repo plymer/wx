@@ -24,12 +24,12 @@ const usePublicState = create<PublicState>()(
       },
     }),
     {
-      partialize: (state) => ({ office: state.office, bulletin: state.bulletin } as Partial<PublicState>),
+      partialize: (state) => ({ office: state.office, bulletin: state.bulletin }) as Partial<PublicState>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as PublicState) }),
       name: "publicOptions",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 // export the stateStore data accessors

@@ -2,7 +2,7 @@ import { Layer, Source } from "react-map-gl/maplibre";
 
 import { LightningData } from "@/lib/types";
 import { FeatureCollection } from "geojson";
-import { LIGHTNING_ALT, VECTOR_DISPLAY_CONFIGS } from "@/config/vectorData";
+import { LIGHTNING_ALT } from "@/config/vectorData";
 import { useFrame, useStartTime } from "@/stateStores/map/animation";
 import { HOUR, MINUTE } from "@/lib/utils";
 
@@ -25,7 +25,8 @@ const LightningDataLayer = ({ data, belowLayer }: Props) => {
   const filteredData: FeatureCollection = {
     type: "FeatureCollection",
     features: lightningData.features.filter(
-      (feature) => feature.properties.validTime >= displayTime - HOUR / 2 && feature.properties.validTime <= displayTime
+      (feature) =>
+        feature.properties.validTime >= displayTime - HOUR / 2 && feature.properties.validTime <= displayTime,
     ),
   };
 

@@ -11,13 +11,14 @@ interface Props {
 }
 
 const AvChartsGFA = ({ product, data }: Props) => {
-  if (!data || data.status !== "success") return;
-
   // get our state variables and mutation
   const domain = useDomain();
   const subProduct = useSubProduct();
   const timeStep = useTimeStep();
   const actions = useAviationActions();
+
+  // if we don't have any data, or the data is not successful, return early
+  if (!data || data.status !== "success") return;
 
   // get our available domains for our currently selected product
   // we will use this to build the ui to switch between the different domains
@@ -28,7 +29,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
 
   // if our currentProduct is undefined, our current domain is not in the domainList
   // default it back to the first domain in the domainList
-  !currentProduct && domainList[0] && actions.setDomain(domainList[0].domain);
+  if (!currentProduct && domainList[0]) actions.setDomain(domainList[0].domain);
 
   const currentProductData = data.data.find((d) => d.domain === domain);
 
@@ -72,7 +73,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
                   >
                     T+{i * currentProduct.timeDelta}
                   </Button>
-                ))
+                )),
             )}
         </div>
       </nav>
@@ -97,7 +98,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
                   >
                     T+{i * currentProduct.timeDelta}
                   </Button>
-                ))
+                )),
             )}
         </div>
       </nav>

@@ -7,7 +7,7 @@ export const HOUR = 3_600_000;
 export const MINUTE = 60_000;
 
 export function injectViteDevServer(fileContents: string): string {
-  var output = fileContents.replace(
+  const output = fileContents.replace(
     "<head>",
     `
   <script type="module">
@@ -19,7 +19,7 @@ window.__vite_plugin_react_preamble_installed__ = true
 </script>
 
   <script type="module" src="/@vite/client"></script>
-  `
+  `,
   );
   return output;
 }
@@ -198,7 +198,7 @@ export function processCoordinates(shape: string, bufferSize: number, coords: nu
 export function computeCoordinates(
   shape: string,
   bufferSize: number | undefined,
-  coordinates?: LatLon[] | undefined
+  coordinates?: LatLon[] | undefined,
 ): LatLon[] | undefined {
   // console.log("computing coordinates for", shape, bufferSize, coordinateTimes);
 
@@ -220,9 +220,9 @@ export function computeCoordinates(
       // calculate the normals for the line, and use that to calculate the outline of the polygon
       // check the tangent at the point and then calculate the normal of the tangent itself
 
-      let output: LatLon[] = [];
+      const output: LatLon[] = [];
 
-      coordinates &&
+      if (coordinates) {
         coordinates.forEach((point, index) => {
           const current = point; // the current point we're working with
           const next = coordinates[(index + 1) % coordinates.length]; // the next point in the sequence, or the first point
@@ -242,9 +242,10 @@ export function computeCoordinates(
 
           output.push(
             { lat: current.lat + normal.lat * buffer, lon: current.lon + normal.lon * buffer },
-            { lat: current.lat - normal.lat * buffer, lon: current.lon - normal.lon * buffer }
+            { lat: current.lat - normal.lat * buffer, lon: current.lon - normal.lon * buffer },
           );
         });
+      }
       return output;
   }
 }

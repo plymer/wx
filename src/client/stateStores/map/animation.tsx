@@ -60,12 +60,12 @@ const useAnimation = create<AnimationStateStore>()(
     }),
     {
       // persist only frameRate
-      partialize: (state) => ({ frameRate: state.frameRate } as Partial<AnimationStateStore>),
+      partialize: (state) => ({ frameRate: state.frameRate }) as Partial<AnimationStateStore>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as AnimationStateStore) }),
       name: "animationOptions",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 export const useFrame = () => useAnimation((state) => state.frame);

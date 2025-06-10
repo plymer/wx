@@ -42,8 +42,8 @@ route.get("/lightning", async (ctx) => {
           .catch((err) => {
             console.error(`Error fetching data from ${url}:`, err);
             return null; // Return null for failed requests
-          })
-      )
+          }),
+      ),
     );
 
     // keep track of all of the features we find

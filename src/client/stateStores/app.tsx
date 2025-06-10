@@ -19,12 +19,12 @@ const useAppState = create<AppState>()(
       partialize: (state) =>
         ({
           appMode: state.appMode,
-        } as Partial<AppState>),
+        }) as Partial<AppState>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as AppState) }),
       name: "appOptions",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );
 
 // export the stateStore data accessors

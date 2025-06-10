@@ -9,16 +9,16 @@ import { FEET_PER_METRE, leadZero } from "../lib/utils.js";
 const route = new Hono();
 
 route.get("/metars", validateParams("query", metarSchema), async (c) => {
+  const { site, hrs } = c.req.valid("query");
+
+  // do a conversion for CYEU -> CWEU
+  const searchSite = site === "CYEU" ? "CWEU" : site;
+
+  const url = `http://aviationweather.gov/api/data/metar?ids=${searchSite}&hours=${hrs}&format=json`;
+  console.log("requesting metars from:", url);
+
   try {
-    // we might need to mutate the site variable
-    let { site, hrs } = c.req.valid("query");
-
-    // do a conversion for CYEU -> CWEU
-    site.toString().toUpperCase() === "CYEU" ? (site = "CWEU") : "";
-
     // begin data retrieval
-    const url = `http://aviationweather.gov/api/data/metar?ids=${site}&hours=${hrs}&format=json`;
-    console.log("requesting metars from:", url);
     const metarObjects: MetarObject[] | string = await axios.get(url).then((metars) => metars.data);
 
     // check for the presence of valid data, otherwise return an error message
@@ -38,14 +38,15 @@ route.get("/metars", validateParams("query", metarSchema), async (c) => {
 });
 
 route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
-  // we might need to mutate the site variable
-  let { site } = c.req.valid("query");
-  try {
-    // do a conversion for CWEU -> CYEU
-    site.toString().toUpperCase() === "CWEU" ? (site = "CYEU") : "";
+  const { site } = c.req.valid("query");
 
-    const url = `http://aviationweather.gov/api/data/stationinfo?ids=${site}&format=json`;
-    console.log("requesting station info from:", url);
+  // do a conversion for CWEU -> CYEU
+  const searchSite = site === "CWEU" ? "CYEU" : site;
+
+  const url = `http://aviationweather.gov/api/data/stationinfo?ids=${searchSite}&format=json`;
+  console.log("requesting station info from:", url);
+
+  try {
     const siteData: StationObject[] = await axios.get(url).then((site) => site.data);
 
     // check for the presence of valid data, otherwise return an error message
@@ -89,7 +90,7 @@ route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
             sunset: setString,
           },
         },
-        200
+        200,
       );
     }
   } catch (error) {
@@ -98,14 +99,15 @@ route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
 });
 
 route.get("/taf", validateParams("query", singleSiteSchema), async (c) => {
-  // we may need to mutate the site variable
-  let { site } = c.req.valid("query");
-  try {
-    // do a conversion for CWEU -> CYEU
-    site.toString().toUpperCase() === "CWEU" ? (site = "CYEU") : "";
+  const { site } = c.req.valid("query");
 
-    const url = `http://aviationweather.gov/api/data/taf?ids=${site}&format=json`;
-    console.log("requesting taf from:", url);
+  // do a conversion for CWEU -> CYEU
+  const searchSite = site === "CWEU" ? "CYEU" : site;
+
+  const url = `http://aviationweather.gov/api/data/taf?ids=${searchSite}&format=json`;
+  console.log("requesting taf from:", url);
+
+  try {
     const tafObject: TafObject[] | string = await axios.get(url).then((taf) => taf.data);
 
     // no match for a taf site on avwx.gov returns zero-length array of json, or for an error
@@ -121,7 +123,7 @@ route.get("/taf", validateParams("query", singleSiteSchema), async (c) => {
           status: "success",
           data: tafObject[0].rawTAF,
         },
-        200
+        200,
       );
     }
   } catch (error) {
@@ -131,22 +133,20 @@ route.get("/taf", validateParams("query", singleSiteSchema), async (c) => {
 
 route.get("/hubs", validateParams("query", singleSiteSchema), async (c) => {
   const { site } = c.req.valid("query");
+
+  const HubSites: Record<string, string> = {
+    CYYZ: "Toronto Pearson Int'l Airport",
+    CYUL: "Montreal Trudeau Int'l Airport",
+    CYYC: "Calgary Int'l Airport",
+    CYVR: "Vancouver Int'l Airport",
+    CYOW: "Ottawa MacDonald Int'l Airport",
+    CYHZ: "Halifax Stanfield Airport",
+  };
+
+  const url = "https://metaviation.ec.gc.ca/hubwx/scripts/getForecasterNotes.php";
+
   try {
-    type SiteName = {
-      [siteName: string]: string;
-    };
-
-    const HubSites: SiteName = {
-      CYYZ: "Toronto Pearson Int'l Airport",
-      CYUL: "Montreal Trudeau Int'l Airport",
-      CYYC: "Calgary Int'l Airport",
-      CYVR: "Vancouver Int'l Airport",
-      CYOW: "Ottawa MacDonald Int'l Airport",
-      CYHZ: "Halifax Stanfield Airport",
-    };
-
     // get the data
-    const url = "https://metaviation.ec.gc.ca/hubwx/scripts/getForecasterNotes.php";
     const hubs: HubDiscussion = await axios.get(url).then((hub) => hub.data);
 
     // check to see if the site id exists in the resulting json, return an error message if it doesnt
@@ -169,7 +169,7 @@ route.get("/hubs", validateParams("query", singleSiteSchema), async (c) => {
           office: hubData.stroffice,
         },
       },
-      200
+      200,
     );
   } catch (error) {
     return c.json({ status: "error", error: error }, 500);
@@ -179,37 +179,45 @@ route.get("/hubs", validateParams("query", singleSiteSchema), async (c) => {
 route.get("/public/bulletin", validateParams("query", publicBulletinSchema), async (c) => {
   const { bulletin, office } = c.req.valid("query");
 
-  let searchURL = `https://weather.gc.ca/forecast/public_bulletins_e.html?Bulletin=${bulletin}.${office}`;
+  const searchUrl =
+    bulletin === "focn45" && office === "cwwg"
+      ? "https://tgftp.nws.noaa.gov/data/raw/fo/focn45.cwwg..txt"
+      : `https://weather.gc.ca/forecast/public_bulletins_e.html?Bulletin=${bulletin}.${office}`;
 
-  if (bulletin === "focn45" && office === "cwwg") {
-    searchURL = "https://tgftp.nws.noaa.gov/data/raw/fo/focn45.cwwg..txt";
-  }
-
-  console.log("requesting bulletin from:", searchURL);
+  console.log("requesting bulletin from:", searchUrl);
 
   try {
-    let bulletinData: string = await axios.get(searchURL).then((bulletin) => bulletin.data);
+    const bulletinData: string = await axios.get(searchUrl).then((bulletin) => bulletin.data);
 
     if (bulletinData.length === 0) {
       return c.json({ status: "noData" }, 200);
     }
 
+    let output = bulletinData;
+
     if (bulletin !== "focn45") {
+      // use this to remove any 'reference' sections from the bulletin
+      const refPattern = /(\n[-]{2,})\n?((.+)\n){1,}([-]{2,})/g;
       // because we're returning HTML, we need to actually yoink out the text between the two pre tags
       const bulletinText = bulletinData.match(/<pre>[\s\S]*?<\/pre>/g);
-      bulletinData = bulletinText ? bulletinText[0].replace(/<pre>/g, "").replace(/<\/pre>/g, "") : "";
 
-      // if the bulletin contains any of the elevation references, remove those
-      const refPattern = /(\n[-]{2,})\n?((.+)\n){1,}([-]{2,})/g;
-      bulletinData = bulletinData.replace(refPattern, "");
+      if (!bulletinText || bulletinText.length === 0) {
+        return c.json({ status: "noData" }, 200);
+      }
+
+      // if we have output, remove the pre tags and the reference section
+      output = bulletinText[0]
+        .replace(/<pre>/g, "")
+        .replace(/<\/pre>/g, "")
+        .replace(refPattern, "");
     }
 
     return c.json(
       {
         status: "success",
-        data: bulletinData,
+        data: output,
       },
-      200
+      200,
     );
   } catch (error) {
     return c.json({ status: "error", error: error }, 500);

@@ -34,7 +34,7 @@ export const GeoLocation = forwardRef<GeoLocationHandle, GeoLocationProps>(({ on
         onError?.(err);
         setCurrentPos(null);
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 10000 },
     );
   };
 
