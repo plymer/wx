@@ -18,6 +18,8 @@ module.exports = {
       },
       env_production: {
         NODE_ENV: "production",
+        AM_I_A_SERVER: process.env.AM_I_A_SERVER,
+        DB_PASSWORD: process.env.DB_PASSWORD,
         PORT: 3000,
       },
     },

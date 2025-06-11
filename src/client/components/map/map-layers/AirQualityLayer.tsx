@@ -3,7 +3,7 @@ import { Layer, Source } from "react-map-gl/maplibre";
 import { AqData } from "@/lib/types";
 import { FeatureCollection } from "geojson";
 import { AQ_DISPLAY, AQ_VALUE_DISPLAY } from "@/config/vectorData";
-import { useFrame, useStartTime } from "@/stateStores/map/animation";
+import { useFrame, useFrameCount, useStartTime } from "@/stateStores/map/animation";
 import { MINUTE } from "@/lib/utils";
 
 interface Props {
@@ -17,6 +17,7 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
 
   const startTime = useStartTime();
   const frame = useFrame();
+  const lastFrame = useFrameCount() - 1;
 
   const displayTime = startTime + frame * 10 * MINUTE;
 
@@ -28,7 +29,10 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
 
       // otherwise, filter based on the validTime property
       const validTime = feature.properties.validTime;
-      const lastTimeStep = new Date(displayTime - 15 * MINUTE).toISOString() as unknown as Date;
+      // show twice as much data in the last frame to make sure it isn't blank
+      const lastTimeStep = new Date(
+        frame === lastFrame ? displayTime - 30 * MINUTE : displayTime - 15 * MINUTE,
+      ).toISOString() as unknown as Date;
       const displayTimeDate = new Date(displayTime).toISOString() as unknown as Date;
 
       return validTime < displayTimeDate && validTime >= lastTimeStep;
