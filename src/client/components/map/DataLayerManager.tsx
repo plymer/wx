@@ -2,12 +2,13 @@
 import { useEffect, useState } from "react";
 
 // types, utilities, and hooks
-import { RasterLayerData, LightningData } from "@/lib/types";
+import { RasterLayerData, LightningData, AqData } from "@/lib/types";
 // import { MINUTE, tempCircleBuilder } from "@/lib/utils";
 
 // data layers
 import RasterDataLayer from "./map-layers/RasterDataLayer";
 import LightningDataLayer from "./map-layers/LightningDataLayer";
+import AirQualityLayer from "./map-layers/AirQualityLayer";
 
 // import SurfaceData from "./map-layers/SurfaceData";
 // import PirepData from "./map-layers/PirepData";
@@ -26,6 +27,7 @@ import {
 } from "@/stateStores/map/rasterData";
 import useAPI from "@/hooks/useAPI";
 import {
+  useShowAQ,
   useShowAIRMETs,
   useShowLightning,
   useShowObs,
@@ -57,6 +59,7 @@ const DataLayerManager = ({ baseLayers }: Props) => {
   // state store subscriptions
 
   const vector = {
+    showAQ: useShowAQ(),
     showLightning: useShowLightning(),
     showObs: useShowObs(),
     showPIREPs: useShowPIREPs(),
@@ -112,6 +115,8 @@ const DataLayerManager = ({ baseLayers }: Props) => {
       interval: 1,
     },
   );
+
+  const { data: aqData } = useAPI<AqData>("/aq", { hours: 4 }, { queryName: "aqData", enabled: true, interval: 1 });
 
   // const { data: sigmets } = useAPI<GeoJSON>(
   //   "/alpha/sigmets",
@@ -195,6 +200,10 @@ const DataLayerManager = ({ baseLayers }: Props) => {
 
       {vector.showLightning && lightning?.status === "success" && (
         <LightningDataLayer key="lightning" data={lightning.data} belowLayer={layerConstraints.vector} />
+      )}
+
+      {vector.showAQ && aqData?.status === "success" && (
+        <AirQualityLayer key="air-quality" data={aqData.data} belowLayer={layerConstraints.vector} />
       )}
     </>
   );

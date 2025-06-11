@@ -20,6 +20,10 @@ import { VECTOR_DATA_TYPES } from "../config/vectorData";
 
 import { FeatureCollection, MultiPoint } from "geojson";
 
+import { InferSelectModel } from "drizzle-orm";
+
+import { aqData } from "../../server/dbSchemas/aq.drizzle.js";
+
 export type AppMode = keyof typeof APP_MODES_LIST;
 export type AnimationState = (typeof ANIMATION_STATES)[number];
 export type AnimationControlsList = (typeof ANIM_CONTROLS)[number];
@@ -72,6 +76,8 @@ export type SiteData = {
 };
 
 export type LightningData = FeatureCollection<MultiPoint, { validTime: number }>;
+export type AqDbData = Omit<InferSelectModel<typeof aqData>, "id">;
+export type AqData = FeatureCollection<MultiPoint, AqDbData>;
 
 export type METAR = string[];
 export type TAFData = string;

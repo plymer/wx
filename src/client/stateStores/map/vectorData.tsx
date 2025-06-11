@@ -2,12 +2,14 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 interface VectorStateStore {
+  showAQ: boolean;
   showLightning: boolean;
   showObs: boolean;
   showPIREPs: boolean;
   showSIGMETs: boolean;
   showAIRMETs: boolean;
   actions: {
+    toggleAQ: () => void;
     toggleLightning: () => void;
     toggleObs: () => void;
     togglePIREPs: () => void;
@@ -20,12 +22,14 @@ const useVectorData = create<VectorStateStore>()(
   persist(
     (set) => ({
       // initial values
+      showAQ: true,
       showLightning: true,
       showObs: true,
       showPIREPs: true,
       showSIGMETs: true,
       showAIRMETs: true,
       actions: {
+        toggleAQ: () => set((state) => ({ showAQ: !state.showAQ })),
         toggleLightning: () => set((state) => ({ showLightning: !state.showLightning })),
         toggleObs: () => set((state) => ({ showObs: !state.showObs })),
         togglePIREPs: () => set((state) => ({ showPIREPs: !state.showPIREPs })),
@@ -36,6 +40,7 @@ const useVectorData = create<VectorStateStore>()(
     {
       partialize: (state) =>
         ({
+          showAQ: state.showAQ,
           showLightning: state.showLightning,
           showObs: state.showObs,
           showPIREPs: state.showPIREPs,
@@ -49,6 +54,7 @@ const useVectorData = create<VectorStateStore>()(
   ),
 );
 
+export const useShowAQ = () => useVectorData((state) => state.showAQ);
 export const useShowLightning = () => useVectorData((state) => state.showLightning);
 export const useShowObs = () => useVectorData((state) => state.showObs);
 export const useShowPIREPs = () => useVectorData((state) => state.showPIREPs);

@@ -18,6 +18,7 @@ import {
   useShowPIREPs,
   useShowSIGMETs,
   useVectorActions,
+  useShowAQ,
 } from "@/stateStores/map/vectorData";
 import { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
@@ -33,6 +34,7 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
 
   // global state
   const vector = {
+    useShowAQ: useShowAQ(),
     showLightning: useShowLightning(),
     showObs: useShowObs(),
     showPIREPs: useShowPIREPs(),
@@ -55,6 +57,7 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
 
   // vector options config
   const VECTOR_DATA_OPTIONS: ToggleDataOption[] = [
+    { type: "aq", name: "PM 2.5μm", state: vector.useShowAQ, toggle: vectorActions.toggleAQ },
     {
       type: "lightning",
       name: "Lightning",

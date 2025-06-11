@@ -3,17 +3,24 @@ import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { readFileSync } from "fs";
+import "dotenv/config";
 
 // endpoint imports
 import { default as geomet } from "./endpoints/geomet.js";
 import { default as alpha } from "./endpoints/alphanumeric.js";
 import { default as charts } from "./endpoints/charts.js";
 import { default as lightning } from "./endpoints/lightning.js";
+import { default as aq } from "./endpoints/aq.js";
+
+// database schemas
+import * as aqSchema from "./dbSchemas/aq.drizzle.js";
 
 // custom types and utilities
-import { injectViteDevServer } from "./lib/utils.js";
+import { generateDbConnection, injectViteDevServer } from "./lib/utils.js";
 
 const isProd = process.env.NODE_ENV === "production";
+
+export const aqDb = await generateDbConnection("aq", aqSchema);
 
 // get the content of the index.html so we can serve it from the root
 // TODO :: set this up to serve all files out of /dist just like in the HubWx implementation
@@ -33,6 +40,9 @@ app.route("/api", geomet);
 app.route("/api/alpha", alpha);
 app.route("/api/charts", charts);
 app.route("/api", lightning);
+
+// add our db-dependent routes only if the database connection is successful
+if (aqDb) app.route("/api", aq);
 
 // we can pretty this up like we did internally at some point
 // return a list of all the API routes thay are active
