@@ -44,7 +44,7 @@ export const App = () => {
     if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
       setAppMode(hashMode);
     } else if (!hashMode && appMode) {
-      navigate(`/`, { replace: true, relative: "route" });
+      navigate(`../`, { replace: true, relative: "route" });
     }
   }, [location.pathname, location.hash]);
 
