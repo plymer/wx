@@ -31,15 +31,22 @@ export const App = () => {
   // and allow us to create a sharable URL without breaking
   // the iOS SPA PWA experience
   useEffect(() => {
-    const hashMode = location.pathname.replace("/", "") as AppMode;
+    console.log("hi there useEffect");
+    // If the user lands on a path like /obs (not /), do nothing and let nginx redirect to /#/obs
+    if (location.pathname !== "/") return;
+
+    // Now we're at /, so use the hash as the source of truth
+    const hashMode = location.hash.replace("#/", "") as AppMode;
+
+    console.log(location.pathname, location.hash, hashMode);
 
     // if the hash mode is set, valid, and different from the current app mode, set the app mode
     if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
       setAppMode(hashMode);
     } else if (!hashMode && appMode) {
-      navigate(`/${appMode}`, { replace: true });
+      navigate(`/#/${appMode}`, { replace: true });
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.hash]);
 
   // handle the app mode when a user clicks on one of the app mode tabs
   const handleSetAppMode = (mode: AppMode) => {
@@ -89,6 +96,8 @@ export const App = () => {
       {appMode === "otlk" && <Outlooks />}
 
       <Toaster toastOptions={{ className: "bg-neutral-800 text-white" }} />
+
+      {/* <ReactQueryDevtools /> */}
     </main>
   );
 };
