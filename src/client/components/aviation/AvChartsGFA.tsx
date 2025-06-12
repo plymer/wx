@@ -1,6 +1,6 @@
 import { AVIATION_PRODUCTS } from "@/config/aviationProducts";
 import { APIResponse, GFAData, ProductDomains, Products } from "@/lib/types";
-import { useAviationActions, useDomain, useSubProduct, useTimeStep } from "@/stateStores/aviation";
+import { useAviationActions, useDomain, useAvSubProduct, useTimeStep } from "@/stateStores/aviation";
 import Button from "../ui/Button";
 
 import AvImageContainer from "./AvImageContainer";
@@ -13,7 +13,7 @@ interface Props {
 const AvChartsGFA = ({ product, data }: Props) => {
   // get our state variables and mutation
   const domain = useDomain();
-  const subProduct = useSubProduct();
+  const subProduct = useAvSubProduct();
   const timeStep = useTimeStep();
   const actions = useAviationActions();
 

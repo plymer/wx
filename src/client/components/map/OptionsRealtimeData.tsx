@@ -102,17 +102,21 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
         </DrawerTrigger>
         <DrawerContent className="border-black bg-gray-800 text-white">
           <div className="text-black mx-auto my-4 w-full max-w-md p-2 bg-white border-neutral-400 rounded-md border-px">
-            <Tabs defaultValue={tab} className="w-full min-h-[25svh]">
+            <Tabs
+              value={tab}
+              onValueChange={UIActions.setLayersTab as (value: string) => void}
+              className="w-full min-h-[25svh]"
+            >
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="other" onClick={() => UIActions.setLayersTab("other")}>
+                <TabsTrigger value="other">
                   <CloudLightning className="me-2" />
                   Wx Elements
                 </TabsTrigger>
-                <TabsTrigger value="satellite" onClick={() => UIActions.setLayersTab("satellite")}>
+                <TabsTrigger value="satellite">
                   <Satellite className="me-2" />
                   Satellite
                 </TabsTrigger>
-                <TabsTrigger value="radar" onClick={() => UIActions.setLayersTab("radar")}>
+                <TabsTrigger value="radar">
                   <Radar className="me-2" />
                   Radar
                 </TabsTrigger>
@@ -128,8 +132,10 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
                   className="flex items-center justify-between p-2 rounded-md text-black border border-input"
                 />
                 <Select
-                  defaultValue={raster.satelliteProduct}
-                  onValueChange={(e) => rasterActions.setSatelliteProduct(e as SatelliteChannelsWMSName)}
+                  value={raster.satelliteProduct}
+                  onValueChange={(selectVal) =>
+                    rasterActions.setSatelliteProduct(selectVal as SatelliteChannelsWMSName)
+                  }
                 >
                   <SelectTrigger disabled={!raster.showSatellite} className="w-full text-black">
                     <SelectValue placeholder="Select Satellite Channel" />

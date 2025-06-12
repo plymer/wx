@@ -52,8 +52,8 @@ const useAviation = create<AviationState>()(
 );
 
 // export the stateStore data accessors
-export const useProduct = () => useAviation((state) => state.product);
-export const useSubProduct = () => useAviation((state) => state.subProduct);
+export const useAvProduct = () => useAviation((state) => state.product);
+export const useAvSubProduct = () => useAviation((state) => state.subProduct);
 export const useDomain = () => useAviation((state) => state.domain);
 export const useTimeStep = () => useAviation((state) => state.timeStep);
 export const useHub = () => useAviation((state) => state.hub);

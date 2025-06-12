@@ -101,13 +101,17 @@ export default function OptionsMapOverlays({ ...props }: ButtonProps) {
         </DrawerTrigger>
         <DrawerContent className="border-black bg-gray-800 text-white">
           <div className="text-black mx-auto my-4 w-full max-w-md p-2 bg-white border-neutral-400 rounded-md border-px">
-            <Tabs defaultValue={tab} className="w-full min-h-[25svh]">
+            <Tabs
+              value={tab}
+              onValueChange={UIActions.setMapOptionsTab as (value: string) => void}
+              className="w-full min-h-[25svh]"
+            >
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="projection" onClick={() => UIActions.setMapOptionsTab("projection")}>
+                <TabsTrigger value="projection">
                   <ScanEye className="me-2" />
                   Projection
                 </TabsTrigger>
-                <TabsTrigger value="overlays" onClick={() => UIActions.setMapOptionsTab("overlays")}>
+                <TabsTrigger value="overlays">
                   <List className="me-2" />
                   Geography
                 </TabsTrigger>
