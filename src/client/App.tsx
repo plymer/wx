@@ -36,7 +36,7 @@ export const App = () => {
     if (location.pathname !== "/") return;
 
     // Now we're at /, so use the hash as the source of truth
-    const hashMode = location.pathname.replace("#/", "") as AppMode;
+    const hashMode = location.hash.replace("#/", "") as AppMode;
 
     console.log(location.pathname, location.hash, hashMode);
 
