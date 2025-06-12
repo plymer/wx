@@ -52,7 +52,7 @@ export const App = () => {
   const handleSetAppMode = (mode: AppMode) => {
     if (mode !== appMode) {
       setAppMode(mode);
-      navigate(`/${mode}`, { replace: true });
+      navigate(`../${mode}`, { replace: true, relative: "route" });
     }
   };
 
