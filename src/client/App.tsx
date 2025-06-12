@@ -1,5 +1,5 @@
 // third-party libraries
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 // ui components
@@ -25,6 +25,7 @@ export const App = () => {
   const setAppMode = useSetAppMode();
   const location = useLocation();
   const navigate = useNavigate();
+  const [count, setCount] = useState(0);
 
   // handle app mode base on the URL hash path
   // we are using the hash path to determine the app mode
@@ -33,7 +34,9 @@ export const App = () => {
   useEffect(() => {
     const hashMode = location.pathname.replace("/", "") as AppMode;
 
-    console.log(location.pathname, location.hash, hashMode);
+    console.log(count, location.pathname, location.hash, hashMode);
+
+    setCount(count + 1);
 
     // if the hash mode is set, valid, and different from the current app mode, set the app mode
     if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
