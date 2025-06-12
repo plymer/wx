@@ -10,7 +10,7 @@
     "format": "prettier --write .",
     "compile": "tsc -b",
     "build": "vite build && tsc -b",
-    "deploy": "pm2 stop beta.config.cjs && git stash && git pull && git checkout dev && npm install --include=dev && npm run build && pm2 start beta.config.cjs --env production"
+    "deploy": "pm2 stop beta.config.cjs && git stash && git pull --rebase && npm install --include=dev && npm run build && pm2 start beta.config.cjs --env production"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
