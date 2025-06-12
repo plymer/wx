@@ -36,7 +36,7 @@ export const App = () => {
     if (location.pathname !== "/") return;
 
     // Now we're at /, so use the hash as the source of truth
-    const hashMode = location.hash.replace("#/", "") as AppMode;
+    const hashMode = location.pathname.replace("#/", "") as AppMode;
 
     console.log(location.pathname, location.hash, hashMode);
 
@@ -44,7 +44,7 @@ export const App = () => {
     if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
       setAppMode(hashMode);
     } else if (!hashMode && appMode) {
-      navigate(`/#/${appMode}`, { replace: true });
+      navigate(`../${appMode}`, { replace: true, relative: "route" });
     }
   }, [location.pathname, location.hash]);
 
