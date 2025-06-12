@@ -31,12 +31,12 @@ export const App = () => {
   // and allow us to create a sharable URL without breaking
   // the iOS SPA PWA experience
   useEffect(() => {
-    console.log("hi there useEffect");
+    console.log("hi there useEffect", location.pathname, location.hash);
     // If the user lands on a path like /obs (not /), do nothing and let nginx redirect to /#/obs
     if (location.pathname !== "/") return;
 
     // Now we're at /, so use the hash as the source of truth
-    const hashMode = location.hash.replace("#/", "") as AppMode;
+    const hashMode = location.pathname.replace("/", "") as AppMode;
 
     console.log(location.pathname, location.hash, hashMode);
 
