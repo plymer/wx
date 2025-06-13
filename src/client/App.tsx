@@ -31,40 +31,22 @@ export const App = () => {
   // we are using the hash path to determine the app mode
   // and allow us to create a sharable URL without breaking
   // the iOS SPA PWA experience
-  // useEffect(() => {
-  //   const hashMode = location.pathname.replace("/", "") as AppMode;
-
-  //   setCount(count + 1);
-
-  //   console.log(count, location.pathname, location.hash, hashMode, appMode);
-
-  //   // if the hash mode is set, valid, and different from the current app mode, set the app mode
-  //   if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
-  //     setAppMode(hashMode);
-  //   } else if (!hashMode && appMode) {
-  //     navigate(`/${appMode}`, { replace: true });
-  //   }
-  // }, [location.pathname, location.hash]);
-
   useEffect(() => {
-    // Only handle appMode if we're at the SPA root (after nginx redirect)
+    const hashMode = location.pathname.replace("/", "") as AppMode;
 
     setCount(count + 1);
 
-    console.log(count, location.pathname, location.hash, "hashModeHere", appMode);
-
-    if (location.pathname !== "/") return;
-
-    const hashMode = location.hash.replace(/^#\/?/, "") as AppMode;
-
     console.log(count, location.pathname, location.hash, hashMode, appMode);
 
+    // if the hash mode is set, valid, and different from the current app mode, set the app mode
     if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
+      console.log("setting app mode");
       setAppMode(hashMode);
     } else if (!hashMode && appMode) {
+      console.log("navigating");
       navigate(`/${appMode}`, { replace: true });
     }
-  }, [location.pathname, location.hash]);
+  }, [location.pathname]);
 
   // handle the app mode when a user clicks on one of the app mode tabs
   const handleSetAppMode = (mode: AppMode) => {
