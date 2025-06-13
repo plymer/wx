@@ -62,7 +62,7 @@ export const App = () => {
     if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
       setAppMode(hashMode);
     } else if (!hashMode && appMode) {
-      navigate(`/#/${appMode}`, { replace: true });
+      navigate(`/${appMode}`, { replace: true });
     }
   }, [location.pathname, location.hash]);
 
@@ -70,7 +70,7 @@ export const App = () => {
   const handleSetAppMode = (mode: AppMode) => {
     if (mode !== appMode) {
       setAppMode(mode);
-      navigate(`/#/${mode}`, { replace: true });
+      navigate(`/${mode}`, { replace: true });
     }
   };
 
