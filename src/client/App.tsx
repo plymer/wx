@@ -1,6 +1,5 @@
 // third-party libraries
-import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 // ui components
 import Button from "@/components/ui/Button";
@@ -20,7 +19,6 @@ import { APP_MODES_LIST } from "@/config/modes";
 import { useAppMode, useSetAppMode } from "@/stateStores/app";
 import { AppMode } from "@/lib/types";
 import { Toaster } from "@/components/ui/Sonner";
-import { useNavigate } from "react-router";
 
 const appModesList: AppMode[] = Object.keys(APP_MODES_LIST).map((k) => k as AppMode);
 
@@ -81,7 +79,6 @@ export const App = () => {
       {appMode === "otlk" && <Outlooks />}
 
       <Toaster toastOptions={{ className: "bg-neutral-800 text-white" }} />
-
     </main>
   );
 };
