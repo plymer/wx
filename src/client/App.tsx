@@ -26,11 +26,23 @@ export const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  console.log(sessionStorage.getItem("ignoreHashOnce"));
+
   // handle app mode base on the URL hash path
   // we are using the hash path to determine the app mode
   // and allow us to create a sharable URL without breaking
   // the iOS SPA PWA experience
   useEffect(() => {
+    // Only run this logic once per session
+    if (!sessionStorage.getItem("ignoreHashOnce")) {
+      if (location.pathname !== "/" && location.pathname !== "") {
+        // Remove the hash path and go to the appMode in localStorage
+        sessionStorage.setItem("ignoreHashOnce", "true");
+        navigate(`/${appMode}`, { replace: true });
+        return;
+      }
+    }
+
     const hashMode = location.pathname.replace("/", "") as AppMode;
 
     // if the hash mode is set, valid, and different from the current app mode, set the app mode
