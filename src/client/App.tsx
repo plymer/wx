@@ -1,6 +1,6 @@
 // third-party libraries
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // ui components
 import Button from "@/components/ui/Button";
@@ -31,18 +31,31 @@ export const App = () => {
   // we are using the hash path to determine the app mode
   // and allow us to create a sharable URL without breaking
   // the iOS SPA PWA experience
+  // useEffect(() => {
+  //   const hashMode = location.pathname.replace("/", "") as AppMode;
+
+  //   setCount(count + 1);
+
+  //   console.log(count, location.pathname, location.hash, hashMode, appMode);
+
+  //   // if the hash mode is set, valid, and different from the current app mode, set the app mode
+  //   if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
+  //     setAppMode(hashMode);
+  //   } else if (!hashMode && appMode) {
+  //     navigate(`/${appMode}`, { replace: true });
+  //   }
+  // }, [location.pathname, location.hash]);
+
   useEffect(() => {
-    const hashMode = location.pathname.replace("/", "") as AppMode;
+    // Only handle appMode if we're at the SPA root (after nginx redirect)
+    if (location.pathname !== "/") return;
 
-    setCount(count + 1);
+    const hashMode = location.hash.replace(/^#\/?/, "") as AppMode;
 
-    console.log(count, location.pathname, hashMode, appMode);
-
-    // if the hash mode is set, valid, and different from the current app mode, set the app mode
     if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
       setAppMode(hashMode);
     } else if (!hashMode && appMode) {
-      navigate(`/${appMode}`, { replace: true });
+      navigate(`/#/${appMode}`, { replace: true });
     }
   }, [location.pathname, location.hash]);
 
