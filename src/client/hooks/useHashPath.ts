@@ -19,12 +19,18 @@ const useHashPath = () => {
   // the nginx config on the server uses a 302 redirect to take any URL that points to /[appModesList]
   // and convert it to a /#/[appModesList] URL, which is then handled by this code
   useEffect(() => {
+    // get our hash mode from the URL path
+    // using HashRouter means that 'pathname' will be, compltely unintuitively(!)
+    //  the hash path, while 'hash' is actually empty (lol)
+    const hashMode = location.pathname.replace("/", "") as AppMode;
+
     // if redirected from nginx, set ignoreHashOnce and clean up the URL
     const params = new URLSearchParams(location.search);
     if (params.has("redirected")) {
       sessionStorage.setItem("ignoreHashOnce", "true");
-      // Remove the query param from the URL
-      navigate(location.pathname, { replace: true });
+      // Remove the query param from the URL, set the appMode, and navigate to the hash mode
+      setAppMode(hashMode);
+      navigate(`/${hashMode}`, { replace: true });
       return;
     }
 
@@ -42,11 +48,6 @@ const useHashPath = () => {
         return;
       }
     }
-
-    // get our hash mode from the URL path
-    // using HashRouter means that 'pathname' will be, compltely unintuitively(!)
-    //  the hash path, while 'hash' is actually empty (lol)
-    const hashMode = location.pathname.replace("/", "") as AppMode;
 
     // if the hash mode is set, valid, and different from the current app mode, set the app mode
     if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
