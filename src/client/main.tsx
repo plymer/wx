@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom/client";
 import { StrictMode } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import "./index.css";
@@ -15,9 +15,9 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <HashRouter>
           <App />
-        </BrowserRouter>
+        </HashRouter>
       </QueryClientProvider>
     </StrictMode>,
   );

@@ -49,6 +49,8 @@ export const App = () => {
   useEffect(() => {
     // Only handle appMode if we're at the SPA root (after nginx redirect)
 
+    setCount(count + 1);
+
     console.log(count, location.pathname, location.hash, "hashModeHere", appMode);
 
     if (location.pathname !== "/") return;
