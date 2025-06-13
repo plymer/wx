@@ -1,6 +1,6 @@
 // third-party libraries
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // ui components
 import Button from "@/components/ui/Button";
@@ -34,15 +34,15 @@ export const App = () => {
   useEffect(() => {
     const hashMode = location.pathname.replace("/", "") as AppMode;
 
-    console.log(count, location.pathname, location.hash, hashMode);
-
     setCount(count + 1);
+
+    console.log(count, location.pathname, location.hash, appMode);
 
     // if the hash mode is set, valid, and different from the current app mode, set the app mode
     if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
       setAppMode(hashMode);
     } else if (!hashMode && appMode) {
-      navigate(`../${appMode}`, { replace: true, relative: "route" });
+      navigate(`/${appMode}`, { replace: true });
     }
   }, [location.pathname, location.hash]);
 
@@ -50,7 +50,7 @@ export const App = () => {
   const handleSetAppMode = (mode: AppMode) => {
     if (mode !== appMode) {
       setAppMode(mode);
-      navigate(`../${mode}`, { replace: true, relative: "route" });
+      navigate(`/${mode}`, { replace: true });
     }
   };
 
