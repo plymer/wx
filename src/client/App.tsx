@@ -1,4 +1,6 @@
 // third-party libraries
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 // ui components
 import Button from "@/components/ui/Button";
@@ -80,7 +82,6 @@ export const App = () => {
 
       <Toaster toastOptions={{ className: "bg-neutral-800 text-white" }} />
 
-      {/* <ReactQueryDevtools /> */}
     </main>
   );
 };
