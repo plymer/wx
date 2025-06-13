@@ -1,6 +1,6 @@
 // third-party libraries
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 
 // ui components
 import Button from "@/components/ui/Button";
@@ -36,7 +36,7 @@ export const App = () => {
 
     setCount(count + 1);
 
-    console.log(count, location.pathname, location.hash, appMode);
+    console.log(count, location.pathname, hashMode, appMode);
 
     // if the hash mode is set, valid, and different from the current app mode, set the app mode
     if (hashMode && hashMode !== appMode && appModesList.includes(hashMode)) {
