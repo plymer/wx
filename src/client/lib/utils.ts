@@ -99,10 +99,10 @@ export function formatSigWx(alphaString: string | undefined, mode: "taf" | "meta
     );
 
     const otherMatches = [
+      ...Array.from(alphaString.matchAll(SIGWX_REGEX.fzPrecipitation)),
       ...Array.from(alphaString.matchAll(SIGWX_REGEX.cloudPattern)),
       ...Array.from(alphaString.matchAll(SIGWX_REGEX.windPattern)),
       ...Array.from(alphaString.matchAll(SIGWX_REGEX.tsPattern)),
-      ...Array.from(alphaString.matchAll(SIGWX_REGEX.fzPrecipitation)),
     ].filter((match) => {
       if (!match.index) return false;
       return !ifrMatches.some((ifrMatch) => {
@@ -113,15 +113,29 @@ export function formatSigWx(alphaString: string | undefined, mode: "taf" | "meta
     });
 
     const allMatches = [...ifrMatches, ...otherMatches].sort((a, b) => (b.index || 0) - (a.index || 0));
+
     if (allMatches.length > 0) {
       // Process the TAF once, wrapping matches in brackets
       let formattedString = alphaString;
       allMatches.forEach((match) => {
         const matchText = match[0];
         const startPos = match.index || 0;
+
+        // count the brackets in the match text
+        // this is what throws off our matches and was duplicated text after certain matches
+        // when different matches were nested inside each other
+        const bracketCount = matchText.match(/[()]/g);
+
+        console.log(bracketCount, bracketCount?.length, matchText);
+
         formattedString =
-          formattedString.slice(0, startPos) + `(${matchText})` + formattedString.slice(startPos + matchText.length);
+          formattedString.slice(0, startPos) + ` (${matchText}) ` + formattedString.slice(startPos + matchText.length);
       });
+
+      console.log(formattedString);
+
+      // concatenate any adjacent matches
+      formattedString = formattedString.replace(/\)\s+\(/g, " ");
 
       if (mode === "taf") {
         return parseTaf(formattedString);

@@ -35,7 +35,7 @@ const TAF = ({ site, data }: Props) => {
             <div>{highlightSigWx(parsedTaf.main)}</div>
             {parsedTaf.partPeriods &&
               parsedTaf.partPeriods.map((p, i) => (
-                <div className="ms-8 -indent-4" key={i}>
+                <div className={`ms-8 ${p.startsWith("FM") ? "-indent-6" : "-indent-4"}`} key={i}>
                   {highlightSigWx(p)}
                 </div>
               ))}
