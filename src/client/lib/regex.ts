@@ -7,8 +7,8 @@ const ifrWxPattern =
   /\b(?:[0-2](?:\s[0-9]\/[0-9])?|[0-9]\/[0-9])SM(?:\s(?:[-+])?(?:(?:BL|SH|TS|FZ|VC|)?(?:(?:RA|SN|DZ){1,3}|(?:DZ|RA|SN|SG|IC|PE|PL|GR|GS|FC|BR|FG|FZFG|HZ|FU|VA|DU|SA|PY))(?:\s(?:[-+])?(?:BL|SH|TS|FZ|VC|)?(?:(?:RA|SN|DZ){1,3}|(?:DZ|RA|SN|SG|IC|PE|PL|GR|GS|FC|BR|FG|FZFG|HZ|FU|VA|DU|SA|PY)))*))?\b/g;
 
 const tsPattern =
-  /(.{3}\d{2,}G?\d{0,2}KT\sP?\d{0,2}\/?\dSM\s(\+|-)?(VCTS|TSRA|TSSN|TSRAGR|TSSNGR|TSGR|TSRAGR)(\s\+?FC)?\s(\w{3}\d{3}\s)*(\w{3}\d{3}CB))/g;
+  /(((VRB)?\d{2,}G\d{0,2}KT\s)?(\d{2,3}V\d{2,3}\s)?(P?\d{0,2}\/?\dSM\s)(-SHRA\s)?(\+|-)?(VCTS|TSRA|TSSN|TSRAGR|TSSNGR|TSGR|TSRAGR|TS)(\s\+?FC|\sBR|\sFG)?((\s(\w{3}\d{3}\s)*(\w{3}\d{3}CB))?)?)/g;
 
 export const siteIdPattern = /(C[YWZ][A-Z]{2})\b/g;
 
-export const SIGWX_REGEX = { cloudPattern, fzPrecipitation, windPattern, ifrWxPattern, tsPattern, siteIdPattern };
+export const SIGWX_REGEX = { tsPattern, cloudPattern, fzPrecipitation, windPattern, ifrWxPattern, siteIdPattern };
