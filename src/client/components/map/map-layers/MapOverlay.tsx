@@ -1,22 +1,28 @@
-import { Layer, Source } from "react-map-gl/maplibre";
+import {
+  CircleLayerSpecification,
+  FillLayerSpecification,
+  Layer,
+  LineLayerSpecification,
+  Source,
+  SourceSpecification,
+  SymbolLayerSpecification,
+  VectorSourceSpecification,
+} from "react-map-gl/maplibre";
 
-import { OverlayOptions } from "@/lib/types";
 import { FeatureCollection } from "geojson";
 
 interface Props {
-  id: string;
   data: FeatureCollection;
-  overlayType: "circle" | "line" | "fill" | "symbol";
-  overlayOptions?: OverlayOptions;
+  overlayOptions: SymbolLayerSpecification | LineLayerSpecification | CircleLayerSpecification | FillLayerSpecification;
 }
 
-const MapOverlay = ({ id, overlayType, data, overlayOptions }: Props) => {
+const MapOverlay = ({ data, overlayOptions }: Props) => {
   const layout = overlayOptions?.layout ?? {};
   const paint = overlayOptions?.paint ?? {};
   return (
     <>
       <Source type="geojson" data={data}>
-        <Layer type={overlayType} id={id} beforeId="boundary_state" layout={layout} paint={paint} />
+        <Layer beforeId="boundary_state" {...overlayOptions} />
       </Source>
     </>
   );

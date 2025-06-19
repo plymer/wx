@@ -1,47 +1,42 @@
-import { OverlayOptions } from "../lib/types";
+import { LineLayerSpecification, SymbolLayerSpecification } from "maplibre-gl";
 
-export const TAF_OVERLAY: OverlayOptions = {
+export const TAF_OVERLAY: SymbolLayerSpecification = {
+  id: "taf-sites",
+  type: "symbol",
+  source: "taf",
   layout: {
-    "text-field": {
-      stops: [
-        [0, ""],
-        [2, "{siteId}"],
-        [10, "{siteId}"],
-      ],
-    },
-    "icon-image": {
-      stops: [
-        [0, '"'],
-        [6, "circle-11"],
-      ],
-    },
-    "icon-size": {
-      stops: [
-        [6, 0.5],
-        [10, 1],
-      ],
-    },
-    "text-size": {
-      stops: [
-        [0, 6],
-        [6, 12],
-      ],
-    },
-    "text-anchor": {
-      stops: [
-        [0, "center"],
-        [6, "top-left"],
-      ],
-    },
-    "text-offset": {
-      stops: [
-        [0, [0, 0]],
-        [10, [0, 0.5]],
-      ],
-    },
+    "text-field": [
+      "step",
+      ["zoom"],
+      "", // default: zoom < 2
+      4.5,
+      ["get", "siteId"], // zoom >= 2
+    ],
+    "icon-image": [
+      "step",
+      ["zoom"], // default: zoom < 6
+      "circle-11",
+      4.5,
+      "circle-11",
+    ],
+    "icon-size": [
+      "step",
+      ["zoom"],
+      0.5, // default: zoom < 10
+      4.5,
+      1,
+    ],
+    "text-size": [
+      "step",
+      ["zoom"],
+      8, // default: zoom < 6
+      8,
+      14,
+    ],
+    "text-offset": [0.5, 0.5],
     "icon-allow-overlap": true,
-    "text-allow-overlap": false,
-    "text-justify": "auto",
+    "text-allow-overlap": true,
+    "text-variable-anchor": ["top-left", "bottom-right", "top-right", "bottom-left", "left", "right", "top", "bottom"],
   },
   paint: {
     "text-halo-width": 2,
@@ -50,44 +45,34 @@ export const TAF_OVERLAY: OverlayOptions = {
   },
 };
 
-export const BEDPOST_OVERLAY: OverlayOptions = {
+export const BEDPOSTS_OVERLAY: SymbolLayerSpecification = {
+  id: "bedposts",
+  type: "symbol",
+  source: "bedposts",
   layout: {
-    "text-field": {
-      stops: [
-        [0, " "],
-        [5, "{name}"],
-        [10, "{name}"],
-      ],
-    },
-    "text-size": {
-      stops: [
-        [5, 8],
-        [10, 14],
-      ],
-    },
-    "icon-image": {
-      stops: [
-        [0, " "],
-        [5, "circle-11"],
-        [10, "circle-11"],
-      ],
-    },
-    "icon-size": 0.25,
-    "text-offset": [0, 1],
+    "text-field": ["step", ["zoom"], "", 5, ["get", "name"]],
+    "text-size": ["step", ["zoom"], 10, 7, 14],
+    "icon-image": ["step", ["zoom"], "", 5, "star-11"],
+    "icon-size": ["step", ["zoom"], 0.8, 7, 1.25],
+    "text-offset": [-1, 0],
+    "text-anchor": "right",
     "text-font": ["Open Sans Regular Italic", "Arial Unicode MS Regular"],
     "text-allow-overlap": true,
+    "icon-allow-overlap": true,
   },
   paint: {
-    "text-color": "rgba(146, 21, 21, 1)",
-    "text-halo-width": 1,
+    "text-color": "#ff9999",
+    "text-halo-width": 0,
     "text-halo-blur": 1,
-    "icon-color": "#921515",
     "icon-halo-color": "rgba(146, 21, 21, 1)",
-    "text-halo-color": "rgba(255, 255, 255, 1)",
+    "text-halo-color": "#000",
   },
 };
 
-export const LGF_OVERLAY: OverlayOptions = {
+export const LGF_OVERLAY: LineLayerSpecification = {
+  id: "lgf-boundaries",
+  type: "line",
+  source: "lgf",
   paint: {
     "line-color": [
       "match",
@@ -104,10 +89,30 @@ export const LGF_OVERLAY: OverlayOptions = {
   },
 };
 
-export const FIR_OVERLAY: OverlayOptions = { paint: { "line-color": "rgb(255,0,0)", "line-width": 1 } };
+export const FIR_OVERLAY: LineLayerSpecification = {
+  id: "fir-boundaries",
+  type: "line",
+  source: "fir",
+  paint: { "line-color": "rgb(255,0,0)", "line-width": 1 },
+};
 
-export const GFA_OVERLAY: OverlayOptions = { paint: { "line-color": "rgb(0,0,255)", "line-width": 3 } };
+export const GFA_OVERLAY: LineLayerSpecification = {
+  id: "gfa-boundaries",
+  type: "line",
+  source: "gfa",
+  paint: { "line-color": "rgb(0,0,255)", "line-width": 3 },
+};
 
-export const PUBLIC_OVERLAY: OverlayOptions = { paint: { "line-color": "rgb(0,0,0)", "line-width": 1 } };
+export const PUBLIC_OVERLAY: LineLayerSpecification = {
+  id: "public-regions",
+  type: "line",
+  source: "publicRegions",
+  paint: { "line-color": "rgb(0,0,0)", "line-width": 1 },
+};
 
-export const MARINE_OVERLAY: OverlayOptions = { paint: { "line-color": "rgb(0,0,144)", "line-width": 1 } };
+export const MARINE_OVERLAY: LineLayerSpecification = {
+  id: "marine-regions",
+  type: "line",
+  source: "marineRegions",
+  paint: { "line-color": "rgb(0,0,144)", "line-width": 1 },
+};

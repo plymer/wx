@@ -21,7 +21,7 @@ import marineRegions from "@/assets/general-overlays/marine-regions.json";
 // overlay configurations
 import {
   TAF_OVERLAY,
-  BEDPOST_OVERLAY,
+  BEDPOSTS_OVERLAY,
   LGF_OVERLAY,
   FIR_OVERLAY,
   GFA_OVERLAY,
@@ -71,70 +71,18 @@ const OverlayManager = () => {
 
   return (
     <>
-      {firOverlay && (
-        <MapOverlay
-          key={"firBoundaries"}
-          id="fir-boundaries"
-          data={overlays.fir}
-          overlayType="line"
-          overlayOptions={FIR_OVERLAY}
-        />
-      )}
-      {gfaOverlay && (
-        <MapOverlay
-          key={"gfaBoundaries"}
-          id="gfa-boundaries"
-          data={overlays.gfa}
-          overlayType="line"
-          overlayOptions={GFA_OVERLAY}
-        />
-      )}
-      {lgfOverlay && (
-        <MapOverlay
-          key={"lgfBoundaries"}
-          id="lgf-boundaries"
-          data={overlays.lgf}
-          overlayType="line"
-          overlayOptions={LGF_OVERLAY}
-        />
-      )}
-      {bedpostsOverlay && (
-        <MapOverlay
-          key={"bedposts"}
-          id="bedposts"
-          data={overlays.bedposts}
-          overlayType="symbol"
-          overlayOptions={BEDPOST_OVERLAY}
-        />
-      )}
+      {firOverlay && <MapOverlay key={"firBoundaries"} data={overlays.fir} overlayOptions={FIR_OVERLAY} />}
+      {gfaOverlay && <MapOverlay key={"gfaBoundaries"} data={overlays.gfa} overlayOptions={GFA_OVERLAY} />}
+      {lgfOverlay && <MapOverlay key={"lgfBoundaries"} data={overlays.lgf} overlayOptions={LGF_OVERLAY} />}
+      {bedpostsOverlay && <MapOverlay key={"bedposts"} data={overlays.bedposts} overlayOptions={BEDPOSTS_OVERLAY} />}
       {publicRegionsOverlay && (
-        <MapOverlay
-          key={"publicRegions"}
-          id="publicRegions"
-          data={overlays.publicRegions}
-          overlayType="line"
-          overlayOptions={PUBLIC_OVERLAY}
-        />
+        <MapOverlay key={"publicRegions"} data={overlays.publicRegions} overlayOptions={PUBLIC_OVERLAY} />
       )}
 
       {marineRegionsOverlay && (
-        <MapOverlay
-          key={"marineRegions"}
-          id="marineRegions"
-          data={overlays.marineRegions}
-          overlayType="line"
-          overlayOptions={MARINE_OVERLAY}
-        />
+        <MapOverlay key={"marineRegions"} data={overlays.marineRegions} overlayOptions={MARINE_OVERLAY} />
       )}
-      {tafsOverlay && (
-        <MapOverlay
-          key={"tafSites"}
-          id="tafSites"
-          data={overlays.taf}
-          overlayType="symbol"
-          overlayOptions={TAF_OVERLAY}
-        />
-      )}
+      {tafsOverlay && <MapOverlay key={"tafSites"} data={overlays.taf} overlayOptions={TAF_OVERLAY} />}
 
       {/* {popupData && (
         <Popup
