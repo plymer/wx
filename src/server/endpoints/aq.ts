@@ -4,7 +4,7 @@ import type { Feature, GeoJSON, Point } from "geojson";
 
 import { aqDb } from "../main.js";
 import { aqData } from "../dbSchemas/aq.drizzle.js";
-import { HOUR } from "../lib/utils.js";
+import { errorResponse, HOUR, jsonResponse } from "../lib/utils.js";
 
 import { validateParams } from "../lib/zod-validator.js";
 import { aqSchema } from "../validationSchemas/aq.zod.js";
@@ -53,17 +53,9 @@ route.get("/aq", validateParams("query", aqSchema), async (c) => {
       return acc;
     }, []);
 
-    if (geoData.length === 0) return c.json({ status: "noData" }, 200);
-
-    return c.json(
-      {
-        status: "success",
-        data: { type: "FeatureCollection", features: geoData } as GeoJSON<Point>,
-      },
-      200,
-    );
+    return jsonResponse(c, geoData, "geojson");
   } catch (error) {
-    return c.json({ status: "error", message: error }, 500);
+    return errorResponse(c, error);
   }
 });
 

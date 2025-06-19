@@ -5,6 +5,8 @@ import { Relations, sql } from "drizzle-orm";
 
 import { LatLon, SunTimes } from "./common.types.js";
 import { MySqlTableWithColumns } from "drizzle-orm/mysql-core/table.js";
+import { Context } from "hono";
+import { Feature, FeatureCollection } from "geojson";
 
 export const FEET_PER_METRE = 3.28084;
 export const HOUR = 3_600_000;
@@ -59,6 +61,52 @@ window.__vite_plugin_react_preamble_installed__ = true
   `,
   );
   return output;
+}
+
+export function jsonResponse(ctx: Context, data: any, responseType: "json" | "geojson" = "json") {
+  // check for 'noData' conditions
+  const isEmpty = (d: any) => {
+    if (!d) return true; // if we don't have any data, return true
+    if (Array.isArray(d)) return d.length === 0;
+    if (d && typeof d === "object") return Object.keys(d).length === 0;
+    if (typeof d === "string") return d.length === 0 || d === "error retrieving data";
+    return !d;
+  };
+
+  switch (responseType) {
+    // when we want to return a GeoJSON FeatureCollection
+    case "geojson":
+      const features = data as Feature[];
+
+      if (isEmpty(features)) {
+        ctx.header("Content-Type", "application/json");
+        return ctx.json({ status: "noData" }, 200);
+      }
+
+      const output: FeatureCollection = {
+        type: "FeatureCollection",
+        features: features,
+      };
+
+      ctx.header("Content-Type", "application/geo+json");
+      return ctx.json({ status: "success", data: output }, 200);
+
+    // when we want to return a JSON object
+    case "json":
+      if (isEmpty(data)) {
+        ctx.header("Content-Type", "application/json");
+        return ctx.json({ status: "noData" }, 200);
+      }
+
+      ctx.header("Content-Type", "application/json");
+      return ctx.json({ status: "success", data }, 200);
+  }
+}
+
+export function errorResponse(ctx: Context, error: unknown) {
+  ctx.status(500);
+  ctx.header("Content-Type", "application/json");
+  return ctx.json({ status: "error", message: error });
 }
 
 /**

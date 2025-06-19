@@ -2,10 +2,11 @@ import { Hono } from "hono";
 import axios from "axios";
 import { Feature, FeatureCollection, Point } from "geojson";
 import { LightningFC } from "../lib/lightning.types.js";
+import { errorResponse, jsonResponse } from "../lib/utils.js";
 
 const route = new Hono();
 
-route.get("/lightning", async (ctx) => {
+route.get("/lightning", async (c) => {
   // first, lets get our current minutes from the current UTC time
   const latestTime = new Date().getUTCMinutes();
 
@@ -68,16 +69,9 @@ route.get("/lightning", async (ctx) => {
       });
     });
 
-    if (features.length === 0) return ctx.json({ status: "noData" }, 200);
-
-    const output: FeatureCollection = {
-      type: "FeatureCollection",
-      features: features,
-    };
-
-    return ctx.json({ status: "success", data: output }, 200);
+    return jsonResponse(c, features, "geojson");
   } catch (error) {
-    return ctx.json({ status: "error", message: error }, 500);
+    return errorResponse(c, error);
   }
 });
 

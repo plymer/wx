@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Hono } from "hono";
 import { NavCanImageList, NavCanResponse } from "../lib/alphanumeric.types.js";
+import { errorResponse, jsonResponse } from "../lib/utils.js";
 
 const route = new Hono();
 
@@ -39,11 +40,9 @@ route.get("/gfa", async (c) => {
       return { domain: d, cldwx: results[d].cldwx, turbc: results[d].turbc };
     });
 
-    if (output.length === 0) return c.json({ status: "noData" }, 200);
-
-    return c.json({ status: "success", data: output }, 200);
+    return jsonResponse(c, output);
   } catch (error) {
-    return c.json({ status: "error", error: error }, 500);
+    return errorResponse(c, error);
   }
 });
 
@@ -88,11 +87,9 @@ route.get("/sigwx", async (c) => {
       [],
     );
 
-    if (output.length === 0) return c.json({ status: "noData" }, 200);
-
-    return c.json({ status: "success", data: output }, 200);
+    return jsonResponse(c, output);
   } catch (error) {
-    return c.json({ status: "error", error: error }, 500);
+    return errorResponse(c, error);
   }
 });
 
@@ -136,11 +133,9 @@ route.get("/hlt", async (c) => {
       [],
     );
 
-    if (output.length === 0) return c.json({ status: "noData" }, 200);
-
-    return c.json({ status: "success", data: output }, 200);
+    return jsonResponse(c, output);
   } catch (error) {
-    return c.json({ status: "error", error: error }, 500);
+    return errorResponse(c, error);
   }
 });
 
@@ -167,11 +162,9 @@ route.get("/lgf", async (c) => {
       return { domain: p, images: results[p] };
     });
 
-    if (output.length === 0) return c.json({ status: "noData" }, 200);
-
-    return c.json({ status: "success", data: output }, 200);
+    return jsonResponse(c, output);
   } catch (error) {
-    return c.json({ status: "error", error: error }, 500);
+    return errorResponse(c, error);
   }
 });
 
@@ -266,11 +259,9 @@ route.get("/navcan", async (c) => {
       }
     });
 
-    if (Object.keys(output).length === 0) return c.json({ status: "noData" }, 200);
-
-    return c.json({ status: "success", data: output }, 200);
+    return jsonResponse(c, output);
   } catch (error) {
-    return c.json({ status: "error", error: error }, 500);
+    return errorResponse(c, error);
   }
 });
 

@@ -4,7 +4,7 @@ import suncalc, { GetTimesResult } from "suncalc";
 import { validateParams } from "../lib/zod-validator.js";
 import { metarSchema, publicBulletinSchema, singleSiteSchema } from "../validationSchemas/alphanumeric.zod.js";
 import { HubDiscussion, MetarObject, StationObject, TafObject } from "../lib/alphanumeric.types.js";
-import { FEET_PER_METRE, leadZero } from "../lib/utils.js";
+import { errorResponse, FEET_PER_METRE, jsonResponse, leadZero } from "../lib/utils.js";
 
 const route = new Hono();
 
@@ -30,10 +30,10 @@ route.get("/metars", validateParams("query", metarSchema), async (c) => {
     // if our returned value is an object, we know we have valid output
     if (typeof metarObjects === "object") {
       const output = metarObjects.reverse().map((m: MetarObject) => m.rawOb);
-      return c.json({ status: "success", data: output }, 200);
+      return jsonResponse(c, output);
     }
   } catch (error) {
-    return c.json({ status: "error", error: error }, 500);
+    return errorResponse(c, error);
   }
 });
 
@@ -60,41 +60,40 @@ route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
       const times: GetTimesResult = suncalc.getTimes(new Date(), siteData[0].lat, siteData[0].lon);
 
       // set sunrise and sunset times to "---" when the sun doesn't rise or set today
-      const riseString: string =
+      const sunrise: string =
         times.sunrise.getUTCHours().toString() !== "NaN"
           ? leadZero(times.sunrise.getUTCHours(), 2) + ":" + leadZero(times.sunrise.getUTCMinutes(), 2) + "Z"
           : "---";
-      const setString: string =
+      const sunset: string =
         times.sunsetStart.getUTCHours().toString() !== "NaN"
           ? leadZero(times.sunsetStart.getUTCHours(), 2) + ":" + leadZero(times.sunsetStart.getUTCMinutes(), 2) + "Z"
           : "---";
 
+      // we want to show the state/province for usa/canada, otherwise just the country
+      const location = `${siteData[0].site}, ${siteData[0].country === "US" || siteData[0].country === "CA" ? siteData[0].state : siteData[0].country}`;
+
+      const output = {
+        icaoId: siteData[0].icaoId,
+        location,
+        lat:
+          siteData[0].lat > 0
+            ? (Math.round(siteData[0].lat * 10) / 10).toString() + "°N"
+            : Math.abs(Math.round(siteData[0].lat * 10) / 10).toString() + "°S",
+        lon:
+          siteData[0].lon > 0
+            ? (Math.round(siteData[0].lon * 10) / 10).toString() + "°E"
+            : Math.abs(Math.round(siteData[0].lon * 10) / 10).toString() + "°W",
+        elev_f: Math.floor(siteData[0].elev * FEET_PER_METRE) + " ft",
+        elev_m: siteData[0].elev + " m",
+        sunrise,
+        sunset,
+      };
+
       // return the site data object
-      return c.json(
-        {
-          status: "success",
-          data: {
-            icaoId: siteData[0].icaoId,
-            location: siteData[0].site + ", " + siteData[0].state,
-            lat:
-              siteData[0].lat > 0
-                ? (Math.round(siteData[0].lat * 10) / 10).toString() + "°N"
-                : Math.abs(Math.round(siteData[0].lat * 10) / 10).toString() + "°S",
-            lon:
-              siteData[0].lon > 0
-                ? (Math.round(siteData[0].lon * 10) / 10).toString() + "°E"
-                : Math.abs(Math.round(siteData[0].lon * 10) / 10).toString() + "°W",
-            elev_f: Math.floor(siteData[0].elev * FEET_PER_METRE) + " ft",
-            elev_m: siteData[0].elev + " m",
-            sunrise: riseString,
-            sunset: setString,
-          },
-        },
-        200,
-      );
+      return jsonResponse(c, output);
     }
   } catch (error) {
-    return c.json({ status: "error", error: error }, 500);
+    return errorResponse(c, error);
   }
 });
 
@@ -117,17 +116,11 @@ route.get("/taf", validateParams("query", singleSiteSchema), async (c) => {
       return c.json({ status: "noData" }, 200);
     }
 
-    if (typeof tafObject === "object") {
-      return c.json(
-        {
-          status: "success",
-          data: tafObject[0].rawTAF,
-        },
-        200,
-      );
-    }
+    const output = (tafObject[0] as TafObject).rawTAF;
+
+    return jsonResponse(c, output);
   } catch (error) {
-    return c.json({ status: "error", error: error }, 500);
+    return errorResponse(c, error);
   }
 });
 
@@ -154,25 +147,28 @@ route.get("/hubs", validateParams("query", singleSiteSchema), async (c) => {
       return c.json({ status: "noData" }, 200);
     }
 
-    // ready our data to be returned
-    const hubData = hubs[site.toUpperCase() as keyof HubDiscussion];
+    const siteName = HubSites[site.toUpperCase() as keyof typeof HubSites];
 
-    return c.json(
-      {
-        status: "success",
-        data: {
-          siteName: HubSites[site],
-          header: hubData.strheaders,
-          discussion: hubData.strdiscussion,
-          outlook: hubData.stroutlook,
-          forecaster: hubData.strforecaster,
-          office: hubData.stroffice,
-        },
-      },
-      200,
-    );
+    const {
+      strheaders: header,
+      strdiscussion: discussion,
+      stroutlook: outlook,
+      strforecaster: forecaster,
+      stroffice: office,
+    } = hubs[site.toUpperCase() as keyof HubDiscussion];
+
+    const output = {
+      siteName,
+      header,
+      discussion,
+      outlook,
+      forecaster,
+      office,
+    };
+
+    return jsonResponse(c, output);
   } catch (error) {
-    return c.json({ status: "error", error: error }, 500);
+    return errorResponse(c, error);
   }
 });
 
@@ -212,15 +208,9 @@ route.get("/public/bulletin", validateParams("query", publicBulletinSchema), asy
         .replace(refPattern, "");
     }
 
-    return c.json(
-      {
-        status: "success",
-        data: output,
-      },
-      200,
-    );
+    return jsonResponse(c, output);
   } catch (error) {
-    return c.json({ status: "error", error: error }, 500);
+    return errorResponse(c, error);
   }
 });
 

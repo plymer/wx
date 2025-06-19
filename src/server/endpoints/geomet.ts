@@ -7,7 +7,7 @@ import axios from "axios";
 import { GeoMetLayer } from "../lib/geomet.types.js";
 
 // utility functions
-import { processDimensionString, transformName } from "../lib/utils.js";
+import { errorResponse, jsonResponse, processDimensionString, transformName } from "../lib/utils.js";
 
 // configuration files
 import { GEOMET_GETCAPABILITIES } from "../config/geomet.config.js";
@@ -20,9 +20,9 @@ import { realtimeLayersSchema } from "../validationSchemas/geomet.zod.js";
 // don't forget to add 'export default route' at the bottom of this file
 const route = new Hono();
 
-route.get("/geomet", validateParams("query", realtimeLayersSchema), async (ctx) => {
+route.get("/geomet", validateParams("query", realtimeLayersSchema), async (c) => {
   // get our validated query parameters from our GET request context
-  const { layers } = ctx.req.valid("query");
+  const { layers } = c.req.valid("query");
   try {
     // configure the XML parser to make traversing the XML easier
     const newParser = new XMLParser({
@@ -79,13 +79,9 @@ route.get("/geomet", validateParams("query", realtimeLayersSchema), async (ctx) 
           })
       : allLayers;
 
-    if (output.length === 0) {
-      return ctx.json({ status: "noData" }, 200);
-    }
-
-    return ctx.json({ status: "success", data: output }, 200);
+    return jsonResponse(c, output);
   } catch (error) {
-    return ctx.json({ status: "error", message: error }, 500);
+    return errorResponse(c, error);
   }
 });
 
