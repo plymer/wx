@@ -124,7 +124,7 @@ export function formatSigWx(alphaString: string | undefined, mode: "taf" | "meta
         // count the brackets in the match text
         // this is what throws off our matches and was duplicated text after certain matches
         // when different matches were nested inside each other
-        const bracketCount = matchText.match(/[()]/g);
+        // const bracketCount = matchText.match(/[()]/g);
 
         formattedString =
           formattedString.slice(0, startPos) + ` (${matchText}) ` + formattedString.slice(startPos + matchText.length);

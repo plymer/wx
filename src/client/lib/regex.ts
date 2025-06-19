@@ -3,8 +3,8 @@ const fzPrecipitation = /((-|\+|\b)(FZRA|PL|SNPL|FZRASN|FZDZ)+)\b/g;
 const windPattern =
   /(WS\d{3}\/)?(\b\d{3}|\bVRB)([2-9][5-9]|[3-9]\d|\d{3})G?([2-9][5-9]|[3-9][0-9]|\d{3})?KT\b|\b((\b\d{3}|\bVRB)\d{2,3}G([2-9][6-9]|[3-9][0-9]|\d{3}))KT\b/g;
 
-const visPattern = /\b([0-2](\s[0-9]\/[0-9])?|[0-9]\/[0-9])SM\b/g;
-const rvrPattern = /(\sR\d{2}\/\d{1,4}(V\d{1,4})FT\/[DNU])*/g;
+// const visPattern = /\b([0-2](\s[0-9]\/[0-9])?|[0-9]\/[0-9])SM\b/g;
+// const rvrPattern = /(\sR\d{2}\/\d{1,4}(V\d{1,4})FT\/[DNU])*/g;
 
 /*
 
