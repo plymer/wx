@@ -47,7 +47,6 @@ export default function WxMap() {
   // import the map style - this may need to change to allow different map styles in the future
   const mapStyle = positronWxMap;
 
-  // TODO :: fix the small gap of a few px when the map is first loading because the wrapper div below does not actually cover the entire height of the map
   return (
     <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height) text-sm">
       <MapInstance viewState={viewState} mapProjection={projection} basemap={mapStyle}>
@@ -55,7 +54,7 @@ export default function WxMap() {
           <AttributionControl
             compact
             position="top-right"
-            style={{ backgroundColor: "#475569", color: "var(--secondary)", border: "1px solid var(--primary)" }}
+            style={{ backgroundColor: "var(--accent)", color: "var(--secondary)", border: "1px solid var(--primary)" }}
           />
 
           {/* <DataAttributions className="absolute bottom-0 right-0 bg-primary text-white m-2">Hello</DataAttributions> */}

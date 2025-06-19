@@ -122,7 +122,7 @@ const WxMap = ({ viewState, mapProjection, children, basemap }: Props) => {
       touchPitch={false}
       boxZoom={false}
       maxBounds={MAP_BOUNDS}
-      style={{ width: "100%", height: "inherit" }}
+      style={{ width: "100%", height: "inherit", backgroundColor: "var(--color-neutral-700)" }}
       mapStyle={basemap}
       // define which layers are interactive (contain data that we can extract)
       // interactiveLayerIds={["layer-pirep", "layer-sigmet", "layer-airmet", "layer-sfc-obs-target"]}

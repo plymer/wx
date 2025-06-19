@@ -113,7 +113,6 @@ export default function Observations() {
               if (e.key === "Enter") handleInputText(e.currentTarget.value);
             }}
             onClick={(e) => (e.currentTarget.value = "")}
-            autoFocus={true}
           />
           <Button
             className="me-2 rounded-e-md rounded-s-none flex place-items-center"

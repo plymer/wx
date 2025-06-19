@@ -19,7 +19,7 @@ export default function Aviation() {
 
   return (
     <>
-      <div className="bg-neutral-800 text-white ">
+      <div className="bg-neutral-800 text-white min-h-(--max-avn-height) max-md:min-h-(--md-avn-height)">
         <nav className="md:p-2 max-md:pt-2">
           <label className="me-2 max-md:hidden">Product:</label>
           {PRODUCTS.map((c, i) => (

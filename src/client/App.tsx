@@ -43,7 +43,7 @@ export const App = () => {
     <main className="w-full max-w-(--breakpoint-2xl) mx-auto">
       {/* large-screen nav bar */}
       <nav className="flex justify-between px-4 mt-2 place-items-center max-md:hidden">
-        <img src="/site-icon.svg" className="w-10 h-10 inline me-2" />
+        <img src="/site-icon.svg" className="size-10 inline me-2" />
         {appModesList.map((l, i) => (
           <Button
             key={i}

@@ -108,11 +108,11 @@ export default function OptionsMapOverlays({ ...props }: ButtonProps) {
             >
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="projection">
-                  <ScanEye className="me-2" />
+                  <ScanEye className="me-2 size-6" />
                   Projection
                 </TabsTrigger>
                 <TabsTrigger value="overlays">
-                  <List className="me-2" />
+                  <List className="me-2 size-6" />
                   Geography
                 </TabsTrigger>
               </TabsList>
@@ -125,7 +125,7 @@ export default function OptionsMapOverlays({ ...props }: ButtonProps) {
                     onClick={() => mapActions.setProjection("globe")}
                     className={`${map.projection === "globe" && "active"}`}
                   >
-                    <Globe className="me-2" />
+                    <Globe className="me-2 size-6" />
                     Globe
                   </Button>
                   <Button
@@ -134,7 +134,7 @@ export default function OptionsMapOverlays({ ...props }: ButtonProps) {
                     onClick={() => mapActions.setProjection("mercator")}
                     className={`${map.projection === "mercator" && "active"}`}
                   >
-                    <Map className="me-2" />
+                    <Map className="me-2 size-6" />
                     Mercator
                   </Button>
                 </div>

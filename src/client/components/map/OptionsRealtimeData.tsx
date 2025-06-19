@@ -109,15 +109,15 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
             >
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="other">
-                  <CloudLightning className="me-2" />
+                  <CloudLightning className="me-2 size-6" />
                   Wx Elements
                 </TabsTrigger>
                 <TabsTrigger value="satellite">
-                  <Satellite className="me-2" />
+                  <Satellite className="me-2 size-6" />
                   Satellite
                 </TabsTrigger>
                 <TabsTrigger value="radar">
-                  <Radar className="me-2" />
+                  <Radar className="me-2 size-6" />
                   Radar
                 </TabsTrigger>
               </TabsList>
