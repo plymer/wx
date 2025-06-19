@@ -31,7 +31,10 @@ export default defineConfig({
         plugins: [["babel-plugin-react-compiler", { target: "19" }]],
       },
     }),
-    VitePWA({ registerType: "autoUpdate", manifest: false }),
+    VitePWA({
+      registerType: "autoUpdate",
+      manifest: false,
+    }),
   ],
   resolve: { alias: { "@": "/src/client" } },
 });

@@ -18,5 +18,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["vite.config.ts", "src/client/*"]
+  "include": ["vite.config.ts", "src/client/*", "src/vite-env.d.ts"]
 }
