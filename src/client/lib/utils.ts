@@ -126,13 +126,9 @@ export function formatSigWx(alphaString: string | undefined, mode: "taf" | "meta
         // when different matches were nested inside each other
         const bracketCount = matchText.match(/[()]/g);
 
-        console.log(bracketCount, bracketCount?.length, matchText);
-
         formattedString =
           formattedString.slice(0, startPos) + ` (${matchText}) ` + formattedString.slice(startPos + matchText.length);
       });
-
-      console.log(formattedString);
 
       // concatenate any adjacent matches
       formattedString = formattedString.replace(/\)\s+\(/g, " ");

@@ -29,7 +29,6 @@ export default function Observations() {
       siteId.current = "";
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     };
-     
   }, []); // this needs to only run on mount/unmount
 
   // hours that are available as options in the dropdown list
@@ -81,10 +80,13 @@ export default function Observations() {
     // check if we are currently debouncing an input change, clear the timeout if so
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
+    // need to store the value in order for it to be available after the debounce completes
+    const newValue = e.currentTarget.value;
+
     // set the new value after a debounce period
     debounceTimeout.current = setTimeout(() => {
-      siteId.current = e.currentTarget.value;
-    }, 300); // 300ms debounce
+      siteId.current = newValue;
+    }, 300);
   };
 
   return (
@@ -115,7 +117,10 @@ export default function Observations() {
           />
           <Button
             className="me-2 rounded-e-md rounded-s-none flex place-items-center"
-            onClick={() => handleInputText(siteId.current)}
+            onClick={() => {
+              console.log("click", siteId.current);
+              handleInputText(siteId.current);
+            }}
             variant="alternate"
           >
             <RefreshCw className="w-4 h-4 me-2 inline" />
