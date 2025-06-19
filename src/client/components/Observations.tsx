@@ -15,7 +15,7 @@ import Button from "./ui/Button";
 export default function Observations() {
   // create a refs to the siteId text input and the input debounce timeout
   const siteId = useRef("");
-  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+  // const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // use a context to store state so that when we come back to this tab it restores our obs/taf search
   const actions = useObsActions();
@@ -27,7 +27,7 @@ export default function Observations() {
     siteId.current = site;
     return () => {
       siteId.current = "";
-      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+      // if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     };
   }, []); // this needs to only run on mount/unmount
 
@@ -48,9 +48,9 @@ export default function Observations() {
 
   // validate the input and mutate the search string, passing it to the context and then it will propagate to the child components
   //   to show the user the data they have requested
-  function handleInputText(input: string) {
+  const handleInputText = (input: string) => {
     // check if we are currently debouncing an input change, clear the timeout if so
-    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    // if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
     // we want to allow 2, 3, and 4-letter idents to be used
     // for 2-letter idents, assume we are doing a major canadian site and prepend with "cy"
@@ -74,19 +74,35 @@ export default function Observations() {
         },
       });
     }
-  }
+  };
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // check if we are currently debouncing an input change, clear the timeout if so
-    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    // if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
 
     // need to store the value in order for it to be available after the debounce completes
     const newValue = e.currentTarget.value;
 
+    siteId.current = newValue;
+
     // set the new value after a debounce period
-    debounceTimeout.current = setTimeout(() => {
-      siteId.current = newValue;
-    }, 300);
+    // debounceTimeout.current = setTimeout(() => {
+    //   siteId.current = newValue;
+    // }, 100);
+  };
+
+  const handleOnClick = () => {
+    handleInputText(siteId.current);
+  };
+
+  const handleOnKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleInputText(siteId.current);
+      // Unfocus if on mobile
+      if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        e.currentTarget.blur();
+      }
+    }
   };
 
   return (
@@ -109,17 +125,12 @@ export default function Observations() {
             spellCheck="false"
             defaultValue={site}
             onChange={(e) => handleOnChange(e)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleInputText(e.currentTarget.value);
-            }}
+            onKeyDown={(e) => handleOnKeyDown(e)}
             onClick={(e) => (e.currentTarget.value = "")}
           />
           <Button
             className="me-2 rounded-e-md rounded-s-none flex place-items-center"
-            onClick={() => {
-              console.log("click", siteId.current);
-              handleInputText(siteId.current);
-            }}
+            onClick={() => handleOnClick()}
             variant="alternate"
           >
             <RefreshCw className="w-4 h-4 me-2 inline" />
