@@ -15,16 +15,16 @@ export const TAF_OVERLAY: SymbolLayerSpecification = {
     "icon-image": [
       "step",
       ["zoom"], // default: zoom < 6
-      "circle-11",
+      "icons:aircraft",
       4.5,
-      "circle-11",
+      "icons:aircraft",
     ],
     "icon-size": [
       "step",
       ["zoom"],
-      0.5, // default: zoom < 10
+      0.35, // default: zoom < 10
       4.5,
-      1,
+      0.65,
     ],
     "text-size": [
       "step",

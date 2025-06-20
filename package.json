@@ -10,7 +10,8 @@
     "format": "prettier --write .",
     "compile": "tsc -b",
     "build": "vite build && tsc -b",
-    "deploy": "git stash && git pull --rebase && npm install --include=dev && npm run build && pm2 restart beta.config.cjs --env production && pm2 save"
+    "deploy": "git stash && git pull --rebase && npm install --include=dev && npm run build && pm2 restart beta.config.cjs --env production && pm2 save",
+    "sprites:icons": "spreet public/sprites/icons public/sprites/icons/icons && spreet public/sprites/icons public/sprites/icons/icons@2x"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",

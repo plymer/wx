@@ -6,31 +6,12 @@ export const PUBLIC_URL = `${pathDetails.protocol}//${pathDetails.hostname}${
 }${
   process.env.NODE_ENV === "production"
     ? ""
-    : pathDetails.pathname.replace("src/assets/map-styles/positron-wxmap.ts", "")
+    : pathDetails.pathname.replace("src/client/assets/map-styles/positron-wxmap.ts", "")
 }`;
 
 export const positronWxMap: StyleSpecification = {
   version: 8,
   name: "Positron-Wxmap",
-  metadata: {
-    "mapbox:autocomposite": false,
-    "mapbox:groups": {
-      "101da9f13b64a08fa4b6ac1168e89e5f": {
-        collapsed: false,
-        name: "Places",
-      },
-      a14c9607bc7954ba1df7205bf660433f: { name: "Boundaries" },
-      b6371a3f2f5a9932464fa3867530a2e5: {
-        collapsed: false,
-        name: "Transportation",
-      },
-    },
-    "mapbox:type": "template",
-    "openmaptiles:mapbox:owner": "openmaptiles",
-    "openmaptiles:mapbox:source:url": "mapbox://openmaptiles.4qljc88t",
-    "openmaptiles:version": "3.x",
-    "maputnik:renderer": "mlgljs",
-  },
   sources: {
     openmaptiles: {
       type: "vector",
@@ -39,6 +20,7 @@ export const positronWxMap: StyleSpecification = {
   },
   sprite: [
     { id: "default", url: "https://openmaptiles.github.io/positron-gl-style/sprite" },
+    { id: "icons", url: `${PUBLIC_URL}/sprites/icons` },
     // { id: "windbarbs", url: `${PUBLIC_URL}/sprites/windbarbs` },
   ],
   glyphs: "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=xDuB4axhGsuzLiFvvDiF",
@@ -53,7 +35,7 @@ export const positronWxMap: StyleSpecification = {
     {
       id: "boundary_state",
       type: "line",
-      metadata: { "mapbox:group": "a14c9607bc7954ba1df7205bf660433f" },
+
       source: "openmaptiles",
       "source-layer": "boundary",
       filter: ["all", ["==", "admin_level", 4], ["==", "maritime", 0]],
@@ -73,7 +55,6 @@ export const positronWxMap: StyleSpecification = {
     {
       id: "boundary_country_z0-4",
       type: "line",
-      metadata: { "mapbox:group": "a14c9607bc7954ba1df7205bf660433f" },
       source: "openmaptiles",
       "source-layer": "boundary",
       maxzoom: 24,
@@ -93,7 +74,6 @@ export const positronWxMap: StyleSpecification = {
     {
       id: "boundary_country_z5-",
       type: "line",
-      metadata: { "mapbox:group": "a14c9607bc7954ba1df7205bf660433f" },
       source: "openmaptiles",
       "source-layer": "boundary",
       minzoom: 5,
@@ -135,7 +115,6 @@ export const positronWxMap: StyleSpecification = {
     {
       id: "place_town",
       type: "symbol",
-      metadata: { "mapbox:group": "101da9f13b64a08fa4b6ac1168e89e5f" },
       source: "openmaptiles",
       "source-layer": "place",
       maxzoom: 15,
@@ -163,7 +142,6 @@ export const positronWxMap: StyleSpecification = {
     {
       id: "place_city",
       type: "symbol",
-      metadata: { "mapbox:group": "101da9f13b64a08fa4b6ac1168e89e5f" },
       source: "openmaptiles",
       "source-layer": "place",
       maxzoom: 14,
@@ -195,7 +173,6 @@ export const positronWxMap: StyleSpecification = {
     {
       id: "place_capital",
       type: "symbol",
-      metadata: { "mapbox:group": "101da9f13b64a08fa4b6ac1168e89e5f" },
       source: "openmaptiles",
       "source-layer": "place",
       maxzoom: 12,
@@ -223,7 +200,6 @@ export const positronWxMap: StyleSpecification = {
     {
       id: "place_city_large",
       type: "symbol",
-      metadata: { "mapbox:group": "101da9f13b64a08fa4b6ac1168e89e5f" },
       source: "openmaptiles",
       "source-layer": "place",
       maxzoom: 12,
@@ -255,7 +231,6 @@ export const positronWxMap: StyleSpecification = {
     {
       id: "place_state",
       type: "symbol",
-      metadata: { "mapbox:group": "101da9f13b64a08fa4b6ac1168e89e5f" },
       source: "openmaptiles",
       "source-layer": "place",
       maxzoom: 12,
