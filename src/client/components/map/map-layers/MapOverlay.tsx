@@ -4,9 +4,7 @@ import {
   Layer,
   LineLayerSpecification,
   Source,
-  SourceSpecification,
   SymbolLayerSpecification,
-  VectorSourceSpecification,
 } from "react-map-gl/maplibre";
 
 import { FeatureCollection } from "geojson";
@@ -17,8 +15,8 @@ interface Props {
 }
 
 const MapOverlay = ({ data, overlayOptions }: Props) => {
-  const layout = overlayOptions?.layout ?? {};
-  const paint = overlayOptions?.paint ?? {};
+  // const layout = overlayOptions?.layout ?? {};
+  // const paint = overlayOptions?.paint ?? {};
   return (
     <>
       <Source type="geojson" data={data}>

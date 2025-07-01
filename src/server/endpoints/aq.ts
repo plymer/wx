@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { gte } from "drizzle-orm";
-import type { Feature, GeoJSON, Point } from "geojson";
+import type { Feature, Point } from "geojson";
 
 import { aqDb } from "../main.js";
 import { aqData } from "../dbSchemas/aq.drizzle.js";

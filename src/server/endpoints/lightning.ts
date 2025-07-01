@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import axios from "axios";
-import { Feature, FeatureCollection, Point } from "geojson";
+import { Feature, Point } from "geojson";
 import { LightningFC } from "../lib/lightning.types.js";
 import { errorResponse, jsonResponse } from "../lib/utils.js";
 

@@ -198,8 +198,8 @@ const DataLayerManager = ({ baseLayers }: Props) => {
 
       {/* {vector.showPIREPs && <PirepData key={"pirep"} currentTime={currentTime} viewportBounds={map.bounds} />} */}
 
-      {vector.showLightning && lightning?.status === "success" && (
-        <LightningDataLayer key="lightning" data={lightning.data} belowLayer={layerConstraints.vector} />
+      {vector.showLightning && (
+        <LightningDataLayer key="lightning" lightningData={lightning} belowLayer={layerConstraints.vector} />
       )}
 
       {vector.showAQ && aqData?.status === "success" && (

@@ -1,4 +1,4 @@
-import { Layer, RasterSourceSpecification, Source } from "react-map-gl/maplibre";
+import { Layer, RasterSourceSpecification, Source, useMap } from "react-map-gl/maplibre";
 import { useEffect, useRef, useState } from "react";
 
 import { RasterLayerData } from "@/lib/types";
@@ -23,6 +23,8 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
     frameCount: useFrameCount(),
     deltaTime: useDeltaTime(),
   };
+
+  const map = useMap().current!;
 
   const [init, isInit] = useState(false);
 
@@ -72,6 +74,9 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
   // safety checks
 
   if (!belowLayer || !apiData || !apiData.timeSteps || apiData.timeSteps.length === 0) return;
+
+  // if the belowLayer is not in the map's layers, we cannot render this layer
+  if (!map.getLayer(belowLayer)) return;
 
   const layerId = "layer-" + apiData.type + "-" + apiData.domain;
 
