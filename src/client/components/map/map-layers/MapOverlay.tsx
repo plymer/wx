@@ -10,17 +10,18 @@ import {
 import { FeatureCollection } from "geojson";
 
 interface Props {
+  overlayId: string; // optional id for the overlay, useful for debugging
   data: FeatureCollection;
   overlayOptions: SymbolLayerSpecification | LineLayerSpecification | CircleLayerSpecification | FillLayerSpecification;
 }
 
-const MapOverlay = ({ data, overlayOptions }: Props) => {
+const MapOverlay = ({ overlayId, data, overlayOptions }: Props) => {
   // const layout = overlayOptions?.layout ?? {};
   // const paint = overlayOptions?.paint ?? {};
   return (
     <>
-      <Source type="geojson" data={data}>
-        <Layer beforeId="boundary_state" {...overlayOptions} />
+      <Source type="geojson" data={data} id={overlayId}>
+        <Layer beforeId="boundary_state" {...overlayOptions} id={overlayId} />
       </Source>
     </>
   );

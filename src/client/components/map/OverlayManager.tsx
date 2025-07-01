@@ -71,18 +71,38 @@ const OverlayManager = () => {
 
   return (
     <>
-      {firOverlay && <MapOverlay key={"firBoundaries"} data={overlays.fir} overlayOptions={FIR_OVERLAY} />}
-      {gfaOverlay && <MapOverlay key={"gfaBoundaries"} data={overlays.gfa} overlayOptions={GFA_OVERLAY} />}
-      {lgfOverlay && <MapOverlay key={"lgfBoundaries"} data={overlays.lgf} overlayOptions={LGF_OVERLAY} />}
-      {bedpostsOverlay && <MapOverlay key={"bedposts"} data={overlays.bedposts} overlayOptions={BEDPOSTS_OVERLAY} />}
+      {firOverlay && (
+        <MapOverlay overlayId="firBoundaries" key="firBoundaries" data={overlays.fir} overlayOptions={FIR_OVERLAY} />
+      )}
+      {gfaOverlay && (
+        <MapOverlay overlayId="gfaBoundaries" key="gfaBoundaries" data={overlays.gfa} overlayOptions={GFA_OVERLAY} />
+      )}
+      {lgfOverlay && (
+        <MapOverlay overlayId="lgfBoundaries" key="lgfBoundaries" data={overlays.lgf} overlayOptions={LGF_OVERLAY} />
+      )}
+      {bedpostsOverlay && (
+        <MapOverlay overlayId="bedposts" key="bedposts" data={overlays.bedposts} overlayOptions={BEDPOSTS_OVERLAY} />
+      )}
       {publicRegionsOverlay && (
-        <MapOverlay key={"publicRegions"} data={overlays.publicRegions} overlayOptions={PUBLIC_OVERLAY} />
+        <MapOverlay
+          overlayId="publicRegions"
+          key="publicRegions"
+          data={overlays.publicRegions}
+          overlayOptions={PUBLIC_OVERLAY}
+        />
       )}
 
       {marineRegionsOverlay && (
-        <MapOverlay key={"marineRegions"} data={overlays.marineRegions} overlayOptions={MARINE_OVERLAY} />
+        <MapOverlay
+          overlayId="marineRegions"
+          key="marineRegions"
+          data={overlays.marineRegions}
+          overlayOptions={MARINE_OVERLAY}
+        />
       )}
-      {tafsOverlay && <MapOverlay key={"tafSites"} data={overlays.taf} overlayOptions={TAF_OVERLAY} />}
+      {tafsOverlay && (
+        <MapOverlay overlayId="tafSites" key="tafSites" data={overlays.taf} overlayOptions={TAF_OVERLAY} />
+      )}
 
       {/* {popupData && (
         <Popup

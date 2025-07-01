@@ -123,3 +123,5 @@ export const VECTOR_DISPLAY_CONFIGS = {
   pirep: PIREP_DISPLAY,
   aq: AQ_DISPLAY,
 };
+
+export const AQ_ATTRIBUTION = { en: "<a href='https://cyclone.unbc.ca/aqmap/'>UNBC Cyclone</a>" };

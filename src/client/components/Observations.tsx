@@ -15,7 +15,6 @@ import Button from "./ui/Button";
 export default function Observations() {
   // create a refs to the siteId text input and the input debounce timeout
   const siteId = useRef("");
-  // const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // use a context to store state so that when we come back to this tab it restores our obs/taf search
   const actions = useObsActions();
@@ -27,7 +26,6 @@ export default function Observations() {
     siteId.current = site;
     return () => {
       siteId.current = "";
-      // if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     };
   }, []); // this needs to only run on mount/unmount
 
@@ -49,9 +47,6 @@ export default function Observations() {
   // validate the input and mutate the search string, passing it to the context and then it will propagate to the child components
   //   to show the user the data they have requested
   const handleInputText = (input: string) => {
-    // check if we are currently debouncing an input change, clear the timeout if so
-    // if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-
     // we want to allow 2, 3, and 4-letter idents to be used
     // for 2-letter idents, assume we are doing a major canadian site and prepend with "cy"
     // for 3-letter idents, assume we are doing a canadian site and prepend with "c"
@@ -77,18 +72,7 @@ export default function Observations() {
   };
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // check if we are currently debouncing an input change, clear the timeout if so
-    // if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
-
-    // need to store the value in order for it to be available after the debounce completes
-    const newValue = e.currentTarget.value;
-
-    siteId.current = newValue;
-
-    // set the new value after a debounce period
-    // debounceTimeout.current = setTimeout(() => {
-    //   siteId.current = newValue;
-    // }, 100);
+    siteId.current = e.currentTarget.value;
   };
 
   const handleOnClick = () => {

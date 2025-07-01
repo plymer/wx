@@ -5,6 +5,7 @@ import { FeatureCollection, Point } from "geojson";
 import { LIGHTNING_ALT } from "@/config/vectorData";
 import { useFrame, useStartTime } from "@/stateStores/map/animation";
 import { HOUR, MINUTE } from "@/lib/utils";
+import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
 
 interface Props {
   lightningData?: APIResponse<LightningData>;
@@ -48,6 +49,7 @@ const LightningDataLayer = ({ lightningData, belowLayer }: Props) => {
     <>
       <Source
         type="geojson"
+        attribution={GEOMET_ATTRIBUTION["en"]}
         key="lightning-data-source"
         data={filteredData}
         id="lightning-data"

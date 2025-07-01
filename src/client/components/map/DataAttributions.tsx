@@ -1,23 +1,17 @@
 import React from "react";
-import { useMap } from "react-map-gl/maplibre";
+import useDataAttributions from "@/hooks/useDataAttributions";
 
-const DataAttributions = ({ ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  // get the map instance so we can work on it
-  const map = useMap()?.current;
-  if (!map) return;
+const DataAttributions = (props: React.HTMLAttributes<HTMLDivElement>) => {
+  const attributions = useDataAttributions();
 
-  // grab the map style so we can extract the sources and attributions
-  const style = map.getStyle();
-
-  Object.entries(style.sources).forEach((s) => {
-    console.log((s as any).attribution);
-  });
-
-  const sources = style.sources;
-
-  console.log("Map Sources:", sources);
-
-  return <div {...props}>DataAttributions</div>;
+  return (
+    <div {...props}>
+      <p className="text-center border-b-1">Data Sources:</p>
+      {[...attributions].map((attr) => (
+        <span className="hover:underline ms-1" key={attr} dangerouslySetInnerHTML={{ __html: attr }} />
+      ))}
+    </div>
+  );
 };
 
 export default DataAttributions;

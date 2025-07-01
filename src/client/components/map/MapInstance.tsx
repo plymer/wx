@@ -28,13 +28,6 @@ interface Props {
   children?: ReactElement<any, any>;
 }
 
-function getWxLayers(layerList: string[]) {
-  const wxLayers = layerList.filter((l) => l.includes("layer-") && !l.includes("text") && !l.includes("target"));
-
-  return wxLayers;
-  // console.log(wxLayers);
-}
-
 const WxMap = ({ viewState, mapProjection, children, basemap }: Props) => {
   // subscribe to our global state stores
   const mapState = useMapStateActions();
@@ -154,10 +147,8 @@ const WxMap = ({ viewState, mapProjection, children, basemap }: Props) => {
           mapState.setLoadingState(true);
         }
       }}
-      onIdle={(e) => {
+      onIdle={() => {
         mapState.setLoadingState(false);
-
-        if (isMapInitialized) getWxLayers(e.target.getLayersOrder());
       }}
       onMove={onMove}
     >

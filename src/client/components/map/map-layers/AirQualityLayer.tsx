@@ -2,7 +2,7 @@ import { Layer, Source } from "react-map-gl/maplibre";
 
 import { AqData } from "@/lib/types";
 import { FeatureCollection } from "geojson";
-import { AQ_DISPLAY, AQ_VALUE_DISPLAY } from "@/config/vectorData";
+import { AQ_ATTRIBUTION, AQ_DISPLAY, AQ_VALUE_DISPLAY } from "@/config/vectorData";
 import { useFrame, useFrameCount, useStartTime } from "@/stateStores/map/animation";
 import { MINUTE } from "@/lib/utils";
 
@@ -42,6 +42,7 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
   return (
     <>
       <Source
+        attribution={AQ_ATTRIBUTION["en"]}
         type="geojson"
         data={filteredData}
         id="aq-data-clusters"

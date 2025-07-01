@@ -16,7 +16,6 @@ export default function SlideComponent({ isVisible, onAnimationComplete, childre
       setShouldRender(true);
       // Small delay to ensure DOM is ready
       setTimeout(() => {
-        console.log("timeout");
         setAnimationClass("slide-enter-active");
       }, 20);
     } else {
