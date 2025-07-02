@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Feature, Point } from "geojson";
 import { LightningFC } from "../lib/lightning.types.js";
 import { errorResponse, jsonResponse } from "../lib/utils.js";
@@ -40,8 +40,8 @@ route.get("/lightning", async (c) => {
         axios
           .get(url)
           .then((res) => res.data as LightningFC)
-          .catch((err) => {
-            console.error(`Error fetching data from ${url}:`, err);
+          .catch((err: AxiosError) => {
+            console.error(`Error fetching data from ${url}:`, err.message);
             return null; // Return null for failed requests
           }),
       ),

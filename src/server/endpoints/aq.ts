@@ -18,7 +18,7 @@ route.get("/aq", validateParams("query", aqSchema), async (c) => {
   // get our validated query parameters
   const { hours } = c.req.valid("query");
 
-  console.log(`Fetching AQ data from the last ${hours} hours(s)...`);
+  console.log(`[API] Fetching AQ data from the last ${hours} hours(s)...`);
 
   const then = new Date(new Date().getTime() - hours * HOUR);
 

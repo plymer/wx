@@ -65,9 +65,9 @@ async function main() {
     // insert the data into the database
     await db.insert(aqData).values(rows);
 
-    console.log(`[${new Date().toISOString()}] Inserted ${rows.length} rows into the database.`);
+    console.log(`[AQ Data] Inserted ${rows.length} rows into the database.`);
 
-    console.log(`[${new Date().toISOString()}] Cleaning up out of date records...`);
+    console.log(`[AQ Data] Cleaning up out of date records...`);
 
     const holdHours = 4;
     const cleanUpTime = new Date(now.getTime() - holdHours * 60 * 60 * 1000); // 24 hours ago
@@ -76,8 +76,8 @@ async function main() {
 
     await db.delete(aqData).where(lt(aqData.validTime, cleanUpTime));
 
-    console.log(`[${new Date().toISOString()}] Deleted ${toDelete} out of date records.`);
-    console.log(`[${new Date().toISOString()}] Process complete; exiting.`);
+    console.log(`[AQ Data] Deleted ${toDelete} out of date records.`);
+    console.log(`[AQ Data] Process complete; exiting.`);
   } catch (err) {
     console.error(err);
     process.exit(1);

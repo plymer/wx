@@ -10,7 +10,7 @@ route.get("/gfa", async (c) => {
     const url =
       "https://plan.navcanada.ca/weather/api/alpha/?site=CYEG&site=CYVR&site=CYZF&site=CYFB&site=CYYZ&site=CYHZ&site=CYRB&image=GFA/CLDWX&image=GFA/TURBC";
 
-    console.log("requesting gfas from:", url);
+    console.log("[API] Requesting GFAs from:", url);
 
     const ncAPIData: NavCanResponse = await axios.get(url).then((gfas) => gfas.data);
 
@@ -50,7 +50,7 @@ route.get("/sigwx", async (c) => {
   try {
     const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=SIG_WX//MID_LEVEL/*";
 
-    console.log("requesting sigwx charts from:", url);
+    console.log("[API] Requesting SigWx charts from:", url);
 
     const ncAPIData: NavCanResponse = await axios.get(url).then((gfas) => gfas.data);
 
@@ -97,7 +97,7 @@ route.get("/hlt", async (c) => {
   try {
     const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=TURBULENCE";
 
-    console.log("requesting hlt charts from:", url);
+    console.log("[API] Requesting HLT charts from:", url);
 
     const ncAPIData: NavCanResponse = await axios.get(url).then((gfas) => gfas.data);
 
@@ -143,7 +143,7 @@ route.get("/lgf", async (c) => {
   try {
     const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CZVR&image=LGF";
 
-    console.log("requesting lgfs from:", url);
+    console.log("[API] Requesting LGFs from:", url);
 
     const ncAPIData: NavCanResponse = await axios.get(url).then((lgfs) => lgfs.data);
 

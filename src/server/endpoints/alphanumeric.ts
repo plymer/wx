@@ -15,7 +15,7 @@ route.get("/metars", validateParams("query", metarSchema), async (c) => {
   const searchSite = site === "CYEU" ? "CWEU" : site;
 
   const url = `http://aviationweather.gov/api/data/metar?ids=${searchSite}&hours=${hrs}&format=json`;
-  console.log("requesting metars from:", url);
+  console.log("[API] Requesting METARs from:", url);
 
   try {
     // begin data retrieval
@@ -44,7 +44,7 @@ route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
   const searchSite = site === "CWEU" ? "CYEU" : site;
 
   const url = `http://aviationweather.gov/api/data/stationinfo?ids=${searchSite}&format=json`;
-  console.log("requesting station info from:", url);
+  console.log("[API] Requesting station info from:", url);
 
   try {
     const siteData: StationObject[] = await axios.get(url).then((site) => site.data);
@@ -104,7 +104,7 @@ route.get("/taf", validateParams("query", singleSiteSchema), async (c) => {
   const searchSite = site === "CWEU" ? "CYEU" : site;
 
   const url = `http://aviationweather.gov/api/data/taf?ids=${searchSite}&format=json`;
-  console.log("requesting taf from:", url);
+  console.log("[API] Requesting TAF from:", url);
 
   try {
     const tafObject: TafObject[] | string = await axios.get(url).then((taf) => taf.data);
