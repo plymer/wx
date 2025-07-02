@@ -3,7 +3,7 @@ import { gte } from "drizzle-orm";
 import type { Feature, Point } from "geojson";
 
 import { aqDb } from "../main.js";
-import { aqData } from "../dbSchemas/aq.drizzle.js";
+import { aqData } from "../../shared/db/schemas/aq.drizzle.js";
 import { errorResponse, HOUR, jsonResponse } from "../lib/utils.js";
 
 import { validateParams } from "../lib/zod-validator.js";

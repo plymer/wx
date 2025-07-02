@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import path from "path";
 
 // plugins
 import react from "@vitejs/plugin-react";
@@ -36,5 +37,9 @@ export default defineConfig({
       manifest: false,
     }),
   ],
-  resolve: { alias: { "@": "/src/client" } },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src/client"),
+    },
+  },
 });

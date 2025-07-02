@@ -13,7 +13,7 @@ import { default as lightning } from "./endpoints/lightning.js";
 import { default as aq } from "./endpoints/aq.js";
 
 // database schemas
-import * as aqSchema from "./dbSchemas/aq.drizzle.js";
+import * as aqSchema from "../shared/db/schemas/aq.drizzle.js";
 
 // custom types and utilities
 import { generateDbConnection, injectViteDevServer } from "./lib/utils.js";

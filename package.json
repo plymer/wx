@@ -11,8 +11,10 @@
     "format": "prettier --write .",
     "compile": "tsc -b",
     "build": "vite build && tsc -b",
-    "deploy": "git stash && git pull --rebase && npm install --include=dev && npm run build && pm2 restart beta.config.cjs --env production && pm2 save",
-    "sprites:icons": "spreet public/sprites/icons public/sprites/icons/icons && spreet public/sprites/icons public/sprites/icons/icons@2x"
+    "db-push": "npm run aqdb-push",
+    "deploy": "git stash && git pull --rebase && npm install --include=dev && npm run build && npm run db-push && pm2 restart beta.config.cjs --env production && pm2 save",
+    "sprites:icons": "spreet public/sprites/icons public/sprites/icons/icons && spreet public/sprites/icons public/sprites/icons/icons@2x",
+    "aqdb-push": "drizzle-kit push --config aq.drizzle.config.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",
@@ -49,6 +51,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.0.0",
+    "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.2",
     "fast-xml-parser": "^5.2.3",
     "hono": "^4.8.3",

@@ -22,7 +22,7 @@ import { FeatureCollection, MultiPoint } from "geojson";
 
 import { InferSelectModel } from "drizzle-orm";
 
-import { aqData } from "../../server/dbSchemas/aq.drizzle.js";
+import { aqData } from "../../shared/db/schemas/aq.drizzle.js";
 
 export type AppMode = keyof typeof APP_MODES_LIST;
 export type AnimationState = (typeof ANIMATION_STATES)[number];
