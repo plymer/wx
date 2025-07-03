@@ -2,32 +2,21 @@
 // stations update once per day
 
 import { createGunzip } from "zlib";
+import { sql } from "drizzle-orm";
 import axios from "axios";
-import { generateDbConnection } from "../lib/utils";
-import { stations } from "../db/schemas/stations.drizzle";
-import { FEET_PER_METRE } from "../../server/lib/utils";
-
-export type CacheStationData = {
-  icaoId: string;
-  iataId: string;
-  faaId: string;
-  wmoId: string;
-  lat: number;
-  lon: number;
-  elev: number;
-  site: string;
-  state: string;
-  country: string;
-  priority: number;
-};
+import { generateDbConnection } from "../lib/utils.js";
+import { stations } from "../db/tables/stations.drizzle.js";
+import { FEET_PER_METRE } from "../../server/lib/utils.js";
+import { CacheStationData } from "../lib/types.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/stations.cache.json.gz";
+const DB_NAME = "station-catalog";
 
 async function main() {
-  const db = await generateDbConnection("station-catalog", { stations });
+  const db = await generateDbConnection(DB_NAME, { stations });
 
   if (!db) {
-    console.error("[Station Catalog] Database connection failed.");
+    console.error(`[${DB_NAME.toUpperCase()}] Database connection failed.`);
     return;
   }
 
@@ -50,34 +39,51 @@ async function main() {
     });
 
     if (typeof decompressedData !== "string") {
-      throw new Error("[Station Catalog] Decompressed data is not a string");
+      throw new Error(`[${DB_NAME.toUpperCase()}] Decompressed data is not a string`);
     }
 
     // parse the JSON data
     const stationData: CacheStationData[] = JSON.parse(decompressedData as string);
 
     if (stationData.length === 0) {
-      console.warn("[Station Catalog] No station data found in the cache file.");
+      console.warn(`[${DB_NAME.toUpperCase()}] No station data found in the cache file.`);
       return;
     }
 
-    // process and store the station data in the database
-    for (const station of stationData) {
-      db.insert(stations).values({
+    const output = stationData.map((station) => {
+      return {
         name: station.site,
         icaoId: station.icaoId,
         lat: station.lat,
         lon: station.lon,
-        elev_f: station.elev * FEET_PER_METRE,
+        elev_f: Math.floor(station.elev * FEET_PER_METRE),
         elev_m: station.elev,
         country: station.country,
         state: station.state,
-      });
-    }
+      };
+    });
 
-    console.log("[Station Catalog] Cache file processing complete.");
+    console.log(`[${DB_NAME.toUpperCase()}] Inserting ${output.length} stations...`);
+
+    // insert the station data, or update each station if it already exists
+    await db
+      .insert(stations)
+      .values(output)
+      .onDuplicateKeyUpdate({
+        set: {
+          name: sql`VALUES(name)`,
+          lat: sql`VALUES(lat)`,
+          lon: sql`VALUES(lon)`,
+          elev_f: sql`VALUES(elev_f)`,
+          elev_m: sql`VALUES(elev_m)`,
+          country: sql`VALUES(country)`,
+          state: sql`VALUES(state)`,
+        },
+      });
+
+    console.log(`[${DB_NAME.toUpperCase()}] Cache file processing complete.`);
   } catch (error) {
-    console.error("[Station Catalog] Error processing cache file:", error);
+    console.error(`[${DB_NAME.toUpperCase()}] Error processing cache file: ${(error as Error).message}`);
   }
 }
 

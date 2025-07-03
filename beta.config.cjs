@@ -34,5 +34,18 @@ module.exports = {
       autorestart: false, // don't restart this script automatically
       cron_restart: "*/10 * * * *", // run every 10 minutes
     },
+    {
+      name: "build-station-catalog",
+      script: path.resolve(__dirname, "dist/shared/station-catalog/index.js"),
+      instances: 1,
+      exec_mode: "fork", // use form for single-instance cron scripts
+      log_date_format: "YYYY-MM-DD HH:mm Z",
+      error_file: "./logs/data/stations-error.log",
+      out_file: "./logs/data/stations-out.log",
+      merge_logs: true,
+      env: { ...ENV_VARS },
+      autorestart: false, // don't restart this script automatically
+      cron_restart: "* 0 * * *", // run once a day at midnight
+    },
   ],
 };

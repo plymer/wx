@@ -22,7 +22,9 @@ import { FeatureCollection, MultiPoint } from "geojson";
 
 import { InferSelectModel } from "drizzle-orm";
 
-import { aqData } from "../../shared/db/schemas/aq.drizzle.js";
+import { aqData } from "../../shared/db/tables/aq.drizzle.js";
+
+import { StationData } from "../../shared/lib/types.js";
 
 export type AppMode = keyof typeof APP_MODES_LIST;
 export type AnimationState = (typeof ANIMATION_STATES)[number];
@@ -64,16 +66,12 @@ type ApiReponses<TData> = {
 // create an immediately indexed mapped type for API responses
 export type APIResponse<TData> = IIMT<ApiReponses<TData>, "status">;
 
-export type SiteData = {
-  icaoId: string;
-  location: string;
-  lat: string;
-  lon: string;
-  elev_f: string;
-  elev_m: string;
-  sunrise: string;
-  sunset: string;
-};
+export type SiteData = Prettify<
+  StationData & {
+    sunrise: string;
+    sunset: string;
+  }
+>;
 
 export type LightningData = FeatureCollection<MultiPoint, { validTime: number }>;
 export type AqDbData = Omit<InferSelectModel<typeof aqData>, "id">;

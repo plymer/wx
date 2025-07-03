@@ -11,7 +11,7 @@ if (!url) {
 
 export default defineConfig({
   out: "./drizzle",
-  schema: "src/shared/db/schemas/aq.drizzle.ts",
+  schema: "src/shared/db/tables/aq.drizzle.ts",
   dialect: "mysql",
   dbCredentials: { url },
 });

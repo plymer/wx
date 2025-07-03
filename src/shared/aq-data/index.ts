@@ -1,17 +1,19 @@
 import axios from "axios";
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/mysql2";
 import { lt } from "drizzle-orm";
-import { generateDbConnection, testDbConnection } from "../lib/utils.js";
-import { aqData } from "../db/schemas/aq.drizzle.js";
+import { generateDbConnection } from "../lib/utils.js";
+import { aqData } from "../db/tables/aq.drizzle.js";
 import { AQObservation, AQOutput } from "../lib/types.js";
 
 async function main() {
   const remote = axios.create({ baseURL: "https://cyclone.unbc.ca/aqmap/data/" });
 
-  const db = drizzle(generateDbConnection("aq"));
+  const db = await generateDbConnection("aq", { aqData });
 
-  await testDbConnection(db);
+  if (!db) {
+    console.error("[AQ Data] Failed to connect to the database.");
+    process.exit(1);
+  }
 
   const now = new Date();
 

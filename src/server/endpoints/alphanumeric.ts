@@ -1,10 +1,14 @@
-import axios from "axios";
 import { Hono } from "hono";
+import { eq } from "drizzle-orm";
+import axios from "axios";
 import suncalc, { GetTimesResult } from "suncalc";
+
 import { validateParams } from "../lib/zod-validator.js";
 import { metarSchema, publicBulletinSchema, singleSiteSchema } from "../validationSchemas/alphanumeric.zod.js";
-import { HubDiscussion, MetarObject, StationObject, TafObject } from "../lib/alphanumeric.types.js";
-import { errorResponse, FEET_PER_METRE, jsonResponse, leadZero } from "../lib/utils.js";
+import { HubDiscussion, MetarObject, TafObject } from "../lib/alphanumeric.types.js";
+import { errorResponse, jsonResponse, leadZero } from "../lib/utils.js";
+import { stationsDb } from "../main.js";
+import { stations } from "../../shared/db/tables/stations.drizzle.js";
 
 const route = new Hono();
 
@@ -40,58 +44,57 @@ route.get("/metars", validateParams("query", metarSchema), async (c) => {
 route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
   const { site } = c.req.valid("query");
 
+  if (!stationsDb) {
+    console.error("[API] No stations database connection available.");
+    return errorResponse(c, "No stations database connection available.");
+  }
+
   // do a conversion for CWEU -> CYEU
   const searchSite = site === "CWEU" ? "CYEU" : site;
 
-  const url = `http://aviationweather.gov/api/data/stationinfo?ids=${searchSite}&format=json`;
-  console.log("[API] Requesting station info from:", url);
-
   try {
-    const siteData: StationObject[] = await axios.get(url).then((site) => site.data);
+    const stationData = await stationsDb.query.stations.findFirst({
+      where: eq(stations.icaoId, searchSite.toUpperCase()),
+    });
 
-    // check for the presence of valid data, otherwise return an error message
-    if (siteData.length === 0) {
-      // we do not have any site data that we can return, so send an empty response
+    // if we don't have any data for this station, return a noData response
+    if (!stationData) {
       return c.json({ status: "noData" }, 200);
     }
 
-    if (typeof siteData === "object") {
-      // create a suncalc time object
-      const times: GetTimesResult = suncalc.getTimes(new Date(), siteData[0].lat, siteData[0].lon);
+    const { icaoId, name, lat, lon, elev_f, elev_m, country, state } = stationData;
 
-      // set sunrise and sunset times to "---" when the sun doesn't rise or set today
-      const sunrise: string =
-        times.sunrise.getUTCHours().toString() !== "NaN"
-          ? leadZero(times.sunrise.getUTCHours(), 2) + ":" + leadZero(times.sunrise.getUTCMinutes(), 2) + "Z"
-          : "---";
-      const sunset: string =
-        times.sunsetStart.getUTCHours().toString() !== "NaN"
-          ? leadZero(times.sunsetStart.getUTCHours(), 2) + ":" + leadZero(times.sunsetStart.getUTCMinutes(), 2) + "Z"
-          : "---";
+    // create a suncalc time object
+    const times: GetTimesResult = suncalc.getTimes(new Date(), lat, lon);
 
-      // we want to show the state/province for usa/canada, otherwise just the country
-      const location = `${siteData[0].site}, ${siteData[0].country === "US" || siteData[0].country === "CA" ? siteData[0].state : siteData[0].country}`;
+    // set sunrise and sunset times to "---" when the sun doesn't rise or set today
+    const sunrise: string =
+      times.sunrise.getUTCHours().toString() !== "NaN"
+        ? leadZero(times.sunrise.getUTCHours(), 2) + ":" + leadZero(times.sunrise.getUTCMinutes(), 2) + "Z"
+        : "---";
+    const sunset: string =
+      times.sunsetStart.getUTCHours().toString() !== "NaN"
+        ? leadZero(times.sunsetStart.getUTCHours(), 2) + ":" + leadZero(times.sunsetStart.getUTCMinutes(), 2) + "Z"
+        : "---";
 
-      const output = {
-        icaoId: siteData[0].icaoId,
-        location,
-        lat:
-          siteData[0].lat > 0
-            ? (Math.round(siteData[0].lat * 10) / 10).toString() + "°N"
-            : Math.abs(Math.round(siteData[0].lat * 10) / 10).toString() + "°S",
-        lon:
-          siteData[0].lon > 0
-            ? (Math.round(siteData[0].lon * 10) / 10).toString() + "°E"
-            : Math.abs(Math.round(siteData[0].lon * 10) / 10).toString() + "°W",
-        elev_f: Math.floor(siteData[0].elev * FEET_PER_METRE) + " ft",
-        elev_m: siteData[0].elev + " m",
-        sunrise,
-        sunset,
-      };
+    // we want to show the state/province for usa/canada, otherwise just the country
+    const location = `${name}, ${country === "US" || country === "CA" ? state : country}`;
 
-      // return the site data object
-      return jsonResponse(c, output);
-    }
+    const output = {
+      icaoId,
+      location,
+      lat:
+        lat > 0 ? (Math.round(lat * 10) / 10).toString() + "°N" : Math.abs(Math.round(lat * 10) / 10).toString() + "°S",
+      lon:
+        lon > 0 ? (Math.round(lon * 10) / 10).toString() + "°E" : Math.abs(Math.round(lon * 10) / 10).toString() + "°W",
+      elev_f,
+      elev_m,
+      sunrise,
+      sunset,
+    };
+
+    // return the site data object
+    return jsonResponse(c, output);
   } catch (error) {
     return errorResponse(c, error);
   }

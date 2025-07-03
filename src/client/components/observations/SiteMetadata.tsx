@@ -6,13 +6,13 @@ import { APIResponse, SiteData } from "@/lib/types";
 
 interface Props {
   site: string;
-  data: APIResponse<SiteData> | undefined;
+  response: APIResponse<SiteData> | undefined;
 }
 
-const SiteMetadata = ({ site, data }: Props) => {
-  if (!data) return;
+const SiteMetadata = ({ site, response }: Props) => {
+  if (!response) return;
 
-  switch (data.status) {
+  switch (response.status) {
     case "noData":
       return (
         <div className="px-6 py-2 bg-neutral-800 text-white">
@@ -22,34 +22,33 @@ const SiteMetadata = ({ site, data }: Props) => {
     case "error":
       return (
         <div className="px-6 py-2 bg-neutral-800 text-destructive">
-          <Skull className="inline" /> {data.message || "There was an unknown error"}
+          <Skull className="inline" /> {response.message || "There was an unknown error"}
         </div>
       );
     case "success":
-      // cursed data structure, yes i know
-      const metaData = data.data;
+      const { name, lat, lon, elev_f, elev_m, sunrise, sunset } = response.data;
       return (
         <div className="text-center bg-neutral-800 py-2 text-white border-y-2 border-black">
           <h2 className="text-xl font-bold">
             <TowerControl className="inline me-2" />
-            {metaData.location}
+            {name}
           </h2>
           <div className="inline me-4 place-items-center text-sm">
             <Globe className="inline me-2 w-4 h-4" />
-            {metaData.lat} {metaData.lon}
+            {lat} {lon}
           </div>
           <div className="inline me-4 place-items-center text-sm">
             <MountainSnow className="inline me-2 w-4 h-4" />
-            {metaData.elev_f} / {metaData.elev_m}
+            {elev_f} / {elev_m}
           </div>
           <div>
             <div className="inline me-4 place-items-center text-sm">
               <Sunrise className="inline me-2 w-4 h-4" />
-              {metaData.sunrise}
+              {sunrise}
             </div>
             <div className="inline me-4 place-items-center text-sm">
               <Sunset className="inline me-2 w-4 h-4" />
-              {metaData.sunset}
+              {sunset}
             </div>
           </div>
         </div>

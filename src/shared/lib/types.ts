@@ -1,3 +1,6 @@
+import { InferSelectModel } from "drizzle-orm";
+import { stations } from "../db/tables/stations.drizzle";
+
 export type AQObservation = {
   sensor_index: string;
   monitor: string;
@@ -39,3 +42,19 @@ export type AQOutput = {
   validTime: Date | null;
   pm25: number | null;
 };
+
+export type CacheStationData = {
+  icaoId: string;
+  iataId: string;
+  faaId: string;
+  wmoId: string;
+  lat: number;
+  lon: number;
+  elev: number;
+  site: string;
+  state: string;
+  country: string;
+  priority: number;
+};
+
+export type StationData = InferSelectModel<typeof stations>;
