@@ -1,49 +1,13 @@
 import suncalc, { GetTimesResult } from "suncalc";
 import * as turf from "@turf/turf";
-import { drizzle } from "drizzle-orm/mysql2";
-import { Relations, sql } from "drizzle-orm";
 
 import { LatLon, SunTimes } from "./common.types.js";
-import { MySqlTableWithColumns } from "drizzle-orm/mysql-core/table.js";
 import { Context } from "hono";
 import { Feature, FeatureCollection } from "geojson";
 
 export const FEET_PER_METRE = 3.28084;
 export const HOUR = 3_600_000;
 export const MINUTE = 60_000;
-
-export async function generateDbConnection<
-  TSchema extends Record<string, MySqlTableWithColumns<any> | Relations<any, any>>,
->(dbName: string, dbSchema: TSchema) {
-  const credentials = {
-    userName: process.env.AM_I_A_SERVER ? `${dbName}user` : "root",
-    password: process.env.DB_PASSWORD,
-  };
-
-  if (!credentials.password) {
-    console.error("DB_PASSWORD environment variable is not set");
-  }
-
-  const connectionString = `mysql://${credentials.userName}:${credentials.password}@localhost:3306/${dbName}`;
-
-  const db = drizzle(connectionString, { mode: "default", schema: dbSchema });
-
-  const isConnected = await testDbConnection(db);
-
-  if (isConnected) return db;
-  else return undefined;
-}
-
-export async function testDbConnection(db: ReturnType<typeof drizzle>) {
-  try {
-    await db.execute(sql`SELECT 1`);
-    console.log(`[${new Date().toISOString()}] Database connection is valid.`);
-    return true;
-  } catch (err) {
-    console.error(`[${new Date().toISOString()}] Database connection failed:`, err);
-    return false;
-  }
-}
 
 export function injectViteDevServer(fileContents: string): string {
   const output = fileContents.replace(

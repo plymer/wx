@@ -1,25 +1,44 @@
+import { Relations } from "drizzle-orm";
+import { MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 import { drizzle } from "drizzle-orm/mysql2";
 import { sql } from "drizzle-orm/sql";
 
-export function generateDbConnection(dbName: string) {
-  const credentials = {
-    userName: process.env.AM_I_A_SERVER ? `${dbName}user` : "root",
-    password: process.env.DB_PASSWORD,
-  };
+export async function generateDbConnection<
+  TSchema extends Record<string, MySqlTableWithColumns<any> | Relations<any, any>>,
+>(dbName: string, dbSchema: TSchema) {
+  const connectionString = genDbConnString(dbName);
 
-  if (!credentials.password) {
-    throw new Error("DB_PASSWORD environment variable is not set");
+  if (!connectionString) {
+    console.error(`[${dbName.toUpperCase()}] Database credentials are not set.`);
+    return undefined;
   }
 
-  return `mysql://${credentials.userName}:${credentials.password}@localhost:3306/${dbName}`;
+  const db = drizzle(connectionString, { mode: "default", schema: dbSchema });
+
+  const isConnected = await testDbConnection(db, dbName);
+
+  if (isConnected) return db;
+  else return undefined;
 }
 
-export async function testDbConnection(db: ReturnType<typeof drizzle>) {
+export function genDbConnString(dbName: string) {
+  const userName = process.env.AM_I_A_SERVER ? `${dbName}user` : "root";
+  const password = process.env.DB_PASSWORD;
+  if (!password) {
+    console.error("DB_PASSWORD environment variable is not set");
+    return undefined;
+  }
+
+  return `mysql://${userName}:${password}@localhost:3306/${dbName}`;
+}
+
+export async function testDbConnection(db: ReturnType<typeof drizzle>, dbName: string) {
   try {
     await db.execute(sql`SELECT 1`);
-    console.log(`[DATA PROCESSING] Database connection is valid.`);
+    console.log(`[${dbName.toUpperCase()}] Database connection is valid.`);
+    return true;
   } catch (err) {
-    console.error(`[DATA PROCESSING] Database connection failed:`, err);
-    process.exit(1);
+    console.error(`[${dbName.toUpperCase()}] Database connection failed:`, err);
+    return false;
   }
 }

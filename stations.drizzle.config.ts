@@ -2,16 +2,16 @@ import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
 import { genDbConnString } from "./src/shared/lib/utils";
 
-const url = genDbConnString("aq");
+const url = genDbConnString("station-catalog");
 
 if (!url) {
-  console.error("[AQ] Database credentials are not set.");
+  console.error("[Station Catalog] Database credentials are not set.");
   process.exit(1);
 }
 
 export default defineConfig({
   out: "./drizzle",
-  schema: "src/shared/db/schemas/aq.drizzle.ts",
+  schema: "src/shared/db/schemas/stations.drizzle.ts",
   dialect: "mysql",
   dbCredentials: { url },
 });

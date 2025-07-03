@@ -3,12 +3,33 @@
 
 import { createGunzip } from "zlib";
 import axios from "axios";
-// import { drizzle } from "drizzle-orm/mysql2";
+import { generateDbConnection } from "../lib/utils";
+import { stations } from "../db/schemas/stations.drizzle";
+import { FEET_PER_METRE } from "../../server/lib/utils";
+
+export type CacheStationData = {
+  icaoId: string;
+  iataId: string;
+  faaId: string;
+  wmoId: string;
+  lat: number;
+  lon: number;
+  elev: number;
+  site: string;
+  state: string;
+  country: string;
+  priority: number;
+};
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/stations.cache.json.gz";
 
 async function main() {
-  // const db = drizzle();
+  const db = await generateDbConnection("station-catalog", { stations });
+
+  if (!db) {
+    console.error("[Station Catalog] Database connection failed.");
+    return;
+  }
 
   try {
     // fetch the compressed data
@@ -29,22 +50,34 @@ async function main() {
     });
 
     if (typeof decompressedData !== "string") {
-      throw new Error("Decompressed data is not a string");
+      throw new Error("[Station Catalog] Decompressed data is not a string");
     }
 
     // parse the JSON data
-    const stations = JSON.parse(decompressedData as string);
+    const stationData: CacheStationData[] = JSON.parse(decompressedData as string);
 
-    // process and store the station data in the database
-    for (const station of stations) {
-      // Here you would insert or update your station data in the database
-      console.log(`Processing station: ${station}`);
-      // Example: await db.insert(stationTable).values(station);
+    if (stationData.length === 0) {
+      console.warn("[Station Catalog] No station data found in the cache file.");
+      return;
     }
 
-    console.log("Station catalog processing complete.");
+    // process and store the station data in the database
+    for (const station of stationData) {
+      db.insert(stations).values({
+        name: station.site,
+        icaoId: station.icaoId,
+        lat: station.lat,
+        lon: station.lon,
+        elev_f: station.elev * FEET_PER_METRE,
+        elev_m: station.elev,
+        country: station.country,
+        state: station.state,
+      });
+    }
+
+    console.log("[Station Catalog] Cache file processing complete.");
   } catch (error) {
-    console.error("Error processing station catalog:", error);
+    console.error("[Station Catalog] Error processing cache file:", error);
   }
 }
 
