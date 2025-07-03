@@ -17,7 +17,7 @@ async function main() {
 
   if (!db) {
     console.error(`[${DB_NAME.toUpperCase()}] Database connection failed.`);
-    return;
+    process.exit(1);
   }
 
   try {
@@ -46,8 +46,7 @@ async function main() {
     const stationData: CacheStationData[] = JSON.parse(decompressedData as string);
 
     if (stationData.length === 0) {
-      console.warn(`[${DB_NAME.toUpperCase()}] No station data found in the cache file.`);
-      return;
+      throw new Error(`[${DB_NAME.toUpperCase()}] No station data found in the cache file.`);
     }
 
     const output = stationData.map((station) => {
@@ -84,6 +83,7 @@ async function main() {
     console.log(`[${DB_NAME.toUpperCase()}] Cache file processing complete.`);
   } catch (error) {
     console.error(`[${DB_NAME.toUpperCase()}] Error processing cache file: ${(error as Error).message}`);
+    process.exit(1);
   }
 }
 
