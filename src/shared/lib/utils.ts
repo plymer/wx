@@ -17,9 +17,9 @@ export function generateDbConnection(dbName: string) {
 export async function testDbConnection(db: ReturnType<typeof drizzle>) {
   try {
     await db.execute(sql`SELECT 1`);
-    console.log(`[${new Date().toISOString()}] Database connection is valid.`);
+    console.log(`[DATA PROCESSING] Database connection is valid.`);
   } catch (err) {
-    console.error(`[${new Date().toISOString()}] Database connection failed:`, err);
+    console.error(`[DATA PROCESSING] Database connection failed:`, err);
     process.exit(1);
   }
 }
