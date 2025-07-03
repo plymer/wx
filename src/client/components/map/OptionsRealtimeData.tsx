@@ -110,7 +110,7 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="other">
                   <CloudLightning className="me-2 size-6" />
-                  Wx Elements
+                  Wx Plots
                 </TabsTrigger>
                 <TabsTrigger value="satellite">
                   <Satellite className="me-2 size-6" />
