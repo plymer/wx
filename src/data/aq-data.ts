@@ -1,9 +1,9 @@
 import axios from "axios";
 import "dotenv/config";
 import { lt } from "drizzle-orm";
-import { generateDbConnection } from "../lib/utils.js";
-import { aqData } from "../db/tables/aq.drizzle.js";
-import { AQObservation, AQOutput } from "../lib/types.js";
+import { generateDbConnection } from "../shared/lib/utils.js";
+import { aqData } from "../shared/db/tables/aq.drizzle.js";
+import { AQObservation, AQOutput } from "../shared/lib/types.js";
 
 async function main() {
   const remote = axios.create({ baseURL: "https://cyclone.unbc.ca/aqmap/data/" });
@@ -49,13 +49,15 @@ async function main() {
         return row;
       })
       .reduce((acc: AQOutput[], row: AQObservation) => {
+        const { monitor, network, lat, lng, date, pm25_recent_r } = row;
+
         const data: AQOutput = {
-          name: row.monitor ? row.monitor.slice(0, 45) : null, // truncate to 45 characters
-          type: row.network,
-          lat: isNaN(parseFloat(row.lat)) ? null : parseFloat(row.lat),
-          lon: isNaN(parseFloat(row.lng)) ? null : parseFloat(row.lng),
-          validTime: row.date ? new Date(row.date.replace(" ", "T") + "Z") : null, // convert to seconds since epoch
-          pm25: isNaN(parseFloat(row.pm25_recent_r)) ? null : parseFloat(row.pm25_recent_r),
+          name: monitor ? monitor.slice(0, 45) : null, // truncate to 45 characters
+          type: network,
+          lat: isNaN(parseFloat(lat)) ? null : parseFloat(lat),
+          lon: isNaN(parseFloat(lng)) ? null : parseFloat(lng),
+          validTime: date ? new Date(date.replace(" ", "T") + "Z") : null, // convert to seconds since epoch
+          pm25: isNaN(parseFloat(pm25_recent_r)) ? null : parseFloat(pm25_recent_r),
         };
 
         acc.push(data);

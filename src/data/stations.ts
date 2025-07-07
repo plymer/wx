@@ -4,10 +4,11 @@
 import { createGunzip } from "zlib";
 import { sql } from "drizzle-orm";
 import axios from "axios";
-import { generateDbConnection } from "../lib/utils.js";
-import { stations } from "../db/tables/stations.drizzle.js";
-import { FEET_PER_METRE } from "../../server/lib/utils.js";
-import { CacheStationData } from "../lib/types.js";
+import "dotenv/config";
+import { generateDbConnection } from "../shared/lib/utils.js";
+import { stations } from "../shared/db/tables/stations.drizzle.js";
+import { FEET_PER_METRE } from "../server/lib/utils.js";
+import { CacheStationData } from "../shared/lib/types.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/stations.cache.json.gz";
 const DB_NAME = "station-catalog";
@@ -65,20 +66,24 @@ async function main() {
     console.log(`[${DB_NAME.toUpperCase()}] Inserting ${output.length} stations...`);
 
     // insert the station data, or update each station if it already exists
-    await db
-      .insert(stations)
-      .values(output)
-      .onDuplicateKeyUpdate({
-        set: {
-          name: sql`VALUES(name)`,
-          lat: sql`VALUES(lat)`,
-          lon: sql`VALUES(lon)`,
-          elev_f: sql`VALUES(elev_f)`,
-          elev_m: sql`VALUES(elev_m)`,
-          country: sql`VALUES(country)`,
-          state: sql`VALUES(state)`,
-        },
-      });
+    await Promise.allSettled(
+      output.map(async (station) => {
+        await db
+          .insert(stations)
+          .values(station)
+          .onDuplicateKeyUpdate({
+            set: {
+              name: station.name,
+              lat: station.lat,
+              lon: station.lon,
+              elev_f: station.elev_f,
+              elev_m: station.elev_m,
+              country: station.country,
+              state: station.state,
+            },
+          });
+      }),
+    );
 
     console.log(`[${DB_NAME.toUpperCase()}] Cache file processing complete.`);
   } catch (error) {

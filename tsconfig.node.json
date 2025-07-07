@@ -16,5 +16,5 @@
     "isolatedModules": true,
     "outDir": "./dist"
   },
-  "include": ["src/server", "src/shared"]
+  "include": ["src/server", "src/shared", "src/data"]
 }

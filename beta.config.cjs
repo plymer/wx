@@ -23,7 +23,7 @@ module.exports = {
     },
     {
       name: "aq-data-processing",
-      script: path.resolve(__dirname, "dist/shared/aq-data/index.js"),
+      script: path.resolve(__dirname, "dist/data/aq-data.js"),
       instances: 1,
       exec_mode: "fork", // use form for single-instance cron scripts
       log_date_format: "YYYY-MM-DD HH:mm Z",
@@ -36,7 +36,7 @@ module.exports = {
     },
     {
       name: "build-station-catalog",
-      script: path.resolve(__dirname, "dist/shared/station-catalog/index.js"),
+      script: path.resolve(__dirname, "dist/data/stations.js"),
       instances: 1,
       exec_mode: "fork", // use form for single-instance cron scripts
       log_date_format: "YYYY-MM-DD HH:mm Z",

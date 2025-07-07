@@ -26,12 +26,17 @@ const SiteMetadata = ({ site, response }: Props) => {
         </div>
       );
     case "success":
-      const { name, lat, lon, elev_f, elev_m, sunrise, sunset } = response.data;
+      // destructure the response data
+      const { name, lat, lon, elev_f, elev_m, sunrise, sunset, country, state } = response.data;
+
+      // we want to show the state/province for usa/canada, otherwise just the country
+      const location = `${name}, ${country === "US" || country === "CA" ? state : country}`;
+
       return (
         <div className="text-center bg-neutral-800 py-2 text-white border-y-2 border-black">
           <h2 className="text-xl font-bold">
             <TowerControl className="inline me-2" />
-            {name}
+            {location}
           </h2>
           <div className="inline me-4 place-items-center text-sm">
             <Globe className="inline me-2 w-4 h-4" />
@@ -39,7 +44,7 @@ const SiteMetadata = ({ site, response }: Props) => {
           </div>
           <div className="inline me-4 place-items-center text-sm">
             <MountainSnow className="inline me-2 w-4 h-4" />
-            {elev_f} / {elev_m}
+            {elev_f} ft / {elev_m} m
           </div>
           <div>
             <div className="inline me-4 place-items-center text-sm">

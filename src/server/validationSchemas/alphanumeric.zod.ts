@@ -16,6 +16,7 @@ export const singleSiteSchema = z
     site: z
       .string()
       .trim()
+      .regex(/^[a-zA-Z0-9]+$/)
       .transform((val) => val.toUpperCase()),
   })
   .strict();

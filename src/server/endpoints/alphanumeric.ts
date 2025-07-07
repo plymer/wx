@@ -77,18 +77,17 @@ route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
         ? leadZero(times.sunsetStart.getUTCHours(), 2) + ":" + leadZero(times.sunsetStart.getUTCMinutes(), 2) + "Z"
         : "---";
 
-    // we want to show the state/province for usa/canada, otherwise just the country
-    const location = `${name}, ${country === "US" || country === "CA" ? state : country}`;
-
     const output = {
       icaoId,
-      location,
+      name,
       lat:
         lat > 0 ? (Math.round(lat * 10) / 10).toString() + "°N" : Math.abs(Math.round(lat * 10) / 10).toString() + "°S",
       lon:
         lon > 0 ? (Math.round(lon * 10) / 10).toString() + "°E" : Math.abs(Math.round(lon * 10) / 10).toString() + "°W",
       elev_f,
       elev_m,
+      country,
+      state,
       sunrise,
       sunset,
     };
