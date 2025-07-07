@@ -86,6 +86,7 @@ async function main() {
     );
 
     console.log(`[${DB_NAME.toUpperCase()}] Cache file processing complete.`);
+    process.exit(0);
   } catch (error) {
     console.error(`[${DB_NAME.toUpperCase()}] Error processing cache file: ${(error as Error).message}`);
     process.exit(1);
