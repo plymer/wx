@@ -12,7 +12,7 @@
     "lint": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
     "compile": "tsc -b",
-    "build": "vite build && tsc -b",
+    "build": "vite build && tsc -b -v",
     "deploy": "git stash && git pull --rebase && npm install --include=dev && npm run build && npm run db-push && pm2 restart beta.config.cjs && pm2 save",
     "sprites:icons": "spreet public/sprites/icons public/sprites/icons/icons && spreet public/sprites/icons public/sprites/icons/icons@2x",
     "db-push": "npm run aqdb-push && npm run stationsdb-push",
