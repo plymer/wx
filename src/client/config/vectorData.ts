@@ -21,7 +21,7 @@ export const LIGHTNING_ALT: SymbolLayerSpecification = {
     "text-overlap": "always",
     "symbol-sort-key": ["get", "validTime"],
     "text-size": 14,
-    "text-font": ["Roboto Regular"],
+    "text-font": ["Metropolis-Regular"],
   },
   paint: { "text-color": "rgb(255,0,155)", "text-halo-color": "rgb(255,255,255)", "text-halo-width": 1 },
 };

@@ -6,5 +6,29 @@
     "x": 0,
     "y": 0,
     "sdf": true
+  },
+  "bedpost": {
+    "height": 54,
+    "pixelRatio": 2,
+    "width": 54,
+    "x": 54,
+    "y": 0,
+    "sdf": true
+  },
+  "stn-auto": {
+    "height": 54,
+    "pixelRatio": 2,
+    "width": 54,
+    "x": 0,
+    "y": 54,
+    "sdf": true
+  },
+  "stn-hwos": {
+    "height": 54,
+    "pixelRatio": 2,
+    "width": 54,
+    "x": 54,
+    "y": 54,
+    "sdf": true
   }
 }
