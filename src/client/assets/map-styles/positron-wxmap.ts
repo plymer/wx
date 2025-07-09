@@ -1,13 +1,6 @@
 import { StyleSpecification } from "react-map-gl/maplibre";
 
-const pathDetails = new URL(import.meta.url);
-export const PUBLIC_URL = `${pathDetails.protocol}//${pathDetails.hostname}${
-  pathDetails.port ? `:${pathDetails.port}` : ""
-}${
-  process.env.NODE_ENV === "production"
-    ? ""
-    : pathDetails.pathname.replace("src/client/assets/map-styles/positron-wxmap.ts", "")
-}`;
+export const PUBLIC_URL = new URL(import.meta.url).origin;
 
 export const positronWxMap: StyleSpecification = {
   version: 8,
@@ -23,7 +16,7 @@ export const positronWxMap: StyleSpecification = {
     { id: "icons", url: `${PUBLIC_URL}/sprites/icons` },
     // { id: "windbarbs", url: `${PUBLIC_URL}/sprites/windbarbs` },
   ],
-  glyphs: "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=xDuB4axhGsuzLiFvvDiF",
+  glyphs: "https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf",
   layers: [
     {
       id: "wateroutline",
@@ -100,7 +93,7 @@ export const positronWxMap: StyleSpecification = {
         "symbol-placement": "line",
         "symbol-spacing": 500,
         "text-field": "{name:latin}\n{name:nonlatin}",
-        "text-font": ["Metropolis Medium Italic", "Noto Sans Italic"],
+        "text-font": ["Roboto Italic"],
         "text-rotation-alignment": "map",
         "text-size": 12,
         visibility: "visible",
@@ -124,7 +117,7 @@ export const positronWxMap: StyleSpecification = {
         "icon-size": 0.4,
         "text-anchor": ["step", ["zoom"], "left", 8, "center"],
         "text-field": "{name:latin}\n{name:nonlatin}",
-        "text-font": ["Metropolis Regular", "Noto Sans Regular"],
+        "text-font": ["Roboto Regular"],
         "text-justify": "left",
         "text-offset": [0.5, 0.2],
         "text-size": 10,
@@ -155,7 +148,7 @@ export const positronWxMap: StyleSpecification = {
         "icon-size": 0.4,
         "text-anchor": ["step", ["zoom"], "left", 8, "center"],
         "text-field": "{name:latin}\n{name:nonlatin}",
-        "text-font": ["Metropolis Regular", "Noto Sans Regular"],
+        "text-font": ["Roboto Regular"],
         "text-justify": "left",
         "text-offset": [0.5, 0.2],
         "text-size": 10,
@@ -182,7 +175,7 @@ export const positronWxMap: StyleSpecification = {
         "icon-size": 1,
         "text-anchor": ["step", ["zoom"], "left", 8, "center"],
         "text-field": "{name:latin}\n{name:nonlatin}",
-        "text-font": ["Metropolis Regular", "Noto Sans Regular"],
+        "text-font": ["Roboto Regular"],
         "text-justify": "left",
         "text-offset": [0.5, 0.2],
         "text-size": 14,
@@ -213,7 +206,7 @@ export const positronWxMap: StyleSpecification = {
         "icon-size": 0.4,
         "text-anchor": ["step", ["zoom"], "left", 8, "center"],
         "text-field": "{name:latin}\n{name:nonlatin}",
-        "text-font": ["Metropolis Regular", "Noto Sans Regular"],
+        "text-font": ["Roboto Regular"],
         "text-justify": "left",
         "text-offset": [0.5, 0.2],
         "text-size": 14,
@@ -237,7 +230,7 @@ export const positronWxMap: StyleSpecification = {
       filter: ["all", ["==", "$type", "Point"], ["==", "class", "state"]],
       layout: {
         "text-field": "{name:latin}\n{name:nonlatin}",
-        "text-font": ["Metropolis Regular Italic", "Noto Sans Regular"],
+        "text-font": ["Roboto Italic"],
         "text-size": 14,
         "text-transform": "uppercase",
         visibility: "visible",

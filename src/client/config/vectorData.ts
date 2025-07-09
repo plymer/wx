@@ -21,7 +21,7 @@ export const LIGHTNING_ALT: SymbolLayerSpecification = {
     "text-overlap": "always",
     "symbol-sort-key": ["get", "validTime"],
     "text-size": 14,
-    "text-font": ["Monospace Regular"],
+    "text-font": ["Roboto Regular"],
   },
   paint: { "text-color": "rgb(255,0,155)", "text-halo-color": "rgb(255,255,255)", "text-halo-width": 1 },
 };
@@ -103,7 +103,7 @@ export const AQ_VALUE_DISPLAY: SymbolLayerSpecification = {
   layout: {
     "text-field": ["get", "pm25"],
     "text-size": 12,
-    "text-font": ["Monospace Regular"],
+    "text-font": ["Roboto Regular"],
     "text-offset": [0, 0],
     "text-anchor": "center",
     "text-allow-overlap": false,

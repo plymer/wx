@@ -5,34 +5,11 @@ export const TAF_OVERLAY: SymbolLayerSpecification = {
   type: "symbol",
   source: "taf",
   layout: {
-    "text-field": [
-      "step",
-      ["zoom"],
-      "", // default: zoom < 2
-      4.5,
-      ["get", "siteId"], // zoom >= 2
-    ],
-    "icon-image": [
-      "step",
-      ["zoom"], // default: zoom < 6
-      "icons:aircraft",
-      4.5,
-      "icons:aircraft",
-    ],
-    "icon-size": [
-      "step",
-      ["zoom"],
-      0.35, // default: zoom < 10
-      4.5,
-      0.65,
-    ],
-    "text-size": [
-      "step",
-      ["zoom"],
-      8, // default: zoom < 6
-      8,
-      14,
-    ],
+    "text-field": ["step", ["zoom"], "", 4.5, ["get", "siteId"]],
+    "icon-image": ["step", ["zoom"], "icons:aircraft", 4.5, "icons:aircraft"],
+    "icon-size": ["step", ["zoom"], 0.35, 4.5, 0.65],
+    "text-size": ["step", ["zoom"], 8, 8, 14],
+    "text-font": ["Roboto Regular"],
     "text-offset": [0.5, 0.5],
     "icon-allow-overlap": true,
     "text-allow-overlap": true,
@@ -56,7 +33,7 @@ export const BEDPOSTS_OVERLAY: SymbolLayerSpecification = {
     "icon-size": ["step", ["zoom"], 0.8, 7, 1.25],
     "text-offset": [-1, 0],
     "text-anchor": "right",
-    "text-font": ["Open Sans Regular Italic", "Arial Unicode MS Regular"],
+    "text-font": ["Roboto Italic"],
     "text-allow-overlap": true,
     "icon-allow-overlap": true,
   },
