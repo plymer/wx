@@ -1,9 +1,10 @@
 {
   "aircraft": {
-    "height": 24,
-    "pixelRatio": 1,
-    "width": 24,
+    "height": 54,
+    "pixelRatio": 2,
+    "width": 54,
     "x": 0,
-    "y": 0
+    "y": 0,
+    "sdf": true
   }
 }
