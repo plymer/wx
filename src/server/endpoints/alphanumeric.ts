@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { and, desc, eq, gte } from "drizzle-orm";
+import { and, asc, eq, gte } from "drizzle-orm";
 import axios from "axios";
 import suncalc, { GetTimesResult } from "suncalc";
 
@@ -31,7 +31,7 @@ route.get("/metars", validateParams("query", metarSchema), async (c) => {
     const metarData = await avwx.query.metars.findMany({
       columns: { rawText: true },
       where: and(eq(metars.siteId, searchSite.toUpperCase()), gte(metars.validTime, new Date(Date.now() - hrs * HOUR))),
-      orderBy: desc(metars.validTime),
+      orderBy: asc(metars.validTime),
     });
 
     if (!metarData || metarData.length === 0) {
