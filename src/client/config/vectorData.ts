@@ -103,7 +103,7 @@ export const AQ_VALUE_DISPLAY: SymbolLayerSpecification = {
   layout: {
     "text-field": ["get", "pm25"],
     "text-size": 12,
-    "text-font": ["Roboto Regular"],
+    "text-font": ["Metropolis-Regular"],
     "text-offset": [0, 0],
     "text-anchor": "center",
     "text-allow-overlap": false,
