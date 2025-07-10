@@ -45,7 +45,7 @@ module.exports = {
       merge_logs: true,
       env: { ...ENV_VARS },
       autorestart: false, // don't restart this script automatically
-      cron_restart: "* 0 * * *", // run once a day at midnight
+      cron_restart: "0 0 * * *", // run once a day at midnight
     },
     {
       name: "metars-processing",
@@ -58,7 +58,7 @@ module.exports = {
       merge_logs: true,
       env: { ...ENV_VARS },
       autorestart: false, // don't restart this script automatically
-      cron_restart: "* * * * *", // run once a day at midnight
+      cron_restart: "* * * * *", // run every minute
     },
   ],
 };
