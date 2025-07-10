@@ -4,10 +4,7 @@ import * as turf from "@turf/turf";
 import { LatLon, SunTimes } from "./common.types.js";
 import { Context } from "hono";
 import { Feature, FeatureCollection } from "geojson";
-
-export const FEET_PER_METRE = 3.28084;
-export const HOUR = 3_600_000;
-export const MINUTE = 60_000;
+import { MINUTE } from "../../shared/lib/constants.js";
 
 export function injectViteDevServer(fileContents: string): string {
   const output = fileContents.replace(

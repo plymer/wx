@@ -4,7 +4,7 @@ import { AqData } from "@/lib/types";
 import { FeatureCollection } from "geojson";
 import { AQ_ATTRIBUTION, AQ_DISPLAY, AQ_VALUE_DISPLAY } from "@/config/vectorData";
 import { useFrame, useFrameCount, useStartTime } from "@/stateStores/map/animation";
-import { MINUTE } from "@/lib/utils";
+import { MINUTE } from "@shared/lib/constants";
 
 interface Props {
   data: AqData;

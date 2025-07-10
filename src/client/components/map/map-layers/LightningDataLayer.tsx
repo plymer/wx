@@ -4,7 +4,7 @@ import { LightningData, APIResponse } from "@/lib/types";
 import { FeatureCollection, Point } from "geojson";
 import { LIGHTNING_ALT } from "@/config/vectorData";
 import { useFrame, useStartTime } from "@/stateStores/map/animation";
-import { HOUR, MINUTE } from "@/lib/utils";
+import { HOUR, MINUTE } from "@shared/lib/constants";
 import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
 
 interface Props {

@@ -1,0 +1,114 @@
+// this script will download and parse the metars 'cache' files from aviationweather.gov
+// metar cache updates minutely
+
+import "dotenv/config";
+import { generateDbConnection, readGzipFile } from "../shared/lib/utils.js";
+import { xmlParser } from "../shared/lib/utils.js";
+import { metars } from "../shared/db/tables/avwx.drizzle.js";
+import { CacheMetarData, MetarData, XMLCacheFile } from "../shared/lib/types.js";
+import { metarSchema } from "../shared/lib/validation.js";
+import { lt } from "drizzle-orm";
+import { HOUR } from "../shared/lib/constants.js";
+
+const RESOURCE_URL = "https://aviationweather.gov/data/cache/metars.cache.xml.gz";
+const DB_NAME = "avwx";
+
+async function main() {
+  const db = await generateDbConnection(DB_NAME, { metars });
+
+  if (!db) {
+    console.error(`[${DB_NAME.toUpperCase()}] Database connection failed.`);
+    process.exit(1);
+  }
+
+  const xml = await readGzipFile(RESOURCE_URL, DB_NAME);
+
+  const parser = xmlParser();
+
+  const metarData = (parser.parse(xml) as XMLCacheFile<CacheMetarData, "metar">).response.data.metar;
+
+  try {
+    const output: MetarData[] = metarData
+      .map((metar) => {
+        // if we can't geo-location the metars, throw them out
+        if (metar.longitude === -99.99 || metar.latitude === -99.99 || metar.elevationM === 9999) return;
+
+        // the observation time is coming in as a string, so we convert it to an actual ECMAScript date
+        metar.observationTime = new Date(metar.observationTime);
+
+        // use our validation schema to make sure we are passing valid data into the database
+        const parsed = metarSchema.safeParse(metar);
+
+        if (!parsed.success) {
+          console.error(parsed.error);
+          return;
+        }
+
+        // destructure the parsed data to get the fields we want
+        const {
+          stationId: siteId,
+          observationTime: validTime,
+          rawText,
+          flightCategory: category,
+          tempC: tt,
+          dewpointC: td,
+          windDirDegrees: windDir,
+          windGustKt: windGst,
+          windSpeedKt: windSpd,
+          wxString,
+          visibilityStatuteMi: vis,
+        } = parsed.data;
+
+        // return the data, ready to be inserted into the database
+        return {
+          siteId,
+          validTime,
+          rawText,
+          category,
+          windDir,
+          windSpd,
+          windGst,
+          vis,
+          wxString,
+          tt,
+          td,
+        };
+      })
+      .filter((entry) => entry !== undefined);
+
+    console.log(`[${DB_NAME.toUpperCase()}] Inserting ${output.length} metars...`);
+
+    // insert the metar data, or update each metar if it already exists (our pk is siteId + validTime)
+    await Promise.allSettled(
+      output.map(async (metar) => {
+        await db
+          .insert(metars)
+          .values(metar)
+          .onDuplicateKeyUpdate({
+            set: {
+              category: metar.category,
+              tt: metar.tt,
+              td: metar.td,
+              windDir: metar.windDir,
+              windSpd: metar.windSpd,
+              windGst: metar.windGst,
+              vis: metar.vis,
+              wxString: metar.wxString,
+              rawText: metar.rawText,
+            },
+          });
+      }),
+    );
+
+    // now clean up the database and remove any metars older than 96 hours
+    await db.delete(metars).where(lt(metars.validTime, new Date(Date.now() - 96 * HOUR)));
+
+    console.log(`[${DB_NAME.toUpperCase()}] Cache file processing complete.`);
+    process.exit(0);
+  } catch (error) {
+    console.error(`[${DB_NAME.toUpperCase()}] Error processing cache file: ${(error as Error).message}`);
+    process.exit(1);
+  }
+}
+
+await main();

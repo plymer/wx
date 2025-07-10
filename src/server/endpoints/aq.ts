@@ -4,10 +4,11 @@ import type { Feature, Point } from "geojson";
 
 import { aqDb } from "../main.js";
 import { aqData } from "../../shared/db/tables/aq.drizzle.js";
-import { errorResponse, HOUR, jsonResponse } from "../lib/utils.js";
+import { errorResponse, jsonResponse } from "../lib/utils.js";
 
 import { validateParams } from "../lib/zod-validator.js";
 import { aqSchema } from "../validationSchemas/aq.zod.js";
+import { HOUR } from "../../shared/lib/constants.js";
 
 const route = new Hono();
 

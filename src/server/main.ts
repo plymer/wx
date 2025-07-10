@@ -14,7 +14,7 @@ import { default as aq } from "./endpoints/aq.js";
 
 // database schemas
 import * as aqSchema from "../shared/db/tables/aq.drizzle.js";
-import * as stations from "../shared/db/tables/stations.drizzle.js";
+import * as avwxSchemas from "../shared/db/tables/avwx.drizzle.js";
 
 // custom types and utilities
 import { injectViteDevServer } from "./lib/utils.js";
@@ -23,7 +23,7 @@ import { generateDbConnection } from "../shared/lib/utils.js";
 const isProd = process.env.NODE_ENV === "production";
 
 export const aqDb = await generateDbConnection("aq", aqSchema);
-export const stationsDb = await generateDbConnection("station-catalog", stations);
+export const avwx = await generateDbConnection("avwx", avwxSchemas);
 
 // get the content of the index.html so we can serve it from the root
 // TODO :: set this up to serve all files out of /dist just like in the HubWx implementation

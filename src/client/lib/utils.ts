@@ -9,8 +9,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // custom utils start
-export const HOUR = 3_600_000;
-export const MINUTE = 60_000;
 
 export const makeISOTimeStamp = (time: number, mode: "display" | "data" = "display", hourMins?: boolean) => {
   switch (mode) {

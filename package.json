@@ -8,6 +8,7 @@
     "dev": "vite",
     "dev:stations": "tsx src/data/stations.ts",
     "dev:aq-data": "tsx src/data/aq-data.ts",
+    "dev:metars": "tsx src/data/metars.ts",
     "check": "tsc --noEmit  && npm run format && npm run lint",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
@@ -15,9 +16,9 @@
     "build": "vite build && tsc -b -v",
     "deploy": "git stash && git pull --rebase && npm install --include=dev && npm run build && npm run db-push && pm2 restart beta.config.cjs && pm2 save",
     "sprites:icons": "spreet --sdf public/sprites/icons public/sprites/icons && spreet --retina --sdf public/sprites/icons public/sprites/icons@2x",
-    "db-push": "npm run aqdb-push && npm run stationsdb-push",
+    "db-push": "npm run aqdb-push && npm run avwxdb-push",
     "aqdb-push": "drizzle-kit push --config aq.drizzle.config.ts",
-    "stationsdb-push": "drizzle-kit push --config stations.drizzle.config.ts"
+    "avwxdb-push": "drizzle-kit push --config avwx.drizzle.config.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",

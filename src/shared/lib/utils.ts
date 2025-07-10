@@ -1,7 +1,10 @@
+import axios from "axios";
 import { Relations } from "drizzle-orm";
 import { MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 import { drizzle } from "drizzle-orm/mysql2";
 import { sql } from "drizzle-orm/sql";
+import { createGunzip } from "zlib";
+import { XMLParser } from "fast-xml-parser";
 
 export async function generateDbConnection<
   TSchema extends Record<string, MySqlTableWithColumns<any> | Relations<any, any>>,
@@ -41,4 +44,66 @@ export async function testDbConnection(db: ReturnType<typeof drizzle>, dbName: s
     console.error(`[${dbName.toUpperCase()}] Database connection failed:`, err);
     return false;
   }
+}
+
+export async function readGzipFile(url: string, dbName: string) {
+  try {
+    // fetch the compressed data
+    const response = await axios.get(url, { responseType: "arraybuffer" });
+    const compressedData = response.data;
+
+    // decompress the data
+    const decompressedData = await new Promise((resolve, reject) => {
+      const gunzip = createGunzip();
+      const chunks: Buffer[] = [];
+
+      gunzip.on("data", (chunk) => chunks.push(chunk));
+      gunzip.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
+      gunzip.on("error", (err) => reject(err));
+
+      gunzip.write(compressedData);
+      gunzip.end();
+    });
+
+    if (typeof decompressedData !== "string") {
+      throw new Error(`[${dbName.toUpperCase()}] Decompressed data is not a string`);
+    }
+
+    return decompressedData;
+  } catch (error) {
+    console.error(`[${dbName.toUpperCase()}] Error reading gzip file:`, error);
+    throw error;
+  }
+}
+
+/**
+ * transform a tag or attribute name into camelCase so that it can be used as a key in a JSON object
+ * @param name a tag or attribute name that we want to transform
+ * @returns a camelCase version of the tag or attribute name supplied
+ */
+function transformName(name: string) {
+  const parts = name.replace(/[-_]/g, " ").split(" ");
+  return (
+    parts[0].toLowerCase() +
+    parts
+      .slice(1)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+      .join("")
+  );
+}
+
+/**
+ * create a new XMLParser instance configured with JSON-friendly options
+ * @returns a new XMLParser that replaces all namespace prefixes and converts all tags and attributes to camelCase
+ */
+export function xmlParser() {
+  const parser = new XMLParser({
+    removeNSPrefix: true,
+    ignoreAttributes: false,
+    attributeNamePrefix: "",
+    transformAttributeName: (attrName) => transformName(attrName),
+    transformTagName: (tagName) => transformName(tagName),
+  });
+
+  return parser;
 }

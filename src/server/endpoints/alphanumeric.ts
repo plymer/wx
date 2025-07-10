@@ -7,8 +7,8 @@ import { validateParams } from "../lib/zod-validator.js";
 import { metarSchema, publicBulletinSchema, singleSiteSchema } from "../validationSchemas/alphanumeric.zod.js";
 import { HubDiscussion, MetarObject, TafObject } from "../lib/alphanumeric.types.js";
 import { errorResponse, jsonResponse, leadZero } from "../lib/utils.js";
-import { stationsDb } from "../main.js";
-import { stations } from "../../shared/db/tables/stations.drizzle.js";
+import { avwx } from "../main.js";
+import { stations } from "../../shared/db/tables/avwx.drizzle.js";
 
 const route = new Hono();
 
@@ -44,16 +44,16 @@ route.get("/metars", validateParams("query", metarSchema), async (c) => {
 route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
   const { site } = c.req.valid("query");
 
-  if (!stationsDb) {
-    console.error("[API] No stations database connection available.");
-    return errorResponse(c, "No stations database connection available.");
+  if (!avwx) {
+    console.error("[API] No avwx connection available.");
+    return errorResponse(c, "No avwx connection available.");
   }
 
   // do a conversion for CWEU -> CYEU
   const searchSite = site === "CWEU" ? "CYEU" : site;
 
   try {
-    const stationData = await stationsDb.query.stations.findFirst({
+    const stationData = await avwx.query.stations.findFirst({
       where: eq(stations.icaoId, searchSite.toUpperCase()),
     });
 

@@ -3,7 +3,7 @@ import "dotenv/config";
 import { lt } from "drizzle-orm";
 import { generateDbConnection } from "../shared/lib/utils.js";
 import { aqData } from "../shared/db/tables/aq.drizzle.js";
-import { AQObservation, AQOutput } from "../shared/lib/types.js";
+import { CSVAQData, AQData } from "../shared/lib/types.js";
 
 async function main() {
   const remote = axios.create({ baseURL: "https://cyclone.unbc.ca/aqmap/data/" });
@@ -31,7 +31,7 @@ async function main() {
     const header = lines[0].split(",");
 
     // now loop over the rows and construct an array of objects
-    const rows: AQOutput[] = lines
+    const rows: AQData[] = lines
       .slice(1)
       .map((line: string) => {
         // Replace commas inside quotes with a space
@@ -48,10 +48,10 @@ async function main() {
         });
         return row;
       })
-      .reduce((acc: AQOutput[], row: AQObservation) => {
+      .reduce((acc: AQData[], row: CSVAQData) => {
         const { monitor, network, lat, lng, date, pm25_recent_r } = row;
 
-        const data: AQOutput = {
+        const data: AQData = {
           name: monitor ? monitor.slice(0, 45) : null, // truncate to 45 characters
           type: network,
           lat: isNaN(parseFloat(lat)) ? null : parseFloat(lat),
@@ -64,7 +64,7 @@ async function main() {
 
         return acc;
       }, [])
-      .filter((row: AQOutput) => row.lat !== null && row.lon !== null && row.validTime !== null && row.pm25 !== null);
+      .filter((row: AQData) => row.lat !== null && row.lon !== null && row.validTime !== null && row.pm25 !== null);
 
     // insert the data into the database
     await db.insert(aqData).values(rows);

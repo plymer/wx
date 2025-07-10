@@ -1,60 +1,29 @@
 import { InferSelectModel } from "drizzle-orm";
-import { stations } from "../db/tables/stations.drizzle";
+import { metars, stations } from "../db/tables/avwx.drizzle";
+import { z } from "zod";
+import { aqSchema, metarSchema, stationSchema } from "./validation";
+import { aqData } from "../db/tables/aq.drizzle";
 
-export type AQObservation = {
-  sensor_index: string;
-  monitor: string;
-  network: string;
-  lat: string;
-  lng: string;
-  date: string;
-  prov_terr: string;
-  pm25_recent_r: string;
-  pm25_recent: string;
-  pm25_1hr_r: string;
-  pm25_1hr: string;
-  pm25_3hr_r: string;
-  pm25_3hr: string;
-  pm25_24hr_r: string;
-  pm25_24hr: string;
-  temperature: string;
-  rh: string;
-  pressure: string;
-  val_24hr_r: string;
-  val_1hr_r: string;
-  val_r: string;
-  val_24hr: string;
-  val_1hr: string;
-  val: string;
-  icon_url_24hr_r: string;
-  icon_url_1hr_r: string;
-  icon_url_r: string;
-  icon_url_24hr: string;
-  icon_url_1hr: string;
-  icon_url: string;
+export type XMLCacheFile<TData, TDataName extends string> = {
+  response: {
+    requestIndex: number;
+    dataSource: { name: string };
+    request: { type: string };
+    errors: any;
+    warnings: any;
+    timeTakenMs: number;
+    data: { [Key in TDataName extends string ? TDataName : string]: TData[] };
+  };
 };
 
-export type AQOutput = {
-  name: string | null;
-  type: string | null;
-  lat: number | null;
-  lon: number | null;
-  validTime: Date | null;
-  pm25: number | null;
-};
+// data from aq csv files
+export type CSVAQData = z.infer<typeof aqSchema>;
 
-export type CacheStationData = {
-  icaoId: string;
-  iataId: string;
-  faaId: string;
-  wmoId: string;
-  lat: number;
-  lon: number;
-  elev: number;
-  site: string;
-  state: string;
-  country: string;
-  priority: number;
-};
+// data from the avwx cache files
+export type CacheStationData = z.infer<typeof stationSchema>;
+export type CacheMetarData = z.infer<typeof metarSchema>;
 
+// database schema-derived types
+export type AQData = Omit<InferSelectModel<typeof aqData>, "id">;
 export type StationData = InferSelectModel<typeof stations>;
+export type MetarData = InferSelectModel<typeof metars>;

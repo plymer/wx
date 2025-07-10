@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { HOUR, MINUTE } from "@/lib/utils";
 import { useEndTime, useAnimationActions } from "@/stateStores/map/animation";
+import { MINUTE, HOUR } from "@shared/lib/constants";
 
 function clockTick(
   setClockTimer: React.Dispatch<React.SetStateAction<NodeJS.Timeout>>,

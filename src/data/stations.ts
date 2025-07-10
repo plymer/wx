@@ -1,17 +1,15 @@
 // this script will download and parse the station catalog 'cache' files from aviationweather.gov
 // stations update once per day
 
-import { createGunzip } from "zlib";
-import { sql } from "drizzle-orm";
-import axios from "axios";
 import "dotenv/config";
-import { generateDbConnection } from "../shared/lib/utils.js";
-import { stations } from "../shared/db/tables/stations.drizzle.js";
-import { FEET_PER_METRE } from "../server/lib/utils.js";
-import { CacheStationData } from "../shared/lib/types.js";
+import { generateDbConnection, readGzipFile } from "../shared/lib/utils.js";
+import { stations } from "../shared/db/tables/avwx.drizzle.js";
+import { FEET_PER_METRE } from "../shared/lib/constants.js";
+import { CacheStationData, StationData } from "../shared/lib/types.js";
+import { stationSchema } from "../shared/lib/validation.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/stations.cache.json.gz";
-const DB_NAME = "station-catalog";
+const DB_NAME = "avwx";
 
 async function main() {
   const db = await generateDbConnection(DB_NAME, { stations });
@@ -21,47 +19,37 @@ async function main() {
     process.exit(1);
   }
 
+  const data = await readGzipFile(RESOURCE_URL, DB_NAME);
+
   try {
-    // fetch the compressed data
-    const response = await axios.get(RESOURCE_URL, { responseType: "arraybuffer" });
-    const compressedData = response.data;
-
-    // decompress the data
-    const decompressedData = await new Promise((resolve, reject) => {
-      const gunzip = createGunzip();
-      const chunks: Buffer[] = [];
-
-      gunzip.on("data", (chunk) => chunks.push(chunk));
-      gunzip.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
-      gunzip.on("error", (err) => reject(err));
-
-      gunzip.write(compressedData);
-      gunzip.end();
-    });
-
-    if (typeof decompressedData !== "string") {
-      throw new Error(`[${DB_NAME.toUpperCase()}] Decompressed data is not a string`);
-    }
-
     // parse the JSON data
-    const stationData: CacheStationData[] = JSON.parse(decompressedData as string);
+    const stationData: CacheStationData[] = JSON.parse(data);
 
     if (stationData.length === 0) {
       throw new Error(`[${DB_NAME.toUpperCase()}] No station data found in the cache file.`);
     }
 
-    const output = stationData.map((station) => {
-      return {
-        name: station.site,
-        icaoId: station.icaoId,
-        lat: station.lat,
-        lon: station.lon,
-        elev_f: Math.floor(station.elev * FEET_PER_METRE),
-        elev_m: station.elev,
-        country: station.country,
-        state: station.state,
-      };
-    });
+    const output: StationData[] = stationData
+      .map((station) => {
+        // parse our object and validate it against the schema
+        const parsed = stationSchema.safeParse(station);
+        if (!parsed.success) {
+          console.error(`[${DB_NAME.toUpperCase()}] Invalid station data: ${parsed.error}`);
+          return undefined; // skip invalid station data
+        }
+
+        return {
+          name: station.site,
+          icaoId: station.icaoId,
+          lat: station.lat,
+          lon: station.lon,
+          elev_f: Math.floor(station.elev * FEET_PER_METRE),
+          elev_m: station.elev,
+          country: station.country,
+          state: station.state,
+        };
+      })
+      .filter((entry) => entry !== undefined); // filter out any undefined entries
 
     console.log(`[${DB_NAME.toUpperCase()}] Inserting ${output.length} stations...`);
 

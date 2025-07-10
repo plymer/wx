@@ -12,7 +12,7 @@ interface Props {
 }
 
 const HubDiscussion = ({ hub }: Props) => {
-  const setHub = useAviationActions().setHub;
+  const { setHub } = useAviationActions();
 
   const { data: hubData, fetchStatus: hubFetchStatus } = useAPI<HubData>("/alpha/hubs", { site: hub });
   const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("/alpha/taf", { site: hub });
