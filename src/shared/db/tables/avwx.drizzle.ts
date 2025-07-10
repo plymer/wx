@@ -2,7 +2,7 @@ import { datetime, float, int, mysqlTable, primaryKey, text, varchar } from "dri
 
 export const stations = mysqlTable("stations", {
   name: varchar({ length: 45 }),
-  icaoId: varchar({ length: 4 }).primaryKey(),
+  siteId: varchar({ length: 4 }).primaryKey(),
   lat: float().notNull(),
   lon: float().notNull(),
   elev_f: float(),

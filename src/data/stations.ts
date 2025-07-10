@@ -40,7 +40,7 @@ async function main() {
 
         return {
           name: station.site,
-          icaoId: station.icaoId,
+          siteId: station.icaoId,
           lat: station.lat,
           lon: station.lon,
           elev_f: Math.floor(station.elev * FEET_PER_METRE),

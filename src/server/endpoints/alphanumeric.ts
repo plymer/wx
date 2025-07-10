@@ -1,41 +1,47 @@
 import { Hono } from "hono";
-import { eq } from "drizzle-orm";
+import { and, desc, eq, gte } from "drizzle-orm";
 import axios from "axios";
 import suncalc, { GetTimesResult } from "suncalc";
 
 import { validateParams } from "../lib/zod-validator.js";
 import { metarSchema, publicBulletinSchema, singleSiteSchema } from "../validationSchemas/alphanumeric.zod.js";
-import { HubDiscussion, MetarObject, TafObject } from "../lib/alphanumeric.types.js";
+import { HubDiscussion, TafObject } from "../lib/alphanumeric.types.js";
 import { errorResponse, jsonResponse, leadZero } from "../lib/utils.js";
 import { avwx } from "../main.js";
-import { stations } from "../../shared/db/tables/avwx.drizzle.js";
+import { metars, stations } from "../../shared/db/tables/avwx.drizzle.js";
+import { HOUR } from "../../shared/lib/constants.js";
 
 const route = new Hono();
 
 route.get("/metars", validateParams("query", metarSchema), async (c) => {
   const { site, hrs } = c.req.valid("query");
 
+  if (!avwx) {
+    console.error("[API] No avwx connection available.");
+    return errorResponse(c, "No avwx connection available.");
+  }
+
   // do a conversion for CYEU -> CWEU
   const searchSite = site === "CYEU" ? "CWEU" : site;
 
-  const url = `http://aviationweather.gov/api/data/metar?ids=${searchSite}&hours=${hrs}&format=json`;
-  console.log("[API] Requesting METARs from:", url);
+  console.log("[API] Requesting METARs for:", searchSite, "for the last", hrs, "hours");
 
   try {
-    // begin data retrieval
-    const metarObjects: MetarObject[] | string = await axios.get(url).then((metars) => metars.data);
+    // retrieve the data from the avwx database
+    const metarData = await avwx.query.metars.findMany({
+      columns: { rawText: true },
+      where: and(eq(metars.siteId, searchSite.toUpperCase()), gte(metars.validTime, new Date(Date.now() - hrs * HOUR))),
+      orderBy: desc(metars.validTime),
+    });
 
-    // check for the presence of valid data, otherwise return an error message
-    if (metarObjects.length === 0 || metarObjects === "error retrieving data") {
-      // we do not have any METARs that we can return, so send an empty response
+    if (!metarData || metarData.length === 0) {
+      // we do not have any METARs that we can return, so send a 'noData' response
       return c.json({ status: "noData" }, 200);
     }
 
-    // if our returned value is an object, we know we have valid output
-    if (typeof metarObjects === "object") {
-      const output = metarObjects.reverse().map((m: MetarObject) => m.rawOb);
-      return jsonResponse(c, output);
-    }
+    const output = metarData.map((m) => m.rawText);
+
+    return jsonResponse(c, output);
   } catch (error) {
     return errorResponse(c, error);
   }
@@ -52,9 +58,11 @@ route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
   // do a conversion for CWEU -> CYEU
   const searchSite = site === "CWEU" ? "CYEU" : site;
 
+  console.log("[API] Requesting site data for:", searchSite);
+
   try {
     const stationData = await avwx.query.stations.findFirst({
-      where: eq(stations.icaoId, searchSite.toUpperCase()),
+      where: eq(stations.siteId, searchSite.toUpperCase()),
     });
 
     // if we don't have any data for this station, return a noData response
@@ -62,7 +70,7 @@ route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
       return c.json({ status: "noData" }, 200);
     }
 
-    const { icaoId, name, lat, lon, elev_f, elev_m, country, state } = stationData;
+    const { siteId, name, lat, lon, elev_f, elev_m, country, state } = stationData;
 
     // create a suncalc time object
     const times: GetTimesResult = suncalc.getTimes(new Date(), lat, lon);
@@ -78,7 +86,7 @@ route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
         : "---";
 
     const output = {
-      icaoId,
+      siteId,
       name,
       lat:
         lat > 0 ? (Math.round(lat * 10) / 10).toString() + "°N" : Math.abs(Math.round(lat * 10) / 10).toString() + "°S",
