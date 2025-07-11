@@ -76,19 +76,7 @@ export const PIREP_DISPLAY: FillLayerSpecification = {
 export const AQ_DISPLAY: CircleLayerSpecification = {
   paint: {
     "circle-radius": 10, // this will need some turf-ing for proper sizing based on lat/lon/zoom
-    "circle-color": [
-      "step",
-      ["get", "pm25"],
-      "#00ff00", // pm25 <= 5: green
-      25,
-      "#ffff00", // 5 < pm25 <= 10: yellow
-      50,
-      "#ff9900", // 10 < pm25 <= 15: orange
-      75,
-      "#ff0000", // pm25 > 15: red
-      100,
-      "#990000", // pm25 > 20: dark red
-    ],
+    "circle-color": ["step", ["get", "pm25"], "#00ff00", 25, "#ffff00", 50, "#ff9900", 75, "#ff0000", 100, "#990000"],
   },
   layout: { visibility: "visible", "circle-sort-key": ["get", "validTime"] },
   type: "circle",

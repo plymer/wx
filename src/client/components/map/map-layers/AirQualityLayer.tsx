@@ -57,7 +57,15 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
           id="aq-data-values"
           filter={["!", ["has", "point_count"]]}
           beforeId={belowLayer}
-          layout={textOptions.layout}
+          layout={{
+            "text-field": ["get", "pm25"],
+            "text-size": 12,
+            "text-font": ["Metropolis-Regular"],
+            "text-offset": [0, 0],
+            "text-anchor": "center",
+            "text-allow-overlap": false,
+            "symbol-sort-key": ["get", "validTime"],
+          }}
           paint={{ "text-color": "#fff", "text-halo-color": "#000", "text-halo-width": 1 }}
         />
         <Layer // non-clustered layer for circles
@@ -92,6 +100,9 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
           beforeId={"aq-data"}
           layout={{
             "text-field": "{max_pm25}",
+            "text-font": ["Metropolis-Regular"],
+            "text-offset": [0, 0],
+            "text-anchor": "center",
             "text-size": [
               "step",
               ["get", "point_count"],
