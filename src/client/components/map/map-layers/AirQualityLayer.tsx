@@ -57,15 +57,18 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
           filter={["!", ["has", "point_count"]]}
           beforeId={belowLayer}
           layout={{
-            "text-field": ["get", "pm25"],
+            "text-field": ["to-string", ["round", ["get", "pm25"]]],
             "text-size": 12,
-            "text-font": ["Metropolis-Regular"],
-            "text-offset": [0, 0],
+            "text-font": ["Consolas-Regular"],
             "text-anchor": "center",
             "text-allow-overlap": false,
             "symbol-sort-key": ["get", "validTime"],
           }}
-          paint={{ "text-color": "#fff", "text-halo-color": "#000", "text-halo-width": 1 }}
+          paint={{
+            "text-color": ["step", ["get", "pm25"], "#000", 25, "#000", 50, "#fff", 75, "#fff", 100, "#fff"],
+            "text-halo-color": ["step", ["get", "pm25"], "#fff", 25, "#fff", 50, "#000", 75, "#000", 100, "#000"],
+            "text-halo-width": 1,
+          }}
         />
         <Layer // non-clustered layer for circles
           type="circle"
@@ -73,9 +76,9 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
           filter={["!", ["has", "point_count"]]}
           beforeId={"aq-data-values"}
           paint={{
-            "circle-radius": 10,
+            "circle-radius": 12,
             "circle-stroke-width": 1,
-            "circle-stroke-color": "#fff",
+            "circle-stroke-color": ["step", ["get", "pm25"], "#000", 25, "#000", 50, "#fff", 75, "#fff", 100, "#fff"],
             "circle-color": [
               "step",
               ["get", "pm25"],
@@ -98,16 +101,16 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
           filter={["has", "point_count"]}
           beforeId={"aq-data"}
           layout={{
-            "text-field": "{max_pm25}",
-            "text-font": ["Metropolis-Regular"],
+            "text-field": ["to-string", ["round", ["get", "max_pm25"]]],
+            "text-font": ["Consolas-Regular"],
             "text-offset": [0, 0],
             "text-anchor": "center",
             "text-size": [
               "step",
               ["get", "point_count"],
-              10, // size when point_count < 10
+              12, // size when point_count < 10
               10,
-              12, // size when point_count >= 10
+              14, // size when point_count >= 10
               25,
               18, // size when point_count >= 25
               50,
@@ -117,7 +120,11 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
             ],
             "text-allow-overlap": true,
           }}
-          paint={{ "text-color": "#fff", "text-halo-color": "#000", "text-halo-width": 1 }}
+          paint={{
+            "text-color": ["step", ["get", "max_pm25"], "#000", 25, "#000", 50, "#fff", 75, "#fff", 100, "#fff"],
+            "text-halo-color": ["step", ["get", "max_pm25"], "#fff", 25, "#fff", 50, "#000", 75, "#000", 100, "#000"],
+            "text-halo-width": 1,
+          }}
         />
 
         <Layer // cluster layer for circles
@@ -129,9 +136,9 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
             "circle-radius": [
               "step",
               ["get", "point_count"],
-              10, // radius when point_count < 10
+              12, // radius when point_count < 10
               10,
-              12, // radius when point_count >= 10
+              14, // radius when point_count >= 10
               25,
               18, // radius when point_count >= 25
               50,
@@ -140,7 +147,19 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
               22, // radius when point_count >= 100
             ],
             "circle-stroke-width": 1,
-            "circle-stroke-color": "#fff",
+            "circle-stroke-color": [
+              "step",
+              ["get", "max_pm25"],
+              "#000",
+              25,
+              "#000",
+              50,
+              "#fff",
+              75,
+              "#fff",
+              100,
+              "#fff",
+            ],
             "circle-color": [
               "step",
               ["get", "max_pm25"],
