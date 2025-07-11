@@ -3,7 +3,7 @@
   "version": "0.48.1",
   "private": true,
   "type": "module",
-  "main": "main.js",
+  "main": "dist/server/main.js",
   "scripts": {
     "dev": "vite",
     "dev:stations": "tsx src/data/stations.ts",
@@ -14,7 +14,7 @@
     "format": "prettier --write .",
     "compile": "tsc -b",
     "build": "vite build && tsc -b -v",
-    "deploy": "git stash && git pull --rebase && npm install --include=dev && npm run build && npm run db-push && pm2 restart beta.config.cjs && pm2 save",
+    "deploy": "npm install --include=dev && npm run build && npm run db-push && pm2 restart beta.config.cjs && pm2 save",
     "sprites:icons": "spreet --sdf public/sprites/icons public/sprites/icons && spreet --retina --sdf public/sprites/icons public/sprites/icons@2x",
     "db-push": "npm run aqdb-push && npm run avwxdb-push",
     "aqdb-push": "drizzle-kit push --config aq.drizzle.config.ts",
