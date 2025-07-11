@@ -1,5 +1,4 @@
 import { datetime, float, int, mysqlTable, primaryKey, text, varchar } from "drizzle-orm/mysql-core";
-import { raw } from "mysql2";
 
 export const stations = mysqlTable("stations", {
   name: varchar({ length: 45 }),

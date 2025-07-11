@@ -5,7 +5,7 @@ import suncalc, { GetTimesResult } from "suncalc";
 
 import { validateParams } from "../lib/zod-validator.js";
 import { metarSchema, publicBulletinSchema, singleSiteSchema } from "../validationSchemas/alphanumeric.zod.js";
-import { HubDiscussion, TafObject } from "../lib/alphanumeric.types.js";
+import { HubDiscussion } from "../lib/alphanumeric.types.js";
 import { errorResponse, jsonResponse, leadZero } from "../lib/utils.js";
 import { avwx } from "../main.js";
 import { metars, stations, tafs } from "../../shared/db/tables/avwx.drizzle.js";

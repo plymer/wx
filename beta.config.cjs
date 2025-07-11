@@ -60,5 +60,18 @@ module.exports = {
       autorestart: false, // don't restart this script automatically
       cron_restart: "* * * * *", // run every minute
     },
+    {
+      name: "tafs-processing",
+      script: path.resolve(__dirname, "dist/data/tafs.js"),
+      instances: 1,
+      exec_mode: "fork", // use form for single-instance cron scripts
+      log_date_format: "YYYY-MM-DD HH:mm Z",
+      error_file: "./logs/data/tafs-error.log",
+      out_file: "./logs/data/tafs-out.log",
+      merge_logs: true,
+      env: { ...ENV_VARS },
+      autorestart: false, // don't restart this script automatically
+      cron_restart: "* * * * *", // run every minute
+    },
   ],
 };
