@@ -1,6 +1,6 @@
 {
   "name": "prairie-wx",
-  "version": "0.48.1",
+  "version": "0.49.0",
   "private": true,
   "type": "module",
   "main": "dist/server/main.js",
@@ -9,6 +9,7 @@
     "dev:stations": "tsx src/data/stations.ts",
     "dev:aq-data": "tsx src/data/aq-data.ts",
     "dev:metars": "tsx src/data/metars.ts",
+    "dev:tafs": "tsx src/data/tafs.ts",
     "check": "tsc --noEmit  && npm run format && npm run lint",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
@@ -43,7 +44,7 @@
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.34.0",
-    "vite": "^7.0.0",
+    "vite": "^7.0.4",
     "vite-plugin-pwa": "^1.0.1"
   },
   "dependencies": {

@@ -4,6 +4,7 @@ import { lt } from "drizzle-orm";
 import { generateDbConnection } from "../shared/lib/utils.js";
 import { aqData } from "../shared/db/tables/aq.drizzle.js";
 import { CSVAQData, AQData } from "../shared/lib/types.js";
+import { aqSchema } from "../shared/lib/validation.js";
 
 async function main() {
   const remote = axios.create({ baseURL: "https://cyclone.unbc.ca/aqmap/data/" });
@@ -49,15 +50,25 @@ async function main() {
         return row;
       })
       .reduce((acc: AQData[], row: CSVAQData) => {
-        const { monitor, network, lat, lng, date, pm25_recent_r } = row;
+        const parsed = aqSchema.safeParse(row);
+
+        if (!parsed.success) {
+          console.error(parsed.error);
+          return acc; // Skip this row if validation fails
+        }
+
+        const { monitor, network, lat, lng, date, pm25_recent_r } = parsed.data;
+
+        // if any of these columns are null, skip this row
+        if (!monitor || !network || !lat || !lng || !date || !pm25_recent_r) return acc;
 
         const data: AQData = {
-          name: monitor ? monitor.slice(0, 45) : null, // truncate to 45 characters
+          name: monitor,
           type: network,
-          lat: isNaN(parseFloat(lat)) ? null : parseFloat(lat),
-          lon: isNaN(parseFloat(lng)) ? null : parseFloat(lng),
-          validTime: date ? new Date(date.replace(" ", "T") + "Z") : null, // convert to seconds since epoch
-          pm25: isNaN(parseFloat(pm25_recent_r)) ? null : parseFloat(pm25_recent_r),
+          lat,
+          lon: lng,
+          validTime: date,
+          pm25: pm25_recent_r,
         };
 
         acc.push(data);

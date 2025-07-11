@@ -17,7 +17,7 @@ async function main() {
   const db = await generateDbConnection(DB_NAME, { metars });
 
   if (!db) {
-    console.error(`[${DB_NAME.toUpperCase()}] Database connection failed.`);
+    console.error(`[${DB_NAME.toUpperCase()}] (METARs) Database connection failed.`);
     process.exit(1);
   }
 
@@ -32,9 +32,6 @@ async function main() {
       .map((metar) => {
         // if we can't geo-location the metars, throw them out
         if (metar.longitude === -99.99 || metar.latitude === -99.99 || metar.elevationM === 9999) return;
-
-        // the observation time is coming in as a string, so we convert it to an actual ECMAScript date
-        metar.observationTime = new Date(metar.observationTime);
 
         // use our validation schema to make sure we are passing valid data into the database
         const parsed = metarSchema.safeParse(metar);
@@ -76,7 +73,7 @@ async function main() {
       })
       .filter((entry) => entry !== undefined);
 
-    console.log(`[${DB_NAME.toUpperCase()}] Inserting ${output.length} metars...`);
+    console.log(`[${DB_NAME.toUpperCase()}] Inserting ${output.length} METARs...`);
 
     // insert the metar data, or update each metar if it already exists (our pk is siteId + validTime)
     await Promise.allSettled(
@@ -100,13 +97,16 @@ async function main() {
       }),
     );
 
+    console.log(`[${DB_NAME.toUpperCase()}] Cleaning up old METARs...`);
     // now clean up the database and remove any metars older than 96 hours
     await db.delete(metars).where(lt(metars.validTime, new Date(Date.now() - 96 * HOUR)));
 
-    console.log(`[${DB_NAME.toUpperCase()}] Cache file processing complete.`);
+    console.log(`[${DB_NAME.toUpperCase()}] METAR cleanup complete.`);
+
+    console.log(`[${DB_NAME.toUpperCase()}] METAR cache file processing complete.`);
     process.exit(0);
   } catch (error) {
-    console.error(`[${DB_NAME.toUpperCase()}] Error processing cache file: ${(error as Error).message}`);
+    console.error(`[${DB_NAME.toUpperCase()}] Error processing METAR cache file: ${(error as Error).message}`);
     process.exit(1);
   }
 }

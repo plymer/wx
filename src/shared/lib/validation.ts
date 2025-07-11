@@ -1,38 +1,5 @@
 import { z } from "zod";
 
-export const aqSchema = z.object({
-  sensor_index: z.string(),
-  monitor: z.string(),
-  network: z.string(),
-  lat: z.string(),
-  lng: z.string(),
-  date: z.string(),
-  prov_terr: z.string(),
-  pm25_recent_r: z.string(),
-  pm25_recent: z.string(),
-  pm25_1hr_r: z.string(),
-  pm25_1hr: z.string(),
-  pm25_3hr_r: z.string(),
-  pm25_3hr: z.string(),
-  pm25_24hr_r: z.string(),
-  pm25_24hr: z.string(),
-  temperature: z.string(),
-  rh: z.string(),
-  pressure: z.string(),
-  val_24hr_r: z.string(),
-  val_1hr_r: z.string(),
-  val_r: z.string(),
-  val_24hr: z.string(),
-  val_1hr: z.string(),
-  val: z.string(),
-  icon_url_24hr_r: z.string(),
-  icon_url_1hr_r: z.string(),
-  icon_url_r: z.string(),
-  icon_url_24hr: z.string(),
-  icon_url_1hr: z.string(),
-  icon_url: z.string(),
-});
-
 const stringOrNumber = () =>
   z.preprocess((val) => {
     if (val === undefined || val === null) return undefined;
@@ -44,10 +11,55 @@ const stringOrNumber = () =>
     return undefined;
   }, z.number().optional());
 
+export const aqSchema = z.object({
+  sensor_index: z.string(),
+  monitor: z
+    .string()
+    .optional()
+    .transform((val) => (val === undefined ? null : val.slice(0, 45))),
+  network: z
+    .string()
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+  lat: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  lng: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  date: z
+    .string()
+    .optional()
+    .transform((val) => (val ? new Date(val.replace(" ", "T") + "Z") : null)),
+  prov_terr: z
+    .string()
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+  pm25_recent_r: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  pm25_recent: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  pm25_1hr_r: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  pm25_1hr: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  pm25_3hr_r: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  pm25_3hr: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  pm25_24hr_r: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  pm25_24hr: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  temperature: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  rh: z.string().optional(),
+  pressure: z.string().optional(),
+  val_24hr_r: z.string().optional(),
+  val_1hr_r: z.string().optional(),
+  val_r: z.string().optional(),
+  val_24hr: z.string().optional(),
+  val_1hr: z.string().optional(),
+  val: z.string().optional(),
+  icon_url_24hr_r: z.string().optional(),
+  icon_url_1hr_r: z.string().optional(),
+  icon_url_r: z.string().optional(),
+  icon_url_24hr: z.string().optional(),
+  icon_url_1hr: z.string().optional(),
+  icon_url: z.string().optional(),
+});
+
 export const metarSchema = z.object({
   rawText: z.string(),
   stationId: z.string().length(4),
-  observationTime: z.date(),
+  observationTime: z.coerce.date(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   tempC: z
@@ -101,4 +113,55 @@ export const stationSchema = z.object({
   state: z.string(),
   country: z.string(),
   priority: z.number(),
+});
+
+const tafForecastSchema = z.object({
+  fcstTimeFrom: z.coerce.date(),
+  fcstTimeTo: z.coerce.date(),
+  changeIndicator: z
+    .enum(["FM", "BECMG", "TEMPO", "PROB"])
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+  probability: z
+    .number()
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+  windDirDegrees: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  windSpeedKt: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  windGustKt: stringOrNumber().transform((val) => (val === undefined ? null : val)),
+  visibilityStatuteMi: z.coerce
+    .string()
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+  wxString: z
+    .string()
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+  skyCondition: z
+    .array(
+      z.object({
+        skyCover: z.string(),
+        cloudBaseFtAgl: z.string().transform((val) => parseInt(val)),
+      }),
+    )
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+});
+
+export const tafSchema = z.object({
+  rawText: z.string(),
+  stationId: z.string().length(4),
+  issueTime: z.coerce.date(),
+  bulletinTime: z.coerce.date(),
+  validTimeFrom: z.coerce.date(),
+  validTimeTo: z.coerce.date(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
+  elevationM: z
+    .number()
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+  forecast: z
+    .union([tafForecastSchema, z.array(tafForecastSchema)])
+    .transform((val) => (Array.isArray(val) ? val : [val])),
 });

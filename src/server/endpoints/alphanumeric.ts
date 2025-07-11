@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { and, asc, eq, gte } from "drizzle-orm";
+import { and, asc, desc, eq, gte } from "drizzle-orm";
 import axios from "axios";
 import suncalc, { GetTimesResult } from "suncalc";
 
@@ -8,7 +8,7 @@ import { metarSchema, publicBulletinSchema, singleSiteSchema } from "../validati
 import { HubDiscussion, TafObject } from "../lib/alphanumeric.types.js";
 import { errorResponse, jsonResponse, leadZero } from "../lib/utils.js";
 import { avwx } from "../main.js";
-import { metars, stations } from "../../shared/db/tables/avwx.drizzle.js";
+import { metars, stations, tafs } from "../../shared/db/tables/avwx.drizzle.js";
 import { HOUR } from "../../shared/lib/constants.js";
 
 const route = new Hono();
@@ -110,23 +110,30 @@ route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
 route.get("/taf", validateParams("query", singleSiteSchema), async (c) => {
   const { site } = c.req.valid("query");
 
+  if (!avwx) {
+    console.error("[API] No avwx connection available.");
+    return errorResponse(c, "No avwx connection available.");
+  }
+
   // do a conversion for CWEU -> CYEU
   const searchSite = site === "CWEU" ? "CYEU" : site;
 
-  const url = `http://aviationweather.gov/api/data/taf?ids=${searchSite}&format=json`;
-  console.log("[API] Requesting TAF from:", url);
+  console.log("[API] Requesting TAF for:", searchSite);
 
   try {
-    const tafObject: TafObject[] | string = await axios.get(url).then((taf) => taf.data);
+    // retrieve the data from the avwx database
+    const tafData = await avwx.query.tafs.findMany({
+      columns: { rawText: true },
+      where: eq(tafs.siteId, searchSite.toUpperCase()),
+      orderBy: desc(tafs.validTime),
+    });
 
-    // no match for a taf site on avwx.gov returns zero-length array of json, or for an error
-    // returns a string of "error retrieving data"
-    if (tafObject.length === 0 || tafObject === "error retrieving data") {
-      // we do not have a TAF that we can return, so send an empty response
+    if (!tafData || tafData.length === 0) {
+      // we do not have any TAFs that we can return, so send a 'noData' response
       return c.json({ status: "noData" }, 200);
     }
 
-    const output = (tafObject[0] as TafObject).rawTAF;
+    const output = tafData[0].rawText;
 
     return jsonResponse(c, output);
   } catch (error) {

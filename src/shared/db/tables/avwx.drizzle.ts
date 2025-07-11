@@ -1,4 +1,5 @@
 import { datetime, float, int, mysqlTable, primaryKey, text, varchar } from "drizzle-orm/mysql-core";
+import { raw } from "mysql2";
 
 export const stations = mysqlTable("stations", {
   name: varchar({ length: 45 }),
@@ -24,6 +25,16 @@ export const metars = mysqlTable(
     vis: text(),
     wxString: text(),
     category: varchar({ length: 4 }),
+    rawText: text(),
+  },
+  (table) => [primaryKey({ columns: [table.siteId, table.validTime] })],
+);
+
+export const tafs = mysqlTable(
+  "tafs",
+  {
+    siteId: varchar({ length: 4 }).notNull(),
+    validTime: datetime().notNull(),
     rawText: text(),
   },
   (table) => [primaryKey({ columns: [table.siteId, table.validTime] })],
