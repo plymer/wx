@@ -58,8 +58,6 @@ async function main() {
     // insert the metar data, or update each metar if it already exists (our pk is siteId + validTime)
     await Promise.allSettled(
       output.map(async (taf) => {
-        console.log("inserting taf", taf.siteId);
-
         await db
           .insert(tafs)
           .values(taf)
