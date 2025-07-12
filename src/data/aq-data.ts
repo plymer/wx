@@ -5,6 +5,7 @@ import { generateDbConnection } from "../shared/lib/utils.js";
 import { aqData } from "../shared/db/tables/aq.drizzle.js";
 import { CSVAQData, AQData } from "../shared/lib/types.js";
 import { aqSchema } from "../shared/lib/validation.js";
+import { HOUR } from "../shared/lib/constants.js";
 
 async function main() {
   const remote = axios.create({ baseURL: "https://cyclone.unbc.ca/aqmap/data/" });
@@ -77,15 +78,26 @@ async function main() {
       }, [])
       .filter((row: AQData) => row.lat !== null && row.lon !== null && row.validTime !== null && row.pm25 !== null);
 
-    // insert the data into the database
-    await db.insert(aqData).values(rows);
+    // prevent having duplicate entries in the database by checking for duplicate PKs
+    await Promise.allSettled(
+      rows.map(async (data) => {
+        await db
+          .insert(aqData)
+          .values(data)
+          .onDuplicateKeyUpdate({
+            set: {
+              pm25: data.pm25,
+            },
+          });
+      }),
+    );
 
     console.log(`[AQ Data] Inserted ${rows.length} rows into the database.`);
 
     console.log(`[AQ Data] Cleaning up out of date records...`);
 
     const holdHours = 4;
-    const cleanUpTime = new Date(now.getTime() - holdHours * 60 * 60 * 1000); // 24 hours ago
+    const cleanUpTime = new Date(now.getTime() - holdHours * HOUR);
 
     const toDelete = (await db.select().from(aqData).where(lt(aqData.validTime, cleanUpTime))).length;
 

@@ -1,7 +1,7 @@
 import { Layer, Source } from "react-map-gl/maplibre";
+import { FeatureCollection } from "geojson";
 
 import { AqData } from "@/lib/types";
-import { FeatureCollection } from "geojson";
 import { AQ_ATTRIBUTION, AQ_DISPLAY } from "@/config/vectorData";
 import { useFrame, useFrameCount, useStartTime } from "@/stateStores/map/animation";
 import { MINUTE } from "@shared/lib/constants";
@@ -12,8 +12,6 @@ interface Props {
 }
 
 const AirQualityLayer = ({ data, belowLayer }: Props) => {
-  const displayOptions = AQ_DISPLAY;
-
   const startTime = useStartTime();
   const frame = useFrame();
   const lastFrame = useFrameCount() - 1;
@@ -71,6 +69,7 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
           }}
         />
         <Layer // non-clustered layer for circles
+          {...AQ_DISPLAY}
           type="circle"
           id="aq-data"
           filter={["!", ["has", "point_count"]]}
@@ -93,7 +92,6 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
               "#990000",
             ],
           }}
-          layout={displayOptions.layout}
         />
         <Layer // cluster layer for text values
           type="symbol"
@@ -128,6 +126,7 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
         />
 
         <Layer // cluster layer for circles
+          {...AQ_DISPLAY}
           type="circle"
           id="aq-data-clusters"
           filter={["has", "point_count"]}
@@ -174,7 +173,6 @@ const AirQualityLayer = ({ data, belowLayer }: Props) => {
               "#990000",
             ],
           }}
-          layout={displayOptions.layout}
         />
       </Source>
     </>
