@@ -10,6 +10,7 @@
     "dev:aq-data": "tsx src/data/aq-data.ts",
     "dev:metars": "tsx src/data/metars.ts",
     "dev:tafs": "tsx src/data/tafs.ts",
+    "dev:pireps": "tsx src/data/pireps.ts",
     "check": "tsc --noEmit  && npm run format && npm run lint",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",

@@ -1,7 +1,7 @@
 import { InferSelectModel } from "drizzle-orm";
-import { metars, stations, tafs } from "../db/tables/avwx.drizzle";
+import { metars, pireps, stations, tafs } from "../db/tables/avwx.drizzle";
 import { z } from "zod";
-import { aqSchema, metarSchema, stationSchema, tafSchema } from "./validation";
+import { aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation";
 import { aqData } from "../db/tables/aq.drizzle";
 
 export type XMLCacheFile<TData, TDataName extends string> = {
@@ -23,9 +23,11 @@ export type CSVAQData = z.infer<typeof aqSchema>;
 export type CacheStationData = z.infer<typeof stationSchema>;
 export type CacheMetarData = z.infer<typeof metarSchema>;
 export type CacheTafData = z.infer<typeof tafSchema>;
+export type CachePirepData = z.infer<typeof pirepSchema>;
 
 // database schema-derived types
-export type AQData = Omit<InferSelectModel<typeof aqData>, "id">;
+export type AQData = InferSelectModel<typeof aqData>;
 export type StationData = InferSelectModel<typeof stations>;
 export type MetarData = InferSelectModel<typeof metars>;
 export type TafData = InferSelectModel<typeof tafs>;
+export type PirepData = InferSelectModel<typeof pireps>;

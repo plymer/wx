@@ -1,3 +1,4 @@
+import { report } from "process";
 import { z } from "zod";
 
 const stringOrNumber = () =>
@@ -164,4 +165,70 @@ export const tafSchema = z.object({
   forecast: z
     .union([tafForecastSchema, z.array(tafForecastSchema)])
     .transform((val) => (Array.isArray(val) ? val : [val])),
+});
+
+export const pirepSchema = z.object({
+  rawText: z.string(),
+  reportType: z.enum(["PIREP", "AIREP"]),
+  receiptTime: z.coerce.date(),
+  observationTime: z.coerce.date(),
+  qualityControlFlags: z
+    .object({
+      badLocation: z.coerce
+        .boolean()
+        .optional()
+        .transform((val) => (val === undefined ? null : val)),
+    })
+    .transform((val) => (val === undefined ? null : val))
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+  aircraftRef: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+  tempC: z
+    .number()
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+  altitudeFtMsl: z
+    .number()
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+  skyCondition: z
+    .array(
+      z.object({
+        skyCover: z
+          .string()
+          .optional()
+          .transform((val) => (val === undefined ? null : val)),
+        cloudBaseFtMsl: z.coerce
+          .number()
+          .optional()
+          .transform((val) => (val === undefined ? null : val)),
+        cloudTopFtMsl: z.coerce
+          .number()
+          .optional()
+          .transform((val) => (val === undefined ? null : val)),
+      }),
+    )
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+
+  turbulenceCondition: z
+    .object({
+      turbulenceIntensity: z
+        .string()
+        .optional()
+        .transform((val) => (val === undefined ? null : val)),
+    })
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
+  icingCondition: z
+    .object({
+      icingIntensity: z
+        .string()
+        .optional()
+        .transform((val) => (val === undefined ? null : val)),
+    })
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
 });

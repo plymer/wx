@@ -38,3 +38,18 @@ export const tafs = mysqlTable(
   },
   (table) => [primaryKey({ columns: [table.siteId, table.validTime] })],
 );
+
+export const pireps = mysqlTable(
+  "pireps",
+  {
+    validTime: datetime().notNull(),
+    lat: float().notNull(),
+    lon: float().notNull(),
+    flightLevel: int(),
+    aircraftType: varchar({ length: 10 }),
+    icg: varchar({ length: 10 }),
+    turb: varchar({ length: 10 }),
+    rawText: text().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.lat, table.lon, table.validTime] })],
+);

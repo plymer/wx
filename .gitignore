@@ -3,7 +3,7 @@
 *.local
 *.log*
 .env
-data
+/data
 
 #server things
 .htaccess
