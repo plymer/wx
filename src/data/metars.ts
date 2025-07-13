@@ -23,7 +23,7 @@ async function main() {
 
   const xml = await readGzipFile(RESOURCE_URL, DB_NAME);
 
-  const parser = xmlParser();
+  const { parser } = xmlParser();
 
   const metarData = (parser.parse(xml) as XMLCacheFile<CacheMetarData, "metar">).response.data.metar;
 

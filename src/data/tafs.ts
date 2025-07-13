@@ -1,5 +1,5 @@
-// this script will download and parse the metars 'cache' files from aviationweather.gov
-// metar cache updates minutely
+// this script will download and parse the taf 'cache' files from aviationweather.gov
+// taf cache updates minutely
 
 import "dotenv/config";
 import { generateDbConnection, readGzipFile } from "../shared/lib/utils.js";
@@ -23,7 +23,7 @@ async function main() {
 
   const xml = await readGzipFile(RESOURCE_URL, DB_NAME);
 
-  const parser = xmlParser();
+  const { parser } = xmlParser();
 
   const tafData = (parser.parse(xml) as XMLCacheFile<CacheTafData, "taf">).response.data.taf;
 

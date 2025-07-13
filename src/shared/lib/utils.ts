@@ -105,5 +105,5 @@ export function xmlParser() {
     transformTagName: (tagName) => transformName(tagName),
   });
 
-  return parser;
+  return { parser };
 }

@@ -15,7 +15,7 @@ async function main() {
   const db = await generateDbConnection(DB_NAME, { stations });
 
   if (!db) {
-    console.error(`[${DB_NAME.toUpperCase()}] Database connection failed.`);
+    console.error(`[${DB_NAME.toUpperCase()}] (Stations) Database connection failed.`);
     process.exit(1);
   }
 
@@ -73,10 +73,10 @@ async function main() {
       }),
     );
 
-    console.log(`[${DB_NAME.toUpperCase()}] Cache file processing complete.`);
+    console.log(`[${DB_NAME.toUpperCase()}] Station cache file processing complete.`);
     process.exit(0);
   } catch (error) {
-    console.error(`[${DB_NAME.toUpperCase()}] Error processing cache file: ${(error as Error).message}`);
+    console.error(`[${DB_NAME.toUpperCase()}] Error processing station cache file: ${(error as Error).message}`);
     process.exit(1);
   }
 }
