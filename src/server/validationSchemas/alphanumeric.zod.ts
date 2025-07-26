@@ -1,29 +1,20 @@
 import { z } from "zod";
 import { DEFAULT_METARS_HOURS } from "../config/alphanumeric.config.js";
 
-export const metarSchema = z
-  .object({
-    site: z
-      .string()
-      .trim()
-      .transform((val) => val.toUpperCase()),
-    hrs: z.coerce.number().default(DEFAULT_METARS_HOURS),
-  })
-  .strict();
+export const metarSchema = z.strictObject({
+  site: z.string().toUpperCase().trim(),
+  hrs: z.coerce.number().default(DEFAULT_METARS_HOURS),
+});
 
-export const singleSiteSchema = z
-  .object({
-    site: z
-      .string()
-      .trim()
-      .regex(/^[a-zA-Z0-9]+$/)
-      .transform((val) => val.toUpperCase()),
-  })
-  .strict();
+export const singleSiteSchema = z.strictObject({
+  site: z
+    .string()
+    .toUpperCase()
+    .trim()
+    .regex(/^[A-Z0-9]+$/),
+});
 
-export const publicBulletinSchema = z
-  .object({
-    bulletin: z.string().trim(),
-    office: z.string().trim(),
-  })
-  .strict();
+export const publicBulletinSchema = z.strictObject({
+  bulletin: z.string().toLowerCase().trim(),
+  office: z.string().toLowerCase().trim(),
+});

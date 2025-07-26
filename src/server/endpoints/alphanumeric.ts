@@ -30,7 +30,7 @@ route.get("/metars", validateParams("query", metarSchema), async (c) => {
     // retrieve the data from the avwx database
     const metarData = await avwx.query.metars.findMany({
       columns: { rawText: true },
-      where: and(eq(metars.siteId, searchSite.toUpperCase()), gte(metars.validTime, new Date(Date.now() - hrs * HOUR))),
+      where: and(eq(metars.siteId, searchSite), gte(metars.validTime, new Date(Date.now() - hrs * HOUR))),
       orderBy: asc(metars.validTime),
     });
 
@@ -62,7 +62,7 @@ route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
 
   try {
     const stationData = await avwx.query.stations.findFirst({
-      where: eq(stations.siteId, searchSite.toUpperCase()),
+      where: eq(stations.siteId, searchSite),
     });
 
     // if we don't have any data for this station, return a noData response
@@ -124,7 +124,7 @@ route.get("/taf", validateParams("query", singleSiteSchema), async (c) => {
     // retrieve the data from the avwx database
     const tafData = await avwx.query.tafs.findMany({
       columns: { rawText: true },
-      where: eq(tafs.siteId, searchSite.toUpperCase()),
+      where: eq(tafs.siteId, searchSite),
       orderBy: desc(tafs.validTime),
     });
 
@@ -160,11 +160,11 @@ route.get("/hubs", validateParams("query", singleSiteSchema), async (c) => {
     const hubs: HubDiscussion = await axios.get(url).then((hub) => hub.data);
 
     // check to see if the site id exists in the resulting json, return an error message if it doesnt
-    if (!Object.hasOwn(hubs, site.toUpperCase())) {
+    if (!Object.hasOwn(hubs, site)) {
       return c.json({ status: "noData" }, 200);
     }
 
-    const siteName = HubSites[site.toUpperCase() as keyof typeof HubSites];
+    const siteName = HubSites[site as keyof typeof HubSites];
 
     const {
       strheaders: header,
@@ -172,7 +172,7 @@ route.get("/hubs", validateParams("query", singleSiteSchema), async (c) => {
       stroutlook: outlook,
       strforecaster: forecaster,
       stroffice: office,
-    } = hubs[site.toUpperCase() as keyof HubDiscussion];
+    } = hubs[site as keyof HubDiscussion];
 
     const output = {
       siteName,
