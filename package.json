@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "vite",
     "dev:stations": "tsx src/data/stations.ts",
+    "dev:ab-ag": "tsx src/data/ab-ag-data.ts",
+    "dev:airports": "tsx src/data/canada-airports.ts",
     "dev:aq-data": "tsx src/data/aq-data.ts",
     "dev:metars": "tsx src/data/metars.ts",
     "dev:tafs": "tsx src/data/tafs.ts",
