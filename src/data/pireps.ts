@@ -10,7 +10,9 @@ import { pirepSchema } from "../shared/lib/validation.js";
 import { lt } from "drizzle-orm";
 import { HOUR } from "../shared/lib/constants.js";
 
-const RESOURCE_URL = "https://aviationweather.gov/data/cache/aircraftreports.cache.xml.gz";
+const CACHEFILE_URL = "https://aviationweather.gov/data/cache/aircraftreports.cache.xml.gz";
+const NAVCAN_URL =
+  "https://plan.navcanada.ca/weather/api/alpha/?site=CZEG&site=CZVR&site=CZWG&site=CZYZ&site=CZUL&site=CZQM&site=CZQX&alpha=pirep";
 const DB_NAME = "avwx";
 
 async function main() {
@@ -21,7 +23,7 @@ async function main() {
     process.exit(1);
   }
 
-  const xml = await readGzipFile(RESOURCE_URL, DB_NAME);
+  const xml = await readGzipFile(CACHEFILE_URL, DB_NAME);
 
   const { parser } = xmlParser();
 
@@ -101,11 +103,11 @@ async function main() {
     console.log(`[${DB_NAME.toUpperCase()}] PIREP cleanup complete.`);
 
     console.log(`[${DB_NAME.toUpperCase()}] PIREP cache file processing complete.`);
-    process.exit(0);
   } catch (error) {
     console.error(`[${DB_NAME.toUpperCase()}] Error processing PIREP cache file: ${(error as Error).message}`);
     process.exit(1);
   }
+  process.exit(0);
 }
 
 await main();
