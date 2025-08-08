@@ -7,7 +7,6 @@
   "scripts": {
     "dev": "vite",
     "dev:stations": "tsx src/data/stations.ts",
-    "dev:ab-ag": "tsx src/data/ab-ag-data.ts",
     "dev:airports": "tsx src/data/canada-airports.ts",
     "dev:aq-data": "tsx src/data/aq-data.ts",
     "dev:metars": "tsx src/data/metars.ts",
@@ -67,7 +66,6 @@
     "lucide-react": "^0.511.0",
     "maplibre-gl": "^5.6.0",
     "mysql2": "^3.14.1",
-    "puppeteer": "^24.15.0",
     "radix-ui": "^1.4.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
