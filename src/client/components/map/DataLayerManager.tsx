@@ -111,12 +111,16 @@ const DataLayerManager = ({ baseLayers }: Props) => {
     {},
     {
       queryName: "lightning",
-      enabled: true,
+      enabled: vector.showLightning,
       interval: 1,
     },
   );
 
-  const { data: aqData } = useAPI<AqData>("/aq", { hours: 4 }, { queryName: "aqData", enabled: true, interval: 1 });
+  const { data: aqData } = useAPI<AqData>(
+    "/aq",
+    { hours: 4 },
+    { queryName: "aqData", enabled: vector.showAQ, interval: 10 },
+  );
 
   // const { data: sigmets } = useAPI<GeoJSON>(
   //   "/alpha/sigmets",

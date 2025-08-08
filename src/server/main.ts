@@ -1,5 +1,6 @@
 // third-party dependencies
 import { Hono } from "hono";
+import { compress } from "hono/compress";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { readFileSync } from "fs";
@@ -34,6 +35,8 @@ if (!isProd) html = injectViteDevServer(html);
 
 // create the server instance
 const app = new Hono({ strict: false });
+
+app.use(compress());
 
 app.get("/assets/*", serveStatic({ root: isProd ? "./dist" : "./" }));
 app.get("/*", serveStatic({ root: isProd ? "./dist" : "./" }));
