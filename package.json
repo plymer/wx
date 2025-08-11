@@ -1,6 +1,6 @@
 {
   "name": "prairie-wx",
-  "version": "0.50.1",
+  "version": "0.50.2",
   "private": true,
   "type": "module",
   "main": "dist/server/main.js",
@@ -17,7 +17,7 @@
     "format": "prettier --write .",
     "compile": "tsc -b",
     "build": "vite build && tsc -b -v",
-    "deploy": "npm install --include=dev && npm run build && npm run db-push && pm2 restart beta.config.cjs && pm2 save",
+    "deploy": "pm2 stop beta.config.cjs && npm install --include=dev && npm run build && npm run db-push && pm2 start beta.config.cjs && pm2 save",
     "sprites:icons": "spreet --sdf public/sprites/icons public/sprites/icons && spreet --retina --sdf public/sprites/icons public/sprites/icons@2x",
     "db-push": "npm run aqdb-push && npm run avwxdb-push",
     "aqdb-push": "drizzle-kit push --config aq.drizzle.config.ts",
