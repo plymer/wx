@@ -43,8 +43,8 @@ export const RADAR_PRODUCTS = {
 
 // map object constants
 const MAX_WEST: number = -180;
-const MAX_SOUTH: number = 0;
-const MAX_EAST: number = -20;
+const MAX_SOUTH: number = -85;
+const MAX_EAST: number = 45;
 const MAX_NORTH: number = 85;
 const EAST_WEST_SPLIT: number = -90;
 export const MAP_BOUNDS: LngLatBoundsLike & [number, number, number, number] = [

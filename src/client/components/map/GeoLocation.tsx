@@ -1,51 +1,85 @@
-import { useState, useImperativeHandle, forwardRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "../ui/Button";
 import { useMap } from "react-map-gl/maplibre";
-import { Crosshair, Loader2 } from "lucide-react";
+import { Crosshair, Loader2, Locate, Navigation, NavigationOff } from "lucide-react";
 import LocationMarker from "../ui/LocationMarker";
 
-export interface GeoLocationProps {
-  onSuccess?: (pos: GeolocationPosition) => void;
-  onError?: (err: GeolocationPositionError) => void;
-  label?: string;
-}
-
-export interface GeoLocationHandle {
-  trigger: () => void;
-}
-
-export const GeoLocation = forwardRef<GeoLocationHandle, GeoLocationProps>(({ onSuccess, onError, label }, ref) => {
+export const GeoLocation = () => {
   const map = useMap().current;
   const [loading, setLoading] = useState(false);
   const [currentPos, setCurrentPos] = useState<GeolocationPosition | null>(null);
+  const [tracking, setTracking] = useState(false);
+  const watchIdRef = useRef<number | null>(null);
+  const hasCenteredRef = useRef(false);
 
-  // this triggers the actual geolocation request
-  const trigger = () => {
+  // start watching the user's location continuously
+  const startTracking = () => {
+    if (!("geolocation" in navigator)) return;
+    if (watchIdRef.current !== null) return; // already watching
     setLoading(true);
-    navigator.geolocation.getCurrentPosition(
+    hasCenteredRef.current = false;
+    watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {
         setLoading(false);
-        onSuccess?.(pos);
+        setTracking(true);
         setCurrentPos(pos);
-        if (map) map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: map.getZoom() });
+        // center once on first fix to avoid constant recentering
+        if (!hasCenteredRef.current && map) {
+          hasCenteredRef.current = true;
+          map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: map.getZoom() });
+        }
       },
       (err) => {
         setLoading(false);
-        onError?.(err);
+        setTracking(false);
         setCurrentPos(null);
+        console.error("Geolocation error:", err);
       },
-      { enableHighAccuracy: true, timeout: 10000 },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 },
     );
   };
 
-  useImperativeHandle(ref, () => ({ trigger }));
+  // stop watching the user's location
+  const stopTracking = () => {
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+    setTracking(false);
+  };
+
+  // toggle tracking on button click
+  const geolocateTrigger = () => {
+    if (tracking) stopTracking();
+    else startTracking();
+  };
+
+  // cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (watchIdRef.current !== null) navigator.geolocation.clearWatch(watchIdRef.current);
+    };
+  }, []);
 
   return (
     <>
-      <Button size="icon" variant={"floating"} onClick={trigger} aria-label={label} disabled={loading}>
-        {loading ? <Loader2 className="animate-spin" /> : <Crosshair />}
+      <Button
+        size="icon"
+        variant={"floating"}
+        onClick={geolocateTrigger}
+        aria-label={tracking ? "Stop location tracking" : "Start location tracking"}
+        title={tracking ? "Stop location tracking" : "Start location tracking"}
+        disabled={loading}
+      >
+        {loading ? (
+          <Loader2 className="animate-spin" />
+        ) : tracking ? (
+          <Navigation className="animate-pulse" />
+        ) : (
+          <NavigationOff />
+        )}
       </Button>
-      {currentPos && <LocationMarker position={currentPos} />}
+      {tracking && currentPos && <LocationMarker position={currentPos} />}
     </>
   );
-});
+};

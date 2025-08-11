@@ -1,7 +1,7 @@
 // third-party libraries
 import { ReactElement, useCallback, useState } from "react";
-import Map, { ViewState } from "react-map-gl/maplibre";
-import { StyleSpecification } from "maplibre-gl";
+import Map, { ViewState, ViewStateChangeEvent } from "react-map-gl/maplibre";
+import { MapLibreEvent, StyleSpecification } from "maplibre-gl";
 import { Loader2 } from "lucide-react";
 
 // map css
@@ -79,24 +79,18 @@ const WxMap = ({ viewState, mapProjection, children, basemap }: Props) => {
   //     setPopupData({ feature: features[0], coords: lngLat, dataType: features[0].properties.dataType });
   // };
 
-  const onMapLoad = useCallback(
-    (e: any) => {
-      // Store map reference in mapState
-      mapState.setMapRef(e.target);
+  const onMapLoad = (e: MapLibreEvent) => {
+    // Store map reference in mapState
+    mapState.setMapRef(e.target);
 
-      // Set base layers
-      setBaseMapLayers(e.target.getLayersOrder());
-      setIsMapInitialized(true);
-    },
-    [mapState],
-  );
+    // Set base layers
+    setBaseMapLayers(e.target.getLayersOrder());
+    setIsMapInitialized(true);
+  };
 
-  const onMove = useCallback(
-    (e: any) => {
-      mapViewUpdater.updateFromMapEvent(e.target, e.viewState);
-    },
-    [mapViewUpdater],
-  );
+  const onMove = (e: ViewStateChangeEvent) => {
+    mapViewUpdater.updateFromMapEvent(e.target, e.viewState);
+  };
 
   return (
     <Map
