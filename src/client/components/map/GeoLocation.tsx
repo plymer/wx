@@ -65,18 +65,19 @@ export const GeoLocation = () => {
     <>
       <Button
         size="icon"
-        variant={"floating"}
+        variant="floating"
         onClick={geolocateTrigger}
         aria-label={tracking ? "Stop location tracking" : "Start location tracking"}
         title={tracking ? "Stop location tracking" : "Start location tracking"}
         disabled={loading}
+        // className={`${tracking ? "bg-secondary border-secondary-foreground" : ""}`}
       >
         {loading ? (
           <Loader2 className="animate-spin" />
-        ) : tracking ? (
-          <Navigation className="animate-pulse" />
         ) : (
-          <NavigationOff />
+          <Navigation
+            className={`${tracking ? "animate-[pulse_2s_ease-in-out_infinite] fill-primary-foreground" : ""}`}
+          />
         )}
       </Button>
       {tracking && currentPos && <LocationMarker position={currentPos} />}
