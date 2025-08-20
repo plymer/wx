@@ -12,6 +12,7 @@ import { default as alpha } from "./endpoints/alphanumeric.js";
 import { default as charts } from "./endpoints/charts.js";
 import { default as lightning } from "./endpoints/lightning.js";
 import { default as aq } from "./endpoints/aq.js";
+import { default as wxmap } from "./endpoints/wxmap.js";
 
 // database schemas
 import * as aqSchema from "../shared/db/tables/aq.drizzle.js";
@@ -46,6 +47,7 @@ app.route("/api", geomet);
 app.route("/api/alpha", alpha);
 app.route("/api/charts", charts);
 app.route("/api", lightning);
+app.route("/api", wxmap);
 
 // add our db-dependent routes only if the database connection is successful
 if (aqDb) app.route("/api", aq);
