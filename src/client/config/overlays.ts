@@ -1,7 +1,7 @@
 import { LineLayerSpecification, SymbolLayerSpecification } from "maplibre-gl";
 
 export const TAF_OVERLAY: SymbolLayerSpecification = {
-  id: "taf-sites",
+  id: "tafSites",
   type: "symbol",
   source: "taf",
   layout: {
@@ -54,7 +54,7 @@ export const BEDPOSTS_OVERLAY: SymbolLayerSpecification = {
 };
 
 export const LGF_OVERLAY: LineLayerSpecification = {
-  id: "lgf-boundaries",
+  id: "lgfBoundaries",
   type: "line",
   source: "lgf",
   paint: {
@@ -74,28 +74,28 @@ export const LGF_OVERLAY: LineLayerSpecification = {
 };
 
 export const FIR_OVERLAY: LineLayerSpecification = {
-  id: "fir-boundaries",
+  id: "firBoundaries",
   type: "line",
   source: "fir",
   paint: { "line-color": "rgb(255,0,0)", "line-width": 1 },
 };
 
 export const GFA_OVERLAY: LineLayerSpecification = {
-  id: "gfa-boundaries",
+  id: "gfaBoundaries",
   type: "line",
   source: "gfa",
   paint: { "line-color": "rgb(0,0,255)", "line-width": 3 },
 };
 
 export const PUBLIC_OVERLAY: LineLayerSpecification = {
-  id: "public-regions",
+  id: "publicRegions",
   type: "line",
   source: "publicRegions",
   paint: { "line-color": "rgb(0,0,0)", "line-width": 1 },
 };
 
 export const MARINE_OVERLAY: LineLayerSpecification = {
-  id: "marine-regions",
+  id: "marineRegions",
   type: "line",
   source: "marineRegions",
   paint: { "line-color": "rgb(0,0,144)", "line-width": 1 },

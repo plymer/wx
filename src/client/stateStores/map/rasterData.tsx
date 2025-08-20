@@ -8,14 +8,11 @@ interface RasterStateStore {
   radarProduct: RadarProductsWMSName;
   showSatellite: boolean;
   showRadar: boolean;
-  manifest: string[];
   actions: {
     setSatelliteProduct: (product: SatelliteChannelsWMSName) => void;
     setRadarProduct: (product: RadarProductsWMSName) => void;
     toggleSatellite: () => void;
     toggleRadar: () => void;
-    clearManifest: () => void;
-    setManifest: (layerList: string[]) => void;
   };
 }
 
@@ -27,15 +24,11 @@ const useRasterData = create<RasterStateStore>()(
       radarProduct: "RADAR_1KM_RRAI",
       showSatellite: true,
       showRadar: true,
-      manifest: [],
       actions: {
-        // declare methods to change animation state
         setSatelliteProduct: (newProduct: SatelliteChannelsWMSName) => set(() => ({ satelliteProduct: newProduct })),
         setRadarProduct: (newProduct: RadarProductsWMSName) => set(() => ({ radarProduct: newProduct })),
         toggleSatellite: () => set((state) => ({ showSatellite: !state.showSatellite })),
         toggleRadar: () => set((state) => ({ showRadar: !state.showRadar })),
-        clearManifest: () => set(() => ({ manifest: [] })),
-        setManifest: (newLayerList: string[]) => set(() => ({ manifest: newLayerList })),
       },
     }),
     {
@@ -57,5 +50,4 @@ export const useSatelliteProduct = () => useRasterData((state) => state.satellit
 export const useRadarProduct = () => useRasterData((state) => state.radarProduct);
 export const useShowSatellite = () => useRasterData((state) => state.showSatellite);
 export const useShowRadar = () => useRasterData((state) => state.showRadar);
-export const useRasterManifest = () => useRasterData((state) => state.manifest);
 export const useRasterStateActions = () => useRasterData((state) => state.actions);

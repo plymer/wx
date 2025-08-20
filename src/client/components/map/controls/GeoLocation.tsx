@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import Button from "../ui/Button";
+import Button from "@/components/ui/Button";
 import { useMap } from "react-map-gl/maplibre";
-import { Crosshair, Loader2, Locate, Navigation, NavigationOff } from "lucide-react";
-import LocationMarker from "../ui/LocationMarker";
+import { Loader2, Navigation } from "lucide-react";
+import LocationMarker from "@/components/ui/LocationMarker";
 
 export const GeoLocation = () => {
   const map = useMap().current;

@@ -1,5 +1,5 @@
 // third-party libraries
-import { ReactElement, useCallback, useState } from "react";
+import { ReactElement, useState } from "react";
 import Map, { ViewState, ViewStateChangeEvent } from "react-map-gl/maplibre";
 import { MapLibreEvent, StyleSpecification } from "maplibre-gl";
 import { Loader2 } from "lucide-react";
@@ -9,10 +9,6 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 // helpers
 import { MAP_BOUNDS } from "@/config/map";
-
-// layer managers
-import DataLayerManager from "./DataLayerManager";
-import OverlayManager from "./OverlayManager";
 
 // global state stores
 import { useMapStateActions } from "@/stateStores/map/mapView";
@@ -28,7 +24,7 @@ interface Props {
   children?: ReactElement<any, any>;
 }
 
-const WxMap = ({ viewState, mapProjection, children, basemap }: Props) => {
+const WeatherMap = ({ viewState, mapProjection, children, basemap }: Props) => {
   // subscribe to our global state stores
   const mapState = useMapStateActions();
   const mapViewUpdater = useUpdateMapViewstate();
@@ -147,11 +143,7 @@ const WxMap = ({ viewState, mapProjection, children, basemap }: Props) => {
       onMove={onMove}
     >
       {isMapInitialized && baseMapLayers ? (
-        <>
-          <OverlayManager />
-          {children}
-          <DataLayerManager baseLayers={baseMapLayers} />
-        </>
+        <>{children}</>
       ) : (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white">
           <Loader2 className="inline animate-spin me-2" />
@@ -162,4 +154,4 @@ const WxMap = ({ viewState, mapProjection, children, basemap }: Props) => {
   );
 };
 
-export default WxMap;
+export default WeatherMap;

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-interface VectorOverlaysStore {
+interface OverlaysStore {
   gfa: boolean;
   lgf: boolean;
   fir: boolean;
@@ -20,7 +20,7 @@ interface VectorOverlaysStore {
   };
 }
 
-const useVectorOverlays = create<VectorOverlaysStore>()(
+const useMapOverlays = create<OverlaysStore>()(
   persist(
     (set) => ({
       gfa: true,
@@ -50,18 +50,18 @@ const useVectorOverlays = create<VectorOverlaysStore>()(
         publicRegions: state.publicRegions,
         marineRegions: state.marineRegions,
       }),
-      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as VectorOverlaysStore) }),
+      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as OverlaysStore) }),
       name: "vectorOverlays",
       storage: createJSONStorage(() => localStorage),
     },
   ),
 );
 
-export const useGFAOverlay = () => useVectorOverlays((state) => state.gfa);
-export const useLGFOverlay = () => useVectorOverlays((state) => state.lgf);
-export const useFIROverlay = () => useVectorOverlays((state) => state.fir);
-export const useTAFsOverlay = () => useVectorOverlays((state) => state.tafs);
-export const useBedpostsOverlay = () => useVectorOverlays((state) => state.bedposts);
-export const usePublicRegionsOverlay = () => useVectorOverlays((state) => state.publicRegions);
-export const useMarineRegionsOverlay = () => useVectorOverlays((state) => state.marineRegions);
-export const useVectorOverlayActions = () => useVectorOverlays((state) => state.actions);
+export const useGFAOverlay = () => useMapOverlays((state) => state.gfa);
+export const useLGFOverlay = () => useMapOverlays((state) => state.lgf);
+export const useFIROverlay = () => useMapOverlays((state) => state.fir);
+export const useTAFsOverlay = () => useMapOverlays((state) => state.tafs);
+export const useBedpostsOverlay = () => useMapOverlays((state) => state.bedposts);
+export const usePublicRegionsOverlay = () => useMapOverlays((state) => state.publicRegions);
+export const useMarineRegionsOverlay = () => useMapOverlays((state) => state.marineRegions);
+export const useVectorOverlayActions = () => useMapOverlays((state) => state.actions);

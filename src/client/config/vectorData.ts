@@ -1,20 +1,20 @@
 // contains configuration for how to display/draw the vector data on the map
 
-import { CircleLayerSpecification, FillLayerSpecification, SymbolLayerSpecification } from "maplibre-gl";
+import {
+  CircleLayerSpecification,
+  FillLayerSpecification,
+  FilterSpecification,
+  SymbolLayerSpecification,
+} from "maplibre-gl";
 
-/*
--- need to incorporate turf library to draw properly-sized circles of spatial dimensions
-
-[data-driven styling](https://maplibre.org/maplibre-gl-js/docs/examples/data-driven-lines/)
-[expressions for data-driven styling](https://maplibre.org/maplibre-style-spec/expressions/#match)
-
-*/
+export const CLUSTERED: FilterSpecification = ["has", "point_count"];
+export const UNCLUSTERED: FilterSpecification = ["!", ["has", "point_count"]];
 
 export const VECTOR_DATA_TYPES = ["lightning", "pirep", "airmet", "sigmet", "aq"] as const;
 
-export const LIGHTNING_ALT: SymbolLayerSpecification = {
+export const LIGHTNING_DISPLAY: SymbolLayerSpecification = {
   type: "symbol",
-  id: "lightning-alt",
+  id: "lightning-data",
   source: "lightning-data",
   layout: {
     "text-field": "X",
@@ -24,20 +24,6 @@ export const LIGHTNING_ALT: SymbolLayerSpecification = {
     "text-font": ["Metropolis-Regular"],
   },
   paint: { "text-color": "rgb(255,0,155)", "text-halo-color": "rgb(255,255,255)", "text-halo-width": 1 },
-};
-
-// TODO :: this will be deprecated since we are moving to a 'threat polygon' method of showing lightning
-export const LIGHTNING_DISPLAY: CircleLayerSpecification = {
-  paint: {
-    "circle-radius": 10, // this will need some turf-ing for proper sizing based on lat/lon/zoom
-    "circle-color": "rgba(255,0,0,0.5)",
-  },
-  layout: {
-    "circle-sort-key": ["get", "validTime"],
-  },
-  type: "circle",
-  id: "lightning-data",
-  source: "lightning-data",
 };
 
 export const SIGMET_DISPLAY: FillLayerSpecification = {

@@ -3,9 +3,9 @@ import { useState } from "react";
 import { Globe, Globe2, List, Map, ScanEye } from "lucide-react";
 
 import { ToggleDataOption } from "@/lib/types";
-import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/Drawer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
-import Button, { ButtonProps } from "../ui/Button";
+import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "@/components/ui/Drawer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
+import Button, { ButtonProps } from "@/components/ui/Button";
 import {
   useBedpostsOverlay,
   useFIROverlay,
@@ -15,10 +15,10 @@ import {
   usePublicRegionsOverlay,
   useTAFsOverlay,
   useVectorOverlayActions,
-} from "@/stateStores/map/vectorOverlays";
+} from "@/stateStores/map/overlays";
 import { useMapStateActions, useProjection } from "@/stateStores/map/mapView";
 import { useMapOptionsTab, useUIActions } from "@/stateStores/map/ui";
-import DataToggle from "./DataToggle";
+import DataToggle from "@/components/ui/DataToggle";
 
 export default function OptionsMapOverlays({ ...props }: ButtonProps) {
   // local state

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import AnimationControlButton from "./AnimationControlButton";
+import AnimationControlButton from "@/components/ui/AnimationControlButton";
 import {
   useAnimationActions,
   useAnimationState,
@@ -15,7 +15,7 @@ import {
 import { ANIM_CONTROLS } from "@/config/animation";
 import { AnimationControlsList } from "@/lib/types";
 import { makeISOTimeStamp } from "@/lib/utils";
-import { Slider } from "../ui/Slider";
+import { Slider } from "@/components/ui/Slider";
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 

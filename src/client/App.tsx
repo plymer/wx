@@ -6,7 +6,7 @@ import Button from "@/components/ui/Button";
 
 // app mode components
 import Observations from "@/components/Observations";
-import WxMap from "@/components/WxMap";
+import WxMap from "@/components/Map";
 import Aviation from "@/components/Aviation";
 import Outlooks from "@/components/Outlooks";
 import Public from "@/components/Public";

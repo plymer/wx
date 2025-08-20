@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 
-import AnimationControls from "./map/AnimationControls";
-import MapInstance from "./map/MapInstance";
+import AnimationControls from "./map/controls/AnimationControls";
+import WeatherMap from "./map/WeatherMap";
 
 import { positronWxMap } from "@/assets/map-styles/positron-wxmap.js";
 
-import { AttributionControl, ViewState } from "react-map-gl/maplibre";
+import type { ViewState } from "react-map-gl/maplibre";
 import MapLoadingIndicator from "./ui/MapLoadingIndicator";
-import { GeoLocation } from "./map/GeoLocation";
+import { GeoLocation } from "./map/controls/GeoLocation";
 import {
   useLoadingState,
   useProjection,
@@ -19,9 +19,18 @@ import {
 } from "@/stateStores/map/mapView";
 import { useAnimationActions } from "@/stateStores/map/animation";
 
-import OptionsMapOverlays from "./map/OptionsMapOverlays";
-import OptionsRealtimeData from "./map/OptionsRealtimeData";
-// import DataAttributions from "./map/DataAttributions";
+import OptionsMapOverlays from "./map/controls/OptionsMapOverlays";
+import OptionsRealtimeData from "./map/controls/OptionsRealtimeData";
+import { SatelliteLayer } from "./map/layers/data/SatelliteLayer";
+import { RadarLayer } from "./map/layers/data/RadarLayer";
+import { TAFOverlay } from "./map/layers/overlays/TAFOverlay";
+import { BedpostOverlay } from "./map/layers/overlays/BedpostOverlay";
+import { FIROverlay } from "./map/layers/overlays/FIROverlay";
+import { GFAOverlay } from "./map/layers/overlays/GFAOverlay";
+import { LGFOverlay } from "./map/layers/overlays/LGFOverlay";
+import { PublicRegionsOverlay } from "./map/layers/overlays/PublicRegionsOverlay";
+import { MarineRegionsOverlay } from "./map/layers/overlays/MarineRegionsOverlay";
+import { LightningDataLayer } from "./map/layers/data/LightningDataLayer";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -49,15 +58,29 @@ export default function WxMap() {
 
   return (
     <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height) text-sm">
-      <MapInstance viewState={viewState} mapProjection={projection} basemap={mapStyle}>
+      <WeatherMap viewState={viewState} mapProjection={projection} basemap={mapStyle}>
         <>
-          <AttributionControl
+          {/* <AttributionControl
             compact
             position="top-right"
             style={{ backgroundColor: "var(--accent)", color: "var(--secondary)", border: "1px solid var(--primary)" }}
-          />
+          /> */}
 
           {/* <DataAttributions className="absolute bottom-0 right-0 rounded-md max-w-1/2 bg-accent border-1 border-black text-white m-2" /> */}
+
+          <SatelliteLayer domain="west" />
+          <SatelliteLayer domain="east" />
+          <RadarLayer />
+
+          <TAFOverlay />
+          <BedpostOverlay />
+          <FIROverlay />
+          <GFAOverlay />
+          <LGFOverlay />
+          <PublicRegionsOverlay />
+          <MarineRegionsOverlay />
+
+          <LightningDataLayer timeRange={15} />
 
           <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
             <OptionsRealtimeData />
@@ -66,7 +89,7 @@ export default function WxMap() {
           </div>
           <MapLoadingIndicator show={loadingState} />
         </>
-      </MapInstance>
+      </WeatherMap>
       <AnimationControls className="w-full flex justify-center border-t-2 border-black bg-neutral-800 px-2 text-white max-md:pb-8" />
     </div>
   );

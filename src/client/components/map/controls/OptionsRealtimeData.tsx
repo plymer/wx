@@ -22,11 +22,11 @@ import {
 } from "@/stateStores/map/vectorData";
 import { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
-import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "../ui/Drawer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/Select";
-import Button, { ButtonProps } from "../ui/Button";
-import DataToggle from "./DataToggle";
+import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "@/components/ui/Drawer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
+import Button, { ButtonProps } from "@/components/ui/Button";
+import DataToggle from "@/components/ui/DataToggle";
 
 export default function OptionsRealtimeData({ ...props }: ButtonProps) {
   // local state

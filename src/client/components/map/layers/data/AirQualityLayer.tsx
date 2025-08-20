@@ -5,22 +5,28 @@ import { AqData } from "@/lib/types";
 import { AQ_ATTRIBUTION, AQ_DISPLAY } from "@/config/vectorData";
 import { useFrame, useFrameCount, useStartTime } from "@/stateStores/map/animation";
 import { MINUTE } from "@shared/lib/constants";
+import useAPI from "@/hooks/useAPI";
+import { useShowAQ } from "@/stateStores/map/vectorData";
 
 interface Props {
-  data: AqData;
   belowLayer?: string;
 }
 
-const AirQualityLayer = ({ data, belowLayer }: Props) => {
+const AirQualityLayer = ({ belowLayer }: Props) => {
+  const enabled = useShowAQ();
   const startTime = useStartTime();
   const frame = useFrame();
   const lastFrame = useFrameCount() - 1;
 
   const displayTime = startTime + frame * 10 * MINUTE;
 
+  const { data: aqData } = useAPI<AqData>("/aq", { hours: 4 }, { queryName: "aqData", enabled, interval: 10 });
+
+  if (!aqData || aqData.status !== "success" || !aqData.data.features.length) return;
+
   const filteredData: FeatureCollection = {
     type: "FeatureCollection",
-    features: data.features.filter((feature) => {
+    features: aqData.data.features.filter((feature) => {
       // filter out features that don't have a validTime property
       if (!feature.properties.validTime) return false;
 

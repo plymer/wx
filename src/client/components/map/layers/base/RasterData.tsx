@@ -11,7 +11,7 @@ import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
 
 interface Props {
   belowLayer?: string;
-  apiData: RasterLayerData;
+  apiData?: RasterLayerData;
   initDelay?: number;
 }
 
@@ -73,10 +73,10 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
 
   // safety checks
 
-  if (!belowLayer || !apiData || !apiData.timeSteps || apiData.timeSteps.length === 0) return;
+  if (!apiData || !apiData.timeSteps || apiData.timeSteps.length === 0) return;
 
   // if the belowLayer is not in the map's layers, we cannot render this layer
-  if (!map.getLayer(belowLayer)) return;
+  if (!belowLayer || !map.getLayer(belowLayer)) belowLayer = "wateroutline"; // default to the radar layer
 
   const layerId = "layer-" + apiData.type + "-" + apiData.domain;
 
