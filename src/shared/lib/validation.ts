@@ -162,7 +162,7 @@ export const tafSchema = z.object({
     .optional()
     .transform((val) => (val === undefined ? null : val)),
   forecast: z
-    .union([tafForecastSchema, z.array(tafForecastSchema)])
+    .union([z.undefined(), tafForecastSchema, z.array(tafForecastSchema)])
     .transform((val) => (Array.isArray(val) ? val : [val])),
 });
 
