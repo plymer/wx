@@ -14,7 +14,7 @@ import { useDisplayTime } from "@/hooks/useDisplayTime";
 import { useAnimationState } from "@/stateStores/map/animation";
 import { useMapRef, useViewportBounds, useZoom } from "@/stateStores/map/mapView";
 import { useShowObs } from "@/stateStores/map/vectorData";
-import { HOUR } from "@shared/lib/constants";
+import { HOUR, MINUTE } from "@shared/lib/constants";
 import { StationPlotData, StationPlotGeoJSON } from "@shared/lib/types";
 import { FeatureCollection, Point, Position } from "geojson";
 import { Layer, LngLatLike, Source, SymbolLayerSpecification } from "react-map-gl/maplibre";
@@ -85,7 +85,9 @@ export const SurfaceDataLayer = () => {
         return aDiff - bDiff;
       })
       .find(
-        (m) => new Date(m.validTime).getTime() <= displayTime && new Date(m.validTime).getTime() >= displayTime - HOUR,
+        (m) =>
+          new Date(m.validTime).getTime() <= displayTime &&
+          new Date(m.validTime).getTime() >= displayTime - HOUR - 30 * MINUTE,
       );
 
     if (metar) {

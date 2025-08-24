@@ -90,7 +90,7 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
     --max-md-map-height: calc(100svh - 12.55rem);
-    --md-map-height: calc(100svh - 11.05rem);
+    --md-map-height: calc(100svh - 11.1rem);
     --max-avn-height: calc(100svh - 3rem);
     --md-avn-height: calc(100svh - 2.5rem);
   }
