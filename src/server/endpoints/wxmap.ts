@@ -1,10 +1,10 @@
 import { Hono } from "hono";
-import { errorResponse, jsonResponse } from "../lib/utils";
+import { errorResponse, jsonResponse } from "../lib/utils.js";
 import { avwx } from "../main.js";
-import type { MetarData, MetarWithStation, StationPlotData } from "../../shared/lib/types";
+import type { MetarData, MetarWithStation, StationPlotData } from "../../shared/lib/types.js";
 import { gt } from "drizzle-orm";
-import { metars } from "../../shared/db/tables/avwx.drizzle";
-import { HOUR } from "../../shared/lib/constants";
+import { metars } from "../../shared/db/tables/avwx.drizzle.js";
+import { HOUR } from "../../shared/lib/constants.js";
 import type { Feature, Point } from "geojson";
 // import * as fs from "fs";
 
