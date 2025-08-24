@@ -31,6 +31,7 @@ import { LGFOverlay } from "./map/layers/overlays/LGFOverlay";
 import { PublicRegionsOverlay } from "./map/layers/overlays/PublicRegionsOverlay";
 import { MarineRegionsOverlay } from "./map/layers/overlays/MarineRegionsOverlay";
 import { LightningDataLayer } from "./map/layers/data/LightningDataLayer";
+import { SurfaceDataLayer } from "./map/layers/data/SurfaceDataLayer";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -71,6 +72,8 @@ export default function WxMap() {
           <SatelliteLayer domain="west" />
           <SatelliteLayer domain="east" />
           <RadarLayer />
+
+          <SurfaceDataLayer />
 
           <TAFOverlay />
           <BedpostOverlay />

@@ -3,11 +3,12 @@ import { Layer, Source } from "react-map-gl/maplibre";
 import { LightningData } from "@/lib/types";
 import { FeatureCollection, Point } from "geojson";
 import { CLUSTERED, LIGHTNING_DISPLAY, UNCLUSTERED } from "@/config/vectorData";
-import { useFrame, useStartTime } from "@/stateStores/map/animation";
+import { useDeltaTime, useFrame, useStartTime } from "@/stateStores/map/animation";
 import { MINUTE } from "@shared/lib/constants";
 import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
 import useAPI from "@/hooks/useAPI";
 import { useShowLightning } from "@/stateStores/map/vectorData";
+import { useDisplayTime } from "@/hooks/useDisplayTime";
 
 interface Props {
   belowLayer?: string;
@@ -17,10 +18,7 @@ interface Props {
 export const LightningDataLayer = ({ belowLayer, timeRange = 15 }: Props) => {
   const enabled = useShowLightning();
 
-  const startTime = useStartTime();
-  const frame = useFrame();
-
-  const displayTime = startTime + frame * 10 * MINUTE;
+  const displayTime = useDisplayTime();
 
   const { data: lightningData } = useAPI<LightningData>(
     "/lightning",

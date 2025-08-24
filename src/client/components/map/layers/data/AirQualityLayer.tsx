@@ -3,10 +3,11 @@ import { FeatureCollection } from "geojson";
 
 import { AqData } from "@/lib/types";
 import { AQ_ATTRIBUTION, AQ_DISPLAY } from "@/config/vectorData";
-import { useFrame, useFrameCount, useStartTime } from "@/stateStores/map/animation";
+import { useFrame, useFrameCount } from "@/stateStores/map/animation";
 import { MINUTE } from "@shared/lib/constants";
 import useAPI from "@/hooks/useAPI";
 import { useShowAQ } from "@/stateStores/map/vectorData";
+import { useDisplayTime } from "@/hooks/useDisplayTime";
 
 interface Props {
   belowLayer?: string;
@@ -14,11 +15,10 @@ interface Props {
 
 const AirQualityLayer = ({ belowLayer }: Props) => {
   const enabled = useShowAQ();
-  const startTime = useStartTime();
+
   const frame = useFrame();
   const lastFrame = useFrameCount() - 1;
-
-  const displayTime = startTime + frame * 10 * MINUTE;
+  const displayTime = useDisplayTime();
 
   const { data: aqData } = useAPI<AqData>("/aq", { hours: 4 }, { queryName: "aqData", enabled, interval: 10 });
 

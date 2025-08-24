@@ -64,12 +64,12 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
       state: vector.showLightning,
       toggle: vectorActions.toggleLightning,
     },
-    // {
-    //   type: "surfaceObs",
-    //   name: "Surface Observations",
-    //   state: vector.showObs,
-    //   toggle: vectorActions.toggleObs,
-    // },
+    {
+      type: "surfaceObs",
+      name: "Surface Observations",
+      state: vector.showObs,
+      toggle: vectorActions.toggleObs,
+    },
     {
       type: "pirep",
       name: "PIREPs",

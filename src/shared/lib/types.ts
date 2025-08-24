@@ -1,4 +1,5 @@
 import { InferSelectModel } from "drizzle-orm";
+import { FeatureCollection, Point } from "geojson";
 import { metars, pireps, stations, tafs } from "../db/tables/avwx.drizzle";
 import { z } from "zod";
 import { aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation";
@@ -31,3 +32,19 @@ export type StationData = InferSelectModel<typeof stations>;
 export type MetarData = InferSelectModel<typeof metars>;
 export type TafData = InferSelectModel<typeof tafs>;
 export type PirepData = InferSelectModel<typeof pireps>;
+
+// used in intermediate steps of the api data return for /wxmap/metars
+export type StationPlotData = {
+  siteId: string;
+  metars: Omit<MetarData, "siteId" | "rawText">[];
+};
+
+export type MetarWithStation = Omit<MetarData, "rawText"> & {
+  stations: {
+    lat: number;
+    lon: number;
+  } | null;
+};
+
+// used for the rendering and filtering of station plots on the map
+export type StationPlotGeoJSON = FeatureCollection<Point, Omit<MetarData, "rawText">>;

@@ -10,7 +10,7 @@ import {
 export const CLUSTERED: FilterSpecification = ["has", "point_count"];
 export const UNCLUSTERED: FilterSpecification = ["!", ["has", "point_count"]];
 
-export const VECTOR_DATA_TYPES = ["lightning", "pirep", "airmet", "sigmet", "aq"] as const;
+export const VECTOR_DATA_TYPES = ["surfaceObs", "lightning", "pirep", "airmet", "sigmet", "aq"] as const;
 
 export const LIGHTNING_DISPLAY: SymbolLayerSpecification = {
   type: "symbol",

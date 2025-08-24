@@ -12,11 +12,12 @@ import { default as alpha } from "./endpoints/alphanumeric.js";
 import { default as charts } from "./endpoints/charts.js";
 import { default as lightning } from "./endpoints/lightning.js";
 import { default as aq } from "./endpoints/aq.js";
-// import { default as wxmap } from "./endpoints/wxmap.js";
+import { default as wxmap } from "./endpoints/wxmap.js";
 
 // database schemas
 import * as aqSchema from "../shared/db/tables/aq.drizzle.js";
 import * as avwxSchemas from "../shared/db/tables/avwx.drizzle.js";
+import * as avwxRelations from "../shared/db/relations/avwx.relations.drizzle.js";
 
 // custom types and utilities
 import { injectViteDevServer } from "./lib/utils.js";
@@ -25,7 +26,10 @@ import { generateDbConnection } from "../shared/lib/utils.js";
 const isProd = process.env.NODE_ENV === "production";
 
 export const aqDb = await generateDbConnection("aq", aqSchema);
-export const avwx = await generateDbConnection("avwx", avwxSchemas);
+export const avwx = await generateDbConnection("avwx", {
+  ...avwxSchemas,
+  ...avwxRelations,
+});
 
 // get the content of the index.html so we can serve it from the root
 // TODO :: set this up to serve all files out of /dist just like in the HubWx implementation
@@ -47,7 +51,7 @@ app.route("/api", geomet);
 app.route("/api/alpha", alpha);
 app.route("/api/charts", charts);
 app.route("/api", lightning);
-// app.route("/api", wxmap);
+app.route("/api", wxmap);
 
 // add our db-dependent routes only if the database connection is successful
 if (aqDb) app.route("/api", aq);

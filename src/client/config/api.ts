@@ -71,5 +71,11 @@ export const API_CONFIG = {
       params: null,
     },
     { data: "aq", url: "/aq", description: "returns air quality data for the last 4 hours", params: ["hours"] },
+    {
+      data: "wxmap metars",
+      url: "/wxmap/metars",
+      description: "returns metar data for all stations on the map",
+      params: null,
+    },
   ],
 } as const;
