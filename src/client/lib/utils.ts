@@ -3,6 +3,8 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ParsedTAF, RasterLayerData } from "./types";
 import { SIGWX_REGEX } from "./regex";
+import type { FeatureCollection, Point, Position } from "geojson";
+import * as turf from "@turf/turf";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -145,4 +147,46 @@ export function formatSigWx(alphaString: string | undefined, mode: "taf" | "meta
       return alphaString;
     }
   }
+}
+
+export function hasValidCoordinates(coords: Position) {
+  const isValidCoords = coords[0] > 180 || coords[0] < -180 || coords[1] > 90 || coords[1] < -90;
+  return !isValidCoords;
+}
+
+export function checkIfInBounds(coords: Position, viewport: [number, number, number, number]) {
+  const isInBounds =
+    coords[0] >= viewport[0] && coords[0] <= viewport[2] && coords[1] >= viewport[1] && coords[1] <= viewport[3];
+
+  return isInBounds;
+}
+
+/**
+ * Filters out points that are too close to each other
+ * @param input A GeoJSON FeatureCollection of Points
+ * @param minDistance Minimum allowed spacing between points (in nautical miles)
+ * @param propertyKey The property to extract from each retained point
+ * @returns An array of strings (values of the given property from spaced points)
+ */
+export function filterSpacedPoints(
+  input: FeatureCollection<Point>,
+  minDistance: number,
+  propertyKey: string,
+): string[] {
+  const retained: FeatureCollection<Point> = turf.featureCollection([]);
+
+  for (const candidate of input.features) {
+    const isTooClose = retained.features.some(
+      (existing) => turf.distance(existing, candidate, { units: "nauticalmiles" }) < minDistance,
+    );
+
+    if (!isTooClose) {
+      retained.features.push(candidate);
+    }
+  }
+
+  // Extract desired property
+  return retained.features
+    .map((f) => f.properties?.[propertyKey])
+    .filter((val): val is string => typeof val === "string");
 }

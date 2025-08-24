@@ -1,3 +1,11 @@
+import { Layer, Source, type SymbolLayerSpecification } from "react-map-gl/maplibre";
+import type { FeatureCollection, Point, Position } from "geojson";
+
+import useAPI from "@/hooks/useAPI";
+import { useDisplayTime } from "@/hooks/useDisplayTime";
+
+import type { StationPlotData, StationPlotGeoJSON } from "@shared/lib/types";
+
 import { ZOOM_THRESHOLDS } from "@/config/map";
 import {
   CAT_COLOURS,
@@ -9,31 +17,14 @@ import {
   WINDBARB_COLOURS,
 } from "@/config/stationPlots";
 import { UNCLUSTERED } from "@/config/vectorData";
-import useAPI from "@/hooks/useAPI";
-import { useDisplayTime } from "@/hooks/useDisplayTime";
-import { useAnimationState } from "@/stateStores/map/animation";
-import { useMapRef, useViewportBounds, useZoom } from "@/stateStores/map/mapView";
-import { useShowObs } from "@/stateStores/map/vectorData";
-import { HOUR, MINUTE } from "@shared/lib/constants";
-import { StationPlotData, StationPlotGeoJSON } from "@shared/lib/types";
-import { FeatureCollection, Point, Position } from "geojson";
-import { Layer, LngLatLike, Source, SymbolLayerSpecification } from "react-map-gl/maplibre";
-import { check } from "zod";
 
-export const SURFACE_OBS_STYLE: SymbolLayerSpecification = {
-  id: "layer-surface-obs",
-  type: "symbol",
-  source: "surface-obs",
-  layout: {
-    "icon-image": "icons:stn-hwos",
-  },
-  paint: {
-    "icon-color": "#ffcc00",
-    "icon-halo-color": "#000000",
-    "icon-halo-width": 1,
-    "icon-halo-blur": 0.5,
-  },
-};
+import { useAnimationState } from "@/stateStores/map/animation";
+import { useViewportBounds, useZoom } from "@/stateStores/map/mapView";
+import { useShowObs } from "@/stateStores/map/vectorData";
+
+import { HOUR } from "@shared/lib/constants";
+import { checkIfInBounds, filterSpacedPoints, hasValidCoordinates } from "@/lib/utils";
+import { useMemo } from "react";
 
 export const SurfaceDataLayer = () => {
   const zoom = useZoom();
@@ -47,6 +38,21 @@ export const SurfaceDataLayer = () => {
 
   if (!viewport || !enabled || plots?.status !== "success") return;
 
+  // construct our station priority list for each zoom level
+  // this will give us a computed list of stations to show at each zoom level
+  // use the predefined list of must-haves and then use a spatial algorithm to fill in the rest
+
+  const stationPriorityList = useMemo(() => {
+    const radius = { min: 120, med: 60, max: 1 };
+
+    const key = "siteId";
+
+    return {
+      min: [...STATION_PRIORITY_MIN, ...filterSpacedPoints(plots.data, radius.min, key)],
+      med: [...STATION_PRIORITY_MED, ...filterSpacedPoints(plots.data, radius.med, key)],
+    };
+  }, [plots.data]);
+
   // for every site in our list of plots, we want to get the metar with the observation that is closest
   // to our display time without being in the future and then collapse its properties into the final output
 
@@ -54,28 +60,16 @@ export const SurfaceDataLayer = () => {
     const coords = feature.geometry.coordinates;
 
     // validate the coordinates
-    if (coords[0] > 180 || coords[0] < -180 || coords[1] > 90 || coords[1] < -90) return acc;
+    if (!hasValidCoordinates(coords)) return acc;
 
-    const checkIfInBounds = (coords: Position) => {
-      return (
-        coords[0] >= viewport[0] && coords[0] <= viewport[2] && coords[1] >= viewport[1] && coords[1] <= viewport[3]
-      );
-    };
-
-    const isInBounds = checkIfInBounds(coords);
-
-    if (isPlaying && !isInBounds) return acc;
+    // if we are animating, only show stations that are in the current viewport
+    if (!checkIfInBounds(coords, viewport)) return acc;
 
     // apply our zoom-based station density filtering
     if (zoom < STATION_DENSITY_THRESHOLDS.min) {
-      if (!STATION_PRIORITY_MIN.includes(feature.properties.siteId) && !feature.properties.siteId.startsWith("C"))
-        return acc;
-    } else if (
-      zoom >= STATION_DENSITY_THRESHOLDS.min &&
-      zoom < STATION_DENSITY_THRESHOLDS.max &&
-      !feature.properties.siteId.startsWith("C")
-    ) {
-      if (!STATION_PRIORITY_MED.includes(feature.properties.siteId)) return acc;
+      if (!stationPriorityList.min.includes(feature.properties.siteId)) return acc;
+    } else if (zoom >= STATION_DENSITY_THRESHOLDS.min && zoom < STATION_DENSITY_THRESHOLDS.max) {
+      if (!stationPriorityList.med.includes(feature.properties.siteId)) return acc;
     }
 
     const metar = feature.properties.metars
@@ -86,8 +80,7 @@ export const SurfaceDataLayer = () => {
       })
       .find(
         (m) =>
-          new Date(m.validTime).getTime() <= displayTime &&
-          new Date(m.validTime).getTime() >= displayTime - HOUR - 30 * MINUTE,
+          new Date(m.validTime).getTime() <= displayTime && new Date(m.validTime).getTime() >= displayTime - 2 * HOUR,
       );
 
     if (metar) {
