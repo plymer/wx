@@ -1,5 +1,5 @@
-import { Layer, Source, type SymbolLayerSpecification } from "react-map-gl/maplibre";
-import type { FeatureCollection, Point, Position } from "geojson";
+import { Layer, Source } from "react-map-gl/maplibre";
+import type { FeatureCollection, Point } from "geojson";
 
 import useAPI from "@/hooks/useAPI";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
@@ -18,7 +18,6 @@ import {
 } from "@/config/stationPlots";
 import { UNCLUSTERED } from "@/config/vectorData";
 
-import { useAnimationState } from "@/stateStores/map/animation";
 import { useViewportBounds, useZoom } from "@/stateStores/map/mapView";
 import { useShowObs } from "@/stateStores/map/vectorData";
 
@@ -30,19 +29,17 @@ export const SurfaceDataLayer = () => {
   const zoom = useZoom();
   const enabled = useShowObs();
   const viewport = useViewportBounds();
-  const isPlaying = useAnimationState() === "playing";
 
   const displayTime = useDisplayTime();
 
   const { data: plots } = useAPI<FeatureCollection<Point, StationPlotData>>("/wxmap/metars", {});
-
-  if (!viewport || !enabled || plots?.status !== "success") return;
 
   // construct our station priority list for each zoom level
   // this will give us a computed list of stations to show at each zoom level
   // use the predefined list of must-haves and then use a spatial algorithm to fill in the rest
 
   const stationPriorityList = useMemo(() => {
+    if (plots?.status !== "success") return { min: [], med: [] };
     const radius = { min: 120, med: 60, max: 1 };
 
     const key = "siteId";
@@ -51,10 +48,12 @@ export const SurfaceDataLayer = () => {
       min: [...STATION_PRIORITY_MIN, ...filterSpacedPoints(plots.data, radius.min, key)],
       med: [...STATION_PRIORITY_MED, ...filterSpacedPoints(plots.data, radius.med, key)],
     };
-  }, [plots.data]);
+  }, [plots]);
 
   // for every site in our list of plots, we want to get the metar with the observation that is closest
   // to our display time without being in the future and then collapse its properties into the final output
+
+  if (!viewport || !enabled || plots?.status !== "success") return;
 
   const features = plots.data.features.reduce<StationPlotGeoJSON["features"]>((acc, feature) => {
     const coords = feature.geometry.coordinates;

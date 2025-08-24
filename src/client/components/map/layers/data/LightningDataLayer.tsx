@@ -3,7 +3,6 @@ import { Layer, Source } from "react-map-gl/maplibre";
 import { LightningData } from "@/lib/types";
 import { FeatureCollection, Point } from "geojson";
 import { CLUSTERED, LIGHTNING_DISPLAY, UNCLUSTERED } from "@/config/vectorData";
-import { useDeltaTime, useFrame, useStartTime } from "@/stateStores/map/animation";
 import { MINUTE } from "@shared/lib/constants";
 import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
 import useAPI from "@/hooks/useAPI";
