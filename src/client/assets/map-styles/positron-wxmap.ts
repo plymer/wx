@@ -14,7 +14,7 @@ export const positronWxMap: StyleSpecification = {
   sprite: [
     { id: "default", url: "https://openmaptiles.github.io/positron-gl-style/sprite" },
     { id: "icons", url: `${PUBLIC_URL}/sprites/icons` },
-    // { id: "windbarbs", url: `${PUBLIC_URL}/sprites/windbarbs` },
+    { id: "windbarbs", url: `${PUBLIC_URL}/sprites/windbarbs` },
   ],
   glyphs: `${PUBLIC_URL}/fonts/{fontstack}/{range}.pbf`,
   layers: [

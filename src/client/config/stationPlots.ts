@@ -32,6 +32,7 @@ export const STATION_TEXT_STYLE: SymbolLayerSpecification = {
   layout: {
     "text-optional": false,
     "text-size": 12,
+    "text-font": ["Metropolis-Regular"],
     // "text-allow-overlap": [
     //   "step",0
     //   ["zoom"],
