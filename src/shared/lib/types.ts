@@ -48,3 +48,12 @@ export type MetarWithStation = Omit<MetarData, "rawText"> & {
 
 // used for the rendering and filtering of station plots on the map
 export type StationPlotGeoJSON = FeatureCollection<Point, Omit<MetarData, "rawText">>;
+
+export type SfcObsPopupBundle = Record<
+  string,
+  {
+    metaData: { siteName: string | null; siteCountry: string | null; siteState: string | null };
+    metars: string[];
+    tafs: string[];
+  }
+>;

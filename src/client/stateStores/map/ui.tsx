@@ -1,13 +1,15 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { MapOptionsTabs, LayerTabs } from "../../lib/types";
+import { MapOptionsTabs, LayerTabs, MapPopupData } from "../../lib/types";
 
 interface UIStateStore {
   mapOptionsTab: MapOptionsTabs;
   layersTab: LayerTabs;
+  popupData?: MapPopupData | undefined;
   actions: {
     setMapOptionsTab: (tab: MapOptionsTabs) => void;
     setLayersTab: (tab: LayerTabs) => void;
+    setPopupData: (data: MapPopupData | undefined) => void;
   };
 }
 
@@ -17,10 +19,12 @@ const useUI = create<UIStateStore>()(
       // initial values
       mapOptionsTab: "overlays",
       layersTab: "satellite",
+      popupData: undefined,
       actions: {
         // declare methods to change the default tabs that are open when the drawers are opened
         setMapOptionsTab: (tab: MapOptionsTabs) => set(() => ({ mapOptionsTab: tab })),
         setLayersTab: (tab: LayerTabs) => set(() => ({ layersTab: tab })),
+        setPopupData: (data: MapPopupData | undefined) => set(() => ({ popupData: data })),
       },
     }),
     {
@@ -38,4 +42,5 @@ const useUI = create<UIStateStore>()(
 
 export const useMapOptionsTab = () => useUI((state) => state.mapOptionsTab);
 export const useLayersTab = () => useUI((state) => state.layersTab);
+export const usePopupData = () => useUI((state) => state.popupData);
 export const useUIActions = () => useUI((state) => state.actions);

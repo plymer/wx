@@ -1,5 +1,8 @@
 import { z } from "zod";
 
 export const wxmapMetarSchema = z.strictObject({
-  id: z.coerce.number().default(0),
+  siteId: z
+    .string()
+    .min(4)
+    .transform((val) => val.split(",").map((v) => v.trim().toUpperCase())),
 });

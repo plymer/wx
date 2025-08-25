@@ -3,6 +3,9 @@ import { StrictMode } from "react";
 import { HashRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+// map css
+import "maplibre-gl/dist/maplibre-gl.css";
+
 import "./index.css";
 import { App } from "./App";
 

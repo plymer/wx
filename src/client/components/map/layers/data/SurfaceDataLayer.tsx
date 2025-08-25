@@ -11,6 +11,7 @@ import {
   CAT_COLOURS,
   ICON_SIZES,
   STATION_DENSITY_THRESHOLDS,
+  STATION_PRIORITY_CANADA,
   STATION_PRIORITY_MED,
   STATION_PRIORITY_MIN,
   STATION_TEXT_STYLE,
@@ -39,12 +40,13 @@ export const SurfaceDataLayer = () => {
   // use the predefined list of must-haves and then use a spatial algorithm to fill in the rest
 
   const stationPriorityList = useMemo(() => {
-    if (plots?.status !== "success") return { min: [], med: [] };
-    const radius = { min: 120, med: 60, max: 1 };
+    if (plots?.status !== "success") return { min: [], med: [], global: [] };
+    const radius = { min: 240, med: 60, max: 1 };
 
     const key = "siteId";
 
     return {
+      global: [...STATION_PRIORITY_CANADA, ...filterSpacedPoints(plots.data, radius.min, key)],
       min: [...STATION_PRIORITY_MIN, ...filterSpacedPoints(plots.data, radius.min, key)],
       med: [...STATION_PRIORITY_MED, ...filterSpacedPoints(plots.data, radius.med, key)],
     };
@@ -64,8 +66,10 @@ export const SurfaceDataLayer = () => {
     // if we are animating, only show stations that are in the current viewport
     if (!checkIfInBounds(coords, viewport)) return acc;
 
-    // apply our zoom-based station density filtering
-    if (zoom < STATION_DENSITY_THRESHOLDS.min) {
+    // apply our zoom-based station density filtering'
+    if (zoom < STATION_DENSITY_THRESHOLDS.global) {
+      if (!stationPriorityList.global.includes(feature.properties.siteId)) return acc;
+    } else if (zoom < STATION_DENSITY_THRESHOLDS.min) {
       if (!stationPriorityList.min.includes(feature.properties.siteId)) return acc;
     } else if (zoom >= STATION_DENSITY_THRESHOLDS.min && zoom < STATION_DENSITY_THRESHOLDS.max) {
       if (!stationPriorityList.med.includes(feature.properties.siteId)) return acc;
@@ -251,7 +255,7 @@ export const SurfaceDataLayer = () => {
           }}
           paint={{
             "icon-halo-color": "#000",
-            "icon-halo-width": 1,
+            "icon-halo-width": 2,
             "icon-color": [
               "step",
               ["get", "windSpd"],
@@ -269,7 +273,7 @@ export const SurfaceDataLayer = () => {
         />
 
         {/* Interactive target (invisible circles for click detection) */}
-        {/* <Layer
+        <Layer
           id="layer-sfc-obs-target"
           type="circle"
           paint={{
@@ -286,7 +290,7 @@ export const SurfaceDataLayer = () => {
             ],
             "circle-opacity": 0,
           }}
-        /> */}
+        />
       </Source>
     </>
   );

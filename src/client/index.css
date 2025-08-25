@@ -139,6 +139,32 @@
   color: white !important;
 }
 
+.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: var(--color-popover-foreground);
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: var(--color-popover-foreground);
+}
+
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--color-popover-foreground);
+}
+
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--color-popover-foreground);
+}
+
+.maplibregl-popup-content {
+  background: var(--color-popover-foreground);
+  padding: 0.5rem;
+  border-radius: calc(var(--radius) - 2px);
+}
+
 /* Base styles for the sliding panel */
 .slide-panel {
   transform: translateX(-100%);

@@ -25,6 +25,7 @@ import { InferSelectModel } from "drizzle-orm";
 import { aqData } from "../../shared/db/tables/aq.drizzle.js";
 
 import { StationData } from "../../shared/lib/types.js";
+import { LngLat, MapGeoJSONFeature } from "maplibre-gl";
 
 export type AppMode = keyof typeof APP_MODES_LIST;
 export type AnimationState = (typeof ANIMATION_STATES)[number];
@@ -217,3 +218,8 @@ export type AviationProductList = {
 };
 
 export type AviationProductListM = IIMT<AviationProducts, "product">;
+
+export type MapPopupData = {
+  features: MapGeoJSONFeature[];
+  lngLat: LngLat;
+};

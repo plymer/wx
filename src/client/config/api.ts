@@ -77,5 +77,11 @@ export const API_CONFIG = {
       description: "returns metar data for all stations on the map",
       params: null,
     },
+    {
+      data: "wxmap popup",
+      url: "/wxmap/popup",
+      description: "returns metar data for specific stations",
+      params: ["siteId"],
+    },
   ],
 } as const;
