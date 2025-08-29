@@ -33,6 +33,7 @@ import { MarineRegionsOverlay } from "./map/layers/overlays/MarineRegionsOverlay
 import { LightningDataLayer } from "./map/layers/data/LightningDataLayer";
 import { SurfaceDataLayer } from "./map/layers/data/SurfaceDataLayer";
 import { SurfaceDataPopup } from "./map/SurfaceDataPopup";
+import AirQualityLayer from "./map/layers/data/AirQualityLayer";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -73,6 +74,8 @@ export default function WxMap() {
           <SatelliteLayer domain="west" />
           <SatelliteLayer domain="east" />
           <RadarLayer />
+
+          <AirQualityLayer />
 
           <SurfaceDataLayer />
 
