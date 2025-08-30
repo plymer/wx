@@ -29,7 +29,7 @@ export const LightningDataLayer = ({ belowLayer, timeRange = 15 }: Props) => {
     },
   );
 
-  if (!lightningData || lightningData.status !== "success" || !lightningData.data.features.length) return;
+  if (!enabled || lightningData?.status !== "success" || !lightningData.data.features.length) return;
 
   const features = lightningData?.data.features;
 

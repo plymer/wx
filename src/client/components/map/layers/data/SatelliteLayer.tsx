@@ -30,6 +30,7 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
     },
   );
 
-  if (satelliteData?.status === "success" && satelliteData.data[0])
-    return <RasterDataLayer apiData={satelliteData.data[0]} belowLayer={belowLayerId} />;
+  if (!enabled || satelliteData?.status !== "success") return;
+
+  return <RasterDataLayer apiData={satelliteData.data[0]} belowLayer={belowLayerId} />;
 };

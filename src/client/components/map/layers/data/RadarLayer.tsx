@@ -27,6 +27,7 @@ export const RadarLayer = ({ belowLayer = "wateroutline" }: Props) => {
     },
   );
 
-  if (radarData?.status === "success" && radarData.data[0])
-    return <RasterDataLayer apiData={radarData.data[0]} belowLayer={belowLayerId} />;
+  if (!enabled || radarData?.status !== "success") return;
+
+  return <RasterDataLayer apiData={radarData.data[0]} belowLayer={belowLayerId} />;
 };
