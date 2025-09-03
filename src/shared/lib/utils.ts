@@ -5,6 +5,7 @@ import { drizzle } from "drizzle-orm/mysql2";
 import { sql } from "drizzle-orm/sql";
 import { createGunzip } from "zlib";
 import { XMLParser } from "fast-xml-parser";
+import { WmoDirection } from "./types";
 
 export async function generateDbConnection<
   TSchema extends Record<string, MySqlTableWithColumns<any> | Relations<any, any>>,
@@ -106,4 +107,34 @@ export function xmlParser() {
   });
 
   return { parser };
+}
+
+/**
+ *
+ * @param dir - a string representing a cardinal direction, such as "N" or "SSW", or a "-"" for no direction
+ * @returns a number representing the direction in degrees, such as 0 or 202.5
+ */
+export function cardinalToDegrees(dir: WmoDirection): number {
+  const directionMap: { [key: string]: number } = {
+    N: 0,
+    NNE: 22.5,
+    NE: 45,
+    ENE: 67.5,
+    E: 90,
+    ESE: 112.5,
+    SE: 135,
+    SSE: 157.5,
+    S: 180,
+    SSW: 202.5,
+    SW: 225,
+    WSW: 247.5,
+    W: 270,
+    WNW: 292.5,
+    NW: 315,
+    NNW: 337.5,
+    "-": 0,
+  };
+
+  // Return the degree corresponding to the given direction
+  return directionMap[dir.toUpperCase()];
 }

@@ -1,6 +1,6 @@
 import { InferSelectModel } from "drizzle-orm";
 import { FeatureCollection, Point } from "geojson";
-import { metars, pireps, stations, tafs } from "../db/tables/avwx.drizzle";
+import { metars, pireps, sigmets, stations, tafs } from "../db/tables/avwx.drizzle";
 import { z } from "zod";
 import { aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation";
 import { aqData } from "../db/tables/aq.drizzle";
@@ -32,6 +32,47 @@ export type StationData = InferSelectModel<typeof stations>;
 export type MetarData = InferSelectModel<typeof metars>;
 export type TafData = InferSelectModel<typeof tafs>;
 export type PirepData = InferSelectModel<typeof pireps>;
+export type SigmetData = InferSelectModel<typeof sigmets>;
+
+export type WmoDirection =
+  | "N"
+  | "NNE"
+  | "NE"
+  | "ENE"
+  | "E"
+  | "ESE"
+  | "SE"
+  | "SSE"
+  | "S"
+  | "SSW"
+  | "SW"
+  | "WSW"
+  | "W"
+  | "WNW"
+  | "NW"
+  | "NNW"
+  | "-";
+
+export type RawIntlSigmetData = {
+  isigmetId: number;
+  icaoId: string;
+  firId: string;
+  firName: string;
+  receiptTime: string;
+  validTimeFrom: number;
+  validTimeTo: number;
+  seriesId: string;
+  hazard: string;
+  qualifier: string;
+  base: number | null;
+  top: number | null;
+  geom: "AREA" | "AREAS";
+  coords: Coords[] | Coords[][];
+  dir: WmoDirection | null;
+  spd: "STNR" | number | null;
+  chng: "NC" | "WKN" | "INTSF";
+  rawSigmet: string;
+};
 
 // used in intermediate steps of the api data return for /wxmap/metars
 export type StationPlotData = {
@@ -57,3 +98,5 @@ export type SfcObsPopupBundle = Record<
     tafs: string[];
   }
 >;
+
+export type Coords = { lat: number; lon: number };

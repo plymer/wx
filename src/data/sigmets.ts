@@ -1,0 +1,204 @@
+import axios, { AxiosError } from "axios";
+import { sigmets } from "../shared/db/tables/avwx.drizzle.js";
+import { gt, sql } from "drizzle-orm";
+import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, HOUR } from "../shared/lib/constants.js";
+import { Coords, RawIntlSigmetData, SigmetData } from "../shared/lib/types.js";
+import { cardinalToDegrees, generateDbConnection } from "../shared/lib/utils.js";
+import "dotenv/config";
+
+async function main() {
+  const DB_NAME = "avwx";
+
+  const db = await generateDbConnection(DB_NAME, { sigmets });
+
+  if (!db) {
+    console.error(`[${DB_NAME.toUpperCase()}] (SIGMETs) Database connection failed.`);
+    process.exit(1);
+  }
+
+  // configure the base axios instance for the API calls
+  const avwxApi = axios.create({
+    baseURL: "https://aviationweather.gov/api/data/",
+    headers: { "User-Agent": "prairiewx/1.0" },
+  });
+
+  const now = new Date();
+
+  // get SIGMET events from the last 6 hours in the AK/PN/NT domains that were NOT issued by CWAO (CONUS) - we only want int'l SIGMETs from this feed
+  const recentSigmets = await db
+    .select()
+    .from(sigmets)
+    .where(gt(sigmets.issueTime, new Date(now.getTime() - 6 * HOUR))); // Last 6 hours
+
+  // find which SIGMETs are still active in the DB so we can diff the AWC API response against them
+  const activeInDb = recentSigmets.filter((s) => s.endTime > now);
+
+  const intlData = await avwxApi
+    .get("isigmet", { params: { format: "json" } })
+    .then((response) => response.data as RawIntlSigmetData[])
+    .catch((error: AxiosError) => {
+      throw new Error(
+        `[${DB_NAME.toUpperCase()}] Failed to fetch international SIGMET data\n${error.response ? error.response.statusText : error.message}`,
+      );
+    });
+
+  const data = intlData
+    .map((sigmet) => {
+      const {
+        firId,
+        icaoId,
+        dir,
+        seriesId,
+        validTimeFrom,
+        validTimeTo,
+        spd,
+        rawSigmet: rawText,
+        hazard,
+        base,
+        top,
+        chng,
+        coords,
+      } = sigmet;
+
+      // some int'l FIRs don't use a letter but they use a number, some don't use a number but use a letter, and some use both
+      const charCode = seriesId.match(/\D+/g) ? seriesId.match(/\D+/g)![0].trim() : DEFAULT_LETTER_ID;
+      const numberCode = seriesId.match(/\d+/g) ? parseInt(seriesId.match(/\d+/g)![0]) : DEFAULT_NUMBER_ID;
+
+      const issueTime = new Date(validTimeFrom * 1000);
+      const endTime = new Date(validTimeTo * 1000);
+
+      // the AWC API just provides precomputed polygons
+      const initialShape = "polygon";
+
+      const hazardBottom = (() => {
+        if (base === null || base === undefined) return null; // handle strictly null/undefined
+        if (base === 0) return "SFC"; // handle 0 as SFC
+        if (typeof base === "number" && !isNaN(base) && base > 0) {
+          return `FL${(base / 100).toString().padStart(3, "0")}`;
+        }
+        return null;
+      })();
+
+      const hazardTop = top && !isNaN(top) ? `FL${(top / 100).toString().padStart(3, "0")}` : null;
+
+      // AWC does some wierd stuff where they do both initial and final areas in one coords array, so we need to handle that
+      const origCoords = Array.isArray(coords[0])
+        ? (coords as Coords[][]).map((subgeom) => subgeom.map((pair) => [pair.lat, pair.lon]).join(" "))
+        : (coords as Coords[]).map((pair) => [pair.lat, pair.lon]).join(" ");
+
+      const initialCoords = Array.isArray(origCoords) ? origCoords[0] : origCoords;
+      const finalCoords = Array.isArray(origCoords) && origCoords.length > 1 ? origCoords[1] : null;
+
+      const header = rawText.slice(0, 6);
+
+      const domain = header.slice(2, 4);
+
+      const direction = dir ? cardinalToDegrees(dir) : 0;
+      const speed = typeof spd === "number" ? spd : spd === "STNR" ? 0 : 0;
+
+      const values: SigmetData = {
+        issuer: icaoId,
+        firRegion: firId,
+        issueTime,
+        endTime,
+        header,
+        domain,
+        charCode,
+        numberCode,
+        hazard,
+        hazardTrend: chng,
+        hazardBottom,
+        hazardTop,
+        initialShape,
+        direction,
+        speed,
+        initialCoords,
+        finalCoords,
+        rawText,
+      };
+
+      return values;
+    })
+    .filter((v): v is SigmetData => v !== undefined);
+
+  // Helper function to check if a SIGMET should be cancelled
+  const shouldCancelSigmet = (dbSigmet: SigmetData) => {
+    // Don't cancel if already cancelled
+    if (dbSigmet.rawText.includes("CNL")) return false;
+
+    // Don't cancel if exact match exists in API
+    const exactMatch = data.find(
+      (apiSigmet) =>
+        apiSigmet.charCode === dbSigmet.charCode &&
+        apiSigmet.domain === dbSigmet.domain &&
+        apiSigmet.numberCode === dbSigmet.numberCode,
+    );
+    if (exactMatch) return false;
+
+    // Don't cancel if newer SIGMET exists in API
+    const newerExists = data.find(
+      (apiSigmet) =>
+        apiSigmet.charCode === dbSigmet.charCode &&
+        apiSigmet.domain === dbSigmet.domain &&
+        apiSigmet.numberCode &&
+        dbSigmet.numberCode &&
+        apiSigmet.numberCode > dbSigmet.numberCode,
+    );
+    if (newerExists) return false;
+
+    // Don't cancel if cancellation already exists
+    const cancellationExists = recentSigmets.find(
+      (existingSigmet) =>
+        existingSigmet.charCode === dbSigmet.charCode &&
+        existingSigmet.domain === dbSigmet.domain &&
+        existingSigmet.numberCode === dbSigmet.numberCode! + 1 &&
+        existingSigmet.rawText.includes("CNL"),
+    );
+    if (cancellationExists) return false;
+
+    return true;
+  };
+
+  // before we return, we need to create those fake cancellations for any SIGMETs that have disappeared from the API but are still active in the DB
+  const toCancel = activeInDb.filter(shouldCancelSigmet);
+
+  toCancel.forEach((sigmet) => {
+    console.warn(
+      `[${DB_NAME.toUpperCase()}] SIGMET ${sigmet.domain} ${sigmet.charCode} ${sigmet.numberCode} is active in the database but missing from the AWC API, creating a cancellation...`,
+    );
+
+    const fakeCancel = {
+      issuer: sigmet.issuer,
+      firRegion: sigmet.firRegion,
+      domain: sigmet.domain,
+      header: sigmet.header,
+      charCode: sigmet.charCode,
+      numberCode: sigmet.numberCode + 1,
+      issueTime: now,
+      endTime: now,
+      rawText: `CNL ${sigmet.charCode}${sigmet.numberCode} ${sigmet.issuer} ${sigmet.firRegion} - THIS SIGMET HAS BEEN CANCELLED AUTOMATICALLY BY THE DATA HANDLER`,
+    } as SigmetData;
+
+    data.push(fakeCancel);
+  });
+
+  try {
+    await Promise.allSettled(
+      data.map(async (sigmet) => {
+        await db
+          .insert(sigmets)
+          .values(sigmet)
+          .onDuplicateKeyUpdate({
+            set: { header: sql`header` },
+          });
+      }),
+    );
+    console.log(`[${DB_NAME.toUpperCase()}] Inserted/updated ${data.length} SIGMETs.`);
+  } catch (error) {
+    throw new Error(
+      `[${DB_NAME.toUpperCase()}] Could not insert SIGMETs into teh database: ${(error as Error).message}`,
+    );
+  }
+}
+
+await main();

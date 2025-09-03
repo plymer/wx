@@ -1,4 +1,14 @@
-import { datetime, float, int, mysqlTable, primaryKey, text, varchar } from "drizzle-orm/mysql-core";
+import {
+  datetime,
+  float,
+  int,
+  mysqlEnum,
+  mysqlTable,
+  primaryKey,
+  smallint,
+  text,
+  varchar,
+} from "drizzle-orm/mysql-core";
 
 export const stations = mysqlTable("stations", {
   name: varchar({ length: 45 }),
@@ -52,4 +62,31 @@ export const pireps = mysqlTable(
     rawText: text().notNull(),
   },
   (table) => [primaryKey({ columns: [table.lat, table.lon, table.validTime] })],
+);
+
+export const sigmets = mysqlTable(
+  "sigmets",
+  {
+    issueTime: datetime().notNull(),
+    endTime: datetime().notNull(),
+    charCode: varchar({ length: 20 }).default("-").notNull(),
+    numberCode: smallint().default(0).notNull(),
+    initialShape: mysqlEnum(["polygon", "line", "point"]),
+    speed: int(),
+    initialCoords: text(),
+    finalCoords: text(),
+    rawText: text().notNull(),
+    domain: text(),
+    issuer: text(),
+    firRegion: text(),
+    header: varchar({ length: 6 }).default("TEMP").notNull(),
+    hazard: text(),
+    hazardTrend: mysqlEnum(["NC", "INTSF", "WKN"]),
+    hazardBottom: text(),
+    hazardTop: text(),
+    direction: float(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.header, table.issueTime, table.charCode, table.numberCode], name: "sigmets_pk" }),
+  ],
 );
