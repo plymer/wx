@@ -18,3 +18,9 @@ export const publicBulletinSchema = z.strictObject({
   bulletin: z.string().toLowerCase().trim(),
   office: z.string().toLowerCase().trim(),
 });
+
+export const xmetSchema = z
+  .object({
+    hours: z.coerce.number().default(1),
+  })
+  .strict();

@@ -1,15 +1,21 @@
 import { Hono } from "hono";
-import { and, asc, desc, eq, gte } from "drizzle-orm";
+import { and, asc, desc, eq, gt, gte } from "drizzle-orm";
 import axios from "axios";
 import suncalc, { GetTimesResult } from "suncalc";
 
 import { validateParams } from "../lib/zod-validator.js";
-import { metarSchema, publicBulletinSchema, singleSiteSchema } from "../validationSchemas/alphanumeric.zod.js";
-import { HubDiscussion } from "../lib/alphanumeric.types.js";
-import { errorResponse, jsonResponse, leadZero } from "../lib/utils.js";
+import {
+  metarSchema,
+  publicBulletinSchema,
+  singleSiteSchema,
+  xmetSchema,
+} from "../validationSchemas/alphanumeric.zod.js";
+import { HubDiscussion, XmetEventData, XmetEventGeometry } from "../lib/alphanumeric.types.js";
+import { errorResponse, isConvectiveSigmet, jsonResponse, leadZero, processCoordinates } from "../lib/utils.js";
 import { avwx } from "../main.js";
-import { metars, stations, tafs } from "../../shared/db/tables/avwx.drizzle.js";
+import { metars, sigmets, stations, tafs } from "../../shared/db/tables/avwx.drizzle.js";
 import { HOUR } from "../../shared/lib/constants.js";
+import { Feature, MultiPolygon } from "geojson";
 
 const route = new Hono();
 
@@ -226,6 +232,119 @@ route.get("/public/bulletin", validateParams("query", publicBulletinSchema), asy
     }
 
     return jsonResponse(c, output);
+  } catch (error) {
+    return errorResponse(c, error);
+  }
+});
+
+route.get("/alpha/sigmets", validateParams("query", xmetSchema), async (c) => {
+  // these endpoints are only added if the db connection is alive, so we assert that is not undefined
+  if (!avwx) {
+    console.error("[API] No avwx connection available.");
+    return errorResponse(c, "No avwx connection available.");
+  }
+
+  try {
+    const { hours } = c.req.valid("query");
+    const queryResult = await avwx.query.sigmets.findMany({
+      where: gt(sigmets.endTime, new Date(Date.now() - hours * HOUR)),
+      orderBy: [desc(sigmets.endTime)],
+    });
+
+    const xmetList = queryResult.sort(
+      (a, b) => new Date(b.endTime).getTime() - new Date(a.endTime).getTime(), //should be desc order
+    );
+
+    const xmetEvents: XmetEventData[] = xmetList.map((xmet) => {
+      // LatLons are stored in the db as space-delimited values in lat,lon format
+
+      const issuer = xmet.issuer;
+      const text = xmet.rawText;
+      const domain = xmet.domain;
+      const charCode = xmet.charCode;
+      const numberCode = xmet.numberCode;
+      const startTime = new Date(xmet.issueTime).getTime();
+      const endTime = new Date(xmet.endTime).getTime();
+      const motionVector = {
+        direction: xmet.direction,
+        speed: xmet.speed,
+      };
+      const header = xmet.header;
+
+      const hazard = {
+        type: xmet.hazard,
+        trend: xmet.hazardTrend,
+        top: xmet.hazardTop,
+        bottom: xmet.hazardBottom,
+      };
+
+      const shape = xmet.initialShape;
+
+      const coords = processCoordinates(shape, 0, xmet.initialCoords);
+
+      // assign a sequenceId for non-convective sigmets and airmets so consumers can group them together
+      const sequenceId = !isConvectiveSigmet(header) ? `${domain}${charCode}` : `conv`;
+
+      return {
+        issuer,
+        text,
+        domain,
+        charCode,
+        numberCode,
+        sequenceId,
+        startTime,
+        endTime,
+        motionVector,
+        header,
+        hazard,
+        coords,
+      };
+    });
+
+    // create the output in the requested format
+    const output: Feature<MultiPolygon, XmetEventData>[] | undefined = xmetEvents
+      .map((xmet) => {
+        const {
+          issuer,
+          text,
+          domain,
+          charCode,
+          numberCode,
+          sequenceId,
+          startTime,
+          endTime,
+          motionVector,
+          header,
+          hazard,
+          coords,
+        } = xmet;
+
+        if (!coords) return null;
+
+        return {
+          type: "Feature",
+          geometry: {
+            coordinates: [coords],
+            type: "MultiPolygon",
+          },
+          properties: {
+            issuer,
+            header,
+            domain,
+            charCode,
+            numberCode,
+            sequenceId,
+            startTime,
+            endTime,
+            hazard,
+            motionVector,
+            text,
+          },
+        };
+      })
+      .filter((f): f is Feature<MultiPolygon, XmetEventData> => f !== null || f !== undefined);
+
+    return jsonResponse(c, output, "geojson");
   } catch (error) {
     return errorResponse(c, error);
   }

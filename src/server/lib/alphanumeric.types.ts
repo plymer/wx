@@ -1,3 +1,6 @@
+import { SigmetData } from "../../shared/lib/types";
+import { Position } from "geojson";
+
 export type StationObject = {
   icaoId: string;
   iataId: string;
@@ -170,4 +173,35 @@ export type NavCanNOTAM = {
   raw: string;
   english: string | null;
   french: string | null;
+};
+
+export type XmetShapes = SigmetData["initialShape"];
+
+export type XmetEventGeometry = {
+  shape?: XmetShapes | null;
+  bufferSize?: number | null;
+  coords?: Position[][] | null;
+};
+
+export type XmetEventData = {
+  issuer: string | null;
+  header: string;
+  startTime: number;
+  endTime: number;
+  domain: string | null;
+  charCode: string;
+  numberCode: number;
+  sequenceId: string;
+  text: string;
+  hazard: {
+    type: string | null;
+    trend: "NC" | "INTSF" | "WKN" | null;
+    top: string | null;
+    bottom: string | null;
+  };
+  motionVector: {
+    direction: number | null;
+    speed: number | null;
+  };
+  coords: Position[][] | null;
 };

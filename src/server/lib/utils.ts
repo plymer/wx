@@ -3,8 +3,9 @@ import * as turf from "@turf/turf";
 
 import { LatLon, SunTimes } from "./common.types.js";
 import { Context } from "hono";
-import { Feature, FeatureCollection } from "geojson";
+import { Feature, FeatureCollection, Position } from "geojson";
 import { MINUTE } from "../../shared/lib/constants.js";
+import { XmetShapes } from "./alphanumeric.types.js";
 
 export function injectViteDevServer(fileContents: string): string {
   const output = fileContents.replace(
@@ -190,29 +191,50 @@ export function cardinalToDegrees(dir: string): number {
 
 /**
  *
- * @param shape the string representing the type of shape defined in the database
- * @param bufferSize the size of the resulting feature, as a radius or width from a central point or line
- * @param coords the input coordinates in the format of [[lon, lat], [lon, lat], ...]
+ * @param shape - the string representing the type of shape defined in the database
+ * @param bufferSize - the size of the resulting feature, as a radius or width from a central point or line
+ * @param coords - the input coordinates in the format of "lat,lon lat,lon lat,lon ..."
  * @returns a Position object that contains the coordinates of the resulting shape, formatted for injection into a GeoJSON object
  */
-export function processCoordinates(shape: string, bufferSize: number, coords: number[][]) {
-  if (shape === "Canceled") return undefined;
+export function processCoordinates(shape: XmetShapes | null, bufferSize: number | null, coords: string | null) {
+  if (!shape || !coords || coords.trim() === "") return null;
+
+  const COORD_DELIMITER = " ";
+
+  const coordsList = coords
+    .split(COORD_DELIMITER)
+    .map((coord) => {
+      const [lat, lon] = coord.split(",");
+      return [Number(lon), Number(lat)] as Position;
+    })
+    .filter(([lon, lat]) => {
+      // Filter out NaN or invalid
+      return !isNaN(lon) && !isNaN(lat);
+    });
+
+  // Ensure we have valid coordinates
+  if (coordsList.length === 0) {
+    console.log("Error - No valid coordinates found in:", coords);
+    return null;
+  }
 
   let output;
 
   switch (shape) {
-    case "circle":
+    case "point":
+      if (!bufferSize) return null;
       // buffer our point to create a circle
-      const circle = turf.circle(coords[0], bufferSize, { steps: 24, units: "nauticalmiles" });
+      const circle = turf.circle(coordsList[0], bufferSize, { steps: 24, units: "nauticalmiles" });
 
       // return the coordinates of the circle polygon
       output = circle.geometry.coordinates;
       break;
-    case "line_corridor":
+    case "line":
+      if (!bufferSize) return null;
       // we need to build two line offsets from the original line, and then weld them back together into a polygon
       // there should end up being 2n + 1 points in the output polygon, where n is the number of points in the input line
-      const offsetA = turf.lineOffset(turf.lineString(coords), bufferSize, { units: "nauticalmiles" });
-      const offsetB = turf.lineOffset(turf.lineString(coords), -bufferSize, { units: "nauticalmiles" });
+      const offsetA = turf.lineOffset(turf.lineString(coordsList), bufferSize, { units: "nauticalmiles" });
+      const offsetB = turf.lineOffset(turf.lineString(coordsList), -bufferSize, { units: "nauticalmiles" });
 
       // TODO :: this is not 100% accurate so we will need to re-build our normals-generator function and use that logic to build the accurate offset lines
 
@@ -229,16 +251,55 @@ export function processCoordinates(shape: string, bufferSize: number, coords: nu
       output = polygon.geometry.coordinates;
 
       break;
-    case "closed_polygon":
-      if (coords.length < 4) {
-        throw new Error("A closed polygon must have at least 4 points");
-      } else {
-        output = [coords];
+    case "polygon":
+      if (coordsList.length < 3) {
+        console.log("Error - A closed polygon must have at least 4 points", shape, bufferSize, coords);
+        return null;
+      } else if (coordsList.length >= 3) {
+        // check to see if the first point is the same as the last point, if it is, return the coordsList as is
+
+        if (coordsList.length === 3) {
+          // we might be trying to draw a triangle, so first off:
+          //  1. check that the first and last points are not the same - if they are, that's wrong and we return null
+          if (firstAndLastAreSame(coordsList)) {
+            console.log("Error - A triangle cannot have the same start and end point", shape, bufferSize, coords);
+            return null;
+          }
+          //  2. check that the three points are not collinear - if they are, that's wrong and we return null
+          const area =
+            0.5 *
+            Math.abs(
+              coordsList[0][0] * (coordsList[1][1] - coordsList[2][1]) +
+                coordsList[1][0] * (coordsList[2][1] - coordsList[0][1]) +
+                coordsList[2][0] * (coordsList[0][1] - coordsList[1][1]),
+            );
+          if (area === 0) {
+            console.log("Error - A triangle cannot have collinear points", shape, bufferSize, coords);
+            return null;
+          }
+
+          // if we have three valid points, we need to close the polygon by adding the first point to the end of the list
+          output = [[...coordsList, coordsList[0]]];
+          break;
+        }
+
+        // if we have more than 3 points, check if the first and last points are the same
+        if (firstAndLastAreSame(coordsList)) {
+          // if they are the same, return the coordsList as is because this should be a valid polygon
+          output = [coordsList];
+        } else {
+          // if not, add the first point to the end of the list to close the polygon
+          output = [[...coordsList, coordsList[0]]];
+        }
       }
       break;
   }
 
-  return output;
+  return output as Position[][];
+}
+
+export function firstAndLastAreSame(coords: Position[]) {
+  return coords[0][0] === coords[coords.length - 1][0] && coords[0][1] === coords[coords.length - 1][1];
 }
 
 export function computeCoordinates(
@@ -327,4 +388,8 @@ function computeTangentVector(p1: LatLon, p2: LatLon, p3: LatLon): LatLon {
 
   // return the length-normalized tangent
   return { lat: tangent.lat / length, lon: tangent.lon / length };
+}
+
+export function isConvectiveSigmet(header: string): boolean {
+  return header.includes("WSUS3");
 }
