@@ -12,7 +12,6 @@ import { AIRMET_DISPLAY, AIRMET_DISPLAY_OUTLINE, SIGMET_DISPLAY, SIGMET_DISPLAY_
 
 import { useCurrentTime } from "@/hooks/useCurrentTime";
 import { HOUR, MINUTE } from "@shared/lib/constants";
-import { makeCompositeKey } from "@/lib/utils";
 
 interface Props {
   dataType: XmetTypes;
@@ -192,7 +191,7 @@ const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
           layout={{
             "text-field": ["get", "alphaCode"],
             "text-allow-overlap": true,
-            "text-font": ["Roboto Condensed Italic"],
+            "text-font": ["Consolas-Regular"],
           }}
           paint={{
             "text-color": "#fff",

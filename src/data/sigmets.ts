@@ -43,6 +43,7 @@ async function main() {
     });
 
   const data = intlData
+    .filter((sigmet) => sigmet !== undefined || sigmet !== null)
     .map((sigmet) => {
       const {
         firId,
@@ -60,9 +61,14 @@ async function main() {
         coords,
       } = sigmet;
 
+      // skip the SIGMET if it doesn't have coordinates
+      if (!coords) {
+        return undefined;
+      }
+
       // some int'l FIRs don't use a letter but they use a number, some don't use a number but use a letter, and some use both
-      const charCode = seriesId.match(/\D+/g) ? seriesId.match(/\D+/g)![0].trim() : DEFAULT_LETTER_ID;
-      const numberCode = seriesId.match(/\d+/g) ? parseInt(seriesId.match(/\d+/g)![0]) : DEFAULT_NUMBER_ID;
+      const charCode = seriesId && seriesId.match(/\D+/g) ? seriesId.match(/\D+/g)![0].trim() : DEFAULT_LETTER_ID;
+      const numberCode = seriesId && seriesId.match(/\d+/g) ? parseInt(seriesId.match(/\d+/g)![0]) : DEFAULT_NUMBER_ID;
 
       const issueTime = new Date(validTimeFrom * 1000);
       const endTime = new Date(validTimeTo * 1000);
@@ -94,7 +100,15 @@ async function main() {
       const domain = header.slice(2, 4);
 
       const direction = dir ? cardinalToDegrees(dir) : 0;
-      const speed = typeof spd === "number" ? spd : spd === "STNR" ? 0 : 0;
+
+      const speed = (() => {
+        if (!spd) return 0;
+        if (typeof spd === "number") return spd;
+        if (!isNaN(parseInt(spd))) return parseInt(spd);
+        if (spd === "STNR") return 0;
+        if (spd === "UNK") return 10; // assign unknown a nominal speed of 10 knots
+        return 0;
+      })();
 
       const values: SigmetData = {
         issuer: icaoId,

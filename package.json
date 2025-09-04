@@ -6,6 +6,7 @@
   "main": "dist/server/main.js",
   "scripts": {
     "dev": "vite",
+    "dev:sigmets": "tsx src/data/sigmets.ts",
     "dev:stations": "tsx src/data/stations.ts",
     "dev:airports": "tsx src/data/canada-airports.ts",
     "dev:aq-data": "tsx src/data/aq-data.ts",
