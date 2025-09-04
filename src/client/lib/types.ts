@@ -16,9 +16,9 @@ import {
 import { APP_MODES_LIST } from "../config/modes";
 import { PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { RASTER_DATA_TYPES } from "../config/rasterData";
-import { VECTOR_DATA_TYPES } from "../config/vectorData";
+import { VECTOR_DATA_TYPES, XMET_TYPES } from "../config/vectorData";
 
-import { FeatureCollection, MultiPoint } from "geojson";
+import { FeatureCollection, MultiPoint, MultiPolygon, Position } from "geojson";
 
 import { InferSelectModel } from "drizzle-orm";
 
@@ -66,6 +66,29 @@ type ApiReponses<TData> = {
 
 // create an immediately indexed mapped type for API responses
 export type APIResponse<TData> = IIMT<ApiReponses<TData>, "status">;
+
+export type XmetTypes = (typeof XMET_TYPES)[number];
+
+export type XmetAPIData = {
+  issuer: string;
+  header: string;
+  domain: string;
+  alphaCode?: string;
+  charCode: string;
+  numberCode: number;
+  sequenceId: string;
+  startTime: number;
+  endTime: number;
+  hazard: string;
+  motionVector: {
+    direction: number | null;
+    speed: number;
+  };
+  text: string;
+  dataType: XmetTypes;
+};
+
+export type XmetGeoJSON = FeatureCollection<MultiPolygon, XmetAPIData>;
 
 export type SiteData = Prettify<
   StationData & {

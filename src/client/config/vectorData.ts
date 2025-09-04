@@ -4,6 +4,7 @@ import {
   CircleLayerSpecification,
   FillLayerSpecification,
   FilterSpecification,
+  LineLayerSpecification,
   SymbolLayerSpecification,
 } from "maplibre-gl";
 
@@ -11,6 +12,8 @@ export const CLUSTERED: FilterSpecification = ["has", "point_count"];
 export const UNCLUSTERED: FilterSpecification = ["!", ["has", "point_count"]];
 
 export const VECTOR_DATA_TYPES = ["surfaceObs", "lightning", "pirep", "airmet", "sigmet", "aq"] as const;
+
+export const XMET_TYPES = ["airmet", "sigmet"] as const;
 
 export const LIGHTNING_DISPLAY: SymbolLayerSpecification = {
   type: "symbol",
@@ -26,26 +29,50 @@ export const LIGHTNING_DISPLAY: SymbolLayerSpecification = {
   paint: { "text-color": "rgb(255,0,155)", "text-halo-color": "rgb(255,255,255)", "text-halo-width": 1 },
 };
 
+const SIGMET_COLOUR = "rgb(184,6,6)";
+
 export const SIGMET_DISPLAY: FillLayerSpecification = {
   paint: {
-    "fill-color": "rgb(255,0,0)",
-    "fill-outline-color": "rgb(255,255,255)",
-    "fill-opacity": 0.5,
+    "fill-color": SIGMET_COLOUR,
+    "fill-opacity": ["case", ["==", ["get", "acknowledged"], true], 0.25, 0.5],
   },
   type: "fill",
-  id: "sigmet-data",
+  id: "layer-sigmet",
   source: "sigmet-data",
 };
 
+export const SIGMET_DISPLAY_OUTLINE: LineLayerSpecification = {
+  id: "layer-sigmet-outline",
+  type: "line",
+  source: "sigmet-data",
+  paint: {
+    "line-color": SIGMET_COLOUR,
+    "line-width": 2,
+    "line-opacity": ["case", ["==", ["get", "acknowledged"], true], 0.75, 1],
+  },
+};
+
+const AIRMET_COLOUR = "rgb(235,235,49)";
+
 export const AIRMET_DISPLAY: FillLayerSpecification = {
   paint: {
-    "fill-color": "rgb(255,255,0)",
-    "fill-outline-color": "rgb(255,255,255)",
-    "fill-opacity": 0.5,
+    "fill-color": AIRMET_COLOUR,
+    "fill-opacity": ["case", ["==", ["get", "acknowledged"], true], 0.25, 0.5],
   },
   type: "fill",
-  id: "airmet-data",
+  id: "layer-airmet",
   source: "airmet-data",
+};
+
+export const AIRMET_DISPLAY_OUTLINE: LineLayerSpecification = {
+  id: "layer-airmet-outline",
+  type: "line",
+  source: "airmet-data",
+  paint: {
+    "line-color": AIRMET_COLOUR,
+    "line-width": 2,
+    "line-opacity": ["case", ["==", ["get", "acknowledged"], true], 0.75, 1],
+  },
 };
 
 export const PIREP_DISPLAY: FillLayerSpecification = {

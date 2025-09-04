@@ -58,6 +58,13 @@ export const API_CONFIG = {
       description: "returns a list of layers, with their valid times coordinated",
       params: null,
     },
+
+    {
+      data: "sigmets",
+      url: "/alpha/sigmets",
+      description: "returns sigmet geojson",
+      params: ["hours"],
+    },
     {
       data: "public bulletins",
       url: "/alpha/public/bulletin",

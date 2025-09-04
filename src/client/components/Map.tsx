@@ -34,6 +34,7 @@ import { LightningDataLayer } from "./map/layers/data/LightningDataLayer";
 import { SurfaceDataLayer } from "./map/layers/data/SurfaceDataLayer";
 import { SurfaceDataPopup } from "./map/SurfaceDataPopup";
 import AirQualityLayer from "./map/layers/data/AirQualityLayer";
+import { SigmetLayer } from "./map/layers/data/SigmetLayer";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -78,6 +79,8 @@ export default function WxMap() {
           <AirQualityLayer />
 
           <SurfaceDataLayer />
+
+          <SigmetLayer />
 
           <TAFOverlay />
           <BedpostOverlay />

@@ -1,9 +1,9 @@
 // tailwindcss boilerplate things
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { ParsedTAF, RasterLayerData } from "./types";
+import { ParsedTAF, RasterLayerData, XmetAPIData } from "./types";
 import { SIGWX_REGEX } from "./regex";
-import type { FeatureCollection, Point, Position } from "geojson";
+import type { Feature, FeatureCollection, MultiPolygon, Point, Position } from "geojson";
 import * as turf from "@turf/turf";
 
 export function cn(...inputs: ClassValue[]) {
@@ -190,3 +190,7 @@ export function filterSpacedPoints(
     .map((f) => f.properties?.[propertyKey])
     .filter((val): val is string => typeof val === "string");
 }
+
+export const makeCompositeKey = (feature: Feature<MultiPolygon, XmetAPIData>) => {
+  return `${feature.properties.header}${feature.properties.startTime}${feature.properties.charCode}${feature.properties.numberCode}`;
+};
