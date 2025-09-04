@@ -237,7 +237,7 @@ route.get("/public/bulletin", validateParams("query", publicBulletinSchema), asy
   }
 });
 
-route.get("/alpha/sigmets", validateParams("query", xmetSchema), async (c) => {
+route.get("/sigmets", validateParams("query", xmetSchema), async (c) => {
   // these endpoints are only added if the db connection is alive, so we assert that is not undefined
   if (!avwx) {
     console.error("[API] No avwx connection available.");

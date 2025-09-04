@@ -18,7 +18,7 @@ import { PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { RASTER_DATA_TYPES } from "../config/rasterData";
 import { VECTOR_DATA_TYPES, XMET_TYPES } from "../config/vectorData";
 
-import { FeatureCollection, MultiPoint, MultiPolygon, Position } from "geojson";
+import { FeatureCollection, MultiPoint, MultiPolygon } from "geojson";
 
 import { InferSelectModel } from "drizzle-orm";
 
