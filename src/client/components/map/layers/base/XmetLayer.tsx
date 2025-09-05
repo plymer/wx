@@ -98,6 +98,8 @@ const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
   const processedData = useMemo(() => {
     if (!jsonData || jsonData.status !== "success") return null;
 
+    console.log(jsonData);
+
     return {
       ...jsonData,
       data: {

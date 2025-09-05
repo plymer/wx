@@ -255,51 +255,53 @@ route.get("/sigmets", validateParams("query", xmetSchema), async (c) => {
       (a, b) => new Date(b.endTime).getTime() - new Date(a.endTime).getTime(), //should be desc order
     );
 
-    const xmetEvents: XmetEventData[] = xmetList.map((xmet) => {
-      // LatLons are stored in the db as space-delimited values in lat,lon format
+    const xmetEvents: XmetEventData[] = xmetList
+      .map((xmet) => {
+        // LatLons are stored in the db as space-delimited values in lat,lon format
 
-      const issuer = xmet.issuer;
-      const text = xmet.rawText;
-      const domain = xmet.domain;
-      const charCode = xmet.charCode;
-      const numberCode = xmet.numberCode;
-      const startTime = new Date(xmet.issueTime).getTime();
-      const endTime = new Date(xmet.endTime).getTime();
-      const motionVector = {
-        direction: xmet.direction,
-        speed: xmet.speed,
-      };
-      const header = xmet.header;
+        const issuer = xmet.issuer;
+        const text = xmet.rawText;
+        const domain = xmet.domain;
+        const charCode = xmet.charCode;
+        const numberCode = xmet.numberCode;
+        const startTime = new Date(xmet.issueTime).getTime();
+        const endTime = new Date(xmet.endTime).getTime();
+        const motionVector = {
+          direction: xmet.direction,
+          speed: xmet.speed,
+        };
+        const header = xmet.header;
 
-      const hazard = {
-        type: xmet.hazard,
-        trend: xmet.hazardTrend,
-        top: xmet.hazardTop,
-        bottom: xmet.hazardBottom,
-      };
+        const hazard = {
+          type: xmet.hazard,
+          trend: xmet.hazardTrend,
+          top: xmet.hazardTop,
+          bottom: xmet.hazardBottom,
+        };
 
-      const shape = xmet.initialShape;
+        const shape = xmet.initialShape;
 
-      const coords = processCoordinates(shape, 0, xmet.initialCoords);
+        const coords = processCoordinates(shape, 0, xmet.initialCoords);
 
-      // assign a sequenceId for non-convective sigmets and airmets so consumers can group them together
-      const sequenceId = !isConvectiveSigmet(header) ? `${domain}${charCode}` : `conv`;
+        // assign a sequenceId for non-convective sigmets and airmets so consumers can group them together
+        const sequenceId = !isConvectiveSigmet(header) ? `${domain}${charCode}` : `conv`;
 
-      return {
-        issuer,
-        text,
-        domain,
-        charCode,
-        numberCode,
-        sequenceId,
-        startTime,
-        endTime,
-        motionVector,
-        header,
-        hazard,
-        coords,
-      };
-    });
+        return {
+          issuer,
+          text,
+          domain,
+          charCode,
+          numberCode,
+          sequenceId,
+          startTime,
+          endTime,
+          motionVector,
+          header,
+          hazard,
+          coords,
+        };
+      })
+      .filter((xmet) => xmet !== undefined && xmet !== null);
 
     // create the output in the requested format
     const output: Feature<MultiPolygon, XmetEventData>[] | undefined = xmetEvents
@@ -342,7 +344,7 @@ route.get("/sigmets", validateParams("query", xmetSchema), async (c) => {
           },
         };
       })
-      .filter((f): f is Feature<MultiPolygon, XmetEventData> => f !== null || f !== undefined);
+      .filter((f): f is Feature<MultiPolygon, XmetEventData> => f !== null && f !== undefined);
 
     return jsonResponse(c, output, "geojson");
   } catch (error) {
