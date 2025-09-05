@@ -22,7 +22,7 @@ interface Props {
   children?: ReactElement<any, any>;
 }
 
-const WeatherMap = ({ viewState, mapProjection, children, basemap }: Props) => {
+const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLayers }: Props) => {
   // subscribe to our global state stores
   const mapState = useMapStateActions();
   const mapViewUpdater = useUpdateMapViewstate();
@@ -80,7 +80,7 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap }: Props) => {
       style={{ width: "100%", height: "inherit", backgroundColor: "var(--color-neutral-700)" }}
       mapStyle={basemap}
       // define which layers are interactive (contain data that we can extract)
-      interactiveLayerIds={["layer-pirep", "layer-sigmet", "layer-airmet", "layer-sfc-obs-target"]}
+      interactiveLayerIds={interactiveLayers}
       // when we click on the map, we want to extract data from any features in the interactive layers defined above, and pass that to a popup that will display on the map
       onClick={(e) => {
         handlePopupDisplay(e);

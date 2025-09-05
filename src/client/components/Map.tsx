@@ -60,9 +60,17 @@ export default function WxMap() {
   // import the map style - this may need to change to allow different map styles in the future
   const mapStyle = positronWxMap;
 
+  // const interactiveLayers = ["layer-pirep", "layer-sigmet", "layer-airmet", "layer-sfc-obs-target"]
+  const interactiveLayers = ["layer-sfc-obs-target"];
+
   return (
     <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height) text-sm">
-      <WeatherMap viewState={viewState} mapProjection={projection} basemap={mapStyle}>
+      <WeatherMap
+        viewState={viewState}
+        mapProjection={projection}
+        basemap={mapStyle}
+        interactiveLayers={interactiveLayers}
+      >
         <>
           {/* <AttributionControl
             compact
