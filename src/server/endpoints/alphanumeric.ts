@@ -10,7 +10,7 @@ import {
   singleSiteSchema,
   xmetSchema,
 } from "../validationSchemas/alphanumeric.zod.js";
-import { HubDiscussion, XmetEventData, XmetEventGeometry } from "../lib/alphanumeric.types.js";
+import { HubDiscussion, XmetEventData } from "../lib/alphanumeric.types.js";
 import { errorResponse, isConvectiveSigmet, jsonResponse, leadZero, processCoordinates } from "../lib/utils.js";
 import { avwx } from "../main.js";
 import { metars, sigmets, stations, tafs } from "../../shared/db/tables/avwx.drizzle.js";
