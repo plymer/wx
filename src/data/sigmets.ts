@@ -54,7 +54,7 @@ async function main() {
         const movement = rawText.match(/(?:MOV )(LTL|FROM)( \d{5}KT)?/g);
 
         const direction =
-          movement && movement[0].includes("LTL") ? 0 : movement ? parseInt(movement[0].slice(9, 12)) : 0;
+          movement && movement[0].includes("LTL") ? 0 : movement ? (parseInt(movement[0].slice(9, 12)) + 180) % 360 : 0;
 
         const speed = movement && movement[0].includes("LTL") ? 0 : movement ? parseInt(movement[0].slice(12, 14)) : 0;
 
