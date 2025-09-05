@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { sigmets } from "../shared/db/tables/avwx.drizzle.js";
-import { gt, sql } from "drizzle-orm";
+import { gt, lt, sql } from "drizzle-orm";
 import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, HOUR } from "../shared/lib/constants.js";
 import { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../shared/lib/types.js";
 import { cardinalToDegrees, generateDbConnection, readGzipFile, xmlParser } from "../shared/lib/utils.js";
@@ -300,7 +300,19 @@ async function main() {
     console.log(`[${DB_NAME.toUpperCase()}] Inserted/updated ${data.length} SIGMETs.`);
   } catch (error) {
     throw new Error(
-      `[${DB_NAME.toUpperCase()}] Could not insert SIGMETs into teh database: ${(error as Error).message}`,
+      `[${DB_NAME.toUpperCase()}] Could not insert SIGMETs into the database: ${(error as Error).message}`,
+    );
+  }
+
+  console.log(`[${DB_NAME.toUpperCase()}] Cleaning up old SIGMETs...`);
+
+  try {
+    await db.delete(sigmets).where(lt(sigmets.endTime, new Date(Date.now() - 12 * HOUR)));
+    console.log(`[${DB_NAME.toUpperCase()}] Old SIGMET cleanup complete.`);
+    process.exit(0);
+  } catch (error) {
+    throw new Error(
+      `[${DB_NAME.toUpperCase()}] Could not clean up old SIGMETs in the database: ${(error as Error).message}`,
     );
   }
 }

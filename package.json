@@ -1,6 +1,6 @@
 {
   "name": "prairie-wx",
-  "version": "0.54.1",
+  "version": "0.54.2",
   "private": true,
   "type": "module",
   "main": "dist/server/main.js",
@@ -17,14 +17,14 @@
     "lint": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
     "compile": "tsc -b",
-    "build": "npm run build-client && npm run build-server",
-    "build-client": "vite build",
-    "build-server": "tsc -b -v",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build",
+    "build:server": "tsc -b -v",
     "deploy": "pm2 stop beta.config.cjs && npm install --include=dev && npm run build && pm2 start beta.config.cjs && pm2 save",
     "sprites:icons": "spreet --sdf public/sprites/icons public/sprites/icons && spreet --retina --sdf public/sprites/icons public/sprites/icons@2x",
-    "db-push": "npm run aqdb-push && npm run avwxdb-push",
-    "aqdb-push": "drizzle-kit push --config aq.drizzle.config.ts",
-    "avwxdb-push": "drizzle-kit push --config avwx.drizzle.config.ts"
+    "db:push": "npm run aqdb:push && npm run avwxdb:push",
+    "aqdb:push": "drizzle-kit push --config aq.drizzle.config.ts",
+    "avwxdb:push": "drizzle-kit push --config avwx.drizzle.config.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
