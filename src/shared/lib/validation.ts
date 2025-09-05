@@ -231,3 +231,30 @@ export const pirepSchema = z.object({
     .optional()
     .transform((val) => (val === undefined ? null : val)),
 });
+
+export const airSigmetsSchema = z.object({
+  rawText: z.string(),
+  validTimeFrom: z.coerce.date(),
+  validTimeTo: z.coerce.date(),
+  hazard: z.object({
+    type: z.string(),
+    severity: z.string(),
+  }),
+  altitude: z.object({
+    minFtMsl: z.coerce
+      .number()
+      .optional()
+      .transform((val) => (val === undefined ? null : val)),
+    maxFtMsl: z.coerce
+      .number()
+      .optional()
+      .transform((val) => (val === undefined ? null : val)),
+  }),
+  area: z.object({
+    point: z.array(z.object({ latitude: z.number(), longitude: z.number() })),
+    numPoints: z.coerce
+      .number()
+      .optional()
+      .transform((val) => (val === undefined ? null : val)),
+  }),
+});

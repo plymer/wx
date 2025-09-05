@@ -2,9 +2,12 @@ import axios, { AxiosError } from "axios";
 import { sigmets } from "../shared/db/tables/avwx.drizzle.js";
 import { gt, sql } from "drizzle-orm";
 import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, HOUR } from "../shared/lib/constants.js";
-import { Coords, RawIntlSigmetData, SigmetData } from "../shared/lib/types.js";
-import { cardinalToDegrees, generateDbConnection } from "../shared/lib/utils.js";
+import { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../shared/lib/types.js";
+import { cardinalToDegrees, generateDbConnection, readGzipFile, xmlParser } from "../shared/lib/utils.js";
 import "dotenv/config";
+import { airSigmetsSchema } from "../shared/lib/validation.js";
+
+const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
 async function main() {
   const DB_NAME = "avwx";
@@ -14,6 +17,90 @@ async function main() {
   if (!db) {
     console.error(`[${DB_NAME.toUpperCase()}] (SIGMETs) Database connection failed.`);
     process.exit(1);
+  }
+
+  const xml = await readGzipFile(RESOURCE_URL, DB_NAME);
+
+  const { parser } = xmlParser();
+
+  const conusData = (parser.parse(xml) as XMLCacheFile<CacheAirSigmetsData, "airsigmet">).response.data.airsigmet;
+
+  const conusOutput: SigmetData[] = [];
+
+  try {
+    const output: SigmetData[] = conusData
+      .map((sigmet) => {
+        const parsed = airSigmetsSchema.safeParse(sigmet);
+
+        if (!parsed.success) {
+          console.error(parsed.error);
+          return;
+        }
+        const { altitude, area, hazard, rawText, validTimeFrom, validTimeTo } = parsed.data;
+
+        const issueTime = new Date(validTimeFrom);
+        const endTime = new Date(validTimeTo);
+        const header = rawText.slice(0, 6);
+        const domain = header.slice(2, 4);
+        const initialShape = "polygon";
+        const issuer = rawText.slice(7, 11);
+        const firRegion = rawText.slice(20, 24);
+
+        const initialCoords = area?.point.map((p) => [p.latitude, p.longitude]).join(" ") ?? null;
+
+        const hazardTop = altitude?.maxFtMsl ? `FL${(altitude.maxFtMsl / 100).toString().padStart(3, "0")}` : null;
+        const hazardBottom = altitude?.minFtMsl ? `FL${(altitude.minFtMsl / 100).toString().padStart(3, "0")}` : null;
+
+        const movement = rawText.match(/(?:MOV )(LTL|FROM)( \d{5}KT)?/g);
+
+        const direction =
+          movement && movement[0].includes("LTL") ? 0 : movement ? parseInt(movement[0].slice(9, 12)) : 0;
+
+        const speed = movement && movement[0].includes("LTL") ? 0 : movement ? parseInt(movement[0].slice(12, 14)) : 0;
+
+        const sigmetIdentifier = rawText
+          .match(/(?:SIGMET)(.+\n)/g)![0]
+          ?.replace("SIGMET", "")
+          .trim();
+
+        const charCode =
+          sigmetIdentifier && sigmetIdentifier.match(/\D+/g) ? sigmetIdentifier.match(/\D+/g)![0].trim() : null;
+        const numberCode =
+          sigmetIdentifier && sigmetIdentifier.match(/\d+/g) ? parseInt(sigmetIdentifier.match(/\d+/g)![0]) : null;
+
+        if (!charCode || !numberCode) {
+          console.error(`[${DB_NAME.toUpperCase()}] Could not parse SIGMET identifier from raw text: ${rawText}`);
+          return;
+        }
+
+        const outputObject: SigmetData = {
+          issueTime,
+          endTime,
+          rawText,
+          header,
+          domain,
+          issuer,
+          charCode,
+          numberCode,
+          firRegion,
+          initialCoords,
+          initialShape,
+          direction,
+          speed,
+          hazard: hazard.type === "CONVECTIVE" ? "TS" : hazard.type,
+          hazardTop,
+          hazardBottom,
+          finalCoords: null,
+          hazardTrend: null,
+        };
+
+        return outputObject;
+      })
+      .filter((v): v is SigmetData => v !== undefined);
+
+    conusOutput.push(...output);
+  } catch (error) {
+    throw new Error(`[${DB_NAME.toUpperCase()}] Could not parse SIGMETs from the AWC XML: ${(error as Error).message}`);
   }
 
   // configure the base axios instance for the API calls
@@ -134,6 +221,9 @@ async function main() {
       return values;
     })
     .filter((v): v is SigmetData => v !== undefined);
+
+  // add the CONUS output to the intl output array
+  data.push(...conusOutput);
 
   // Helper function to check if a SIGMET should be cancelled
   const shouldCancelSigmet = (dbSigmet: SigmetData) => {

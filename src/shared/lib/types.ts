@@ -2,7 +2,7 @@ import { InferSelectModel } from "drizzle-orm";
 import { FeatureCollection, Point } from "geojson";
 import { metars, pireps, sigmets, stations, tafs } from "../db/tables/avwx.drizzle";
 import { z } from "zod";
-import { aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation";
+import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation";
 import { aqData } from "../db/tables/aq.drizzle";
 
 export type XMLCacheFile<TData, TDataName extends string> = {
@@ -25,6 +25,7 @@ export type CacheStationData = z.infer<typeof stationSchema>;
 export type CacheMetarData = z.infer<typeof metarSchema>;
 export type CacheTafData = z.infer<typeof tafSchema>;
 export type CachePirepData = z.infer<typeof pirepSchema>;
+export type CacheAirSigmetsData = z.infer<typeof airSigmetsSchema>;
 
 // database schema-derived types
 export type AQData = InferSelectModel<typeof aqData>;
