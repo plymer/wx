@@ -1,9 +1,13 @@
 import axios from "axios";
-import fs from "fs";
 import { XMLParser } from "fast-xml-parser";
-import { xmlParser } from "../shared/lib/utils";
+import { StationData } from "../shared/lib/types";
+import { generateDbConnection } from "../shared/lib/utils";
+import { stations } from "../shared/db/tables/avwx.drizzle";
+import "dotenv/config";
 
-const provinces = {
+const DB_NAME = "avwx";
+
+const PROVINCES = {
   AB: "Alberta",
   MB: "Manitoba",
   SK: "Saskatchewan",
@@ -20,17 +24,29 @@ const provinces = {
 
 const baseUrl = "https://en.wikipedia.org/w/api.php?action=parse&page=List_of_airports_in_";
 
-interface Feature {
-  type: "Feature";
-  properties: {
-    name: string;
-    siteId: string;
-  };
-  geometry: {
-    type: "Point";
-    coordinates: [number, number];
-  };
-}
+type RawTableData = {
+  td: [
+    { span: string; a: string }, // community name
+    { a: string }, // airport name
+    string | undefined, // icao code
+    string | undefined, // tc code
+    string | undefined, // iata code
+    {
+      span: {
+        link: string;
+        span: {
+          a: {
+            span: [
+              { span: string[] },
+              "/",
+              { span: { span: [string, { span: string; "#text": string }, { span: string; "#text": string }] } }, // coords
+            ];
+          };
+        };
+      };
+    },
+  ];
+};
 
 const parser = new XMLParser({
   ignoreAttributes: true,
@@ -39,63 +55,93 @@ const parser = new XMLParser({
   processEntities: true,
   htmlEntities: true,
 });
-async function scrapeProvince(code: string, name: string): Promise<Feature[]> {
+
+function extractCoordinates(coordinateCell: any): { lat: number; lon: number } | null {
+  try {
+    // Try to find the coordinate string by traversing the nested structure
+    function findCoordinateString(obj: any): string | null {
+      if (typeof obj === "string") {
+        // Check if this string contains coordinates (format: "lat; lon")
+        if (/^-?\d+\.?\d*;\s*-?\d+\.?\d*$/.test(obj.trim())) {
+          return obj.trim();
+        }
+        return null;
+      }
+
+      if (Array.isArray(obj)) {
+        for (const item of obj) {
+          const result = findCoordinateString(item);
+          if (result) return result;
+        }
+      }
+
+      if (obj && typeof obj === "object") {
+        for (const key of Object.keys(obj)) {
+          const result = findCoordinateString(obj[key]);
+          if (result) return result;
+        }
+      }
+
+      return null;
+    }
+
+    const coordString = findCoordinateString(coordinateCell);
+    if (!coordString) return null;
+
+    const [lat, lon] = coordString.split(";").map((coord) => parseFloat(coord.trim()));
+
+    if (isNaN(lat) || isNaN(lon)) return null;
+
+    return { lat, lon };
+  } catch (error) {
+    console.warn("Failed to extract coordinates:", error);
+    return null;
+  }
+}
+
+async function scrapeProvince(code: string, name: string): Promise<StationData[]> {
   const url = `${baseUrl}${name}&format=json`;
 
   const { data: json } = await axios.get(url);
 
   const html = parser.parse(`<html><body>${json.parse.text["*"]}</body></html>`);
 
-  const tableBody = html.html.body.div.table[0].tbody;
+  // we'll need to do something specific for Ontario *(of course)*
+
+  const tableBody = html.html.body.div.table[code === "ON" ? 1 : 0].tbody;
+  // remove the header
   const tableRows = tableBody.tr.slice(1);
 
-  type TableData = {
-    name: string;
-    siteId: string;
-    lat: number;
-    lon: number;
-  };
-
-  type RawTableData = {
-    td: [
-      { span: string; a: string }, // community name
-      { a: string }, // airport name
-      string | undefined, // icao code
-      string | undefined, // tc code
-      string | undefined, // iata code
-      {
-        span: {
-          link: string;
-          span: {
-            a: {
-              span: [
-                { span: string[] },
-                "/",
-                { span: { span: [string, { span: string; "#text": string }, { span: string; "#text": string }] } }, // coords
-              ];
-            };
-          };
-        };
-      },
-    ];
-  };
-
-  const tableTable: TableData[] = tableRows.reduce((acc: TableData[], row: RawTableData) => {
+  const sites: StationData[] = tableRows.reduce((acc: StationData[], row: RawTableData) => {
     const siteId = row.td[2] || row.td[3] || row.td[4];
 
     if (!siteId) {
-      console.warn(`No siteId found for row: ${JSON.stringify(row)}`);
+      console.warn(`No siteId found for entry: ${row.td[1]?.a || "unknown"}`);
       return acc;
     }
 
-    const name = row.td[1].a;
-    const [lat, lon] = row.td[5].span.span.a.span[2].span.span[1].span.split(";");
+    const name = row.td[1]?.a || String(row.td[1]);
+    if (!name) {
+      console.warn(`No name found for siteId: ${siteId}`);
+      return acc;
+    }
 
-    const output: TableData = {
+    const coordinates = extractCoordinates(row.td[4]) || extractCoordinates(row.td[5]);
+
+    if (!coordinates) {
+      console.warn(`No coordinates found for: ${name} (${siteId})`);
+      return acc;
+    }
+
+    const output: StationData = {
       name,
       siteId,
-      lat: parseFloat(lat),
-      lon: parseFloat(lon),
+      lat: coordinates.lat,
+      lon: coordinates.lon,
+      elev_f: null,
+      elev_m: null,
+      country: "CA",
+      state: code,
     };
 
     acc.push(output);
@@ -103,38 +149,59 @@ async function scrapeProvince(code: string, name: string): Promise<Feature[]> {
     return acc;
   }, []);
 
-  // need to fix when airport name is in italics in the table
-
-  console.log(tableTable);
-
-  const features: Feature[] = [];
-
-  return features;
+  return sites;
 }
 
 async function main() {
-  const allFeatures: Feature[] = [];
+  const db = await generateDbConnection(DB_NAME, { stations });
 
-  const AB = await scrapeProvince("AB", "Alberta");
+  if (!db) {
+    console.error(`[${DB_NAME.toUpperCase()}] (Stations) Database connection failed.`);
+    process.exit(1);
+  }
 
-  // for (const [code, name] of Object.entries(provinces)) {
-  //   console.log(`Scraping ${name}...`);
-  //   try {
-  //     const features = await scrapeProvince(code, name);
+  await Promise.allSettled(
+    Array.from(Object.entries(PROVINCES)).map(async (p) => {
+      const [code, name] = p;
+      console.log(`Scraping ${name}...`);
+      try {
+        const features = await scrapeProvince(code, name);
 
-  //     console.log(`  → Found ${features.length} airports`);
-  //   } catch (err) {
-  //     console.error(`Failed to scrape ${name}:`, err);
-  //   }
-  // }
+        return features;
+      } catch (err) {
+        console.error(`Failed to scrape ${name}: ${baseUrl}${name}&format=json\n\n${err}`);
+        return [];
+      }
+    }),
+  ).then(async (results) =>
+    results.forEach(async (provinceList) => {
+      if (provinceList.status === "fulfilled") {
+        const values = provinceList.value;
+        console.log(`[${DB_NAME.toUpperCase()}] Inserting ${values.length} stations...`);
 
-  // const geojson = {
-  //   type: "FeatureCollection",
-  //   features: allFeatures,
-  // };
+        // insert the station data, or update each station if it already exists
+        await Promise.allSettled(
+          values.map(async (station) => {
+            await db
+              .insert(stations)
+              .values(station)
+              .onDuplicateKeyUpdate({
+                set: {
+                  name: station.name,
+                  lat: station.lat,
+                  lon: station.lon,
+                  country: station.country,
+                  state: station.state,
+                },
+              });
+          }),
+        );
+      }
+    }),
+  );
 
-  // fs.writeFileSync("./data/canada-airports.geojson", JSON.stringify(geojson, null, 2));
-  // console.log(`✅ Done. Saved ${allFeatures.length} features to canada-airports.geojson`);
+  console.log(`[${DB_NAME.toUpperCase()}] Done updating stations from WikiPedia.`);
+  process.exit(0);
 }
 
 main();
