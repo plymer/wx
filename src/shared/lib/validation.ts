@@ -98,7 +98,10 @@ export const metarSchema = z.object({
     .optional()
     .transform((val) => (val === "" || val === undefined ? null : val)),
   metarType: z.enum(["METAR", "SPECI"]),
-  elevationM: z.number(),
+  elevationM: z
+    .number()
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
 });
 
 export const stationSchema = z.object({
