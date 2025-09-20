@@ -7,6 +7,7 @@ import { stations } from "../shared/db/tables/avwx.drizzle.js";
 import { FEET_PER_METRE } from "../shared/lib/constants.js";
 import { CacheStationData, StationData } from "../shared/lib/types.js";
 import { stationSchema } from "../shared/lib/validation.js";
+import { scrapeWiki } from "./canada-airports.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/stations.cache.json.gz";
 const DB_NAME = "avwx";
@@ -74,11 +75,13 @@ async function main() {
     );
 
     console.log(`[${DB_NAME.toUpperCase()}] Station cache file processing complete.`);
-    process.exit(0);
   } catch (error) {
     console.error(`[${DB_NAME.toUpperCase()}] Error processing station cache file: ${(error as Error).message}`);
     process.exit(1);
   }
+
+  await scrapeWiki();
+  process.exit(0);
 }
 
 await main();

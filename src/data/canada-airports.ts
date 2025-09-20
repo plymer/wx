@@ -1,8 +1,8 @@
 import axios from "axios";
 import { XMLParser } from "fast-xml-parser";
-import { StationData } from "../shared/lib/types";
-import { generateDbConnection } from "../shared/lib/utils";
-import { stations } from "../shared/db/tables/avwx.drizzle";
+import { StationData } from "../shared/lib/types.js";
+import { generateDbConnection } from "../shared/lib/utils.js";
+import { stations } from "../shared/db/tables/avwx.drizzle.js";
 import "dotenv/config";
 
 const DB_NAME = "avwx";
@@ -152,7 +152,7 @@ async function scrapeProvince(code: string, name: string): Promise<StationData[]
   return sites;
 }
 
-async function main() {
+export async function scrapeWiki() {
   const db = await generateDbConnection(DB_NAME, { stations });
 
   if (!db) {
@@ -204,4 +204,4 @@ async function main() {
   process.exit(0);
 }
 
-main();
+scrapeWiki();
