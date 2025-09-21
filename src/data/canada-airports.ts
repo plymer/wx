@@ -174,30 +174,33 @@ export async function scrapeWiki() {
       }
     }),
   ).then(async (results) =>
-    results.forEach(async (provinceList) => {
-      if (provinceList.status === "fulfilled") {
-        const values = provinceList.value;
-        console.log(`[${DB_NAME.toUpperCase()}] Inserting ${values.length} stations...`);
+    Promise.all(
+      results.map(async (provinceList) => {
+        // can't use forEach with async/await
+        if (provinceList.status === "fulfilled") {
+          const values = provinceList.value;
+          console.log(`[${DB_NAME.toUpperCase()}] Inserting ${values.length} stations...`);
 
-        // insert the station data, or update each station if it already exists
-        await Promise.allSettled(
-          values.map(async (station) => {
-            await db
-              .insert(stations)
-              .values(station)
-              .onDuplicateKeyUpdate({
-                set: {
-                  name: station.name,
-                  lat: station.lat,
-                  lon: station.lon,
-                  country: station.country,
-                  state: station.state,
-                },
-              });
-          }),
-        );
-      }
-    }),
+          // insert the station data, or update each station if it already exists
+          await Promise.allSettled(
+            values.map(async (station) => {
+              await db
+                .insert(stations)
+                .values(station)
+                .onDuplicateKeyUpdate({
+                  set: {
+                    name: station.name,
+                    lat: station.lat,
+                    lon: station.lon,
+                    country: station.country,
+                    state: station.state,
+                  },
+                });
+            }),
+          );
+        }
+      }),
+    ),
   );
 
   console.log(`[${DB_NAME.toUpperCase()}] Done updating stations from WikiPedia.`);
