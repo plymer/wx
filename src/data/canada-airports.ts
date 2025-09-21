@@ -189,7 +189,6 @@ export async function scrapeWiki() {
             .values(station)
             .onDuplicateKeyUpdate({
               set: {
-                name: station.name,
                 lat: station.lat,
                 lon: station.lon,
                 country: station.country,
