@@ -7,7 +7,7 @@ import { SfcObsPopupBundle } from "@shared/lib/types";
 import { useRef } from "react";
 import { Popup, PopupInstance } from "react-map-gl/maplibre";
 import Button from "../ui/Button";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useViewportBounds } from "@/stateStores/map/mapView";
 
 export const SurfaceDataPopup = () => {
@@ -70,13 +70,15 @@ export const SurfaceDataPopup = () => {
                 </h1>
                 <div className="font-mono">
                   {parsedMetar && <div>{highlightSigWx(parsedMetar)}</div>}
-                  {parsedTaf?.main && <div className="border-t mt-2 pt-2">{highlightSigWx(parsedTaf.main)}</div>}
+                  {parsedTaf?.main && (
+                    <div className="border-t mt-2 pt-2 max-md:hidden">{highlightSigWx(parsedTaf.main)}</div>
+                  )}
                   {parsedTaf?.partPeriods?.map((p, i) => (
-                    <div className={`ms-8 ${p.startsWith("FM") ? "-indent-6" : "-indent-4"}`} key={i}>
+                    <div className={`ms-8 max-md:hidden ${p.startsWith("FM") ? "-indent-6" : "-indent-4"}`} key={i}>
                       {highlightSigWx(p)}
                     </div>
                   ))}
-                  {parsedTaf?.rmk && <div>{parsedTaf.rmk}</div>}
+                  {parsedTaf?.rmk && <div className="max-md:hidden">{parsedTaf.rmk}</div>}
                 </div>
               </div>
             </>
@@ -86,6 +88,10 @@ export const SurfaceDataPopup = () => {
           <X />
           Close Details
         </Button>
+        {/* <Button className="mt-2" variant={"default"} onClick={handleClose}>
+          <Plus />
+          More Info
+        </Button> */}
       </div>
     </Popup>
   );

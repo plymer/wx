@@ -37,6 +37,9 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
   // keep track of the map initialization state
   const [isMapInitialized, setIsMapInitialized] = useState(false);
 
+  // set the cursor state
+  const [cursor, setCursor] = useState<React.CSSProperties["cursor"]>("grab");
+
   // // this is the data extracted from whatever map feature was clicked on, that is passed to the popup handler
 
   const handlePopupDisplay = (e: MapLayerMouseEvent): void => {
@@ -76,6 +79,7 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
       pitchWithRotate={false}
       touchPitch={false}
       boxZoom={false}
+      cursor={cursor}
       maxBounds={MAP_BOUNDS}
       style={{ width: "100%", height: "inherit", backgroundColor: "var(--color-neutral-700)" }}
       mapStyle={basemap}
@@ -85,17 +89,8 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
       onClick={(e) => {
         handlePopupDisplay(e);
       }}
-      onMouseEnter={(e) => {
-        handlePopupDisplay(e);
-        // setCursor("pointer");
-      }}
-      onMouseMove={(e) => {
-        handlePopupDisplay(e);
-      }}
-      onMouseLeave={() => {
-        // setPopupData(undefined);
-        // setCursor("grab");
-      }}
+      onMouseEnter={() => setCursor("pointer")}
+      onMouseLeave={() => setCursor("grab")}
       onLoad={onMapLoad}
       onMouseDown={(e) => {
         if (e.originalEvent.button === 1) {
