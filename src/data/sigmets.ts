@@ -1,10 +1,10 @@
-import axios, { AxiosError } from "axios";
-import { sigmets } from "../shared/db/tables/avwx.drizzle.js";
-import { gt, lt, sql } from "drizzle-orm";
-import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, HOUR } from "../shared/lib/constants.js";
-import { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../shared/lib/types.js";
-import { cardinalToDegrees, generateDbConnection, readGzipFile, xmlParser } from "../shared/lib/utils.js";
 import "dotenv/config";
+import axios, { AxiosError } from "axios";
+import { gt, lt, sql } from "drizzle-orm";
+import { sigmets } from "../shared/db/tables/avwx.drizzle.js";
+import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, HOUR } from "../shared/lib/constants.js";
+import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../shared/lib/types.js";
+import { cardinalToDegrees, generateDbConnection, readGzipFile, xmlParser } from "../shared/lib/utils.js";
 import { airSigmetsSchema } from "../shared/lib/validation.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";

@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { and, asc, desc, eq, gt, gte } from "drizzle-orm";
 import axios from "axios";
 import suncalc, { GetTimesResult } from "suncalc";
+import type { Feature, MultiPolygon } from "geojson";
 
 import { validateParams } from "../lib/zod-validator.js";
 import {
@@ -10,12 +11,11 @@ import {
   singleSiteSchema,
   xmetSchema,
 } from "../validationSchemas/alphanumeric.zod.js";
-import { HubDiscussion, XmetEventData } from "../lib/alphanumeric.types.js";
+import type { HubDiscussion, XmetEventData } from "../lib/alphanumeric.types.js";
 import { errorResponse, isConvectiveSigmet, jsonResponse, leadZero, processCoordinates } from "../lib/utils.js";
 import { avwx } from "../main.js";
 import { metars, sigmets, stations, tafs } from "../../shared/db/tables/avwx.drizzle.js";
 import { HOUR } from "../../shared/lib/constants.js";
-import { Feature, MultiPolygon } from "geojson";
 
 const route = new Hono();
 

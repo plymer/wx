@@ -2,12 +2,12 @@
 // taf cache updates minutely
 
 import "dotenv/config";
+import { lt } from "drizzle-orm";
 import { generateDbConnection, readGzipFile } from "../shared/lib/utils.js";
 import { xmlParser } from "../shared/lib/utils.js";
 import { tafs } from "../shared/db/tables/avwx.drizzle.js";
-import { CacheTafData, TafData, XMLCacheFile } from "../shared/lib/types.js";
+import type { CacheTafData, TafData, XMLCacheFile } from "../shared/lib/types.js";
 import { tafSchema } from "../shared/lib/validation.js";
-import { lt } from "drizzle-orm";
 import { HOUR } from "../shared/lib/constants.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/tafs.cache.xml.gz";

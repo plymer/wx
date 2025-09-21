@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Hono } from "hono";
-import { NavCanImageList, NavCanResponse } from "../lib/alphanumeric.types.js";
+import type { NavCanImageList, NavCanResponse } from "../lib/alphanumeric.types.js";
 import { errorResponse, jsonResponse } from "../lib/utils.js";
 
 const route = new Hono();

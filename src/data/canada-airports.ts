@@ -1,9 +1,9 @@
 import axios from "axios";
+import "dotenv/config";
 import { XMLParser } from "fast-xml-parser";
-import { StationData } from "../shared/lib/types.js";
+import type { StationData } from "../shared/lib/types.js";
 import { generateDbConnection } from "../shared/lib/utils.js";
 import { stations } from "../shared/db/tables/avwx.drizzle.js";
-import "dotenv/config";
 
 const DB_NAME = "avwx";
 
@@ -201,7 +201,4 @@ export async function scrapeWiki() {
   );
 
   console.log(`[${DB_NAME.toUpperCase()}] Done updating stations from WikiPedia.`);
-  process.exit(0);
 }
-
-scrapeWiki();

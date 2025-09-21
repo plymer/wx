@@ -1,11 +1,11 @@
+import { Context } from "hono";
 import suncalc, { GetTimesResult } from "suncalc";
 import * as turf from "@turf/turf";
+import type { Feature, FeatureCollection, Position } from "geojson";
 
-import { LatLon, SunTimes } from "./common.types.js";
-import { Context } from "hono";
-import { Feature, FeatureCollection, Position } from "geojson";
+import type { LatLon, SunTimes } from "./common.types.js";
+import type { XmetShapes } from "./alphanumeric.types.js";
 import { MINUTE } from "../../shared/lib/constants.js";
-import { XmetShapes } from "./alphanumeric.types.js";
 
 export function injectViteDevServer(fileContents: string): string {
   const output = fileContents.replace(

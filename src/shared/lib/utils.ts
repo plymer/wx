@@ -5,7 +5,7 @@ import { drizzle } from "drizzle-orm/mysql2";
 import { sql } from "drizzle-orm/sql";
 import { createGunzip } from "zlib";
 import { XMLParser } from "fast-xml-parser";
-import { WmoDirection } from "./types";
+import { WmoDirection } from "./types.js";
 
 export async function generateDbConnection<
   TSchema extends Record<string, MySqlTableWithColumns<any> | Relations<any, any>>,

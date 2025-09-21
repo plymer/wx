@@ -105,7 +105,10 @@ export const metarSchema = z.object({
 });
 
 export const stationSchema = z.object({
-  icaoId: z.string(),
+  icaoId: z
+    .string()
+    .length(4, "ICAO ID must be exactly 4 characters")
+    .regex(/^[A-Z0-9]{4}$/, "ICAO ID must contain only uppercase letters and numbers"),
   iataId: z.string(),
   faaId: z.string(),
   wmoId: z.string(),
@@ -200,10 +203,6 @@ export const pirepSchema = z.object({
       z.object({
         skyCover: z
           .string()
-          .optional()
-          .transform((val) => (val === undefined ? null : val)),
-        cloudBaseFtMsl: z.coerce
-          .number()
           .optional()
           .transform((val) => (val === undefined ? null : val)),
         cloudTopFtMsl: z.coerce

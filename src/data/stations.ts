@@ -5,7 +5,7 @@ import "dotenv/config";
 import { generateDbConnection, readGzipFile } from "../shared/lib/utils.js";
 import { stations } from "../shared/db/tables/avwx.drizzle.js";
 import { FEET_PER_METRE } from "../shared/lib/constants.js";
-import { CacheStationData, StationData } from "../shared/lib/types.js";
+import type { CacheStationData, StationData } from "../shared/lib/types.js";
 import { stationSchema } from "../shared/lib/validation.js";
 import { scrapeWiki } from "./canada-airports.js";
 
@@ -35,7 +35,7 @@ async function main() {
         // parse our object and validate it against the schema
         const parsed = stationSchema.safeParse(station);
         if (!parsed.success) {
-          console.error(`[${DB_NAME.toUpperCase()}] Invalid station data: ${parsed.error}`);
+          console.error(`[${DB_NAME.toUpperCase()}] Invalid station data (${station.icaoId}): ${parsed.error.message}`);
           return undefined; // skip invalid station data
         }
 
@@ -80,7 +80,14 @@ async function main() {
     process.exit(1);
   }
 
-  await scrapeWiki();
+  try {
+    await scrapeWiki();
+  } catch (error) {
+    console.error(
+      `[${DB_NAME.toUpperCase()}] Error scraping Canadian Sites from Wikipedia: ${(error as Error).message}`,
+    );
+    process.exit(1);
+  }
   process.exit(0);
 }
 

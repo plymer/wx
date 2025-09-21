@@ -2,12 +2,12 @@
 // pirep cache updates minutely
 
 import "dotenv/config";
+import { lt } from "drizzle-orm";
 import { generateDbConnection, readGzipFile } from "../shared/lib/utils.js";
 import { xmlParser } from "../shared/lib/utils.js";
 import { pireps } from "../shared/db/tables/avwx.drizzle.js";
-import { CachePirepData, PirepData, XMLCacheFile } from "../shared/lib/types.js";
+import type { CachePirepData, PirepData, XMLCacheFile } from "../shared/lib/types.js";
 import { pirepSchema } from "../shared/lib/validation.js";
-import { lt } from "drizzle-orm";
 import { HOUR } from "../shared/lib/constants.js";
 
 const CACHEFILE_URL = "https://aviationweather.gov/data/cache/aircraftreports.cache.xml.gz";

@@ -2,12 +2,12 @@
 // metar cache updates minutely
 
 import "dotenv/config";
+import { lt } from "drizzle-orm";
 import { generateDbConnection, readGzipFile } from "../shared/lib/utils.js";
 import { xmlParser } from "../shared/lib/utils.js";
 import { metars } from "../shared/db/tables/avwx.drizzle.js";
-import { CacheMetarData, MetarData, XMLCacheFile } from "../shared/lib/types.js";
+import type { CacheMetarData, MetarData, XMLCacheFile } from "../shared/lib/types.js";
 import { metarSchema } from "../shared/lib/validation.js";
-import { lt } from "drizzle-orm";
 import { HOUR } from "../shared/lib/constants.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/metars.cache.xml.gz";

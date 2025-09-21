@@ -1,4 +1,4 @@
-import { FeatureCollection } from "geojson";
+import type { FeatureCollection } from "geojson";
 
 export interface LightningFC extends FeatureCollection {
   timeStamp: string;

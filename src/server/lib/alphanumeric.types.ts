@@ -1,4 +1,4 @@
-import { SigmetData } from "../../shared/lib/types";
+import { SigmetData } from "../../shared/lib/types.js";
 import { Position } from "geojson";
 
 export type StationObject = {

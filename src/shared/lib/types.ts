@@ -1,9 +1,9 @@
 import { InferSelectModel } from "drizzle-orm";
 import { FeatureCollection, Point } from "geojson";
-import { metars, pireps, sigmets, stations, tafs } from "../db/tables/avwx.drizzle";
+import { metars, pireps, sigmets, stations, tafs } from "../db/tables/avwx.drizzle.js";
 import { z } from "zod";
-import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation";
-import { aqData } from "../db/tables/aq.drizzle";
+import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation.js";
+import { aqData } from "../db/tables/aq.drizzle.js";
 
 export type XMLCacheFile<TData, TDataName extends string> = {
   response: {
