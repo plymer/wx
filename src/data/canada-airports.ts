@@ -160,7 +160,7 @@ export async function scrapeWiki() {
     process.exit(1);
   }
 
-  await Promise.allSettled(
+  const results = await Promise.allSettled(
     Array.from(Object.entries(PROVINCES)).map(async (p) => {
       const [code, name] = p;
       console.log(`Scraping ${name}...`);
@@ -173,35 +173,33 @@ export async function scrapeWiki() {
         return [];
       }
     }),
-  ).then(async (results) =>
-    Promise.all(
-      results.map(async (provinceList) => {
-        // can't use forEach with async/await
-        if (provinceList.status === "fulfilled") {
-          const values = provinceList.value;
-          console.log(`[${DB_NAME.toUpperCase()}] Inserting ${values.length} stations...`);
-
-          // insert the station data, or update each station if it already exists
-          await Promise.allSettled(
-            values.map(async (station) => {
-              await db
-                .insert(stations)
-                .values(station)
-                .onDuplicateKeyUpdate({
-                  set: {
-                    name: station.name,
-                    lat: station.lat,
-                    lon: station.lon,
-                    country: station.country,
-                    state: station.state,
-                  },
-                });
-            }),
-          );
-        }
-      }),
-    ),
   );
+
+  // Process results sequentially to ensure all insertions complete
+  for (const provinceList of results) {
+    if (provinceList.status === "fulfilled") {
+      const values = provinceList.value;
+      console.log(`[${DB_NAME.toUpperCase()}] Inserting ${values.length} stations...`);
+
+      // insert the station data, or update each station if it already exists
+      await Promise.allSettled(
+        values.map(async (station) => {
+          await db
+            .insert(stations)
+            .values(station)
+            .onDuplicateKeyUpdate({
+              set: {
+                name: station.name,
+                lat: station.lat,
+                lon: station.lon,
+                country: station.country,
+                state: station.state,
+              },
+            });
+        }),
+      );
+    }
+  }
 
   console.log(`[${DB_NAME.toUpperCase()}] Done updating stations from WikiPedia.`);
 }
