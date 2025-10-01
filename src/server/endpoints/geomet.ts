@@ -85,6 +85,41 @@ route.get("/geomet", validateParams("query", realtimeLayersSchema), async (c) =>
   }
 });
 
+route.get("/eumetsat", validateParams("query", realtimeLayersSchema), async (c) => {
+  const EUMETSAT_GETCAPABILITIES =
+    "https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetCapabilities";
+
+  const { layers } = c.req.valid("query");
+
+  try {
+    // configure the XML parser to make traversing the XML easier
+    const newParser = new XMLParser({
+      removeNSPrefix: true,
+      ignoreAttributes: false,
+      textNodeName: "value",
+      attributeNamePrefix: "",
+      transformAttributeName: (attrName) => transformName(attrName),
+      transformTagName: (tagName) => transformName(tagName),
+    });
+
+    // fetch and parse the xml from the GET_CAPABILITIES endpoint on GeoMet
+    const xml = await axios
+      .get(EUMETSAT_GETCAPABILITIES)
+      .then((response) => response.data)
+      .then((data) => newParser.parse(data));
+
+    const layers = xml.WMS_Capabilities.Capability.Layer.Layer.filter((layer: any) =>
+      layer.Title.includes("- 0 degree"),
+    );
+
+    console.log(JSON.stringify(layers, null, 2));
+  } catch (error) {
+    return errorResponse(c, error);
+  }
+
+  return jsonResponse(c, { message: "EUMETSAT endpoint coming soon!" });
+});
+
 // create all endpoints above this export
 // it is used in the /src/main.ts file and bound to the main hono instance
 export default route;

@@ -28,32 +28,38 @@ export const API_CONFIG = {
     {
       data: "geomet",
       url: "/geomet",
-      description: "returns a list of layers, with their valid times coordinated",
-      params: ["layers", "mode", "frames"],
+      description: "returns a list of layers",
+      params: ["layers"],
     },
     {
-      data: "geomet",
+      data: "eumetsat",
+      url: "/eumetsat",
+      description: "returns a list of EUMETSAT layers",
+      params: ["layers"],
+    },
+    {
+      data: "gfas",
       url: "/charts/gfa",
       description: "returns a list of layers, with their valid times coordinated",
       params: null,
     },
 
     {
-      data: "geomet",
+      data: "lgfs",
       url: "/charts/lgf",
       description: "returns a list of layers, with their valid times coordinated",
       params: null,
     },
 
     {
-      data: "geomet",
+      data: "hlt",
       url: "/charts/hlt",
       description: "returns a list of layers, with their valid times coordinated",
       params: null,
     },
 
     {
-      data: "geomet",
+      data: "sigwx",
       url: "/charts/sigwx",
       description: "returns a list of layers, with their valid times coordinated",
       params: null,
