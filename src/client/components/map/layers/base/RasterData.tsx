@@ -85,7 +85,13 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
     type: "raster",
     tileSize: 256,
     bounds:
-      apiData.type === "satellite" ? (apiData.domain === "west" ? GOES_WEST_BOUNDS : GOES_EAST_BOUNDS) : MAP_BOUNDS,
+      apiData.type === "satellite"
+        ? apiData.domain === "europe"
+          ? undefined
+          : apiData.domain === "west"
+            ? GOES_WEST_BOUNDS
+            : GOES_EAST_BOUNDS
+        : MAP_BOUNDS,
   };
 
   // filter all the time steps that are within our validity period

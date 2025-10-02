@@ -24,7 +24,7 @@ const makeAlphaCode = (feature: Feature<MultiPolygon, XmetAPIData>) => {
 
   const isConvective = props.sequenceId === "conv";
 
-  const isAmerican = props.issuer === "KKCI" || props.issuer === "PHFO" || props.issuer === "PANC";
+  const isAmerican = props.issuer === "KKCI" || props.issuer === "PHFO" || props.issuer === "PAWU";
 
   if (isConvective) return `${props.numberCode}${props.charCode}`;
   else return `${props.charCode.replace("-", props.issuer)}${!isAmerican ? "" : " "}${props.numberCode}`;

@@ -24,7 +24,7 @@ import { InferSelectModel } from "drizzle-orm";
 
 import { aqData } from "../../shared/db/tables/aq.drizzle.js";
 
-import { StationData } from "../../shared/lib/types.js";
+import { StationData, WMSDomains } from "../../shared/lib/types.js";
 import { LngLat, MapGeoJSONFeature } from "maplibre-gl";
 
 export type AppMode = keyof typeof APP_MODES_LIST;
@@ -133,14 +133,9 @@ export type HubData = {
 // this replaces 'LayerData' for the raster layers
 export type RasterLayerData = {
   name: string;
-  domain: "national" | "west" | "east";
+  domain: WMSDomains;
   type: string;
   timeSteps: { validTime: number }[];
-};
-
-export type MapLayerConfig = {
-  vector: string[] | "east" | "west" | "national";
-  raster: string[];
 };
 
 // used to define the vector data (TODO: rename)

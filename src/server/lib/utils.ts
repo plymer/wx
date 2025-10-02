@@ -104,15 +104,38 @@ export function makeISOTimeStamp(time: number, mode: "display" | "data" = "data"
  * @param name a tag or attribute name that we want to transform
  * @returns a camelCase version of the tag or attribute name supplied
  */
-export function transformName(name: string) {
-  // if we don't have a dash, return the name as is
-  if (!name.includes("-") || !name.includes("#")) return name;
+export function transformName(name: string): string {
+  if (!name.includes("-") && !name.includes("#") && !name.includes("_")) {
+    const camelCase = name.charAt(0).toLowerCase() + name.slice(1);
+    return camelCase;
+  }
 
-  // otherwise, lets find the location of the dash and then capitalize the letter after it, and then strip out the dash
-  const index = name.indexOf("-") || name.indexOf("#");
-  const output = name.slice(0, index) + name.charAt(index + 1).toUpperCase() + name.slice(index + 2);
+  // Find the first occurrence of any special character
+  let index = -1;
+  const specialChars = ["-", "#", "_"];
 
-  // call this recursively to handle multiple dashes
+  for (const char of specialChars) {
+    const charIndex = name.indexOf(char);
+    if (charIndex !== -1 && (index === -1 || charIndex < index)) {
+      index = charIndex;
+    }
+  }
+
+  if (index === -1) {
+    // No special characters found, just lowercase first character
+    const camelCase = name.charAt(0).toLowerCase() + name.slice(1);
+    return camelCase;
+  }
+
+  // Check if this is the first transformation (contains uppercase letters before special char)
+  const firstPart = name.slice(0, index);
+  const isFirstTransformation = /[A-Z]/.test(firstPart) && firstPart === firstPart.toUpperCase();
+
+  // Only lowercase the first part if it's the initial transformation
+  const transformedFirstPart = isFirstTransformation ? firstPart.toLowerCase() : firstPart;
+  const secondPart = name.charAt(index + 1).toUpperCase() + name.slice(index + 2);
+  const output = transformedFirstPart + secondPart;
+
   return transformName(output);
 }
 

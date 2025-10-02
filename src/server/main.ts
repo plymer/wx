@@ -7,7 +7,7 @@ import { readFileSync } from "fs";
 import "dotenv/config";
 
 // endpoint imports
-import { default as geomet } from "./endpoints/geomet.js";
+import { default as wms } from "./endpoints/wms.js";
 import { default as alpha } from "./endpoints/alphanumeric.js";
 import { default as charts } from "./endpoints/charts.js";
 import { default as lightning } from "./endpoints/lightning.js";
@@ -47,7 +47,7 @@ app.get("/assets/*", serveStatic({ root: isProd ? "./dist" : "./" }));
 app.get("/*", serveStatic({ root: isProd ? "./dist" : "./" }));
 
 // add our api routes here
-app.route("/api", geomet);
+app.route("/api", wms);
 app.route("/api/alpha", alpha);
 app.route("/api/charts", charts);
 app.route("/api", lightning);

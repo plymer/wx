@@ -1,12 +1,13 @@
 import useAPI from "@/hooks/useAPI";
 import RasterDataLayer from "../base/RasterData";
-import { RasterLayerData } from "@/lib/types";
+import { EndpointUrls, RasterLayerData } from "@/lib/types";
 import { useSatelliteProduct, useShowSatellite } from "@/stateStores/map/rasterData";
 import { useMapRef } from "@/stateStores/map/mapView";
+import { SatelliteDomains } from "@shared/lib/types";
 
 interface Props {
   belowLayer?: string;
-  domain: "west" | "east";
+  domain: SatelliteDomains;
 }
 
 export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain }: Props) => {
@@ -14,21 +15,25 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
   const satelliteProduct = useSatelliteProduct();
   const mapRef = useMapRef();
 
-  const satelliteDomain = domain === "west" ? "GOES-West" : "GOES-East";
+  const satelliteDomain =
+    domain === "europe"
+      ? domain.charAt(0).toUpperCase() + domain.slice(1)
+      : domain === "west"
+        ? "GOES-West"
+        : "GOES-East";
 
   const belowLayerId = mapRef?.getLayer(belowLayer) ? belowLayer : "wateroutline";
 
-  const { data: satelliteData } = useAPI<RasterLayerData[]>(
-    "/geomet",
-    {
-      layers: `${satelliteDomain}_${satelliteProduct}`,
-    },
-    {
-      queryName: `${domain}SatelliteData`,
-      enabled,
-      interval: 1,
-    },
-  );
+  const queryParams =
+    domain === "europe" ? { layers: "mtg_fd:rgb_cloudphase" } : { layers: `${satelliteDomain}_${satelliteProduct}` };
+
+  const endpoint: EndpointUrls = domain === "europe" ? "/eumetsat" : "/geomet";
+
+  const { data: satelliteData } = useAPI<RasterLayerData[]>(endpoint, queryParams, {
+    queryName: `${satelliteDomain}SatelliteData`,
+    enabled,
+    interval: 1,
+  });
 
   if (!enabled || satelliteData?.status !== "success") return;
 

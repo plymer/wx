@@ -5,6 +5,21 @@ import { z } from "zod";
 import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation.js";
 import { aqData } from "../db/tables/aq.drizzle.js";
 
+export type RadarDomains = "national";
+export type SatelliteDomains = "east" | "west" | "europe";
+export type WMSDomains = RadarDomains | (SatelliteDomains & {});
+export type WMSLayerTypes = "radar" | "satellite";
+export type WMSLayer = {
+  name: string;
+  dimension: string;
+  domain: WMSDomains;
+  type: WMSLayerTypes;
+  title?: string;
+  timeSteps?: {
+    validTime: number;
+  }[];
+};
+
 export type XMLCacheFile<TData, TDataName extends string> = {
   response: {
     requestIndex: number;

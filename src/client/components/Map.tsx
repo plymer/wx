@@ -82,6 +82,7 @@ export default function WxMap() {
 
           <SatelliteLayer domain="west" />
           <SatelliteLayer domain="east" />
+          <SatelliteLayer domain="europe" />
           <RadarLayer />
 
           <AirQualityLayer />
