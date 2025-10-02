@@ -174,7 +174,7 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
                   "raster-opacity":
                     index === animation.currentFrame ||
                     index === prevFrameVisible ||
-                    (apiData.type === "satellite" && index === 0)
+                    (apiData.type === "satellite" && apiData.domain !== "europe" && index === 0)
                       ? 1
                       : 0, // here, we want the current, the previous, and the very last frame to be preserved so that we don't get any flickering of the map background since the renderer does not repsect our fade-duration property
                 }}
