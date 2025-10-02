@@ -1,19 +1,32 @@
 import { Layer, RasterSourceSpecification, Source, useMap } from "react-map-gl/maplibre";
 import { useEffect, useRef, useState } from "react";
 
-import { RasterLayerData } from "@/lib/types";
 import { useAnimationState, useDeltaTime, useFrame, useFrameCount, useStartTime } from "@/stateStores/map/animation";
-import { GOES_WEST_BOUNDS, GOES_EAST_BOUNDS, MAP_BOUNDS, GEOMET_GETMAP } from "@/config/map";
 import { makeISOTimeStamp } from "@/lib/utils";
-import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
+import {
+  EUMETSAT_GETMAP,
+  GEOMET_GETMAP,
+  GOES_WEST_BOUNDS,
+  GOES_EAST_BOUNDS,
+  MAP_BOUNDS,
+  EUMETSAT_BOUNDS,
+} from "@/config/rasterData";
+import type { WMSDomains, WMSLayer } from "@shared/lib/types";
+
 // import PausibleSource from "./PausibleSource";
 // import { useIsMoving } from "@/stateStores/mapView";
 
 interface Props {
   belowLayer?: string;
-  apiData?: RasterLayerData;
+  apiData?: WMSLayer;
   initDelay?: number;
 }
+
+const makeTileRequestString = (domain: WMSDomains, layerName: string, validTime: number) => {
+  const baseUrl = domain === "europe" ? EUMETSAT_GETMAP : GEOMET_GETMAP;
+
+  return `${baseUrl}${layerName}&time=${makeISOTimeStamp(validTime, "data")}`;
+};
 
 const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
   const animation = {
@@ -81,13 +94,12 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
   const layerId = "layer-" + apiData.type + "-" + apiData.domain;
 
   const source: RasterSourceSpecification = {
-    attribution: GEOMET_ATTRIBUTION["en"],
     type: "raster",
     tileSize: 256,
     bounds:
       apiData.type === "satellite"
         ? apiData.domain === "europe"
-          ? undefined
+          ? EUMETSAT_BOUNDS
           : apiData.domain === "west"
             ? GOES_WEST_BOUNDS
             : GOES_EAST_BOUNDS
@@ -127,7 +139,7 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
       <Source
         {...source}
         key={maxFrameId}
-        tiles={[`${GEOMET_GETMAP}${apiData.name}&time=${makeISOTimeStamp(timeSteps[maxFrame].validTime, "data")}`]}
+        tiles={[makeTileRequestString(apiData.domain, apiData.name, timeSteps[maxFrame].validTime)]}
         id={maxFrameId}
       >
         <Layer
@@ -148,7 +160,7 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
             <Source
               {...source}
               key={`${layerId}-${index}`}
-              tiles={[`${GEOMET_GETMAP}${apiData.name}&time=${makeISOTimeStamp(u.validTime, "data")}`]}
+              tiles={[makeTileRequestString(apiData.domain, apiData.name, u.validTime)]}
               id={`${layerId}-${index}`}
               // isPaused={isMoving}
             >

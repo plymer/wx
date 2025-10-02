@@ -16,5 +16,5 @@
     "isolatedModules": true,
     "outDir": "./dist"
   },
-  "include": ["src/server", "src/shared", "src/data"]
+  "include": ["src/server", "src/shared", "src/data", "src/client/config/config", "src/client/config/wms.config.ts"]
 }

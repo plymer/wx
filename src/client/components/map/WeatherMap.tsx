@@ -5,7 +5,6 @@ import { MapLayerMouseEvent, MapLibreEvent, StyleSpecification } from "maplibre-
 import { Loader2 } from "lucide-react";
 
 // helpers
-import { MAP_BOUNDS } from "@/config/map";
 
 // global state stores
 import { useMapStateActions } from "@/stateStores/map/mapView";
@@ -80,7 +79,6 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
       touchPitch={false}
       boxZoom={false}
       cursor={cursor}
-      maxBounds={MAP_BOUNDS}
       style={{ width: "100%", height: "inherit", backgroundColor: "var(--color-neutral-700)" }}
       mapStyle={basemap}
       // define which layers are interactive (contain data that we can extract)

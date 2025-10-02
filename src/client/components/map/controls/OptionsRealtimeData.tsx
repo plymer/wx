@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { CloudLightning, Layers, Radar, Satellite } from "lucide-react";
 
-import { SATELLITE_CHANNELS } from "@/config/map";
+import { SATELLITE_CHANNELS } from "@/config/rasterData";
 
 import {
   useRadarProduct,

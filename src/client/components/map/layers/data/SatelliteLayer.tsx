@@ -1,9 +1,9 @@
 import useAPI from "@/hooks/useAPI";
+import type { EndpointUrls } from "@/lib/types";
+import type { SatelliteDomains, WMSLayer } from "@shared/lib/types";
 import RasterDataLayer from "../base/RasterData";
-import { EndpointUrls, RasterLayerData } from "@/lib/types";
 import { useSatelliteProduct, useShowSatellite } from "@/stateStores/map/rasterData";
 import { useMapRef } from "@/stateStores/map/mapView";
-import { SatelliteDomains } from "@shared/lib/types";
 
 interface Props {
   belowLayer?: string;
@@ -29,7 +29,7 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
 
   const endpoint: EndpointUrls = domain === "europe" ? "/eumetsat" : "/geomet";
 
-  const { data: satelliteData } = useAPI<RasterLayerData[]>(endpoint, queryParams, {
+  const { data: satelliteData } = useAPI<WMSLayer[]>(endpoint, queryParams, {
     queryName: `${satelliteDomain}SatelliteData`,
     enabled,
     interval: 1,

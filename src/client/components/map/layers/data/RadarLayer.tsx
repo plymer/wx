@@ -1,6 +1,6 @@
 import useAPI from "@/hooks/useAPI";
 import RasterDataLayer from "../base/RasterData";
-import { RasterLayerData } from "@/lib/types";
+import { WMSLayer } from "@shared/lib/types";
 import { useRadarProduct, useShowRadar } from "@/stateStores/map/rasterData";
 import { useMapRef } from "@/stateStores/map/mapView";
 
@@ -15,7 +15,7 @@ export const RadarLayer = ({ belowLayer = "wateroutline" }: Props) => {
 
   const belowLayerId = mapRef?.getLayer(belowLayer) ? belowLayer : "wateroutline";
 
-  const { data: radarData } = useAPI<RasterLayerData[]>(
+  const { data: radarData } = useAPI<WMSLayer[]>(
     "/geomet",
     {
       layers: radarProduct,

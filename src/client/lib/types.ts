@@ -3,19 +3,10 @@
 import { ANIM_CONTROLS, ANIMATION_STATES } from "../config/animation";
 import { API_CONFIG } from "../config/api";
 import { AVIATION_PRODUCTS } from "../config/aviationProducts";
-import {
-  LAYER_TABS,
-  MAP_LINES,
-  MAP_OPTIONS_TABS,
-  MAP_PROJECTIONS,
-  RADAR_PRODUCTS,
-  SATELLITE_CHANNELS,
-  SATELLITES,
-  ZOOM_THRESHOLDS,
-} from "../config/map";
+import { LAYER_TABS, MAP_LINES, MAP_OPTIONS_TABS, MAP_PROJECTIONS, ZOOM_THRESHOLDS } from "../config/map";
 import { APP_MODES_LIST } from "../config/modes";
 import { PUBLIC_FORECAST_CONFIG } from "../config/public";
-import { RASTER_DATA_TYPES } from "../config/rasterData";
+import { RADAR_PRODUCTS, RASTER_DATA_TYPES, SATELLITE_CHANNELS, SATELLITES } from "../config/rasterData";
 import { VECTOR_DATA_TYPES, XMET_TYPES } from "../config/vectorData";
 
 import { FeatureCollection, MultiPoint, MultiPolygon } from "geojson";
@@ -128,14 +119,6 @@ export type HubData = {
   outlook: string;
   forecaster: string;
   office: string;
-};
-
-// this replaces 'LayerData' for the raster layers
-export type RasterLayerData = {
-  name: string;
-  domain: WMSDomains;
-  type: string;
-  timeSteps: { validTime: number }[];
 };
 
 // used to define the vector data (TODO: rename)

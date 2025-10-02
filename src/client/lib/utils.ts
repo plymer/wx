@@ -1,10 +1,11 @@
 // tailwindcss boilerplate things
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { ParsedTAF, RasterLayerData, XmetAPIData } from "./types";
+import type { ParsedTAF, XmetAPIData } from "./types";
 import { SIGWX_REGEX } from "./regex";
 import type { Feature, FeatureCollection, MultiPolygon, Point, Position } from "geojson";
 import * as turf from "@turf/turf";
+import { WMSLayer } from "@shared/lib/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -31,14 +32,14 @@ export const makeISOTimeStamp = (time: number, mode: "display" | "data" = "displ
   }
 };
 
-export function findNearestTimeStep(data: RasterLayerData, currentTime: number) {
+export function findNearestTimeStep(data: WMSLayer, currentTime: number) {
   // set some large number to use as the initial check
   let diff = 999999999;
   // set the default timestep to the zeroth item of th array
   let closestTimeStep = 0;
 
   // loop over each timestep in the array
-  data.timeSteps.forEach((timeStep, i) => {
+  data.timeSteps?.forEach((timeStep, i) => {
     // calculate the absolute value of the difference between the time of the current frame
     // and the validTime of the current timeStep we are looking at
     const newDiff = Math.abs(currentTime - timeStep.validTime);
