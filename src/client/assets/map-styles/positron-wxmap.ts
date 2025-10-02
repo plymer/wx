@@ -14,12 +14,6 @@ export const positronWxMap: StyleSpecification = {
   version: 8,
   name: "Positron-Wxmap",
   sources: {
-    openmapraster: {
-      type: "raster",
-      maxzoom: 6,
-      tileSize: 256,
-      tiles: ["https://tiles.openfreemap.org/natural_earth/ne2sr/{z}/{x}/{y}.png"],
-    },
     openmaptiles: {
       type: "vector",
       url: "https://tiles.openfreemap.org/planet",
@@ -32,19 +26,6 @@ export const positronWxMap: StyleSpecification = {
   ],
   glyphs: `${PUBLIC_URL}/fonts/{fontstack}/{range}.pbf`,
   layers: [
-    {
-      id: "terrain",
-      type: "raster",
-      source: "openmapraster",
-      "source-layer": "ne2_shaded",
-      maxzoom: 14,
-      paint: {
-        "raster-opacity": ["interpolate", ["exponential", 1.5], ["zoom"], 0, 1, 6, 0.2],
-        "raster-saturation": -1,
-        "raster-brightness-max": 0.3,
-        "raster-contrast": 0.5,
-      },
-    },
     {
       id: "waterfill",
       type: "fill",

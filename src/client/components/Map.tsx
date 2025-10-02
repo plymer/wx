@@ -33,8 +33,9 @@ import { MarineRegionsOverlay } from "./map/layers/overlays/MarineRegionsOverlay
 import { LightningDataLayer } from "./map/layers/data/LightningDataLayer";
 import { SurfaceDataLayer } from "./map/layers/data/SurfaceDataLayer";
 import { SurfaceDataPopup } from "./map/SurfaceDataPopup";
-import AirQualityLayer from "./map/layers/data/AirQualityLayer";
+import { AirQualityLayer } from "./map/layers/data/AirQualityLayer";
 import { SigmetLayer } from "./map/layers/data/SigmetLayer";
+import { TerrainRGB } from "./map/layers/base/TerrainRGB";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -79,6 +80,8 @@ export default function WxMap() {
           /> */}
 
           {/* <DataAttributions className="absolute bottom-0 right-0 rounded-md max-w-1/2 bg-accent border-1 border-black text-white m-2" /> */}
+
+          <TerrainRGB />
 
           <SatelliteLayer domain="west" />
           <SatelliteLayer domain="east" />

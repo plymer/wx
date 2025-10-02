@@ -13,7 +13,7 @@ interface Props {
   belowLayer?: string;
 }
 
-const AirQualityLayer = ({ belowLayer }: Props) => {
+export const AirQualityLayer = ({ belowLayer }: Props) => {
   const enabled = useShowAQ();
 
   const frame = useFrame();
@@ -184,5 +184,3 @@ const AirQualityLayer = ({ belowLayer }: Props) => {
     </>
   );
 };
-
-export default AirQualityLayer;
