@@ -109,6 +109,8 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
   // filter all the time steps that are within our validity period
   const timeSteps = apiData.timeSteps.filter((time) => time.validTime > animation.startTime);
 
+  if (timeSteps.length === 0) return; // if we have no valid time steps, don't render anything
+
   // we also need to make sure we have enough frames to cover the entire animation, so first calculate the difference between the number of time steps we have filtered and the total number of frames
   const timeStepsDiff = timeSteps.length - animation.frameCount;
 
