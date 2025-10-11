@@ -129,6 +129,8 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
   rules for smooth animation:
    1. absolutely NO tile source must change, otherwise the layer will dump the previous tiles and re-initialize new ones, leading to the checkerboard pattern and a poor UX. i do not believe this behaviour can be changed as it is inherent in both mapbox and maplibre.
 
+
+   i am leaving this here as a testament to my stupidity:
   2. the previous frame must be rendered under the current frame in order to prevent the flickering of layers due to an inherent, unchangeable (as of 2024-09-02) 300ms fadeout for each layer. the property "raster-fade-duration" does not do anything as of this time.
   */
 
