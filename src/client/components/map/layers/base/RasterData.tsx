@@ -141,6 +141,51 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
 
   const transition: TransitionSpecification = { duration: 0 };
 
+  // this implementation works for very slow frame changes but is limited by network performance
+  //   i need to figure out what is happening to the tiles or tilecache when the sources change on the layers
+  // const currentLayer = `${layerId}-${animation.currentFrame}`;
+  // const prevLayer = animation.currentFrame > 0 ? `${layerId}-${animation.currentFrame - 1}` : undefined;
+  // const nextLayer = animation.currentFrame < maxFrame ? `${layerId}-${animation.currentFrame + 1}` : undefined;
+  // return (
+  //   <>
+  //     {timeSteps.map((ts, index) => {
+  //       console.log("sourceId", `${layerId}-${index}`);
+  //       return (
+  //         <Source
+  //           {...source}
+  //           key={`source-${layerId}-${index}`}
+  //           tiles={[makeTileRequestString(apiData.domain, apiData.name, ts.validTime)]}
+  //           id={`${layerId}-${index}`}
+  //           // isPaused={isMoving}
+  //         />
+  //       );
+  //     })}
+  //     {prevLayer && (
+  //       <Layer
+  //         key={`layer-${prevLayer}`}
+  //         type="raster"
+  //         source={prevLayer}
+  //         paint={{ "raster-opacity": 0, "raster-opacity-transition": transition }}
+  //       />
+  //     )}
+  //     <Layer
+  //       key={`layer-${currentLayer}`}
+  //       source={currentLayer}
+  //       type="raster"
+  //       beforeId={belowLayer}
+  //       paint={{ "raster-opacity-transition": transition }}
+  //     />
+  //     {nextLayer && (
+  //       <Layer
+  //         key={`layer-${nextLayer}`}
+  //         type="raster"
+  //         source={nextLayer}
+  //         paint={{ "raster-opacity": 0, "raster-opacity-transition": transition }}
+  //       />
+  //     )}
+  //   </>
+  // );
+
   return (
     <>
       <Source
