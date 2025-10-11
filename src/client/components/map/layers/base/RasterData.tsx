@@ -11,7 +11,8 @@ import {
   MAP_BOUNDS,
   EUMETSAT_BOUNDS,
 } from "@/config/rasterData";
-import type { WMSDomains, WMSLayer } from "@shared/lib/types";
+import type { WMSDomains, WMSLayer, WMSLayerTypes } from "@shared/lib/types";
+import { TransitionSpecification } from "maplibre-gl";
 
 // import PausibleSource from "./PausibleSource";
 // import { useIsMoving } from "@/stateStores/mapView";
@@ -136,6 +137,8 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
 
   // we draw the maxFrame first upon mounting the component, we wait the init delay timeout and then add all of the other frames, referencing the maxFrameId as the beforeId to ensure that it will always be the top-most layer rendered
 
+  const transition: TransitionSpecification = { duration: 0 };
+
   return (
     <>
       <Source
@@ -146,11 +149,11 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
       >
         <Layer
           type="raster"
-          source="source"
+          source={maxFrameId}
           id={maxFrameId}
           beforeId={belowLayer}
           paint={{
-            "raster-fade-duration": 300, // literally doesn't do anything; defaults to 300 ms
+            "raster-opacity-transition": transition,
             "raster-opacity": animation.currentFrame === maxFrame ? 1 : 0,
           }}
         />
@@ -168,17 +171,12 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
             >
               <Layer
                 type="raster"
-                source="source"
+                source={`${layerId}-${index}`}
                 id={`${layerId}-${index}`}
                 beforeId={maxFrameId} // we set this to the max frame's id
                 paint={{
-                  "raster-fade-duration": 300, // literally doesn't do anything; defaults to 300 ms
-                  "raster-opacity":
-                    index === animation.currentFrame ||
-                    index === prevFrameVisible ||
-                    (apiData.type === "satellite" && apiData.domain !== "europe" && index === 0)
-                      ? 1
-                      : 0, // here, we want the current, the previous, and the very last frame to be preserved so that we don't get any flickering of the map background since the renderer does not repsect our fade-duration property
+                  "raster-opacity-transition": transition,
+                  "raster-opacity": animation.currentFrame === index ? 1 : 0,
                 }}
               />
             </Source>
