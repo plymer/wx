@@ -3,29 +3,40 @@ import "dotenv/config";
 
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import cors from "cors";
-import { router, publicProcedure } from "./lib/trpc.js";
-import { z } from "zod";
-
-// endpoint imports
 
 // database schemas
-import * as aqSchema from "./db/tables/aq.drizzle.js";
+import * as aqDbSchema from "./db/tables/aq.drizzle.js";
 import * as avwxSchemas from "./db/tables/avwx.drizzle.js";
 import * as avwxRelations from "./db/relations/avwx.relations.drizzle.js";
+
+// utilities
 import { generateDbConnection } from "./lib/utils.js";
 
-// custom types and utilities
+// endpoint routers
+import { aqRouter } from "./endpoints/aq.js";
+import { lightningRouter } from "./endpoints/lightning.js";
+import { wmsRouter } from "./endpoints/wms.js";
+import { wxmapRouter } from "./endpoints/wxmap.js";
+import { alphanumericRouter } from "./endpoints/alphanumeric.js";
+import { chartsRouter } from "./endpoints/charts.js";
+import z from "zod";
+import { publicProcedure, router } from "./lib/trpc.js";
 
-export const aqDb = await generateDbConnection("aq", aqSchema);
+// database connections
+// export const aqDb = await generateDbConnection("aq", aqDbSchema);
 const avwxCombinedSchema = {
   ...avwxSchemas,
   ...avwxRelations,
 };
+export const avwxDb = await generateDbConnection("avwx", avwxCombinedSchema);
 
-const appRouter = router({
+// Merge all routers into the main app router
+// const appRouter = router({
+//   alphanumericRouter,
+// });
+
+const greetRouter = router({
   greeting: publicProcedure
-    // This is the input schema of your procedure
-    // 💡 Tip: Try changing this and see type errors on the client straight away
     .input(
       z
         .object({
@@ -34,13 +45,13 @@ const appRouter = router({
         .nullish(),
     )
     .query(async ({ input }) => {
-      // This is what you're returning to your client
-
-      return {
-        text: `Hello, ${input?.name ?? "world!"}`,
-        // 💡 Tip: Try adding a new property here and see it propagate to the client straight-away
-      };
+      return `Hello, ${input?.name ?? "world!"}`;
     }),
+});
+
+const appRouter = router({
+  base: greetRouter,
+  alpha: alphanumericRouter,
 });
 
 // Export type router type signature,
@@ -50,7 +61,7 @@ export type AppRouter = typeof appRouter;
 createHTTPServer({
   middleware: cors(),
   router: appRouter,
-  basePath: "./api",
+  // basePath: "/api",
 }).listen(3000);
 
-console.log(`tRPC server listening on http://localhost:3000/api`);
+console.log(`tRPC server listening on http://localhost:3000`);

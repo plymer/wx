@@ -1,74 +1,69 @@
 import axios, { AxiosError } from "axios";
 import type { Feature, Point } from "geojson";
+import { TRPCError } from "@trpc/server";
+
 import { LightningFC } from "../lib/lightning.types.js";
+import { router, publicProcedure } from "../lib/trpc.js";
 
-// route.get("/lightning", async (c) => {
-//   // first, lets get our current minutes from the current UTC time
-//   const latestTime = new Date().getUTCMinutes();
+export const lightningRouter = router({
+  lightning: publicProcedure.query(async () => {
+    const latestTime = new Date().getUTCMinutes();
+    const roundedMinutes = Math.floor(latestTime / 6) * 6;
 
-//   // lightning data is binned into 6-minute intervals, so we need to round down to the nearest 6-minute mark
-//   const roundedMinutes = Math.floor(latestTime / 6) * 6;
+    const searchStartTime = new Date();
+    searchStartTime.setUTCMinutes(roundedMinutes);
+    searchStartTime.setUTCSeconds(0);
+    searchStartTime.setUTCMilliseconds(0);
 
-//   const searchStartTime = new Date();
-//   searchStartTime.setUTCMinutes(roundedMinutes);
-//   searchStartTime.setUTCSeconds(0);
-//   searchStartTime.setUTCMilliseconds(0);
+    const timeStamps = [];
+    for (let i = 0; i < 32; i++) {
+      const time = new Date(searchStartTime.getTime() - i * 6 * 60 * 1000);
+      const formattedTime = time
+        .toISOString()
+        .replace(/.\d+Z$/g, "")
+        .replace("T", "_")
+        .replace(/:/g, "");
+      timeStamps.push(formattedTime);
+    }
 
-//   // our search time is in the format YYYY-MM-DD_HHMMSS
-//   // we want to loop back every 6 minutes for the last 3 hours and return all of the lightning data
-//   // we'll create an array of timestamps to fetch
-//   const timeStamps = [];
-//   for (let i = 0; i < 32; i++) {
-//     const time = new Date(searchStartTime.getTime() - i * 6 * 60 * 1000);
-//     const formattedTime = time
-//       .toISOString() //
-//       .replace(/.\d+Z$/g, "")
-//       .replace("T", "_")
-//       .replace(/:/g, ""); // replace the colons with nothing to match the format YYYY-MM-DD_HHMMSS
-//     timeStamps.push(formattedTime);
-//   }
+    const urlList = timeStamps.map((ts) => `https://weather.gc.ca/api/app/v2/Lightning/1/${ts}`);
 
-//   const urlList = timeStamps.map((ts) => `https://weather.gc.ca/api/app/v2/Lightning/1/${ts}`);
+    try {
+      const responses = await Promise.all(
+        urlList.map((url) =>
+          axios
+            .get(url)
+            .then((res) => res.data as LightningFC)
+            .catch((err: AxiosError) => {
+              console.error(`Error fetching data from ${url}:`, err.message);
+              return null;
+            }),
+        ),
+      );
 
-//   try {
-//     const responses = await Promise.all(
-//       urlList.map((url) =>
-//         axios
-//           .get(url)
-//           .then((res) => res.data as LightningFC)
-//           .catch((err: AxiosError) => {
-//             console.error(`Error fetching data from ${url}:`, err.message);
-//             return null; // Return null for failed requests
-//           }),
-//       ),
-//     );
+      const features: Feature[] = [];
 
-//     // keep track of all of the features we find
-//     const features: Feature[] = [];
+      responses.forEach((res) => {
+        if (!res) return null;
 
-//     // so now we need to collapse all of features into a single FeatureCollection with a 'validTime' property
-//     responses.forEach((res) => {
-//       if (!res) return null; // Skip null responses
+        const validTime = new Date(res.dateTo || res.timeStamp).getTime();
+        const coords = res.features.map((feature) => (feature.geometry as Point).coordinates);
 
-//       // prefer dateTo if available, otherwise use timeStamp
-//       const validTime = new Date(res.dateTo || res.timeStamp).getTime();
+        features.push({
+          type: "Feature",
+          geometry: { type: "MultiPoint", coordinates: coords },
+          properties: {
+            validTime,
+          },
+        });
+      });
 
-//       // gather all of the coordinates from the features
-//       const coords = res.features.map((feature) => (feature.geometry as Point).coordinates);
-
-//       features.push({
-//         type: "Feature",
-//         geometry: { type: "MultiPoint", coordinates: coords },
-//         properties: {
-//           validTime,
-//         },
-//       });
-//     });
-
-//     return jsonResponse(c, features, "geojson");
-//   } catch (error) {
-//     return errorResponse(c, error);
-//   }
-// });
-
-// export default route;
+      return features;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
+});

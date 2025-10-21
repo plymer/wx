@@ -2,6 +2,7 @@ import { and, asc, desc, eq, gt, gte } from "drizzle-orm";
 import axios from "axios";
 import suncalc, { GetTimesResult } from "suncalc";
 import type { Feature, MultiPolygon } from "geojson";
+import { TRPCError } from "@trpc/server";
 
 import {
   metarSchema,
@@ -15,337 +16,321 @@ import { isConvectiveSigmet, leadZero, processCoordinates } from "../lib/utils.j
 import { metars, sigmets, stations, tafs } from "../db/tables/avwx.drizzle.js";
 import { HOUR } from "../lib/constants.js";
 
-// route.get("/metars", validateParams("query", metarSchema), async (c) => {
-//   const { site, hrs } = c.req.valid("query");
+import { avwxDb } from "../main.js";
+import { publicProcedure, router } from "../lib/trpc.js";
 
-//   if (!avwx) {
-//     console.error("[API] No avwx connection available.");
-//     return errorResponse(c, "No avwx connection available.");
-//   }
+const HubSites: Record<string, string> = {
+  CYYZ: "Toronto Pearson Int'l Airport",
+  CYUL: "Montreal Trudeau Int'l Airport",
+  CYYC: "Calgary Int'l Airport",
+  CYVR: "Vancouver Int'l Airport",
+  CYOW: "Ottawa MacDonald Int'l Airport",
+  CYHZ: "Halifax Stanfield Airport",
+};
 
-//   // do a conversion for CYEU -> CWEU
-//   const searchSite = site === "CYEU" ? "CWEU" : site;
+export const alphanumericRouter = router({
+  metars: publicProcedure.input(metarSchema).query(async ({ input }) => {
+    if (!avwxDb) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
+    }
 
-//   console.log("[API] Requesting METARs for:", searchSite, "for the last", hrs, "hours");
+    const { site, hrs } = input;
+    const searchSite = site === "CYEU" ? "CWEU" : site;
 
-//   try {
-//     // retrieve the data from the avwx database
-//     const metarData = await avwx.query.metars.findMany({
-//       columns: { rawText: true },
-//       where: and(eq(metars.siteId, searchSite), gte(metars.validTime, new Date(Date.now() - hrs * HOUR))),
-//       orderBy: asc(metars.validTime),
-//     });
+    console.log("[API] Requesting METARs for:", searchSite, "for the last", hrs, "hours");
 
-//     if (!metarData || metarData.length === 0) {
-//       // we do not have any METARs that we can return, so send a 'noData' response
-//       return c.json({ status: "noData" }, 200);
-//     }
+    try {
+      const metarData = await avwxDb.query.metars.findMany({
+        columns: { rawText: true },
+        where: and(eq(metars.siteId, searchSite), gte(metars.validTime, new Date(Date.now() - hrs * HOUR))),
+        orderBy: asc(metars.validTime),
+      });
 
-//     const output = metarData.map((m) => m.rawText);
+      if (!metarData || metarData.length === 0) {
+        return { status: "noData" as const };
+      }
 
-//     return jsonResponse(c, output);
-//   } catch (error) {
-//     return errorResponse(c, error);
-//   }
-// });
+      return metarData.map((m) => m.rawText);
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
 
-// route.get("/sitedata", validateParams("query", singleSiteSchema), async (c) => {
-//   const { site } = c.req.valid("query");
+  sitedata: publicProcedure.input(singleSiteSchema).query(async ({ input }) => {
+    if (!avwxDb) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
+    }
 
-//   if (!avwx) {
-//     console.error("[API] No avwx connection available.");
-//     return errorResponse(c, "No avwx connection available.");
-//   }
+    const { site } = input;
+    const searchSite = site === "CWEU" ? "CYEU" : site;
 
-//   // do a conversion for CWEU -> CYEU
-//   const searchSite = site === "CWEU" ? "CYEU" : site;
+    console.log("[API] Requesting site data for:", searchSite);
 
-//   console.log("[API] Requesting site data for:", searchSite);
+    try {
+      const stationData = await avwxDb.query.stations.findFirst({
+        where: eq(stations.siteId, searchSite),
+      });
 
-//   try {
-//     const stationData = await avwx.query.stations.findFirst({
-//       where: eq(stations.siteId, searchSite),
-//     });
+      if (!stationData) {
+        return { status: "noData" as const };
+      }
 
-//     // if we don't have any data for this station, return a noData response
-//     if (!stationData) {
-//       return c.json({ status: "noData" }, 200);
-//     }
+      const { siteId, name, lat, lon, elev_f, elev_m, country, state } = stationData;
 
-//     const { siteId, name, lat, lon, elev_f, elev_m, country, state } = stationData;
+      const times: GetTimesResult = suncalc.getTimes(new Date(), lat, lon);
 
-//     // create a suncalc time object
-//     const times: GetTimesResult = suncalc.getTimes(new Date(), lat, lon);
+      const sunrise: string =
+        times.sunrise.getUTCHours().toString() !== "NaN"
+          ? leadZero(times.sunrise.getUTCHours(), 2) + ":" + leadZero(times.sunrise.getUTCMinutes(), 2) + "Z"
+          : "---";
+      const sunset: string =
+        times.sunsetStart.getUTCHours().toString() !== "NaN"
+          ? leadZero(times.sunsetStart.getUTCHours(), 2) + ":" + leadZero(times.sunsetStart.getUTCMinutes(), 2) + "Z"
+          : "---";
 
-//     // set sunrise and sunset times to "---" when the sun doesn't rise or set today
-//     const sunrise: string =
-//       times.sunrise.getUTCHours().toString() !== "NaN"
-//         ? leadZero(times.sunrise.getUTCHours(), 2) + ":" + leadZero(times.sunrise.getUTCMinutes(), 2) + "Z"
-//         : "---";
-//     const sunset: string =
-//       times.sunsetStart.getUTCHours().toString() !== "NaN"
-//         ? leadZero(times.sunsetStart.getUTCHours(), 2) + ":" + leadZero(times.sunsetStart.getUTCMinutes(), 2) + "Z"
-//         : "---";
+      return {
+        siteId,
+        name,
+        lat:
+          lat > 0
+            ? (Math.round(lat * 10) / 10).toString() + "°N"
+            : Math.abs(Math.round(lat * 10) / 10).toString() + "°S",
+        lon:
+          lon > 0
+            ? (Math.round(lon * 10) / 10).toString() + "°E"
+            : Math.abs(Math.round(lon * 10) / 10).toString() + "°W",
+        elev_f,
+        elev_m,
+        country,
+        state,
+        sunrise,
+        sunset,
+      };
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
 
-//     const output = {
-//       siteId,
-//       name,
-//       lat:
-//         lat > 0 ? (Math.round(lat * 10) / 10).toString() + "°N" : Math.abs(Math.round(lat * 10) / 10).toString() + "°S",
-//       lon:
-//         lon > 0 ? (Math.round(lon * 10) / 10).toString() + "°E" : Math.abs(Math.round(lon * 10) / 10).toString() + "°W",
-//       elev_f,
-//       elev_m,
-//       country,
-//       state,
-//       sunrise,
-//       sunset,
-//     };
+  taf: publicProcedure.input(singleSiteSchema).query(async ({ input }) => {
+    if (!avwxDb) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
+    }
 
-//     // return the site data object
-//     return jsonResponse(c, output);
-//   } catch (error) {
-//     return errorResponse(c, error);
-//   }
-// });
+    const { site } = input;
+    const searchSite = site === "CWEU" ? "CYEU" : site;
 
-// route.get("/taf", validateParams("query", singleSiteSchema), async (c) => {
-//   const { site } = c.req.valid("query");
+    console.log("[API] Requesting TAF for:", searchSite);
 
-//   if (!avwx) {
-//     console.error("[API] No avwx connection available.");
-//     return errorResponse(c, "No avwx connection available.");
-//   }
+    try {
+      const tafData = await avwxDb.query.tafs.findMany({
+        columns: { rawText: true },
+        where: eq(tafs.siteId, searchSite),
+        orderBy: desc(tafs.validTime),
+      });
 
-//   // do a conversion for CWEU -> CYEU
-//   const searchSite = site === "CWEU" ? "CYEU" : site;
+      if (!tafData || tafData.length === 0) {
+        return { status: "noData" as const };
+      }
 
-//   console.log("[API] Requesting TAF for:", searchSite);
+      return tafData[0].rawText;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
 
-//   try {
-//     // retrieve the data from the avwx database
-//     const tafData = await avwx.query.tafs.findMany({
-//       columns: { rawText: true },
-//       where: eq(tafs.siteId, searchSite),
-//       orderBy: desc(tafs.validTime),
-//     });
+  hubs: publicProcedure.input(singleSiteSchema).query(async ({ input }) => {
+    const { site } = input;
+    const url = "https://metaviation.ec.gc.ca/hubwx/scripts/getForecasterNotes.php";
 
-//     if (!tafData || tafData.length === 0) {
-//       // we do not have any TAFs that we can return, so send a 'noData' response
-//       return c.json({ status: "noData" }, 200);
-//     }
+    try {
+      const hubs: HubDiscussion = await axios.get(url).then((hub) => hub.data);
 
-//     const output = tafData[0].rawText;
+      if (!Object.hasOwn(hubs, site)) {
+        return { status: "noData" as const };
+      }
 
-//     return jsonResponse(c, output);
-//   } catch (error) {
-//     return errorResponse(c, error);
-//   }
-// });
+      const siteName = HubSites[site as keyof typeof HubSites];
 
-// route.get("/hubs", validateParams("query", singleSiteSchema), async (c) => {
-//   const { site } = c.req.valid("query");
+      const {
+        strheaders: header,
+        strdiscussion: discussion,
+        stroutlook: outlook,
+        strforecaster: forecaster,
+        stroffice: office,
+      } = hubs[site as keyof HubDiscussion];
 
-//   const HubSites: Record<string, string> = {
-//     CYYZ: "Toronto Pearson Int'l Airport",
-//     CYUL: "Montreal Trudeau Int'l Airport",
-//     CYYC: "Calgary Int'l Airport",
-//     CYVR: "Vancouver Int'l Airport",
-//     CYOW: "Ottawa MacDonald Int'l Airport",
-//     CYHZ: "Halifax Stanfield Airport",
-//   };
+      return {
+        siteName,
+        header,
+        discussion,
+        outlook,
+        forecaster,
+        office,
+      };
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
 
-//   const url = "https://metaviation.ec.gc.ca/hubwx/scripts/getForecasterNotes.php";
+  publicBulletin: publicProcedure.input(publicBulletinSchema).query(async ({ input }) => {
+    const { bulletin, office } = input;
 
-//   try {
-//     // get the data
-//     const hubs: HubDiscussion = await axios.get(url).then((hub) => hub.data);
+    const searchUrl =
+      bulletin === "focn45" && office === "cwwg"
+        ? "https://tgftp.nws.noaa.gov/data/raw/fo/focn45.cwwg..txt"
+        : `https://weather.gc.ca/forecast/public_bulletins_e.html?Bulletin=${bulletin}.${office}`;
 
-//     // check to see if the site id exists in the resulting json, return an error message if it doesnt
-//     if (!Object.hasOwn(hubs, site)) {
-//       return c.json({ status: "noData" }, 200);
-//     }
+    console.log("requesting bulletin from:", searchUrl);
 
-//     const siteName = HubSites[site as keyof typeof HubSites];
+    try {
+      const bulletinData: string = await axios.get(searchUrl).then((bulletin) => bulletin.data);
 
-//     const {
-//       strheaders: header,
-//       strdiscussion: discussion,
-//       stroutlook: outlook,
-//       strforecaster: forecaster,
-//       stroffice: office,
-//     } = hubs[site as keyof HubDiscussion];
+      if (bulletinData.length === 0) {
+        return { status: "noData" as const };
+      }
 
-//     const output = {
-//       siteName,
-//       header,
-//       discussion,
-//       outlook,
-//       forecaster,
-//       office,
-//     };
+      let output = bulletinData;
 
-//     return jsonResponse(c, output);
-//   } catch (error) {
-//     return errorResponse(c, error);
-//   }
-// });
+      if (bulletin !== "focn45") {
+        const refPattern = /(\n[-]{2,})\n?((.+)\n){1,}([-]{2,})/g;
+        const bulletinText = bulletinData.match(/<pre>[\s\S]*?<\/pre>/g);
 
-// route.get("/public/bulletin", validateParams("query", publicBulletinSchema), async (c) => {
-//   const { bulletin, office } = c.req.valid("query");
+        if (!bulletinText || bulletinText.length === 0) {
+          return { status: "noData" as const };
+        }
 
-//   const searchUrl =
-//     bulletin === "focn45" && office === "cwwg"
-//       ? "https://tgftp.nws.noaa.gov/data/raw/fo/focn45.cwwg..txt"
-//       : `https://weather.gc.ca/forecast/public_bulletins_e.html?Bulletin=${bulletin}.${office}`;
+        output = bulletinText[0]
+          .replace(/<pre>/g, "")
+          .replace(/<\/pre>/g, "")
+          .replace(refPattern, "");
+      }
 
-//   console.log("requesting bulletin from:", searchUrl);
+      return output;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
 
-//   try {
-//     const bulletinData: string = await axios.get(searchUrl).then((bulletin) => bulletin.data);
+  sigmets: publicProcedure.input(xmetSchema).query(async ({ input }) => {
+    if (!avwxDb) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
+    }
 
-//     if (bulletinData.length === 0) {
-//       return c.json({ status: "noData" }, 200);
-//     }
+    try {
+      const { hours } = input;
+      const queryResult = await avwxDb.query.sigmets.findMany({
+        where: gt(sigmets.endTime, new Date(Date.now() - hours * HOUR)),
+        orderBy: [desc(sigmets.endTime)],
+      });
 
-//     let output = bulletinData;
+      const xmetList = queryResult.sort((a, b) => new Date(b.endTime).getTime() - new Date(a.endTime).getTime());
 
-//     if (bulletin !== "focn45") {
-//       // use this to remove any 'reference' sections from the bulletin
-//       const refPattern = /(\n[-]{2,})\n?((.+)\n){1,}([-]{2,})/g;
-//       // because we're returning HTML, we need to actually yoink out the text between the two pre tags
-//       const bulletinText = bulletinData.match(/<pre>[\s\S]*?<\/pre>/g);
+      const xmetEvents: XmetEventData[] = xmetList
+        .map((xmet) => {
+          const issuer = xmet.issuer;
+          const text = xmet.rawText;
+          const domain = xmet.domain;
+          const charCode = xmet.charCode;
+          const numberCode = xmet.numberCode;
+          const startTime = new Date(xmet.issueTime).getTime();
+          const endTime = new Date(xmet.endTime).getTime();
+          const motionVector = {
+            direction: xmet.direction,
+            speed: xmet.speed,
+          };
+          const header = xmet.header;
 
-//       if (!bulletinText || bulletinText.length === 0) {
-//         return c.json({ status: "noData" }, 200);
-//       }
+          const hazard = {
+            type: xmet.hazard,
+            trend: xmet.hazardTrend,
+            top: xmet.hazardTop,
+            bottom: xmet.hazardBottom,
+          };
 
-//       // if we have output, remove the pre tags and the reference section
-//       output = bulletinText[0]
-//         .replace(/<pre>/g, "")
-//         .replace(/<\/pre>/g, "")
-//         .replace(refPattern, "");
-//     }
+          const shape = xmet.initialShape;
+          const coords = processCoordinates(shape, 0, xmet.initialCoords);
+          const sequenceId = !isConvectiveSigmet(header) ? `${domain}${charCode}` : `conv`;
 
-//     return jsonResponse(c, output);
-//   } catch (error) {
-//     return errorResponse(c, error);
-//   }
-// });
+          return {
+            issuer,
+            text,
+            domain,
+            charCode,
+            numberCode,
+            sequenceId,
+            startTime,
+            endTime,
+            motionVector,
+            header,
+            hazard,
+            coords,
+          };
+        })
+        .filter((xmet) => xmet !== undefined && xmet !== null);
 
-// route.get("/sigmets", validateParams("query", xmetSchema), async (c) => {
-//   // these endpoints are only added if the db connection is alive, so we assert that is not undefined
-//   if (!avwx) {
-//     console.error("[API] No avwx connection available.");
-//     return errorResponse(c, "No avwx connection available.");
-//   }
+      const output: Feature<MultiPolygon, XmetEventData>[] | undefined = xmetEvents
+        .map((xmet) => {
+          const {
+            issuer,
+            text,
+            domain,
+            charCode,
+            numberCode,
+            sequenceId,
+            startTime,
+            endTime,
+            motionVector,
+            header,
+            hazard,
+            coords,
+          } = xmet;
 
-//   try {
-//     const { hours } = c.req.valid("query");
-//     const queryResult = await avwx.query.sigmets.findMany({
-//       where: gt(sigmets.endTime, new Date(Date.now() - hours * HOUR)),
-//       orderBy: [desc(sigmets.endTime)],
-//     });
+          if (!coords) return null;
 
-//     const xmetList = queryResult.sort(
-//       (a, b) => new Date(b.endTime).getTime() - new Date(a.endTime).getTime(), //should be desc order
-//     );
+          return {
+            type: "Feature",
+            geometry: {
+              coordinates: [coords],
+              type: "MultiPolygon",
+            },
+            properties: {
+              issuer,
+              header,
+              domain,
+              charCode,
+              numberCode,
+              sequenceId,
+              startTime,
+              endTime,
+              hazard,
+              motionVector,
+              text,
+            },
+          };
+        })
+        .filter((f): f is Feature<MultiPolygon, XmetEventData> => f !== null && f !== undefined);
 
-//     const xmetEvents: XmetEventData[] = xmetList
-//       .map((xmet) => {
-//         // LatLons are stored in the db as space-delimited values in lat,lon format
-
-//         const issuer = xmet.issuer;
-//         const text = xmet.rawText;
-//         const domain = xmet.domain;
-//         const charCode = xmet.charCode;
-//         const numberCode = xmet.numberCode;
-//         const startTime = new Date(xmet.issueTime).getTime();
-//         const endTime = new Date(xmet.endTime).getTime();
-//         const motionVector = {
-//           direction: xmet.direction,
-//           speed: xmet.speed,
-//         };
-//         const header = xmet.header;
-
-//         const hazard = {
-//           type: xmet.hazard,
-//           trend: xmet.hazardTrend,
-//           top: xmet.hazardTop,
-//           bottom: xmet.hazardBottom,
-//         };
-
-//         const shape = xmet.initialShape;
-
-//         const coords = processCoordinates(shape, 0, xmet.initialCoords);
-
-//         // assign a sequenceId for non-convective sigmets and airmets so consumers can group them together
-//         const sequenceId = !isConvectiveSigmet(header) ? `${domain}${charCode}` : `conv`;
-
-//         return {
-//           issuer,
-//           text,
-//           domain,
-//           charCode,
-//           numberCode,
-//           sequenceId,
-//           startTime,
-//           endTime,
-//           motionVector,
-//           header,
-//           hazard,
-//           coords,
-//         };
-//       })
-//       .filter((xmet) => xmet !== undefined && xmet !== null);
-
-//     // create the output in the requested format
-//     const output: Feature<MultiPolygon, XmetEventData>[] | undefined = xmetEvents
-//       .map((xmet) => {
-//         const {
-//           issuer,
-//           text,
-//           domain,
-//           charCode,
-//           numberCode,
-//           sequenceId,
-//           startTime,
-//           endTime,
-//           motionVector,
-//           header,
-//           hazard,
-//           coords,
-//         } = xmet;
-
-//         if (!coords) return null;
-
-//         return {
-//           type: "Feature",
-//           geometry: {
-//             coordinates: [coords],
-//             type: "MultiPolygon",
-//           },
-//           properties: {
-//             issuer,
-//             header,
-//             domain,
-//             charCode,
-//             numberCode,
-//             sequenceId,
-//             startTime,
-//             endTime,
-//             hazard,
-//             motionVector,
-//             text,
-//           },
-//         };
-//       })
-//       .filter((f): f is Feature<MultiPolygon, XmetEventData> => f !== null && f !== undefined);
-
-//     return jsonResponse(c, output, "geojson");
-//   } catch (error) {
-//     return errorResponse(c, error);
-//   }
-// });
-
-// export default route;
+      return output;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
+});
