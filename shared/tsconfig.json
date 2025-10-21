@@ -8,6 +8,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "nodenext",
-    "outDir": "../dist"
-  }
+    "outDir": "../dist/shared",
+    "rootDir": "."
+  },
+  "include": ["**/*"],
+  "exclude": ["node_modules", "dist"]
 }
