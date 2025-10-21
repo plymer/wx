@@ -7,7 +7,7 @@ import AvImageContainer from "./AvImageContainer";
 
 interface Props {
   product: Products;
-  data?: APIResponse<GFAData[]>;
+  data?: GFAData[];
 }
 
 const AvChartsGFA = ({ product, data }: Props) => {
@@ -18,7 +18,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
   const actions = useAviationActions();
 
   // if we don't have any data, or the data is not successful, return early
-  if (!data || data.status !== "success") return;
+  if (!data) return;
 
   // get our available domains for our currently selected product
   // we will use this to build the ui to switch between the different domains
@@ -31,7 +31,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
   // default it back to the first domain in the domainList
   if (!currentProduct && domainList[0]) actions.setDomain(domainList[0].domain);
 
-  const currentProductData = data.data.find((d) => d.domain === domain);
+  const currentProductData = data.find((d) => d.domain === domain);
 
   // build the image url
   const imageUrl = currentProductData && currentProductData[subProduct][timeStep];
@@ -56,7 +56,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
         <label className="me-4">Clouds & Weather:</label>
         <div>
           {currentProduct &&
-            data.data.map(
+            data.map(
               (p) =>
                 p.domain === domain &&
                 p.cldwx.map((u, i) => (
@@ -81,7 +81,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
         <label className="me-4">Turbulence & Icing:</label>
         <div>
           {currentProduct &&
-            data.data.map(
+            data.map(
               (p) =>
                 p.domain === domain &&
                 p.turbc.map((u, i) => (

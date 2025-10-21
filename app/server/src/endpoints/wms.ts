@@ -6,7 +6,7 @@ import { processDimensionString } from "../lib/utils.js";
 import { DATA_CUTOFF, EUMETSAT_GETCAPABILITIES, GEOMET_GETCAPABILITIES } from "../config/wms.config.js";
 import { realtimeLayersSchema } from "../validationSchemas/wms.zod.js";
 import { WMSXMLParser } from "../lib/xml-parser.js";
-import { router, publicProcedure } from "../lib/trpc.js";
+import { publicProcedure, router } from "../lib/trpc.js";
 
 export const wmsRouter = router({
   geomet: publicProcedure.input(realtimeLayersSchema).query(async ({ input }) => {

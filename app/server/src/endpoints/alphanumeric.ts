@@ -18,6 +18,7 @@ import { HOUR } from "../lib/constants.js";
 
 import { avwxDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
+import { HubData, SigmetData, XmetGeoJSON } from "../lib/types.js";
 
 const HubSites: Record<string, string> = {
   CYYZ: "Toronto Pearson Int'l Airport",
@@ -147,16 +148,12 @@ export const alphanumericRouter = router({
     }
   }),
 
-  hubs: publicProcedure.input(singleSiteSchema).query(async ({ input }) => {
+  hubs: publicProcedure.input(singleSiteSchema).query(async ({ input }): Promise<HubData> => {
     const { site } = input;
-    const url = "https://metaviation.ec.gc.ca/hubwx/scripts/getForecasterNotes.php";
+    const url = "https://metaviation.az.ec.gc.ca/hubwx/scripts/getForecasterNotes.php";
 
     try {
       const hubs: HubDiscussion = await axios.get(url).then((hub) => hub.data);
-
-      if (!Object.hasOwn(hubs, site)) {
-        return { status: "noData" as const };
-      }
 
       const siteName = HubSites[site as keyof typeof HubSites];
 
@@ -184,7 +181,7 @@ export const alphanumericRouter = router({
     }
   }),
 
-  publicBulletin: publicProcedure.input(publicBulletinSchema).query(async ({ input }) => {
+  publicBulletin: publicProcedure.input(publicBulletinSchema).query(async ({ input }): Promise<string> => {
     const { bulletin, office } = input;
 
     const searchUrl =
@@ -198,7 +195,7 @@ export const alphanumericRouter = router({
       const bulletinData: string = await axios.get(searchUrl).then((bulletin) => bulletin.data);
 
       if (bulletinData.length === 0) {
-        return { status: "noData" as const };
+        throw new TRPCError({ code: "NOT_FOUND", message: "Bulletin data is empty" });
       }
 
       let output = bulletinData;
@@ -208,7 +205,7 @@ export const alphanumericRouter = router({
         const bulletinText = bulletinData.match(/<pre>[\s\S]*?<\/pre>/g);
 
         if (!bulletinText || bulletinText.length === 0) {
-          return { status: "noData" as const };
+          throw new TRPCError({ code: "NOT_FOUND", message: "No bulletin content found in response" });
         }
 
         output = bulletinText[0]
@@ -325,7 +322,7 @@ export const alphanumericRouter = router({
         })
         .filter((f): f is Feature<MultiPolygon, XmetEventData> => f !== null && f !== undefined);
 
-      return output;
+      return { type: "FeatureCollection", features: output } as unknown as XmetGeoJSON;
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",

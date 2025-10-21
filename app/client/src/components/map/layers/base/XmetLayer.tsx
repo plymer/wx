@@ -5,7 +5,7 @@ import * as turf from "@turf/turf";
 import type { Feature, MultiPolygon } from "geojson";
 
 // generic types
-import type { APIResponse, XmetTypes, XmetAPIData, XmetGeoJSON } from "@/lib/types";
+import type { XmetTypes, XmetAPIData, XmetGeoJSON } from "@/lib/types";
 
 // vector data configs
 import { AIRMET_DISPLAY, AIRMET_DISPLAY_OUTLINE, SIGMET_DISPLAY, SIGMET_DISPLAY_OUTLINE } from "@/config/vectorData";
@@ -15,7 +15,7 @@ import { HOUR, MINUTE } from "@shared/lib/constants";
 
 interface Props {
   dataType: XmetTypes;
-  jsonData: APIResponse<XmetGeoJSON> | undefined;
+  jsonData: XmetGeoJSON | undefined;
   belowLayer: string;
 }
 
@@ -98,28 +98,23 @@ const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
   const currentTime = useCurrentTime();
 
   const processedData = useMemo(() => {
-    if (!jsonData || jsonData.status !== "success") return null;
-
-    console.log(jsonData);
+    if (!jsonData) return null;
 
     return {
       ...jsonData,
-      data: {
-        ...jsonData.data,
-        features: jsonData.data.features.map((feature) => ({
-          ...feature,
-          properties: {
-            ...feature.properties,
-            dataType,
-          },
-        })),
-      },
+      features: jsonData.features.map((feature) => ({
+        ...feature,
+        properties: {
+          ...feature.properties,
+          dataType,
+        },
+      })),
     };
   }, [jsonData, dataType]);
 
-  if (!processedData || processedData.status !== "success") return null;
+  if (!processedData) return null;
 
-  const rawFeatures = processedData.data.features;
+  const rawFeatures = processedData.features;
 
   const groupedXmets = rawFeatures?.reduce(
     (accumulator, xmet) => {
@@ -204,7 +199,7 @@ const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
           }}
         />
       </Source>
-      <Source type="geojson" id={`${dataType}-data`} data={{ ...processedData.data, features: validFeatures }}>
+      <Source type="geojson" id={`${dataType}-data`} data={{ ...processedData, features: validFeatures }}>
         <Layer {...outlineStyle} key={`layer-${dataType}-outline`} beforeId={`layer-${dataType}-text`} />
         <Layer {...fillStyle} key={`layer-${dataType}`} beforeId={outlineStyle.id} />
       </Source>

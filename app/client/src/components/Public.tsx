@@ -6,6 +6,7 @@ import { api } from "@/lib/trpc";
 import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { MINUTE } from "@shared/lib/constants";
 
 export default function Public() {
   const office = useOffice();
@@ -43,7 +44,7 @@ export default function Public() {
   const { data, fetchStatus } = useQuery(
     api.alpha.publicBulletin.queryOptions(
       { office: issuerCode, bulletin: productCode },
-      { placeholderData: keepPreviousData },
+      { placeholderData: keepPreviousData, refetchInterval: 10 * MINUTE },
     ),
   );
 

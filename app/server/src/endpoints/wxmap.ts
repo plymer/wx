@@ -1,13 +1,15 @@
 import { and, eq, gt, inArray } from "drizzle-orm";
-import type { Feature, Point } from "geojson";
+import type { Feature, FeatureCollection, Point } from "geojson";
 import { TRPCError } from "@trpc/server";
 
 import type { MetarData, MetarWithStation, SfcObsPopupBundle, StationPlotData } from "../lib/types.js";
 import { metars, stations, tafs } from "../db/tables/avwx.drizzle.js";
 import { HOUR } from "../lib/constants.js";
 import { wxmapMetarSchema } from "../validationSchemas/wxmap.zod.js";
-import { router, publicProcedure } from "../lib/trpc.js";
+
 import { avwxDb } from "../main.js";
+import { publicProcedure, router } from "../lib/trpc.js";
+import * as turf from "@turf/turf";
 
 // Generic function to convert METAR query results to GeoJSON features
 function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, StationPlotData>[] {
@@ -55,7 +57,7 @@ function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, Sta
 }
 
 export const wxmapRouter = router({
-  wxmapMetars: publicProcedure.query(async () => {
+  wxmapMetars: publicProcedure.query(async (): Promise<FeatureCollection<Point, StationPlotData>> => {
     if (!avwxDb) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
@@ -65,7 +67,7 @@ export const wxmapRouter = router({
       with: { stations: { columns: { lat: true, lon: true } } },
     })) as MetarWithStation[];
 
-    const metarFeatures = buildMetarFeatures(queryResult);
+    const metarFeatures = turf.featureCollection(buildMetarFeatures(queryResult));
 
     return metarFeatures;
   }),
@@ -76,6 +78,10 @@ export const wxmapRouter = router({
     }
 
     const { siteId } = input;
+
+    if (!siteId || siteId.length === 0) {
+      return {};
+    }
 
     const combinedQuery = await avwxDb
       .select({

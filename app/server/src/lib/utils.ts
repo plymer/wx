@@ -49,6 +49,11 @@ export function makeISOTimeStamp(time: number, mode: "display" | "data" = "data"
  * @returns a camelCase version of the tag or attribute name supplied
  */
 export function transformName(name: string): string {
+  // If the entire string is uppercase, convert it to lowercase first
+  if (name === name.toUpperCase() && /[A-Z]/.test(name)) {
+    name = name.toLowerCase();
+  }
+
   if (!name.includes("-") && !name.includes("#") && !name.includes("_")) {
     const camelCase = name.charAt(0).toLowerCase() + name.slice(1);
     return camelCase;
