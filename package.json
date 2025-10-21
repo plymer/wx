@@ -6,23 +6,29 @@
   "author": "Ryan Pimiskern",
   "type": "module",
   "workspaces": [
-    "client",
-    "data",
-    "server",
-    "shared"
+    "packages/client",
+    "packages/data",
+    "packages/server",
+    "packages/shared"
   ],
   "scripts": {
-    "build": "run-s build:client build:server build:data",
-    "build:client": "npm run build -w client",
-    "build:server": "npm run build -w server",
-    "build:data": "npm run build -w data",
-    "dev:client": "npm run dev -w client",
-    "dev:server": "npm run dev -w server",
+    "build": "run-s build:shared build:client build:server build:data",
+    "build:shared": "npm run build -w packages/shared",
+    "build:client": "npm run build -w packages/client",
+    "build:server": "npm run build -w packages/server",
+    "build:data": "npm run build -w packages/data",
+    "dev:client": "npm run dev -w packages/client",
+    "dev:server": "npm run dev -w packages/server",
     "dev": "run-p dev:*",
     "lint": "eslint .",
-    "preview:client": "npm run preview -w client",
+    "preview:client": "npm run preview -w packages/client",
     "preview:server": "pm2 restart beta.config.cjs",
-    "preview": "run-p preview:*"
+    "preview": "run-p preview:*",
+    "deploy": "pm2 stop beta.config.cjs && npm install --include=dev && npm run build && pm2 start beta.config.cjs && pm2 save",
+    "sprites:icons": "spreet --sdf public/sprites/icons public/sprites/icons && spreet --retina --sdf public/sprites/icons public/sprites/icons@2x",
+    "db:push": "npm run aqdb:push && npm run avwxdb:push",
+    "aqdb:push": "drizzle-kit push --config aq.drizzle.config.ts",
+    "avwxdb:push": "drizzle-kit push --config avwx.drizzle.config.ts"
   },
   "dependencies": {
     "@turf/turf": "^7.2.0",
@@ -30,7 +36,7 @@
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.5",
     "fast-xml-parser": "^5.2.5",
-    "mysql2": "^3.15.0",
+    "mysql2": "^3.15.2",
     "zod": "^4.1.12"
   },
   "devDependencies": {
