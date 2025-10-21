@@ -23,7 +23,7 @@ module.exports = {
     },
     {
       name: "aq-data-processing",
-      script: path.resolve(__dirname, "dist/data/aq-data.js"),
+      script: path.resolve(__dirname, "dist/server/data/aq-data.js"),
       instances: 1,
       exec_mode: "fork", // use form for single-instance cron scripts
       log_date_format: "YYYY-MM-DD HH:mm Z",
@@ -36,7 +36,7 @@ module.exports = {
     },
     {
       name: "build-station-catalog",
-      script: path.resolve(__dirname, "dist/data/stations.js"),
+      script: path.resolve(__dirname, "dist/server/data/stations.js"),
       instances: 1,
       exec_mode: "fork", // use form for single-instance cron scripts
       log_date_format: "YYYY-MM-DD HH:mm Z",
@@ -49,7 +49,7 @@ module.exports = {
     },
     {
       name: "metars-processing",
-      script: path.resolve(__dirname, "dist/data/metars.js"),
+      script: path.resolve(__dirname, "dist/server/data/metars.js"),
       instances: 1,
       exec_mode: "fork", // use form for single-instance cron scripts
       log_date_format: "YYYY-MM-DD HH:mm Z",
@@ -62,7 +62,7 @@ module.exports = {
     },
     {
       name: "tafs-processing",
-      script: path.resolve(__dirname, "dist/data/tafs.js"),
+      script: path.resolve(__dirname, "dist/server/data/tafs.js"),
       instances: 1,
       exec_mode: "fork", // use form for single-instance cron scripts
       log_date_format: "YYYY-MM-DD HH:mm Z",
@@ -75,7 +75,7 @@ module.exports = {
     },
     {
       name: "sigmets-processing",
-      script: path.resolve(__dirname, "dist/data/sigmets.js"),
+      script: path.resolve(__dirname, "dist/server/data/sigmets.js"),
       instances: 1,
       exec_mode: "fork", // use form for single-instance cron scripts
       log_date_format: "YYYY-MM-DD HH:mm Z",
