@@ -13,10 +13,9 @@ import { FeatureCollection, MultiPoint, MultiPolygon } from "geojson";
 
 import { InferSelectModel } from "drizzle-orm";
 
-import { aqData } from "../../../shared/db/tables/aq.drizzle.js";
-
-import { StationData, WMSDomains } from "../../../shared/lib/types.js";
 import { LngLat, MapGeoJSONFeature } from "maplibre-gl";
+import { StationData } from "@shared/lib/types";
+import { aqData } from "@shared/db/tables/aq.drizzle";
 
 export type AppMode = keyof typeof APP_MODES_LIST;
 export type AnimationState = (typeof ANIMATION_STATES)[number];
@@ -81,12 +80,18 @@ export type XmetAPIData = {
 
 export type XmetGeoJSON = FeatureCollection<MultiPolygon, XmetAPIData>;
 
-export type SiteData = Prettify<
-  StationData & {
-    sunrise: string;
-    sunset: string;
-  }
->;
+export type SiteData = {
+  name: string | null;
+  siteId: string;
+  lat: string;
+  lon: string;
+  elev_f: number | null;
+  elev_m: number | null;
+  country: string | null;
+  state: string | null;
+  sunrise: string;
+  sunset: string;
+};
 
 export type LightningData = FeatureCollection<MultiPoint, { validTime: number }>;
 export type AqDbData = Omit<InferSelectModel<typeof aqData>, "id">;

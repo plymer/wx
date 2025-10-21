@@ -11,6 +11,8 @@ import METARs from "./observations/METARs";
 import SiteMetadata from "./observations/SiteMetadata";
 import TAF from "./observations/TAF";
 import Button from "./ui/Button";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/trpc";
 
 export default function Observations() {
   // create a refs to the siteId text input and the input debounce timeout
@@ -33,14 +35,18 @@ export default function Observations() {
   const HOURS: number[] = [6, 12, 18, 24, 36, 48, 96];
 
   // fetch all data within the route and then pass it to the child components for each data type
-  const { data: metarData, fetchStatus: metarFetchStatus } = useAPI<METAR>("/alpha/metars", {
-    site: site,
-    hrs: hours,
-  });
+  // const { data: metarData, fetchStatus: metarFetchStatus } = useAPI<METAR>("/alpha/metars", {
+  //   site: site,
+  //   hrs: hours,
+  // });
 
-  const { data: metaData, fetchStatus: metaFetchStatus } = useAPI<SiteData>("/alpha/sitedata", { site: site });
+  const { data: metarData, fetchStatus: metarFetchStatus } = useQuery(
+    api.alpha.metars.queryOptions({ site: site, hrs: hours }),
+  );
 
-  const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("/alpha/taf", { site: site });
+  const { data: metaData, fetchStatus: metaFetchStatus } = useQuery(api.alpha.sitedata.queryOptions({ site: site }));
+
+  const { data: tafData, fetchStatus: tafFetchStatus } = useQuery(api.alpha.taf.queryOptions({ site: site }));
 
   const isLoading = metarFetchStatus !== "idle" || tafFetchStatus !== "idle" || metaFetchStatus !== "idle";
 
@@ -136,9 +142,9 @@ export default function Observations() {
       </div>
 
       <div className="overflow-y-scroll text-sm" style={{ height: "calc(100svh - 6.5rem)" }}>
-        <METARs site={site} data={metarData} />
-        <SiteMetadata site={site} response={metaData} />
-        <TAF site={site} data={tafData} />
+        <METARs site={site} data={metarData as METAR} />
+        <SiteMetadata response={metaData as SiteData} />
+        <TAF data={tafData as TAFData} />
       </div>
     </>
   );

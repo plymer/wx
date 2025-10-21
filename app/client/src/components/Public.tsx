@@ -49,17 +49,17 @@ export default function Public() {
 
   const bulletinContent = data as PublicBulletin;
 
+  const productKey = `${productCode}${issuerCode}`;
+  const productName = productList[productKey as keyof typeof productList];
+
   return (
     <div className="p-2 bg-neutral-800 text-white text-sm">
       <div className="flex items-center ">
         <h3 className="inline-block">Office:</h3>
         <div className="ms-2 min-w-fit w-full inline-block">
-          <Select
-            defaultValue={office}
-            onValueChange={(e) => actions.setOffice(e as keyof typeof PUBLIC_FORECAST_CONFIG)}
-          >
+          <Select value={office} onValueChange={(e) => actions.setOffice(e as keyof typeof PUBLIC_FORECAST_CONFIG)}>
             <SelectTrigger className=" text-black">
-              <SelectValue placeholder={productList[(productCode + issuerCode) as keyof typeof productList]} />
+              <SelectValue placeholder={productName} />
             </SelectTrigger>
             <SelectContent className="inline-block">
               {Object.keys(PUBLIC_FORECAST_CONFIG).map((office, index) => (
@@ -74,9 +74,9 @@ export default function Public() {
       <div className="flex items-center border-y-2 border-white my-2 py-2">
         <h3 className="inline-block">Products:</h3>
         <div className="ms-2 min-w-fit w-full inline-block">
-          <Select defaultValue={productCode} onValueChange={(e) => actions.setBulletin(e as string)}>
+          <Select defaultValue={productName} onValueChange={(e) => actions.setBulletin(e as string)}>
             <SelectTrigger className=" text-black">
-              <SelectValue placeholder={productList[(productCode + issuerCode) as keyof typeof productList]} />
+              <SelectValue placeholder={productName} />
             </SelectTrigger>
             <SelectContent className="inline-block">
               {Object.keys(productList).map((product, index) => (
@@ -89,7 +89,7 @@ export default function Public() {
         </div>
       </div>
 
-      {productList[(productCode + issuerCode) as keyof typeof productList] && bulletinContent && (
+      {productName && bulletinContent && (
         <pre
           className={`overflow-y-scroll whitespace-pre-wrap md:px-6 max-md:pb-12 max-w-fit mx-auto ${fetchStatus === "fetching" ? "text-neutral-500" : ""}`}
           style={{ height: "calc(100svh - 11.2rem)" }}
@@ -98,9 +98,7 @@ export default function Public() {
         </pre>
       )}
 
-      {productList[(productCode + issuerCode) as keyof typeof productList] && !bulletinContent && (
-        <pre>No Product available</pre>
-      )}
+      {productName && !bulletinContent && <pre>No Product available</pre>}
     </div>
   );
 }
