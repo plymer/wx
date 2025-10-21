@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/main.ts",
+    "dev:data:metars": "tsx watch src/data/metars.ts",
     "lint": "eslint .",
     "start": "node ../../dist/server/main.js"
   },

@@ -2,10 +2,11 @@ import axios from "axios";
 import { TRPCError } from "@trpc/server";
 
 import type { NavCanImageList, NavCanResponse } from "../lib/alphanumeric.types.js";
-import { router, publicProcedure } from "../lib/trpc.js";
+import { publicProcedure, router } from "../lib/trpc.js";
+import { GFAData, OtherChartData } from "../lib/types.js";
 
 export const chartsRouter = router({
-  gfa: publicProcedure.query(async () => {
+  gfa: publicProcedure.query(async (): Promise<GFAData[]> => {
     try {
       const url =
         "https://plan.navcanada.ca/weather/api/alpha/?site=CYEG&site=CYVR&site=CYZF&site=CYFB&site=CYYZ&site=CYHZ&site=CYRB&image=GFA/CLDWX&image=GFA/TURBC";
@@ -45,7 +46,7 @@ export const chartsRouter = router({
     }
   }),
 
-  sigwx: publicProcedure.query(async () => {
+  sigwx: publicProcedure.query(async (): Promise<OtherChartData[]> => {
     try {
       const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=SIG_WX//MID_LEVEL/*";
 
@@ -88,7 +89,7 @@ export const chartsRouter = router({
     }
   }),
 
-  hlt: publicProcedure.query(async () => {
+  hlt: publicProcedure.query(async (): Promise<OtherChartData[]> => {
     try {
       const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=TURBULENCE";
 
@@ -130,7 +131,7 @@ export const chartsRouter = router({
     }
   }),
 
-  lgf: publicProcedure.query(async () => {
+  lgf: publicProcedure.query(async (): Promise<OtherChartData[]> => {
     try {
       const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CZVR&image=LGF";
 

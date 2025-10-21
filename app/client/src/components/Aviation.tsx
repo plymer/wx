@@ -6,16 +6,18 @@ import AvChartsOther from "./aviation/AvChartsOther";
 import HubDiscussion from "./aviation/HubDiscussion";
 import Button from "./ui/Button";
 import { PRODUCTS } from "@/config/aviationProducts";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/trpc";
 
 export default function Aviation() {
   const product = useAvProduct();
   const hub = useHub();
   const actions = useAviationActions();
 
-  const { data: gfaData } = useAPI<GFAData[]>("/charts/gfa", {});
-  const { data: lgfData } = useAPI<OtherChartData[]>(`/charts/lgf`, {});
-  const { data: hltData } = useAPI<OtherChartData[]>(`/charts/hlt`, {});
-  const { data: sigwxData } = useAPI<OtherChartData[]>(`/charts/sigwx`, {});
+  const { data: gfaData } = useQuery(api.charts.gfa.queryOptions());
+  const { data: lgfData } = useQuery(api.charts.lgf.queryOptions());
+  const { data: hltData } = useQuery(api.charts.hlt.queryOptions());
+  const { data: sigwxData } = useQuery(api.charts.sigwx.queryOptions());
 
   return (
     <>

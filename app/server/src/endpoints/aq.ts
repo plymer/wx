@@ -5,9 +5,10 @@ import { TRPCError } from "@trpc/server";
 import { aqData } from "../db/tables/aq.drizzle.js";
 import { aqSchema } from "../validationSchemas/aq.zod.js";
 import { HOUR } from "../lib/constants.js";
-import { router, publicProcedure } from "../lib/trpc.js";
-import { aqDb } from "../main.js";
+
 import type { AQData } from "../lib/types.js";
+import { aqDb } from "../main.js";
+import { publicProcedure, router } from "../lib/trpc.js";
 
 export const aqRouter = router({
   aq: publicProcedure.input(aqSchema).query(async ({ input }) => {

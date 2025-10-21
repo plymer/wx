@@ -1,10 +1,7 @@
 import { Layer, Source } from "react-map-gl/maplibre";
-import type { FeatureCollection, Point } from "geojson";
-
-import useAPI from "@/hooks/useAPI";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
 
-import type { StationPlotData, StationPlotGeoJSON } from "@shared/lib/types";
+import type { StationPlotGeoJSON } from "@shared/lib/types";
 
 import { ZOOM_THRESHOLDS } from "@/config/map";
 import {
@@ -22,9 +19,11 @@ import { UNCLUSTERED } from "@/config/vectorData";
 import { useViewportBounds, useZoom } from "@/stateStores/map/mapView";
 import { useShowObs } from "@/stateStores/map/vectorData";
 
-import { HOUR } from "@shared/lib/constants";
+import { HOUR, MINUTE } from "@shared/lib/constants";
 import { checkIfInBounds, filterSpacedPoints, hasValidCoordinates } from "@/lib/utils";
 import { useMemo } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/trpc";
 
 export const SurfaceDataLayer = () => {
   const zoom = useZoom();
@@ -33,31 +32,33 @@ export const SurfaceDataLayer = () => {
 
   const displayTime = useDisplayTime();
 
-  const { data: plots } = useAPI<FeatureCollection<Point, StationPlotData>>("/wxmap/metars", {});
+  const { data } = useQuery(
+    api.wxmap.wxmapMetars.queryOptions(void 0, { enabled, placeholderData: keepPreviousData, refetchInterval: MINUTE }),
+  );
 
   // construct our station priority list for each zoom level
   // this will give us a computed list of stations to show at each zoom level
   // use the predefined list of must-haves and then use a spatial algorithm to fill in the rest
 
   const stationPriorityList = useMemo(() => {
-    if (plots?.status !== "success") return { min: [], med: [], global: [] };
+    if (!data) return { min: [], med: [], global: [] };
     const radius = { min: 240, med: 60, max: 1 };
 
     const key = "siteId";
 
     return {
-      global: [...STATION_PRIORITY_CANADA, ...filterSpacedPoints(plots.data, radius.min, key)],
-      min: [...STATION_PRIORITY_MIN, ...filterSpacedPoints(plots.data, radius.min, key)],
-      med: [...STATION_PRIORITY_MED, ...filterSpacedPoints(plots.data, radius.med, key)],
+      global: [...STATION_PRIORITY_CANADA, ...filterSpacedPoints(data, radius.min, key)],
+      min: [...STATION_PRIORITY_MIN, ...filterSpacedPoints(data, radius.min, key)],
+      med: [...STATION_PRIORITY_MED, ...filterSpacedPoints(data, radius.med, key)],
     };
-  }, [plots]);
+  }, [data]);
 
-  // for every site in our list of plots, we want to get the metar with the observation that is closest
+  // for every site in our list of data, we want to get the metar with the observation that is closest
   // to our display time without being in the future and then collapse its properties into the final output
 
-  if (!viewport || !enabled || plots?.status !== "success") return;
+  if (!viewport || !enabled || !data) return;
 
-  const features = plots.data.features.reduce<StationPlotGeoJSON["features"]>((acc, feature) => {
+  const features = data.features.reduce<StationPlotGeoJSON["features"]>((acc, feature) => {
     const coords = feature.geometry.coordinates;
 
     // validate the coordinates
@@ -92,6 +93,7 @@ export const SurfaceDataLayer = () => {
         geometry: feature.geometry,
         properties: {
           ...metar,
+          validTime: new Date(metar.validTime),
           siteId: feature.properties.siteId,
         },
       });
@@ -186,7 +188,7 @@ export const SurfaceDataLayer = () => {
       </Source>
 
       {/* Non-clustered source for persistent elements */}
-      <Source id="persistent-sfc-plots" key="persistent-sfc-plots" type="geojson" data={resultFC}>
+      <Source id="persistent-sfc-data" key="persistent-sfc-data" type="geojson" data={resultFC}>
         {/* Station dots */}
         <Layer
           beforeId="layer-sfc-obs-gust"

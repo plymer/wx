@@ -1,7 +1,8 @@
+import { api } from "@/lib/trpc";
 import XmetLayer from "../base/XmetLayer";
-import useAPI from "@/hooks/useAPI";
-import { XmetGeoJSON } from "@/lib/types";
 import { useShowSIGMETs } from "@/stateStores/map/vectorData";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { MINUTE } from "@shared/lib/constants";
 
 /**
  * Opinionated SIGMET layer that automatically fetches and displays SIGMET data
@@ -9,18 +10,20 @@ import { useShowSIGMETs } from "@/stateStores/map/vectorData";
  */
 export function SigmetLayer() {
   // Get SIGMET visibility from state store
-  const showSIGMETs = useShowSIGMETs();
-
-  // Get required state for vector layer constraints
-
+  const enabled = useShowSIGMETs();
   const {
     data: sigmetData,
     isLoading,
     error,
-  } = useAPI<XmetGeoJSON>("/alpha/sigmets", { hours: 6 }, { queryName: "sigmet", enabled: showSIGMETs, interval: 1 });
+  } = useQuery(
+    api.alpha.sigmets.queryOptions(
+      { hours: 6 },
+      { enabled, placeholderData: keepPreviousData, refetchInterval: MINUTE },
+    ),
+  );
 
   // Don't render if SIGMETs are disabled in state
-  if (!showSIGMETs) return null;
+  if (!enabled) return null;
 
   if (isLoading) return null;
 
@@ -29,7 +32,7 @@ export function SigmetLayer() {
     return null;
   }
 
-  if (!sigmetData || sigmetData.status !== "success") {
+  if (!sigmetData) {
     return null;
   }
 

@@ -78,7 +78,7 @@ export type XmetAPIData = {
   dataType: XmetTypes;
 };
 
-export type XmetGeoJSON = FeatureCollection<MultiPolygon, XmetAPIData>;
+export type XmetGeoJSON = Prettify<FeatureCollection<MultiPolygon, XmetAPIData>>;
 
 export type SiteData = {
   name: string | null;
@@ -133,28 +133,6 @@ export type ToggleDataOption = {
   state: boolean;
   toggle: () => void;
 };
-
-export type GeoJSON = {
-  features: GeoJSONFeature[];
-  type: "FeatureCollection";
-};
-
-export type GeoJSONFeature = {
-  geometry: {
-    coordinates: number[] | number[][] | number[][][][];
-    type: GeoJSONFeatureTypes;
-  };
-  properties: Record<string, any>;
-  type: "Feature";
-};
-
-export type GeoJSONFeatureTypes =
-  | "Point"
-  | "LineString"
-  | "Polygon"
-  | "MultiPoint"
-  | "MultiLineString"
-  | "MultiPolygon";
 
 export type OverlayOptions = {
   layout?: object;

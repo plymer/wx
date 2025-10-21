@@ -1,9 +1,10 @@
-import useAPI from "@/hooks/useAPI";
-import type { EndpointUrls } from "@/lib/types";
-import type { SatelliteDomains, WMSLayer } from "@shared/lib/types";
+import type { SatelliteDomains } from "@shared/lib/types";
 import RasterDataLayer from "../base/RasterData";
 import { useSatelliteProduct, useShowSatellite } from "@/stateStores/map/rasterData";
 import { useMapRef } from "@/stateStores/map/mapView";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/trpc";
+import { MINUTE } from "@shared/lib/constants";
 
 interface Props {
   belowLayer?: string;
@@ -27,15 +28,15 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
   const queryParams =
     domain === "europe" ? { layers: "mtg_fd:rgb_cloudphase" } : { layers: `${satelliteDomain}_${satelliteProduct}` };
 
-  const endpoint: EndpointUrls = domain === "europe" ? "/eumetsat" : "/geomet";
+  const { data } = useQuery(
+    api.wms[domain === "europe" ? "eumetsat" : "geomet"].queryOptions(queryParams, {
+      enabled,
+      placeholderData: keepPreviousData,
+      refetchInterval: MINUTE,
+    }),
+  );
 
-  const { data: satelliteData } = useAPI<WMSLayer[]>(endpoint, queryParams, {
-    queryName: `${satelliteDomain}SatelliteData`,
-    enabled,
-    interval: 1,
-  });
+  if (!enabled || !data) return;
 
-  if (!enabled || satelliteData?.status !== "success") return;
-
-  return <RasterDataLayer apiData={satelliteData.data[0]} belowLayer={belowLayerId} />;
+  return <RasterDataLayer apiData={data[0]} belowLayer={belowLayerId} />;
 };

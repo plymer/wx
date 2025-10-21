@@ -7,7 +7,7 @@ import AvImageContainer from "./AvImageContainer";
 
 interface Props {
   product: Products;
-  data?: APIResponse<OtherChartData[]>;
+  data?: OtherChartData[];
 }
 
 const AvChartsOther = ({ product, data }: Props) => {
@@ -16,7 +16,7 @@ const AvChartsOther = ({ product, data }: Props) => {
   const timeStep = useTimeStep();
   const actions = useAviationActions();
 
-  if (!data || data.status !== "success") return;
+  if (!data) return;
 
   // get our available domains for our currently selected product
   // we will use this to build the ui to switch between the different domains
@@ -29,7 +29,7 @@ const AvChartsOther = ({ product, data }: Props) => {
   // default it back to the first domain in the domainList
   if (!currentProduct && domainList[0]) actions.setDomain(domainList[0].domain);
 
-  const currentProductData = data.data.find((d) => d.domain === domain);
+  const currentProductData = data.find((d) => d.domain === domain);
 
   // if our current timeStep is greater than the number of timeSteps available in our data layer
   // default it back to the highest available timeStep
@@ -62,7 +62,7 @@ const AvChartsOther = ({ product, data }: Props) => {
         <label className="me-4">Forecasts:</label>
         <div>
           {currentProduct &&
-            data.data.map(
+            data.map(
               (p) =>
                 p.domain === currentProduct.domain &&
                 p.images.map((u, i) => (

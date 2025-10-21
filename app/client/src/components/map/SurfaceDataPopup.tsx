@@ -1,14 +1,14 @@
-import useAPI from "@/hooks/useAPI";
 import { useHighlightSigWx } from "@/hooks/useHighlightSigWx";
 import { ParsedTAF } from "@/lib/types";
 import { checkIfInBounds, formatSigWx } from "@/lib/utils";
 import { usePopupData, useUIActions } from "@/stateStores/map/ui";
-import { SfcObsPopupBundle } from "@shared/lib/types";
 import { useRef } from "react";
 import { Popup, PopupInstance } from "react-map-gl/maplibre";
 import Button from "../ui/Button";
-import { Plus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useViewportBounds } from "@/stateStores/map/mapView";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/trpc";
 
 export const SurfaceDataPopup = () => {
   const popupData = usePopupData();
@@ -22,20 +22,21 @@ export const SurfaceDataPopup = () => {
 
   const { highlightSigWx } = useHighlightSigWx();
 
-  const { data } = useAPI<SfcObsPopupBundle>(
-    "/wxmap/popup",
-    { siteId: popupData?.features.map((f) => (f as any).properties.siteId).join(",") },
-    { enabled: !!popupData },
+  const { data } = useQuery(
+    api.wxmap.wxmapPopup.queryOptions(
+      { siteId: popupData?.features.map((f) => (f as any).properties.siteId).join(",") },
+      { enabled: !!popupData },
+    ),
   );
 
-  if (!viewport || data?.status !== "success" || !popupData || popupData.features.length === 0) return null;
+  if (!viewport || !data || !popupData || popupData.features.length === 0) return null;
 
   const { lng, lat } = popupData.lngLat;
 
   // if we move the map too far from the popup, close it
   if (!checkIfInBounds([lng, lat], viewport)) handleClose();
 
-  const metarsFromData = data.data;
+  const metarsFromData = data;
 
   return (
     <Popup

@@ -1,13 +1,13 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 import { FeatureCollection } from "geojson";
 
-import { AqData } from "@/lib/types";
 import { AQ_ATTRIBUTION, AQ_DISPLAY } from "@/config/vectorData";
 import { useFrame, useFrameCount } from "@/stateStores/map/animation";
 import { MINUTE } from "@shared/lib/constants";
-import useAPI from "@/hooks/useAPI";
 import { useShowAQ } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
+import { api } from "@/lib/trpc";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 interface Props {
   belowLayer?: string;
@@ -20,15 +20,17 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
   const lastFrame = useFrameCount() - 1;
   const displayTime = useDisplayTime();
 
-  const { data: aqData } = useAPI<AqData>("/aq", { hours: 4 }, { queryName: "aqData", enabled, interval: 10 });
+  const { data } = useQuery(
+    api.aq.aq.queryOptions({ hours: 4 }, { enabled, placeholderData: keepPreviousData, refetchInterval: 10 * MINUTE }),
+  );
 
-  if (!enabled || aqData?.status !== "success" || !aqData.data.features.length) return;
+  if (!enabled || !data) return;
 
   const filteredData: FeatureCollection = {
     type: "FeatureCollection",
-    features: aqData.data.features.filter((feature) => {
+    features: data.filter((feature) => {
       // filter out features that don't have a validTime property
-      if (!feature.properties.validTime) return false;
+      if (!feature.properties?.validTime) return false;
 
       // otherwise, filter based on the validTime property
       const validTime = feature.properties.validTime;

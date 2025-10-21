@@ -1,11 +1,13 @@
 import { Binoculars, Loader2, Notebook, Pencil, Plane } from "lucide-react";
-import AppLoadingIndicator from "../ui/AppLoadingIndicator";
 
 import TAF from "../observations/TAF";
 import { useAviationActions } from "@/stateStores/aviation";
-import useAPI from "@/hooks/useAPI";
-import { HubData, TAFData } from "@/lib/types";
+import { TAFData } from "@/lib/types";
 import Button from "../ui/Button";
+import { api } from "@/lib/trpc";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { MINUTE } from "@shared/lib/constants";
+import AppLoadingIndicator from "../ui/AppLoadingIndicator";
 
 interface Props {
   hub: string;
@@ -14,8 +16,12 @@ interface Props {
 const HubDiscussion = ({ hub }: Props) => {
   const { setHub } = useAviationActions();
 
-  const { data: hubData, fetchStatus: hubFetchStatus } = useAPI<HubData>("/alpha/hubs", { site: hub });
-  const { data: tafData, fetchStatus: tafFetchStatus } = useAPI<TAFData>("/alpha/taf", { site: hub });
+  const { data: hubData, fetchStatus: hubFetchStatus } = useQuery(
+    api.alpha.hubs.queryOptions({ site: hub }, { placeholderData: keepPreviousData, refetchInterval: MINUTE }),
+  );
+  const { data: tafData, fetchStatus: tafFetchStatus } = useQuery(
+    api.alpha.taf.queryOptions({ site: hub }, { placeholderData: keepPreviousData, refetchInterval: MINUTE }),
+  );
 
   const HUBS = [
     { ident: "cyvr", name: "Vancouver Intl Airport" },
@@ -23,6 +29,8 @@ const HubDiscussion = ({ hub }: Props) => {
     { ident: "cyyz", name: "Toronto Pearson Intl Airport" },
     { ident: "cyul", name: "Montreal Trudeau Intl Airport" },
   ];
+
+  const showLoader = hubFetchStatus !== "idle" && !hubData;
 
   return (
     <>
@@ -51,17 +59,19 @@ const HubDiscussion = ({ hub }: Props) => {
             {hub.toUpperCase()}:
           </h3>
         </div>
-        {hubData?.status !== "success" && hubFetchStatus !== "idle" ? (
+
+        {showLoader && (
           <AppLoadingIndicator displayText="Loading Discussion" className="px-4 py-2 mt-2 bg-muted text-black" />
-        ) : hubData?.status === "success" ? (
-          <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">
-            {hubData?.data?.header}
+        )}
+        {hubData && (
+          <div
+            className={`font-mono px-4 py-2 mt-2 bg-muted ${hubFetchStatus === "idle" ? "text-black" : "text-neutral-300"} whitespace-pre-wrap`}
+          >
+            {hubData.header}
             <br />
             <br />
-            {hubData?.data?.discussion.trim()}
+            {hubData.discussion.trim()}
           </div>
-        ) : (
-          <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">There was an error</div>
         )}
       </div>
 
@@ -71,14 +81,15 @@ const HubDiscussion = ({ hub }: Props) => {
             <Binoculars className="inline" />
             <h3 className="text-bold p-2 inline">Outlook:</h3>
           </div>
-          {hubData?.status !== "success" && hubFetchStatus !== "idle" ? (
+          {showLoader && (
             <AppLoadingIndicator displayText="Loading Outlook" className="px-4 py-2 mt-2 bg-muted text-black" />
-          ) : hubData?.status === "success" ? (
-            <div className="font-mono p-4 py-2 bg-muted text-black whitespace-pre-wrap">
-              {hubData?.data?.outlook.trim()}
+          )}
+          {hubData && (
+            <div
+              className={`font-mono p-4 py-2 bg-muted ${hubFetchStatus === "idle" ? "text-black" : "text-neutral-300"} whitespace-pre-wrap`}
+            >
+              {hubData.outlook.trim()}
             </div>
-          ) : (
-            <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">There was an error</div>
           )}
         </div>
 
@@ -87,14 +98,15 @@ const HubDiscussion = ({ hub }: Props) => {
             <Pencil className="inline" />
             <h3 className="text-bold p-2 inline">Forecaster:</h3>
           </div>
-          {hubData?.status !== "success" && hubFetchStatus !== "idle" ? (
+          {showLoader && (
             <AppLoadingIndicator displayText="Loading Forecaster" className="px-4 py-2 mt-2 bg-muted text-black" />
-          ) : hubData?.status === "success" ? (
-            <div className="font-mono px-4 py-2 bg-muted text-black whitespace-pre-wrap">
-              {hubData?.data?.forecaster}/{hubData?.data?.office}
+          )}
+          {hubData && (
+            <div
+              className={`font-mono px-4 py-2 bg-muted ${hubFetchStatus === "idle" ? "text-black" : "text-neutral-300"} whitespace-pre-wrap`}
+            >
+              {hubData.forecaster}/{hubData.office}
             </div>
-          ) : (
-            <div className="font-mono px-4 py-2 mt-2 bg-muted text-black whitespace-pre-wrap">There was an error</div>
           )}
         </div>
         <div className="md:col-start-2 md:row-start-1 md:row-span-2 md:border-s-2 md:border-black ">
@@ -102,7 +114,7 @@ const HubDiscussion = ({ hub }: Props) => {
             {tafFetchStatus !== "idle" ? <Loader2 className="animate-spin inline" /> : <Plane className="inline" />}
             <h3 className="text-bold p-2 inline">TAF</h3>
           </div>
-          <TAF site={hub} data={tafData} />
+          <TAF data={tafData as TAFData} />
         </div>
       </div>
     </>

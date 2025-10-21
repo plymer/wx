@@ -11,7 +11,7 @@ import {
   MAP_BOUNDS,
   EUMETSAT_BOUNDS,
 } from "@/config/rasterData";
-import type { WMSDomains, WMSLayer, WMSLayerTypes } from "@shared/lib/types";
+import type { WMSDomains, WMSLayer } from "@shared/lib/types";
 import { TransitionSpecification } from "maplibre-gl";
 
 // import PausibleSource from "./PausibleSource";

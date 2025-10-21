@@ -1,9 +1,53 @@
 import { InferSelectModel } from "drizzle-orm";
-import { FeatureCollection, Point } from "geojson";
+import { FeatureCollection, MultiPolygon, Point } from "geojson";
 import { metars, pireps, sigmets, stations, tafs } from "../db/tables/avwx.drizzle.js";
 import { z } from "zod";
 import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation.js";
 import { aqData } from "../db/tables/aq.drizzle.js";
+import { XMET_TYPES } from "../config/alphanumeric.config.js";
+
+export type GFAData = {
+  domain: string;
+  cldwx: string[];
+  turbc: string[];
+};
+
+export type OtherChartData = {
+  domain: string;
+  images: string[];
+};
+
+export type HubData = {
+  siteName: string;
+  header: string;
+  discussion: string;
+  outlook: string;
+  forecaster: string;
+  office: string;
+};
+
+export type XmetTypes = (typeof XMET_TYPES)[number];
+
+export type XmetAPIData = {
+  issuer: string;
+  header: string;
+  domain: string;
+  alphaCode?: string;
+  charCode: string;
+  numberCode: number;
+  sequenceId: string;
+  startTime: number;
+  endTime: number;
+  hazard: string;
+  motionVector: {
+    direction: number | null;
+    speed: number;
+  };
+  text: string;
+  dataType: XmetTypes;
+};
+
+export type XmetGeoJSON = FeatureCollection<MultiPolygon, XmetAPIData>;
 
 export type RadarDomains = "national";
 export type SatelliteDomains = "east" | "west" | "europe";

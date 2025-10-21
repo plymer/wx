@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import { Loader2, RefreshCw, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useHours, useObsActions, useSite } from "@/stateStores/observations";
-import useAPI from "@/hooks/useAPI";
 import { METAR, SiteData, TAFData } from "@/lib/types";
 import { Input } from "./ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
@@ -11,8 +10,9 @@ import METARs from "./observations/METARs";
 import SiteMetadata from "./observations/SiteMetadata";
 import TAF from "./observations/TAF";
 import Button from "./ui/Button";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
+import { MINUTE } from "@shared/lib/constants";
 
 export default function Observations() {
   // create a refs to the siteId text input and the input debounce timeout
@@ -35,18 +35,21 @@ export default function Observations() {
   const HOURS: number[] = [6, 12, 18, 24, 36, 48, 96];
 
   // fetch all data within the route and then pass it to the child components for each data type
-  // const { data: metarData, fetchStatus: metarFetchStatus } = useAPI<METAR>("/alpha/metars", {
-  //   site: site,
-  //   hrs: hours,
-  // });
 
   const { data: metarData, fetchStatus: metarFetchStatus } = useQuery(
-    api.alpha.metars.queryOptions({ site: site, hrs: hours }),
+    api.alpha.metars.queryOptions(
+      { site: site, hrs: hours },
+      { placeholderData: keepPreviousData, refetchInterval: MINUTE },
+    ),
   );
 
-  const { data: metaData, fetchStatus: metaFetchStatus } = useQuery(api.alpha.sitedata.queryOptions({ site: site }));
+  const { data: metaData, fetchStatus: metaFetchStatus } = useQuery(
+    api.alpha.sitedata.queryOptions({ site: site }, { placeholderData: keepPreviousData, refetchInterval: MINUTE }),
+  );
 
-  const { data: tafData, fetchStatus: tafFetchStatus } = useQuery(api.alpha.taf.queryOptions({ site: site }));
+  const { data: tafData, fetchStatus: tafFetchStatus } = useQuery(
+    api.alpha.taf.queryOptions({ site: site }, { placeholderData: keepPreviousData, refetchInterval: MINUTE }),
+  );
 
   const isLoading = metarFetchStatus !== "idle" || tafFetchStatus !== "idle" || metaFetchStatus !== "idle";
 

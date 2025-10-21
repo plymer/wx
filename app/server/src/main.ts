@@ -23,17 +23,12 @@ import z from "zod";
 import { publicProcedure, router } from "./lib/trpc.js";
 
 // database connections
-// export const aqDb = await generateDbConnection("aq", aqDbSchema);
+export const aqDb = await generateDbConnection("aq", aqDbSchema);
 const avwxCombinedSchema = {
   ...avwxSchemas,
   ...avwxRelations,
 };
 export const avwxDb = await generateDbConnection("avwx", avwxCombinedSchema);
-
-// Merge all routers into the main app router
-// const appRouter = router({
-//   alphanumericRouter,
-// });
 
 const greetRouter = router({
   greeting: publicProcedure
@@ -52,6 +47,11 @@ const greetRouter = router({
 const appRouter = router({
   base: greetRouter,
   alpha: alphanumericRouter,
+  charts: chartsRouter,
+  lightning: lightningRouter,
+  wms: wmsRouter,
+  wxmap: wxmapRouter,
+  aq: aqRouter,
 });
 
 // Export type router type signature,

@@ -1,8 +1,9 @@
-import useAPI from "@/hooks/useAPI";
-import RasterDataLayer from "../base/RasterData";
-import { WMSLayer } from "@shared/lib/types";
 import { useRadarProduct, useShowRadar } from "@/stateStores/map/rasterData";
 import { useMapRef } from "@/stateStores/map/mapView";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/trpc";
+import RasterDataLayer from "../base/RasterData";
+import { MINUTE } from "@shared/lib/constants";
 
 interface Props {
   belowLayer?: string;
@@ -15,19 +16,14 @@ export const RadarLayer = ({ belowLayer = "wateroutline" }: Props) => {
 
   const belowLayerId = mapRef?.getLayer(belowLayer) ? belowLayer : "wateroutline";
 
-  const { data: radarData } = useAPI<WMSLayer[]>(
-    "/geomet",
-    {
-      layers: radarProduct,
-    },
-    {
-      queryName: "radarData",
-      enabled,
-      interval: 1,
-    },
+  const { data } = useQuery(
+    api.wms.geomet.queryOptions(
+      { layers: radarProduct },
+      { enabled, placeholderData: keepPreviousData, refetchInterval: MINUTE },
+    ),
   );
 
-  if (!enabled || radarData?.status !== "success") return;
+  if (!enabled || !data) return;
 
-  return <RasterDataLayer apiData={radarData.data[0]} belowLayer={belowLayerId} />;
+  return <RasterDataLayer apiData={data[0]} belowLayer={belowLayerId} />;
 };

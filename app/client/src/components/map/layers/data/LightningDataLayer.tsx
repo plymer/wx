@@ -1,13 +1,13 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 
-import { LightningData } from "@/lib/types";
 import { FeatureCollection, Point } from "geojson";
 import { CLUSTERED, LIGHTNING_DISPLAY, UNCLUSTERED } from "@/config/vectorData";
 import { MINUTE } from "@shared/lib/constants";
 import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
-import useAPI from "@/hooks/useAPI";
 import { useShowLightning } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
+import { api } from "@/lib/trpc";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 interface Props {
   belowLayer?: string;
@@ -19,23 +19,19 @@ export const LightningDataLayer = ({ belowLayer, timeRange = 15 }: Props) => {
 
   const displayTime = useDisplayTime();
 
-  const { data: lightningData } = useAPI<LightningData>(
-    "/lightning",
-    {},
-    {
-      queryName: "lightning",
+  const { data } = useQuery(
+    api.lightning.lightning.queryOptions(void 0, {
       enabled,
-      interval: 1,
-    },
+      placeholderData: keepPreviousData,
+      refetchInterval: MINUTE,
+    }),
   );
 
-  if (!enabled || lightningData?.status !== "success" || !lightningData.data.features.length) return;
-
-  const features = lightningData?.data.features;
+  if (!enabled || !data) return;
 
   const filteredData: FeatureCollection = {
     type: "FeatureCollection",
-    features: features.reduce((acc: FeatureCollection<Point, { validTime: number }>["features"], feature) => {
+    features: data.reduce((acc: FeatureCollection<Point, { validTime: number }>["features"], feature) => {
       if (
         feature.properties.validTime >= displayTime - timeRange * MINUTE &&
         feature.properties.validTime <= displayTime

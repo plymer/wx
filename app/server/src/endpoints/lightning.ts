@@ -1,9 +1,9 @@
 import axios, { AxiosError } from "axios";
-import type { Feature, Point } from "geojson";
+import type { Feature, MultiPoint, Point } from "geojson";
 import { TRPCError } from "@trpc/server";
 
 import { LightningFC } from "../lib/lightning.types.js";
-import { router, publicProcedure } from "../lib/trpc.js";
+import { publicProcedure, router } from "../lib/trpc.js";
 
 export const lightningRouter = router({
   lightning: publicProcedure.query(async () => {
@@ -41,7 +41,7 @@ export const lightningRouter = router({
         ),
       );
 
-      const features: Feature[] = [];
+      const features: Feature<MultiPoint, { validTime: number }>[] = [];
 
       responses.forEach((res) => {
         if (!res) return null;
