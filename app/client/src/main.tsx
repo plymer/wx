@@ -1,5 +1,5 @@
 import ReactDOM from "react-dom/client";
-import { StrictMode } from "react";
+import { StrictMode, useState } from "react";
 import { HashRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -8,8 +8,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import "./index.css";
 import { App } from "./App";
-
-const queryClient = new QueryClient();
+import { queryClient } from "./lib/trpc";
 
 const rootElement = document.getElementById("app")!;
 

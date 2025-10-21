@@ -2,9 +2,10 @@ import { useBulletin, useOffice, usePublicActions } from "@/stateStores/public";
 
 import { PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { PublicBulletin } from "@/lib/types";
-import useAPI from "@/hooks/useAPI";
+import { api } from "@/lib/trpc";
 import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 export default function Public() {
   const office = useOffice();
@@ -39,10 +40,14 @@ export default function Public() {
     };
   }, [office, bulletin]);
 
-  const { data } = useAPI<PublicBulletin>("/alpha/public/bulletin", {
-    office: issuerCode,
-    bulletin: productCode,
-  });
+  const { data, fetchStatus } = useQuery(
+    api.alpha.publicBulletin.queryOptions(
+      { office: issuerCode, bulletin: productCode },
+      { placeholderData: keepPreviousData },
+    ),
+  );
+
+  const bulletinContent = data as PublicBulletin;
 
   return (
     <div className="p-2 bg-neutral-800 text-white text-sm">
@@ -84,14 +89,16 @@ export default function Public() {
         </div>
       </div>
 
-      {productList[(productCode + issuerCode) as keyof typeof productList] && data?.status === "success" ? (
+      {productList[(productCode + issuerCode) as keyof typeof productList] && bulletinContent && (
         <pre
-          className="overflow-y-scroll whitespace-pre-wrap md:px-6 max-md:pb-12 max-w-fit mx-auto"
+          className={`overflow-y-scroll whitespace-pre-wrap md:px-6 max-md:pb-12 max-w-fit mx-auto ${fetchStatus === "fetching" ? "text-neutral-500" : ""}`}
           style={{ height: "calc(100svh - 11.2rem)" }}
         >
-          {data.data.trim()}
+          {bulletinContent?.trim()}
         </pre>
-      ) : (
+      )}
+
+      {productList[(productCode + issuerCode) as keyof typeof productList] && !bulletinContent && (
         <pre>No Product available</pre>
       )}
     </div>
