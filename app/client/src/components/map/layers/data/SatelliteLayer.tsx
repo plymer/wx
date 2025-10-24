@@ -25,6 +25,9 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
 
   const belowLayerId = mapRef?.getLayer(belowLayer) ? belowLayer : "wateroutline";
 
+  // night time low cloud/fog product:
+  // msg_fes:rgb_fog
+
   const queryParams =
     domain === "europe" ? { layers: "mtg_fd:rgb_cloudphase" } : { layers: `${satelliteDomain}_${satelliteProduct}` };
 
