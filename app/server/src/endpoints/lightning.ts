@@ -1,4 +1,3 @@
-import axios, { AxiosError } from "axios";
 import type { Feature, MultiPoint, Point } from "geojson";
 import { TRPCError } from "@trpc/server";
 
@@ -29,17 +28,19 @@ export const lightningRouter = router({
     const urlList = timeStamps.map((ts) => `https://weather.gc.ca/api/app/v2/Lightning/1/${ts}`);
 
     try {
-      const responses = await Promise.all(
-        urlList.map((url) =>
-          axios
-            .get(url)
-            .then((res) => res.data as LightningFC)
-            .catch((err: AxiosError) => {
-              console.error(`Error fetching data from ${url}:`, err.message);
-              return null;
-            }),
-        ),
-      );
+      const responses = (
+        await Promise.all(
+          urlList.map(async (url) =>
+            fetch(url)
+              .then((res) => res.json())
+              .then((data) => data as LightningFC)
+              .catch((err) => {
+                console.error(`Error fetching data from ${url}:`, err.message);
+                return null;
+              })
+          )
+        )
+      ).filter((res): res is LightningFC => res !== null);
 
       const features: Feature<MultiPoint, { validTime: number }>[] = [];
 

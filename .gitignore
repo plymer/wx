@@ -17,6 +17,10 @@ dist/
 .netlify
 .wrangler
 
+# Package managers
+package-lock.json
+# pnpm-lock.yaml should be committed
+
 # IDE
 .vscode/*
 !.vscode/extensions.json

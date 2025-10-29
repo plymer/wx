@@ -1,6 +1,4 @@
-import axios from "axios";
 import { TRPCError } from "@trpc/server";
-
 import type { WMSLayer } from "../lib/types.js";
 import { processDimensionString } from "../lib/utils.js";
 import { DATA_CUTOFF, EUMETSAT_GETCAPABILITIES, GEOMET_GETCAPABILITIES } from "../config/wms.config.js";
@@ -15,10 +13,7 @@ export const wmsRouter = router({
     try {
       const { parser } = new WMSXMLParser();
 
-      const xml = await axios
-        .get(GEOMET_GETCAPABILITIES)
-        .then((response) => response.data)
-        .then((data) => parser.parse(data));
+      const xml = await fetch(GEOMET_GETCAPABILITIES).then(async (response) => parser.parse(await response.text()));
 
       const layerCategories = xml.wmsCapabilities.capability.layer.layer
         .map((layer: any) => layer.layer)
@@ -70,10 +65,7 @@ export const wmsRouter = router({
     try {
       const { parser } = new WMSXMLParser();
 
-      const xml = await axios
-        .get(EUMETSAT_GETCAPABILITIES)
-        .then((response) => response.data)
-        .then((data) => parser.parse(data));
+      const xml = await fetch(EUMETSAT_GETCAPABILITIES).then(async (response) => parser.parse(await response.text()));
 
       const allLayers: WMSLayer[] = xml.wmsCapabilities.capability.layer.layer
         .filter((layer: any) => layer.title.includes("- 0 degree"))

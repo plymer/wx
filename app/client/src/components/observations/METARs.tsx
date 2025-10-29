@@ -5,11 +5,10 @@ import { APIResponse, METAR } from "@/lib/types";
 import { formatSigWx } from "@/lib/utils";
 
 interface Props {
-  site: string;
   data: METAR | undefined;
 }
 
-const METARs = ({ site, data }: Props) => {
+const METARs = ({ data }: Props) => {
   const scrollTargetRef = useRef<null | HTMLDivElement>(null);
   const highlightSigWx = useHighlightSigWx().highlightSigWx;
 

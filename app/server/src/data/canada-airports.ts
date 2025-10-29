@@ -1,4 +1,3 @@
-import axios from "axios";
 import "dotenv/config";
 import { XMLParser } from "fast-xml-parser";
 import type { StationData } from "../lib/types.js";
@@ -39,12 +38,12 @@ type RawTableData = {
             span: [
               { span: string[] },
               "/",
-              { span: { span: [string, { span: string; "#text": string }, { span: string; "#text": string }] } }, // coords
+              { span: { span: [string, { span: string; "#text": string }, { span: string; "#text": string }] } } // coords
             ];
           };
         };
       };
-    },
+    }
   ];
 };
 
@@ -102,7 +101,9 @@ function extractCoordinates(coordinateCell: any): { lat: number; lon: number } |
 async function scrapeProvince(code: string, name: string): Promise<StationData[]> {
   const url = `${baseUrl}${name}&format=json`;
 
-  const { data: json } = await axios.get(url);
+  const json = await fetch(url)
+    .then((res) => res.json())
+    .then((data) => data as any);
 
   const html = parser.parse(`<html><body>${json.parse.text["*"]}</body></html>`);
 
@@ -172,7 +173,7 @@ export async function scrapeWiki() {
         console.error(`Failed to scrape ${name}: ${baseUrl}${name}&format=json\n\n${err}`);
         return [];
       }
-    }),
+    })
   );
 
   // Process results sequentially to ensure all insertions complete
@@ -195,7 +196,7 @@ export async function scrapeWiki() {
                 state: station.state,
               },
             });
-        }),
+        })
       );
     }
   }

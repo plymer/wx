@@ -37,7 +37,7 @@ async function main() {
         const parsed = metarSchema.safeParse(metar);
 
         if (!parsed.success) {
-          console.error(parsed.error);
+          console.error("PARSE ERROR", metar, parsed.error.issues);
           return;
         }
 

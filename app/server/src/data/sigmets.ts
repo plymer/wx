@@ -1,15 +1,8 @@
 import "dotenv/config";
-import axios, { AxiosError } from "axios";
 import { gt, lt, sql } from "drizzle-orm";
 import { sigmets } from "../db/tables/avwx.drizzle.js";
 import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, HOUR } from "../lib/constants.js";
-import type {
-  CacheAirSigmetsData,
-  Coords,
-  RawIntlSigmetData,
-  SigmetData,
-  XMLCacheFile,
-} from "../lib/types.js";
+import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../lib/types.js";
 import { cardinalToDegrees, generateDbConnection, readGzipFile, xmlParser } from "../lib/utils.js";
 import { airSigmetsSchema } from "../lib/validation.js";
 
@@ -31,10 +24,12 @@ async function main() {
 
   const conusData = (parser.parse(xml) as XMLCacheFile<CacheAirSigmetsData, "airsigmet">).response.data.airsigmet;
 
+  const parsedConusData = Array.isArray(conusData) ? conusData : [conusData];
+
   const conusOutput: SigmetData[] = [];
 
   try {
-    const output: SigmetData[] = conusData
+    const output: SigmetData[] = parsedConusData
       .map((sigmet) => {
         const parsed = airSigmetsSchema.safeParse(sigmet);
 
@@ -109,11 +104,7 @@ async function main() {
     throw new Error(`[${DB_NAME.toUpperCase()}] Could not parse SIGMETs from the AWC XML: ${(error as Error).message}`);
   }
 
-  // configure the base axios instance for the API calls
-  const avwxApi = axios.create({
-    baseURL: "https://aviationweather.gov/api/data/",
-    headers: { "User-Agent": "prairiewx/1.0" },
-  });
+  const avwxApi = "https://aviationweather.gov/api/data/";
 
   const now = new Date();
 
@@ -126,14 +117,18 @@ async function main() {
   // find which SIGMETs are still active in the DB so we can diff the AWC API response against them
   const activeInDb = recentSigmets.filter((s) => s.endTime > now);
 
-  const intlData = await avwxApi
-    .get("isigmet", { params: { format: "json" } })
-    .then((response) => response.data as RawIntlSigmetData[])
-    .catch((error: AxiosError) => {
-      throw new Error(
-        `[${DB_NAME.toUpperCase()}] Failed to fetch international SIGMET data\n${error.response ? error.response.statusText : error.message}`,
-      );
-    });
+  const intlData = await fetch(`${avwxApi}isigmet?format=json`, { headers: { "User-Agent": "prairiewx/1.0" } })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(
+          `[${DB_NAME.toUpperCase()}] Failed to fetch international SIGMET data\n${response.status} ${
+            response.statusText
+          }`,
+        );
+      }
+      return response.json();
+    })
+    .then((data) => data as RawIntlSigmetData[]);
 
   const data = intlData
     .filter((sigmet) => sigmet !== undefined || sigmet !== null)
@@ -274,7 +269,9 @@ async function main() {
 
   toCancel.forEach((sigmet) => {
     console.warn(
-      `[${DB_NAME.toUpperCase()}] SIGMET ${sigmet.domain} ${sigmet.charCode} ${sigmet.numberCode} is active in the database but missing from the AWC API, creating a cancellation...`,
+      `[${DB_NAME.toUpperCase()}] SIGMET ${sigmet.domain} ${sigmet.charCode} ${
+        sigmet.numberCode
+      } is active in the database but missing from the AWC API, creating a cancellation...`,
     );
 
     const fakeCancel = {

@@ -6,7 +6,6 @@ import type { LatLon, SunTimes } from "./common.types.js";
 import type { XmetShapes } from "./alphanumeric.types.js";
 import { MINUTE } from "./constants.js";
 
-import axios from "axios";
 import { Relations } from "drizzle-orm";
 import { MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 import { drizzle } from "drizzle-orm/mysql2";
@@ -379,8 +378,13 @@ export async function testDbConnection(db: ReturnType<typeof drizzle>, dbName: s
 export async function readGzipFile(url: string, dbName: string) {
   try {
     // fetch the compressed data
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    const compressedData = response.data;
+    const arrayBuffer = await fetch(url).then((res) => {
+      if (!res.ok) {
+        throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+      }
+      return res.arrayBuffer();
+    });
+    const compressedData = Buffer.from(arrayBuffer);
 
     // decompress the data
     const decompressedData = await new Promise((resolve, reject) => {

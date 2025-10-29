@@ -84,7 +84,7 @@ module.exports = {
       merge_logs: true,
       env: { ...ENV_VARS },
       autorestart: false, // don't restart this script automatically
-      cron_restart: "*/5 * * * *", // run every 5 minutes
+      cron_restart: "* * * * *", // run every 5 minutes
     },
   ],
 };

@@ -1,7 +1,5 @@
-import axios from "axios";
 import "dotenv/config";
 import { lt } from "drizzle-orm";
-
 import { aqData } from "../db/tables/aq.drizzle.js";
 import { CSVAQData, AQData } from "../lib/types.js";
 import { aqSchema } from "../lib/validation.js";
@@ -9,8 +7,6 @@ import { HOUR } from "../lib/constants.js";
 import { generateDbConnection } from "../lib/utils.js";
 
 async function main() {
-  const remote = axios.create({ baseURL: "https://cyclone.unbc.ca/aqmap/data/" });
-
   const db = await generateDbConnection("aq", { aqData });
 
   if (!db) {
@@ -23,7 +19,9 @@ async function main() {
   const cacheBuster = Math.floor(now.getTime() / 1000);
 
   try {
-    const data = await remote.get(`aqmap_most_recent_obs.csv?${cacheBuster}`).then((res) => res.data);
+    const data = await fetch(`https://cyclone.unbc.ca/aqmap/data/aqmap_most_recent_obs.csv?${cacheBuster}`).then(
+      (res) => res.text(),
+    );
 
     // 29 columns, comma-separated
 
@@ -51,7 +49,7 @@ async function main() {
         });
         return row;
       })
-      .reduce((acc: AQData[], row: CSVAQData) => {
+      .reduce<AQData[]>((acc, row) => {
         const parsed = aqSchema.safeParse(row);
 
         if (!parsed.success) {

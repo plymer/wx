@@ -1,5 +1,4 @@
 import { and, asc, desc, eq, gt, gte } from "drizzle-orm";
-import axios from "axios";
 import suncalc, { GetTimesResult } from "suncalc";
 import type { Feature, MultiPolygon } from "geojson";
 import { TRPCError } from "@trpc/server";
@@ -18,7 +17,7 @@ import { HOUR } from "../lib/constants.js";
 
 import { avwxDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
-import { HubData, SigmetData, XmetGeoJSON } from "../lib/types.js";
+import { HubData, XmetGeoJSON } from "../lib/types.js";
 
 const HubSites: Record<string, string> = {
   CYYZ: "Toronto Pearson Int'l Airport",
@@ -48,10 +47,10 @@ export const alphanumericRouter = router({
       });
 
       if (!metarData || metarData.length === 0) {
-        return { status: "noData" as const };
+        return undefined;
       }
 
-      return metarData.map((m) => m.rawText);
+      return metarData.map((m) => m.rawText).filter((m) => m !== null && m !== undefined);
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
@@ -76,7 +75,7 @@ export const alphanumericRouter = router({
       });
 
       if (!stationData) {
-        return { status: "noData" as const };
+        return undefined;
       }
 
       const { siteId, name, lat, lon, elev_f, elev_m, country, state } = stationData;
@@ -136,10 +135,10 @@ export const alphanumericRouter = router({
       });
 
       if (!tafData || tafData.length === 0) {
-        return { status: "noData" as const };
+        return undefined;
       }
 
-      return tafData[0].rawText;
+      return tafData[0].rawText ? tafData[0].rawText : undefined;
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
@@ -153,7 +152,9 @@ export const alphanumericRouter = router({
     const url = "https://metaviation.az.ec.gc.ca/hubwx/scripts/getForecasterNotes.php";
 
     try {
-      const hubs: HubDiscussion = await axios.get(url).then((hub) => hub.data);
+      const hubs: HubDiscussion = await fetch(url)
+        .then((hub) => hub.json())
+        .then((data) => data as HubDiscussion);
 
       const siteName = HubSites[site as keyof typeof HubSites];
 
@@ -192,7 +193,7 @@ export const alphanumericRouter = router({
     console.log("requesting bulletin from:", searchUrl);
 
     try {
-      const bulletinData: string = await axios.get(searchUrl).then((bulletin) => bulletin.data);
+      const bulletinData: string = await fetch(searchUrl).then((bulletin) => bulletin.text());
 
       if (bulletinData.length === 0) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Bulletin data is empty" });

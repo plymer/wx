@@ -1,4 +1,3 @@
-import axios from "axios";
 import { TRPCError } from "@trpc/server";
 
 import type { NavCanImageList, NavCanResponse } from "../lib/alphanumeric.types.js";
@@ -13,7 +12,9 @@ export const chartsRouter = router({
 
       console.log("[API] Requesting GFAs from:", url);
 
-      const ncAPIData: NavCanResponse = await axios.get(url).then((gfas) => gfas.data);
+      const ncAPIData: NavCanResponse = await fetch(url)
+        .then((gfas) => gfas.json())
+        .then((data) => data as NavCanResponse);
       const rawList = ncAPIData.data.map((region) => JSON.parse(region.text) as NavCanImageList);
 
       const results: Record<string, { cldwx: string[]; turbc: string[] }> = {};
@@ -21,14 +22,14 @@ export const chartsRouter = router({
         if (Object.hasOwn(results, gfa.geography.toLowerCase())) {
           Object.assign(results[gfa.geography.toLowerCase()], {
             [gfa.sub_product.toLowerCase()]: gfa.frame_lists[2].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
+              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
             ),
           });
         } else {
           Object.assign(results, {
             [gfa.geography.toLowerCase()]: {
               [gfa.sub_product.toLowerCase()]: gfa.frame_lists[2].frames.map(
-                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
+                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
               ),
             },
           });
@@ -52,7 +53,9 @@ export const chartsRouter = router({
 
       console.log("[API] Requesting SigWx charts from:", url);
 
-      const ncAPIData: NavCanResponse = await axios.get(url).then((gfas) => gfas.data);
+      const ncAPIData: NavCanResponse = await fetch(url)
+        .then((gfas) => gfas.json())
+        .then((data) => data as NavCanResponse);
       const rawList = ncAPIData.data.map((region) => JSON.parse(region.text) as NavCanImageList);
 
       const results: Record<string, string[]> = {};
@@ -63,14 +66,14 @@ export const chartsRouter = router({
         if (Object.hasOwn(results, product)) {
           Object.assign(results[product], {
             [p.sub_geography.toLowerCase()]: p.frame_lists[0].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
+              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
             ),
           });
         } else {
           Object.assign(results, {
             [product]: {
               [p.sub_geography.toLowerCase()]: p.frame_lists[0].frames.map(
-                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
+                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
               ),
             },
           });
@@ -95,7 +98,9 @@ export const chartsRouter = router({
 
       console.log("[API] Requesting HLT charts from:", url);
 
-      const ncAPIData: NavCanResponse = await axios.get(url).then((gfas) => gfas.data);
+      const ncAPIData: NavCanResponse = await fetch(url)
+        .then((gfas) => gfas.json())
+        .then((data) => data as NavCanResponse);
       const rawList = ncAPIData.data.map((region) => JSON.parse(region.text) as NavCanImageList);
 
       const results: Record<string, string[]> = {};
@@ -105,14 +110,14 @@ export const chartsRouter = router({
         if (Object.hasOwn(results, product)) {
           Object.assign(results[product], {
             [p.geography.toLowerCase()]: p.frame_lists[0].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
+              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
             ),
           });
         } else {
           Object.assign(results, {
             [product]: {
               [p.geography.toLowerCase()]: p.frame_lists[0].frames.map(
-                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
+                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
               ),
             },
           });
@@ -137,14 +142,16 @@ export const chartsRouter = router({
 
       console.log("[API] Requesting LGFs from:", url);
 
-      const ncAPIData: NavCanResponse = await axios.get(url).then((lgfs) => lgfs.data);
+      const ncAPIData: NavCanResponse = await fetch(url)
+        .then((lgfs) => lgfs.json())
+        .then((data) => data as NavCanResponse);
       const rawList = ncAPIData.data.map((region) => JSON.parse(region.text) as NavCanImageList);
 
       const results: Record<string, string[]> = {};
       rawList.forEach((lgf) => {
         Object.assign(results, {
           [lgf.geography.toLowerCase()]: lgf.frame_lists[lgf.frame_lists.length - 1].frames.map(
-            (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
+            (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
           ),
         });
       });
@@ -167,7 +174,9 @@ export const chartsRouter = router({
       const apiURL =
         "https://plan.navcanada.ca/weather/api/alpha/?site=CZVR&site=CZEG&site=CZWG&site=CZYZ&site=CZUL&site=CZQM&site=CZQX&image=GFA/CLDWX&image=GFA/TURBC&image=LGF&image=TURBULENCE&image=SIG_WX//MID_LEVEL/*";
 
-      const ncAPIData: NavCanResponse = await axios.get(apiURL).then((imageList) => imageList.data);
+      const ncAPIData: NavCanResponse = await fetch(apiURL)
+        .then((imageList) => imageList.json())
+        .then((data) => data as NavCanResponse);
       const rawList = ncAPIData.data.map((region) => JSON.parse(region.text) as NavCanImageList);
 
       type NavCanOutput = Record<
@@ -187,14 +196,14 @@ export const chartsRouter = router({
             if (Object.keys(output).includes(item.geography)) {
               Object.assign(output[item.geography], {
                 [item.sub_product]: item.frame_lists[2].frames.map(
-                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
+                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
                 ),
               });
             } else {
               Object.assign(output, {
                 [item.geography]: {
                   [item.sub_product]: item.frame_lists[2].frames.map(
-                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
+                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
                   ),
                 },
               });
@@ -204,14 +213,14 @@ export const chartsRouter = router({
             if (Object.keys(output).includes("SIGWX")) {
               Object.assign(output["SIGWX"], {
                 [item.sub_geography]: item.frame_lists[0].frames.map(
-                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
+                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
                 ),
               });
             } else {
               Object.assign(output, {
                 ["SIGWX"]: {
                   [item.sub_geography]: item.frame_lists[0].frames.map(
-                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
+                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
                   ),
                 },
               });
@@ -221,14 +230,14 @@ export const chartsRouter = router({
             if (Object.keys(output).includes("HLT")) {
               Object.assign(output["HLT"], {
                 [item.geography]: item.frame_lists[0].frames.map(
-                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
+                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
                 ),
               });
             } else {
               Object.assign(output, {
                 ["HLT"]: {
                   [item.geography]: item.frame_lists[0].frames.map(
-                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
+                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
                   ),
                 },
               });
@@ -237,7 +246,7 @@ export const chartsRouter = router({
           case "LGF":
             Object.assign(output, {
               [item.geography]: item.frame_lists[0].frames.map(
-                (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
+                (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
               ),
             });
             break;

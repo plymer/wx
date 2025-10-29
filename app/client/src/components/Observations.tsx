@@ -145,7 +145,7 @@ export default function Observations() {
       </div>
 
       <div className="overflow-y-scroll text-sm" style={{ height: "calc(100svh - 6.5rem)" }}>
-        <METARs site={site} data={metarData as METAR} />
+        <METARs data={metarData as METAR} />
         <SiteMetadata response={metaData as SiteData} />
         <TAF data={tafData as TAFData} />
       </div>

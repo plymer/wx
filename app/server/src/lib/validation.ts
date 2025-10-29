@@ -56,6 +56,14 @@ export const aqSchema = z.object({
   icon_url: z.string().optional(),
 });
 
+const skyObjectSchema = z.object({
+  skyCover: z.string(),
+  cloudBaseFtAgl: z
+    .string()
+    .transform((val) => parseInt(val))
+    .optional(),
+});
+
 export const metarSchema = z.object({
   rawText: z.string(),
   stationId: z.string().length(4),
@@ -85,14 +93,7 @@ export const metarSchema = z.object({
     .number()
     .optional()
     .transform((val) => (val === undefined ? null : val)),
-  skyCondition: z
-    .array(
-      z.object({
-        skyCover: z.string(),
-        cloudBaseFtAgl: z.string().transform((val) => parseInt(val)),
-      }),
-    )
-    .optional(),
+  skyCondition: z.union([z.undefined(), skyObjectSchema, z.array(skyObjectSchema)]),
   flightCategory: z
     .enum(["VFR", "IFR", "MVFR", "LIFR", ""])
     .optional()
@@ -109,9 +110,9 @@ export const stationSchema = z.object({
     .string()
     .length(4, "ICAO ID must be exactly 4 characters")
     .regex(/^[A-Z0-9]{4}$/, "ICAO ID must contain only uppercase letters and numbers"),
-  iataId: z.string(),
-  faaId: z.string(),
-  wmoId: z.string(),
+  iataId: z.string().optional(),
+  faaId: z.string().optional(),
+  wmoId: z.string().optional(),
   lat: z.number(),
   lon: z.number(),
   elev: z.number(),
@@ -143,15 +144,7 @@ const tafForecastSchema = z.object({
     .string()
     .optional()
     .transform((val) => (val === undefined ? null : val)),
-  skyCondition: z
-    .array(
-      z.object({
-        skyCover: z.string(),
-        cloudBaseFtAgl: z.string().transform((val) => parseInt(val)),
-      }),
-    )
-    .optional()
-    .transform((val) => (val === undefined ? null : val)),
+  skyCondition: z.union([z.undefined(), skyObjectSchema, z.array(skyObjectSchema)]),
 });
 
 export const tafSchema = z.object({
