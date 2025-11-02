@@ -19,7 +19,7 @@ export default defineConfig({
       registerType: "autoUpdate",
       manifest: false,
       workbox: {
-        maximumFileSizeToCacheInBytes: 4000000,
+        maximumFileSizeToCacheInBytes: 3000000,
       },
     }),
   ],
@@ -32,6 +32,9 @@ export default defineConfig({
   build: {
     emptyOutDir: true,
     outDir: path.resolve(__dirname, "../../dist"),
+    rolldownOptions: {
+      output: { advancedChunks: { groups: [{ test: /maplibre-gl/, name: "maplibre-gl", priority: 999 }] } },
+    },
   },
   resolve: {
     alias: {
