@@ -11,8 +11,8 @@ import { pirepSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
 
 const CACHEFILE_URL = "https://aviationweather.gov/data/cache/aircraftreports.cache.xml.gz";
-const NAVCAN_URL =
-  "https://plan.navcanada.ca/weather/api/alpha/?site=CZEG&site=CZVR&site=CZWG&site=CZYZ&site=CZUL&site=CZQM&site=CZQX&alpha=pirep";
+// const NAVCAN_URL =
+//   "https://plan.navcanada.ca/weather/api/alpha/?site=CZEG&site=CZVR&site=CZWG&site=CZYZ&site=CZUL&site=CZQM&site=CZQX&alpha=pirep";
 const DB_NAME = "avwx";
 
 async function main() {

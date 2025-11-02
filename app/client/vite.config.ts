@@ -19,7 +19,7 @@ export default defineConfig({
       registerType: "autoUpdate",
       manifest: false,
       workbox: {
-        maximumFileSizeToCacheInBytes: 3000000,
+        maximumFileSizeToCacheInBytes: 4000000,
       },
     }),
   ],

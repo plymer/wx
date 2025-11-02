@@ -1,6 +1,6 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 
-import { FeatureCollection, Point } from "geojson";
+import type { FeatureCollection, Point } from "geojson";
 import { CLUSTERED, LIGHTNING_DISPLAY, UNCLUSTERED } from "@/config/vectorData";
 import { MINUTE } from "@shared/lib/constants";
 import { GEOMET_ATTRIBUTION } from "@/config/rasterData";

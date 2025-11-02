@@ -9,12 +9,11 @@ import { PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { RADAR_PRODUCTS, RASTER_DATA_TYPES, SATELLITE_CHANNELS, SATELLITES } from "../config/rasterData";
 import { VECTOR_DATA_TYPES, XMET_TYPES } from "../config/vectorData";
 
-import { FeatureCollection, MultiPoint, MultiPolygon } from "geojson";
+import type { FeatureCollection, MultiPoint, MultiPolygon } from "geojson";
 
-import { InferSelectModel } from "drizzle-orm";
+import type { InferSelectModel } from "drizzle-orm";
 
-import { LngLat, MapGeoJSONFeature } from "maplibre-gl";
-import { StationData } from "@shared/lib/types";
+import { LngLat, type MapGeoJSONFeature } from "maplibre-gl";
 import { aqData } from "@shared/db/tables/aq.drizzle";
 
 export type AppMode = keyof typeof APP_MODES_LIST;

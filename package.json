@@ -6,6 +6,9 @@
   "author": "Ryan Pimiskern",
   "type": "module",
   "scripts": {
+    "check": "pnpm run check:client && pnpm run check:server",
+    "check:client": "pnpm --filter client run check",
+    "check:server": "pnpm --filter server run check",
     "build": "pnpm run build:client && pnpm run build:server",
     "build:client": "pnpm --filter client build",
     "build:server": "pnpm --filter server build",
@@ -75,7 +78,7 @@
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.44.0",
-    "vite": "npm:rolldown-vite@latest",
+    "vite": "^7.1.12",
     "vite-plugin-pwa": "^1.0.1"
   }
 }

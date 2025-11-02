@@ -1,5 +1,3 @@
-import { LngLatBoundsLike } from "maplibre-gl";
-
 export const MAP_TILE_CACHE_SIZE: number = 1024 * 1024 * 400; // in bytes
 
 // settings for data layers

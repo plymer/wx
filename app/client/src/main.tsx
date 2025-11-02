@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client";
-import { StrictMode, useState } from "react";
+import { StrictMode } from "react";
 import { HashRouter } from "react-router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 
 // map css
 import "maplibre-gl/dist/maplibre-gl.css";

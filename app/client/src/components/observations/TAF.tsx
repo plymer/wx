@@ -1,6 +1,7 @@
-import { ParsedTAF, TAFData } from "@/lib/types";
+import type { ParsedTAF, TAFData } from "@/lib/types";
 import { useHighlightSigWx } from "@/hooks/useHighlightSigWx";
 import { formatSigWx } from "@/lib/utils";
+import { AlertOctagon } from "lucide-react";
 
 interface Props {
   data: TAFData | undefined;
@@ -23,6 +24,13 @@ const TAF = ({ data }: Props) => {
             </div>
           ))}
         <div>{parsedTaf.rmk}</div>
+      </div>
+    );
+  } else {
+    return (
+      <div className="flex justify-center gap-2">
+        <AlertOctagon />
+        <span>No TAFs found</span>
       </div>
     );
   }

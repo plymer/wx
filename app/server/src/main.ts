@@ -61,7 +61,7 @@ export type AppRouter = typeof appRouter;
 createHTTPServer({
   middleware: cors(),
   router: appRouter,
-  // basePath: "/api",
+  basePath: "/api/",
 }).listen(3000);
 
-console.log(`tRPC server listening on http://localhost:3000`);
+console.log(`tRPC server listening on http://localhost:3000/api/`);

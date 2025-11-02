@@ -1,9 +1,9 @@
 import { useHighlightSigWx } from "@/hooks/useHighlightSigWx";
-import { ParsedTAF } from "@/lib/types";
+import type { ParsedTAF } from "@/lib/types";
 import { checkIfInBounds, formatSigWx } from "@/lib/utils";
 import { usePopupData, useUIActions } from "@/stateStores/map/ui";
 import { useRef } from "react";
-import { Popup, PopupInstance } from "react-map-gl/maplibre";
+import { Popup, type PopupInstance } from "react-map-gl/maplibre";
 import Button from "../ui/Button";
 import { X } from "lucide-react";
 import { useViewportBounds } from "@/stateStores/map/mapView";

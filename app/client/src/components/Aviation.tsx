@@ -1,5 +1,4 @@
-import useAPI from "@/hooks/useAPI";
-import { GFAData, OtherChartData, Products } from "@/lib/types";
+import type { Products } from "@/lib/types";
 import { useAviationActions, useHub, useAvProduct } from "@/stateStores/aviation";
 import AvChartsGFA from "./aviation/AvChartsGFA";
 import AvChartsOther from "./aviation/AvChartsOther";

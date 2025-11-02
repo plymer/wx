@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { MapOptionsTabs, LayerTabs, MapPopupData } from "../../lib/types";
+import type { MapOptionsTabs, LayerTabs, MapPopupData } from "../../lib/types";
 
 interface UIStateStore {
   mapOptionsTab: MapOptionsTabs;

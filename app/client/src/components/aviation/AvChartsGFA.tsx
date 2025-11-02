@@ -1,5 +1,5 @@
 import { AVIATION_PRODUCTS } from "@/config/aviationProducts";
-import { APIResponse, GFAData, ProductDomains, Products } from "@/lib/types";
+import type { GFAData, ProductDomains, Products } from "@/lib/types";
 import { useAviationActions, useDomain, useAvSubProduct, useTimeStep } from "@/stateStores/aviation";
 import Button from "../ui/Button";
 

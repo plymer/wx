@@ -1,5 +1,5 @@
 import { and, asc, desc, eq, gt, gte } from "drizzle-orm";
-import suncalc, { GetTimesResult } from "suncalc";
+import suncalc, { type GetTimesResult } from "suncalc";
 import type { Feature, MultiPolygon } from "geojson";
 import { TRPCError } from "@trpc/server";
 
@@ -17,7 +17,7 @@ import { HOUR } from "../lib/constants.js";
 
 import { avwxDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
-import { HubData, XmetGeoJSON } from "../lib/types.js";
+import type { HubData, XmetGeoJSON } from "../lib/types.js";
 
 const HubSites: Record<string, string> = {
   CYYZ: "Toronto Pearson Int'l Airport",

@@ -2,10 +2,10 @@ import { useState } from "react";
 
 import { Globe, Globe2, List, Map, ScanEye } from "lucide-react";
 
-import { ToggleDataOption } from "@/lib/types";
+import type { ToggleDataOption } from "@/lib/types";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "@/components/ui/Drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import Button, { ButtonProps } from "@/components/ui/Button";
+import Button, { type ButtonProps } from "@/components/ui/Button";
 import {
   useBedpostsOverlay,
   useFIROverlay,

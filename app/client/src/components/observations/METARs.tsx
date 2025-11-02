@@ -1,8 +1,8 @@
-import { OctagonAlert, Skull } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useHighlightSigWx } from "@/hooks/useHighlightSigWx";
-import { APIResponse, METAR } from "@/lib/types";
+import type { METAR } from "@/lib/types";
 import { formatSigWx } from "@/lib/utils";
+import { AlertOctagon } from "lucide-react";
 
 interface Props {
   data: METAR | undefined;
@@ -30,6 +30,13 @@ const METARs = ({ data }: Props) => {
           </div>
         ))}
         <div ref={scrollTargetRef}></div>
+      </div>
+    );
+  } else {
+    return (
+      <div className="flex justify-center gap-2">
+        <AlertOctagon />
+        <span>No METARs found</span>
       </div>
     );
   }

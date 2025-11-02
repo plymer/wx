@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { Loader2, RefreshCw, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useHours, useObsActions, useSite } from "@/stateStores/observations";
-import { METAR, SiteData, TAFData } from "@/lib/types";
+import type { METAR, SiteData, TAFData } from "@/lib/types";
 import { Input } from "./ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 import METARs from "./observations/METARs";

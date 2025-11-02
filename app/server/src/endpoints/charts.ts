@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 
 import type { NavCanImageList, NavCanResponse } from "../lib/alphanumeric.types.js";
 import { publicProcedure, router } from "../lib/trpc.js";
-import { GFAData, OtherChartData } from "../lib/types.js";
+import type { GFAData, OtherChartData } from "../lib/types.js";
 
 export const chartsRouter = router({
   gfa: publicProcedure.query(async (): Promise<GFAData[]> => {
@@ -22,14 +22,14 @@ export const chartsRouter = router({
         if (Object.hasOwn(results, gfa.geography.toLowerCase())) {
           Object.assign(results[gfa.geography.toLowerCase()], {
             [gfa.sub_product.toLowerCase()]: gfa.frame_lists[2].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
             ),
           });
         } else {
           Object.assign(results, {
             [gfa.geography.toLowerCase()]: {
               [gfa.sub_product.toLowerCase()]: gfa.frame_lists[2].frames.map(
-                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
               ),
             },
           });
@@ -66,14 +66,14 @@ export const chartsRouter = router({
         if (Object.hasOwn(results, product)) {
           Object.assign(results[product], {
             [p.sub_geography.toLowerCase()]: p.frame_lists[0].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
             ),
           });
         } else {
           Object.assign(results, {
             [product]: {
               [p.sub_geography.toLowerCase()]: p.frame_lists[0].frames.map(
-                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
               ),
             },
           });
@@ -110,14 +110,14 @@ export const chartsRouter = router({
         if (Object.hasOwn(results, product)) {
           Object.assign(results[product], {
             [p.geography.toLowerCase()]: p.frame_lists[0].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
             ),
           });
         } else {
           Object.assign(results, {
             [product]: {
               [p.geography.toLowerCase()]: p.frame_lists[0].frames.map(
-                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
               ),
             },
           });
@@ -151,7 +151,7 @@ export const chartsRouter = router({
       rawList.forEach((lgf) => {
         Object.assign(results, {
           [lgf.geography.toLowerCase()]: lgf.frame_lists[lgf.frame_lists.length - 1].frames.map(
-            (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image"
+            (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
           ),
         });
       });
@@ -196,14 +196,14 @@ export const chartsRouter = router({
             if (Object.keys(output).includes(item.geography)) {
               Object.assign(output[item.geography], {
                 [item.sub_product]: item.frame_lists[2].frames.map(
-                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
                 ),
               });
             } else {
               Object.assign(output, {
                 [item.geography]: {
                   [item.sub_product]: item.frame_lists[2].frames.map(
-                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
                   ),
                 },
               });
@@ -213,14 +213,14 @@ export const chartsRouter = router({
             if (Object.keys(output).includes("SIGWX")) {
               Object.assign(output["SIGWX"], {
                 [item.sub_geography]: item.frame_lists[0].frames.map(
-                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
                 ),
               });
             } else {
               Object.assign(output, {
                 ["SIGWX"]: {
                   [item.sub_geography]: item.frame_lists[0].frames.map(
-                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
                   ),
                 },
               });
@@ -230,14 +230,14 @@ export const chartsRouter = router({
             if (Object.keys(output).includes("HLT")) {
               Object.assign(output["HLT"], {
                 [item.geography]: item.frame_lists[0].frames.map(
-                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                  (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
                 ),
               });
             } else {
               Object.assign(output, {
                 ["HLT"]: {
                   [item.geography]: item.frame_lists[0].frames.map(
-                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                    (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
                   ),
                 },
               });
@@ -246,7 +246,7 @@ export const chartsRouter = router({
           case "LGF":
             Object.assign(output, {
               [item.geography]: item.frame_lists[0].frames.map(
-                (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`
+                (f) => `${RESOURCE_URL}${f.images[f.images.length - 1].id}.image`,
               ),
             });
             break;

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "check": "tsc --noEmit && npm run format && npm run lint",
+    "check": "tsc --noEmit && prettier --write . && eslint . --ext .ts,.tsx --fix",
     "lint": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
     "build": "vite build",

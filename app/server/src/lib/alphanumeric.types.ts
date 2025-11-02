@@ -1,5 +1,5 @@
-import { Position } from "geojson";
-import { SigmetData } from "./types.js";
+import type { Position } from "geojson";
+import type { SigmetData } from "./types.js";
 
 export type StationObject = {
   icaoId: string;

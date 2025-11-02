@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { lt } from "drizzle-orm";
 import { aqData } from "../db/tables/aq.drizzle.js";
-import { CSVAQData, AQData } from "../lib/types.js";
+import type { AQData } from "../lib/types.js";
 import { aqSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
 import { generateDbConnection } from "../lib/utils.js";

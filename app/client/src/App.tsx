@@ -17,7 +17,7 @@ import useHashPath from "@/hooks/useHashPath";
 // app mode configuration
 import { APP_MODES_LIST } from "@/config/modes";
 import { useAppMode, useSetAppMode } from "@/stateStores/app";
-import { AppMode } from "@/lib/types";
+import type { AppMode } from "@/lib/types";
 import { Toaster } from "@/components/ui/Sonner";
 
 const appModesList: AppMode[] = Object.keys(APP_MODES_LIST).map((k) => k as AppMode);

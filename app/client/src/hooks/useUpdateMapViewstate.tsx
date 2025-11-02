@@ -3,7 +3,7 @@ import { useMapStateActions, useViewportBounds } from "../stateStores/map/mapVie
 // import { SiteMetaData } from "../lib/types";
 // import { checkIfInBounds } from "@/lib/utils";
 import { Map } from "maplibre-gl";
-import { ViewState } from "react-map-gl/maplibre";
+import type { ViewState } from "react-map-gl/maplibre";
 
 /**
  * used to control the map's view state

@@ -1,6 +1,6 @@
 import { Label } from "@/components/ui/Label";
 import { Switch } from "@/components/ui/Switch";
-import { ToggleDataOption } from "@/lib/types";
+import type { ToggleDataOption } from "@/lib/types";
 
 function DataToggle({ className, dataOption }: { className?: string; dataOption: ToggleDataOption }) {
   return (

@@ -7,6 +7,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "check": "tsc --noEmit && eslint .",
     "build": "tsc",
     "dev": "tsx watch src/main.ts",
     "dev:data:metars": "tsx watch src/data/metars.ts",

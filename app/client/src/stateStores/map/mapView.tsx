@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 import type { Map } from "maplibre-gl";
-import { PaddingOptions, ViewState } from "react-map-gl/maplibre";
-import { MapProjections } from "../../lib/types";
+import type { PaddingOptions, ViewState } from "react-map-gl/maplibre";
+import type { MapProjections } from "../../lib/types";
 
 interface MapStateStore extends ViewState {
   mapRef: Map | null;

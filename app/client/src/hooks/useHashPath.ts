@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useAppMode, useSetAppMode } from "@/stateStores/app";
-import { AppMode } from "@/lib/types";
+import type { AppMode } from "@/lib/types";
 import { APP_MODES_LIST } from "@/config/modes";
 
 const useHashPath = () => {

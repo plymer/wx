@@ -35,7 +35,7 @@ function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPr
   return (
     <TabsPrimitive.Content
       className={cn(
-        "p-2 space-y-2 ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border-1 border-t-0 rounded-b-md border-input",
+        "p-2 space-y-2 ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-t-0 rounded-b-md border-input",
         className,
       )}
       {...props}

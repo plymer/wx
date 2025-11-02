@@ -20,12 +20,12 @@ import {
   useVectorActions,
   useShowAQ,
 } from "@/stateStores/map/vectorData";
-import { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
+import type { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "@/components/ui/Drawer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
-import Button, { ButtonProps } from "@/components/ui/Button";
+import Button, { type ButtonProps } from "@/components/ui/Button";
 import DataToggle from "@/components/ui/DataToggle";
 
 export default function OptionsRealtimeData({ ...props }: ButtonProps) {

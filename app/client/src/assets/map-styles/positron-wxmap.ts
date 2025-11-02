@@ -1,4 +1,4 @@
-import { StyleSpecification } from "react-map-gl/maplibre";
+import type { StyleSpecification } from "react-map-gl/maplibre";
 
 export const PUBLIC_URL = new URL(import.meta.url).origin;
 

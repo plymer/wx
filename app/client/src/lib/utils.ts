@@ -5,7 +5,7 @@ import type { ParsedTAF, XmetAPIData } from "./types";
 import { SIGWX_REGEX } from "./regex";
 import type { Feature, FeatureCollection, MultiPolygon, Point, Position } from "geojson";
 import * as turf from "@turf/turf";
-import { WMSLayer } from "@shared/lib/types";
+import type { WMSLayer } from "@shared/lib/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

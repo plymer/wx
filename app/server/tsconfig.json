@@ -5,6 +5,7 @@
     "module": "NodeNext",
     "target": "ES2022",
     "moduleResolution": "NodeNext",
+    "verbatimModuleSyntax": true,
     "outDir": "../../dist/server",
     "rootDir": "src",
     "composite": false

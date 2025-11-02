@@ -6,7 +6,7 @@ const DataAttributions = (props: React.HTMLAttributes<HTMLDivElement>) => {
 
   return (
     <div {...props}>
-      <p className="text-center border-b-1">Data Sources:</p>
+      <p className="text-center border-b">Data Sources:</p>
       {[...attributions].map((attr) => (
         <span className="hover:underline ms-1" key={attr} dangerouslySetInnerHTML={{ __html: attr }} />
       ))}

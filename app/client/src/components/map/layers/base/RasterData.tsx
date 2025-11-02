@@ -1,5 +1,5 @@
-import { Layer, RasterSourceSpecification, Source, useMap } from "react-map-gl/maplibre";
-import { useEffect, useRef, useState } from "react";
+import { Layer, type RasterSourceSpecification, Source, useMap } from "react-map-gl/maplibre";
+import { useEffect, useState } from "react";
 
 import { useAnimationState, useDeltaTime, useFrame, useFrameCount, useStartTime } from "@/stateStores/map/animation";
 import { makeISOTimeStamp } from "@/lib/utils";
@@ -12,10 +12,7 @@ import {
   EUMETSAT_BOUNDS,
 } from "@/config/rasterData";
 import type { WMSDomains, WMSLayer } from "@shared/lib/types";
-import { TransitionSpecification } from "maplibre-gl";
-
-// import PausibleSource from "./PausibleSource";
-// import { useIsMoving } from "@/stateStores/mapView";
+import type { TransitionSpecification } from "maplibre-gl";
 
 interface Props {
   belowLayer?: string;
@@ -45,45 +42,6 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
   useEffect(() => {
     setTimeout(() => isInit(true), initDelay ?? 300);
   }, []);
-
-  const [prevFrameVisible, setPrevFrameVisible] = useState<number | undefined>(undefined);
-  const fadeTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
-
-  // on the final frame of the animation, we need to fade out the previous frame, but also need to do it in a way that doesn't flicker the raster data on the map
-  // this mostly improves the utility of the radar data since it has transparency and we don't want to see the previous timestep data when we are effectively 'paused'
-  useEffect(() => {
-    // when frame changes, clear any existing timeout
-    if (fadeTimeout.current) {
-      clearTimeout(fadeTimeout.current);
-      fadeTimeout.current = undefined;
-    }
-
-    // set the previous frame as visible
-    setPrevFrameVisible(animation.currentFrame - 1);
-    // ff we're animating, set the previous frame to be visible
-    if (animation.state === "playing" && animation.currentFrame > 0) {
-      // only do this on the final frame of the animation. debounce the fadeout to prevent flickering with a timeout of 100 ms
-      // if we do this for every frame, it becomes very computationally expensive
-      if (animation.currentFrame === animation.frameCount - 1)
-        fadeTimeout.current = setTimeout(() => {
-          setPrevFrameVisible(undefined);
-          fadeTimeout.current = undefined;
-        }, 100);
-    } else if (animation.state !== "playing") {
-      fadeTimeout.current = setTimeout(() => {
-        setPrevFrameVisible(undefined);
-        fadeTimeout.current = undefined;
-      }, 100);
-    }
-
-    // cleanup on unmount
-    return () => {
-      if (fadeTimeout.current) {
-        clearTimeout(fadeTimeout.current);
-        fadeTimeout.current = undefined;
-      }
-    };
-  }, [animation.currentFrame, animation.state, animation.frameCount]);
 
   // safety checks
 
@@ -214,7 +172,6 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
               key={`${layerId}-${index}`}
               tiles={[makeTileRequestString(apiData.domain, apiData.name, u.validTime)]}
               id={`${layerId}-${index}`}
-              // isPaused={isMoving}
             >
               <Layer
                 type="raster"

@@ -13,7 +13,7 @@ import {
   useStartTime,
 } from "@/stateStores/map/animation";
 import { ANIM_CONTROLS } from "@/config/animation";
-import { AnimationControlsList } from "@/lib/types";
+import type { AnimationControlsList } from "@/lib/types";
 import { makeISOTimeStamp } from "@/lib/utils";
 import { Slider } from "@/components/ui/Slider";
 

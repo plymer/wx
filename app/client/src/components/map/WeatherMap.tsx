@@ -1,7 +1,7 @@
 // third-party libraries
-import { ReactElement, useState } from "react";
-import Map, { ViewState, ViewStateChangeEvent } from "react-map-gl/maplibre";
-import { MapLayerMouseEvent, MapLibreEvent, StyleSpecification } from "maplibre-gl";
+import { type ReactElement, useState } from "react";
+import Map, { type ViewState, type ViewStateChangeEvent } from "react-map-gl/maplibre";
+import type { MapLayerMouseEvent, MapLibreEvent, StyleSpecification } from "maplibre-gl";
 import { Loader2 } from "lucide-react";
 
 // helpers
@@ -9,7 +9,7 @@ import { Loader2 } from "lucide-react";
 // global state stores
 import { useMapStateActions } from "@/stateStores/map/mapView";
 import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
-import { MapProjections } from "@/lib/types";
+import type { MapProjections } from "@/lib/types";
 import useMapClock from "@/hooks/useClock";
 import { useUIActions } from "@/stateStores/map/ui";
 

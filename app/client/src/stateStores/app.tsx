@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { AppMode } from "../lib/types";
+import type { AppMode } from "../lib/types";
 
 // type definition for better DX
 type AppState = {

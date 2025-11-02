@@ -1,4 +1,4 @@
-import suncalc, { GetTimesResult } from "suncalc";
+import suncalc, { type GetTimesResult } from "suncalc";
 import * as turf from "@turf/turf";
 import type { Position } from "geojson";
 
@@ -7,12 +7,12 @@ import type { XmetShapes } from "./alphanumeric.types.js";
 import { MINUTE } from "./constants.js";
 
 import { Relations } from "drizzle-orm";
-import { MySqlTableWithColumns } from "drizzle-orm/mysql-core";
+import type { MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 import { drizzle } from "drizzle-orm/mysql2";
 import { sql } from "drizzle-orm/sql";
 import { createGunzip } from "zlib";
 import { XMLParser } from "fast-xml-parser";
-import { WmoDirection } from "./types.js";
+import type { WmoDirection } from "./types.js";
 
 /**
  *

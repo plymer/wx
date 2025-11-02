@@ -1,5 +1,5 @@
 import { AVIATION_PRODUCTS } from "@/config/aviationProducts";
-import { APIResponse, OtherChartData, Products } from "@/lib/types";
+import type { OtherChartData, Products } from "@/lib/types";
 import { useAviationActions, useDomain, useTimeStep } from "@/stateStores/aviation";
 import Button from "../ui/Button";
 

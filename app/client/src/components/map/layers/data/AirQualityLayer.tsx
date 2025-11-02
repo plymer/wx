@@ -1,5 +1,5 @@
 import { Layer, Source } from "react-map-gl/maplibre";
-import { FeatureCollection } from "geojson";
+import type { FeatureCollection } from "geojson";
 
 import { AQ_ATTRIBUTION, AQ_DISPLAY } from "@/config/vectorData";
 import { useFrame, useFrameCount } from "@/stateStores/map/animation";

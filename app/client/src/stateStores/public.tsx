@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { PublicForecastOffice } from "../lib/types";
+import type { PublicForecastOffice } from "../lib/types";
 
 // type definition for better DX
 type PublicState = {

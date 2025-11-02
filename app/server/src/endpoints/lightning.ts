@@ -1,7 +1,7 @@
 import type { Feature, MultiPoint, Point } from "geojson";
 import { TRPCError } from "@trpc/server";
 
-import { LightningFC } from "../lib/lightning.types.js";
+import type { LightningFC } from "../lib/lightning.types.js";
 import { publicProcedure, router } from "../lib/trpc.js";
 
 export const lightningRouter = router({
@@ -37,8 +37,8 @@ export const lightningRouter = router({
               .catch((err) => {
                 console.error(`Error fetching data from ${url}:`, err.message);
                 return null;
-              })
-          )
+              }),
+          ),
         )
       ).filter((res): res is LightningFC => res !== null);
 

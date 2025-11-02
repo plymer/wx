@@ -1,13 +1,13 @@
-import {
+import { Layer, Source } from "react-map-gl/maplibre";
+
+import type {
   CircleLayerSpecification,
   FillLayerSpecification,
-  Layer,
   LineLayerSpecification,
-  Source,
   SymbolLayerSpecification,
 } from "react-map-gl/maplibre";
 
-import { FeatureCollection } from "geojson";
+import type { FeatureCollection } from "geojson";
 
 interface Props {
   overlayId: string; // optional id for the overlay, useful for debugging

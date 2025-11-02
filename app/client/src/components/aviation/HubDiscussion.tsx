@@ -2,7 +2,7 @@ import { Binoculars, Loader2, Notebook, Pencil, Plane } from "lucide-react";
 
 import TAF from "../observations/TAF";
 import { useAviationActions } from "@/stateStores/aviation";
-import { TAFData } from "@/lib/types";
+import type { TAFData } from "@/lib/types";
 import Button from "../ui/Button";
 import { api } from "@/lib/trpc";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";

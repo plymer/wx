@@ -9,7 +9,7 @@ const MapLoadingIndicator = ({ show, ...props }: Props) => {
   return (
     <SlideComponent
       isVisible={show}
-      className={`absolute top-0 left-0 rounded-xl inline-flex place-items-center my-2 mx-3 py-0.5 px-2 text-white bg-accent border-1 border-primary drop-shadow-lg ${props.className}`}
+      className={`absolute top-0 left-0 rounded-xl inline-flex place-items-center my-2 mx-3 py-0.5 px-2 text-white bg-accent border border-primary drop-shadow-lg ${props.className}`}
     >
       <Loader2 className="animate-spin inline me-2 size-4" /> Loading...
     </SlideComponent>
