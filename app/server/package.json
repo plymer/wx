@@ -10,6 +10,7 @@
     "check": "tsc --noEmit && eslint .",
     "build": "tsc",
     "dev": "tsx watch src/main.ts",
+    "dev:data:sigmets": "tsx watch src/data/sigmets.ts",
     "dev:data:metars": "tsx watch src/data/metars.ts",
     "lint": "eslint .",
     "start": "node ../../dist/server/main.js"

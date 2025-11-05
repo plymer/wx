@@ -36,6 +36,7 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
       enabled,
       placeholderData: keepPreviousData,
       refetchInterval: MINUTE,
+      trpc: { context: { skipBatch: true } },
     }),
   );
 

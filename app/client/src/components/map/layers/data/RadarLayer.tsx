@@ -19,7 +19,7 @@ export const RadarLayer = ({ belowLayer = "wateroutline" }: Props) => {
   const { data } = useQuery(
     api.wms.geomet.queryOptions(
       { layers: radarProduct },
-      { enabled, placeholderData: keepPreviousData, refetchInterval: MINUTE },
+      { enabled, placeholderData: keepPreviousData, refetchInterval: MINUTE, trpc: { context: { skipBatch: true } } },
     ),
   );
 
