@@ -1,7 +1,7 @@
 import { api } from "@/lib/trpc";
 import XmetLayer from "../base/XmetLayer";
 import { useShowSIGMETs } from "@/stateStores/map/vectorData";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { MINUTE } from "@shared/lib/constants";
 
 /**
@@ -15,12 +15,7 @@ export function SigmetLayer() {
     data: sigmetData,
     isLoading,
     error,
-  } = useQuery(
-    api.alpha.sigmets.queryOptions(
-      { hours: 6 },
-      { enabled, placeholderData: keepPreviousData, refetchInterval: MINUTE },
-    ),
-  );
+  } = useQuery(api.alpha.sigmets.queryOptions({ hours: 6 }, { enabled, refetchInterval: MINUTE }));
 
   // Don't render if SIGMETs are disabled in state
   if (!enabled) return null;

@@ -2,53 +2,65 @@ import { TRPCError } from "@trpc/server";
 import type { WMSLayer } from "../lib/types.js";
 import { processDimensionString } from "../lib/utils.js";
 import { DATA_CUTOFF, EUMETSAT_GETCAPABILITIES, GEOMET_GETCAPABILITIES } from "../config/wms.config.js";
-import { realtimeLayersSchema } from "../validationSchemas/wms.zod.js";
+import { goesProductSchema, radarProductSchema, realtimeLayersSchema } from "../validationSchemas/wms.zod.js";
 import { WMSXMLParser } from "../lib/xml-parser.js";
 import { publicProcedure, router } from "../lib/trpc.js";
 
 export const wmsRouter = router({
-  geomet: publicProcedure.input(realtimeLayersSchema).query(async ({ input }) => {
-    const { layers } = input;
+  radar: publicProcedure.input(radarProductSchema).query(async ({ input }) => {
+    const { product } = input;
+
+    const dataCutoff = Date.now() - DATA_CUTOFF;
 
     try {
       const { parser } = new WMSXMLParser();
 
-      const xml = await fetch(GEOMET_GETCAPABILITIES).then(async (response) => parser.parse(await response.text()));
+      const xml = await fetch(`${GEOMET_GETCAPABILITIES}&layers=${product}`).then(async (response) =>
+        parser.parse(await response.text()),
+      );
 
-      const layerCategories = xml.wmsCapabilities.capability.layer.layer
-        .map((layer: any) => layer.layer)
-        .flat()
-        .map((cat: any) => cat);
+      const layerData = xml.wmsCapabilities.capability.layer.layer.layer.layer;
 
-      const radarLayers: WMSLayer[] = layerCategories
-        .filter((layers: any) => layers.name === "North American radar composite [1 km]")
-        .flat()[0]
-        .layer.map((layer: any) => {
-          return { name: layer.name, dimension: layer.dimension.value, domain: "national", type: "radar" };
-        });
+      const output: WMSLayer = {
+        name: layerData.name,
+        dimension: layerData.dimension.value,
+        domain: "national",
+        type: "radar",
+        timeSteps: processDimensionString(layerData.dimension.value).filter((time) => time.validTime >= dataCutoff),
+      };
 
-      const satelliteLayers: WMSLayer[] = layerCategories
-        .filter((layers: any) => layers.name === "Geostationary Operational Environmental Satellite (GOES)")
-        .flat()[0]
-        .layer.map((domain: any) => domain)
-        .flatMap((domain: any) => {
-          const props = { domain: domain.name.toLowerCase(), type: "satellite" };
-          return domain.layer.map((layer: any) => {
-            return { name: layer.name, dimension: layer.dimension.value, ...props };
-          });
-        });
+      return output;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
 
-      const allLayers = [...radarLayers, ...satelliteLayers];
-      const dataCutoff = Date.now() - DATA_CUTOFF;
+  goes: publicProcedure.input(goesProductSchema).query(async ({ input }) => {
+    const { domain, product } = input;
 
-      const output = layers
-        ? allLayers
-            .filter((layer) => layers.includes(layer.name))
-            .map((layer) => {
-              const timesSteps = processDimensionString(layer.dimension).filter((time) => time.validTime >= dataCutoff);
-              return { ...layer, timeSteps: timesSteps };
-            })
-        : allLayers;
+    const domainString = domain === "east" ? "GOES-East" : "GOES-West";
+
+    const dataCutoff = Date.now() - DATA_CUTOFF;
+
+    try {
+      const { parser } = new WMSXMLParser();
+
+      const xml = await fetch(`${GEOMET_GETCAPABILITIES}&layers=${domainString}_${product}`).then(async (response) =>
+        parser.parse(await response.text()),
+      );
+
+      const layerData = xml.wmsCapabilities.capability.layer.layer.layer.layer.layer;
+
+      const output: WMSLayer = {
+        name: layerData.name,
+        dimension: layerData.dimension.value,
+        domain: domain,
+        type: "satellite",
+        timeSteps: processDimensionString(layerData.dimension.value).filter((time) => time.validTime >= dataCutoff),
+      };
 
       return output;
     } catch (error) {
@@ -60,7 +72,7 @@ export const wmsRouter = router({
   }),
 
   eumetsat: publicProcedure.input(realtimeLayersSchema).query(async ({ input }) => {
-    const { layers } = input;
+    const { layer } = input;
 
     try {
       const { parser } = new WMSXMLParser();
@@ -81,16 +93,19 @@ export const wmsRouter = router({
 
       const dataCutoff = Date.now() - DATA_CUTOFF;
 
-      const output = layers
-        ? allLayers
-            .filter((layer) => layers.includes(layer.name))
-            .map((layer) => {
-              const timesSteps = processDimensionString(layer.dimension).filter((time) => time.validTime >= dataCutoff);
-              return { ...layer, timeSteps: timesSteps };
-            })
-        : allLayers;
+      const foundLayer = allLayers.find((l) => l.name === layer);
 
-      return output;
+      if (!foundLayer) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Layer ${layer} not found`,
+        });
+      }
+
+      return {
+        ...foundLayer,
+        timeSteps: processDimensionString(foundLayer.dimension).filter((time) => time.validTime >= dataCutoff),
+      };
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",

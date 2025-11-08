@@ -1,4 +1,4 @@
-import { LngLatBoundsLike } from "maplibre-gl";
+import type { LngLatBoundsLike } from "maplibre-gl";
 
 export const RASTER_DATA_TYPES = ["satellite", "radar"] as const;
 

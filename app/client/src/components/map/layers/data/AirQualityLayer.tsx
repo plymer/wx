@@ -7,7 +7,7 @@ import { MINUTE } from "@shared/lib/constants";
 import { useShowAQ } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
 import { api } from "@/lib/trpc";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 interface Props {
   belowLayer?: string;
@@ -20,9 +20,7 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
   const lastFrame = useFrameCount() - 1;
   const displayTime = useDisplayTime();
 
-  const { data } = useQuery(
-    api.aq.aq.queryOptions({ hours: 4 }, { enabled, placeholderData: keepPreviousData, refetchInterval: 10 * MINUTE }),
-  );
+  const { data } = useQuery(api.aq.aq.queryOptions({ hours: 4 }, { enabled, refetchInterval: 10 * MINUTE }));
 
   if (!enabled || !data) return;
 

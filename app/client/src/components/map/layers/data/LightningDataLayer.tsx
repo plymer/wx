@@ -7,7 +7,7 @@ import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
 import { useShowLightning } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
 import { api } from "@/lib/trpc";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 interface Props {
   belowLayer?: string;
@@ -20,9 +20,8 @@ export const LightningDataLayer = ({ belowLayer, timeRange = 15 }: Props) => {
   const displayTime = useDisplayTime();
 
   const { data } = useQuery(
-    api.lightning.lightning.queryOptions(void 0, {
+    api.lightning.lightning.queryOptions(undefined, {
       enabled,
-      placeholderData: keepPreviousData,
       refetchInterval: MINUTE,
     }),
   );

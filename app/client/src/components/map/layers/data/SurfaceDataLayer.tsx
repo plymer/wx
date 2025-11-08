@@ -32,9 +32,7 @@ export const SurfaceDataLayer = () => {
 
   const displayTime = useDisplayTime();
 
-  const { data } = useQuery(
-    api.wxmap.wxmapMetars.queryOptions(void 0, { enabled, placeholderData: keepPreviousData, refetchInterval: MINUTE }),
-  );
+  const { data } = useQuery(api.wxmap.wxmapMetars.queryOptions(undefined, { enabled, refetchInterval: MINUTE }));
 
   // construct our station priority list for each zoom level
   // this will give us a computed list of stations to show at each zoom level

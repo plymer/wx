@@ -1,11 +1,10 @@
 import { useBulletin, useOffice, usePublicActions } from "@/stateStores/public";
 
 import { PUBLIC_FORECAST_CONFIG } from "../config/public";
-import type { PublicBulletin } from "@/lib/types";
 import { api } from "@/lib/trpc";
 import { useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { MINUTE } from "@shared/lib/constants";
 
 export default function Public() {
@@ -13,7 +12,7 @@ export default function Public() {
   const bulletin = useBulletin();
   const actions = usePublicActions();
 
-  const [productList, setProductList] = useState({});
+  const [productList, setProductList] = useState<Record<string, string>>({});
   const [issuerCode, setIssuerCode] = useState("");
   const [productCode, setProductCode] = useState("");
 
@@ -41,14 +40,12 @@ export default function Public() {
     };
   }, [office, bulletin]);
 
-  const { data, fetchStatus } = useQuery(
+  const { data: bulletinContent, fetchStatus } = useQuery(
     api.alpha.publicBulletin.queryOptions(
       { office: issuerCode, bulletin: productCode },
-      { placeholderData: keepPreviousData, refetchInterval: 10 * MINUTE },
+      { refetchInterval: 10 * MINUTE },
     ),
   );
-
-  const bulletinContent = data as PublicBulletin;
 
   const productKey = `${productCode}${issuerCode}`;
   const productName = productList[productKey as keyof typeof productList];
@@ -95,7 +92,7 @@ export default function Public() {
           className={`overflow-y-scroll whitespace-pre-wrap md:px-6 max-md:pb-12 max-w-fit mx-auto ${fetchStatus === "fetching" ? "text-neutral-500" : ""}`}
           style={{ height: "calc(100svh - 11.2rem)" }}
         >
-          {bulletinContent?.trim()}
+          {bulletinContent.trim()}
         </pre>
       )}
 

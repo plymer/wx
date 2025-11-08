@@ -6,6 +6,10 @@ import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, ta
 import { aqData } from "../db/tables/aq.drizzle.js";
 import { XMET_TYPES } from "../config/alphanumeric.config.js";
 
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
 export type GFAData = {
   domain: string;
   cldwx: string[];
@@ -51,7 +55,7 @@ export type XmetGeoJSON = FeatureCollection<MultiPolygon, XmetAPIData>;
 
 export type RadarDomains = "national";
 export type SatelliteDomains = "east" | "west" | "europe";
-export type WMSDomains = RadarDomains | (SatelliteDomains & {});
+export type WMSDomains = Prettify<RadarDomains | SatelliteDomains>;
 export type WMSLayerTypes = "radar" | "satellite";
 export type WMSLayer = {
   name: string;
@@ -135,20 +139,23 @@ export type RawIntlSigmetData = {
 };
 
 // used in intermediate steps of the api data return for /wxmap/metars
+export type MetarNoIdOrText = Prettify<Omit<MetarData, "siteId" | "rawText">>;
 export type StationPlotData = {
   siteId: string;
-  metars: Omit<MetarData, "siteId" | "rawText">[];
+  metars: MetarNoIdOrText[];
 };
 
-export type MetarWithStation = Omit<MetarData, "rawText"> & {
-  stations: {
-    lat: number;
-    lon: number;
-  } | null;
-};
+export type MetarWithStation = Prettify<
+  Omit<MetarData, "rawText"> & {
+    stations: {
+      lat: number;
+      lon: number;
+    } | null;
+  }
+>;
 
 // used for the rendering and filtering of station plots on the map
-export type StationPlotGeoJSON = FeatureCollection<Point, Omit<MetarData, "rawText">>;
+export type StationPlotGeoJSON = FeatureCollection<Point, Prettify<Omit<MetarData, "rawText">>>;
 
 export type SfcObsPopupBundle = Record<
   string,
