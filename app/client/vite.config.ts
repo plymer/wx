@@ -33,7 +33,14 @@ export default defineConfig({
     emptyOutDir: true,
     outDir: path.resolve(__dirname, "../../dist"),
     rolldownOptions: {
-      output: { advancedChunks: { groups: [{ test: /maplibre-gl/, name: "maplibre-gl", priority: 999 }] } },
+      output: {
+        advancedChunks: {
+          groups: [
+            { test: /maplibre-gl/, name: "maplibre-gl", priority: 999 },
+            { test: /overlays/, name: "overlays", priority: 999 },
+          ],
+        },
+      },
     },
   },
   resolve: {
