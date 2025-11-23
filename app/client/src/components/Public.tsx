@@ -22,12 +22,14 @@ import {
   CloudRainWind,
   CloudSnow,
   CloudSun,
+  CloudSunRain,
   FlameKindling,
   Moon,
   Signal,
   SignalHigh,
   SignalLow,
   SignalMedium,
+  Sun,
   Sunrise,
   Sunset,
   SunSnow,
@@ -38,9 +40,10 @@ import {
   Wind,
   WindArrowDown,
 } from "lucide-react";
-import { PointForecastMap } from "./map/PointForecastMap";
+import { PointForecastMap } from "./public/PointForecastMap";
 import type { Position } from "geojson";
 import { AlertsModal } from "./public/AlertsModal";
+import { WindContainer } from "./public/current/WindContainer";
 
 export default function Public() {
   const office = useOffice();
@@ -178,7 +181,7 @@ export default function Public() {
         </div>
       )}
       {mode === "point" && (
-        <div className="text-center max-md:h-[calc(100dvh-7.1rem)] md:h-[calc(100dvh-7.6rem)] flex flex-col gap-2 w-full md:max-w-[600px] mx-auto">
+        <div className="text-center max-md:h-[calc(100dvh-7.1rem)] md:h-[calc(100dvh-7.6rem)] flex flex-col gap-2 w-full md:max-w-[600px] mx-auto overflow-y-auto">
           <PointForecastMap setSearchCoords={setSearchCoords} fetchStatus={pointFetchStatus} />
 
           {error && <div className="text-red-500 w-full">Error fetching point forecast data. Please try again.</div>}
@@ -219,21 +222,18 @@ export default function Public() {
                             : "no wx available"}
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 place-items-center text-left">
-                        <Thermometer />
+                      <div className="grid grid-cols-2 gap-2 place-items-center text-left">
+                        <Thermometer className="ms-auto" />
                         <div className="text-right">
                           <div>{currentConditions.weather.tt}&deg;C</div>
                           <div>{currentConditions.weather.td}&deg;C</div>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 place-items-center">
-                        <Wind />
-                        <div>
-                          {currentConditions.weather.wDir} {currentConditions.weather.wSpd}
-                          {currentConditions.weather.wGust && ` gust ${currentConditions.weather.wGust}`}
-                          {currentConditions.weather.wSpd === "calm" ? "" : " km/h"}
-                        </div>
-                      </div>
+                      <WindContainer
+                        direction={currentConditions.weather.wDir}
+                        speed={currentConditions.weather.wSpd}
+                        gust={currentConditions.weather.wGust}
+                      />
                       {aqhi && aqhi.time ? (
                         <div className="flex gap-2 place-items-center">
                           <FlameKindling />
@@ -248,7 +248,7 @@ export default function Public() {
                           </div>
                         </div>
                       ) : (
-                        "No AQHI data available"
+                        <div>No AQHI data available</div>
                       )}
                     </div>
 
@@ -277,7 +277,7 @@ export default function Public() {
                 <Label className="flex gap-2 justify-center place-items-center font-bold bg-black rounded-t-md p-2">
                   <Calendar /> 7-day Forecast for {pointForecast?.placeName}
                 </Label>
-                <div className="grid grid-cols-1 overflow-y-auto max-h-76 ">
+                <div className="grid grid-cols-1">
                   {dailyForecasts?.map((period) => {
                     return (
                       <div
@@ -301,6 +301,18 @@ export default function Public() {
 
 const WxOfficeCodeToIcon = ({ code }: { code: number }) => {
   switch (code) {
+    case 0:
+      return <Sun />;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+      return <CloudSun />;
+    case 6:
+    case 7:
+    case 8:
+      return <CloudSunRain />;
     case 10:
       return <Cloud />;
     case 11:
@@ -318,6 +330,7 @@ const WxOfficeCodeToIcon = ({ code }: { code: number }) => {
     case 17:
     case 18:
       return <CloudSnow />;
+    case 9:
     case 19:
     case 39:
     case 46:
@@ -354,6 +367,8 @@ const WxOfficeCodeToIcon = ({ code }: { code: number }) => {
       return <Tornado />;
     case 44:
       return <FlameKindling />;
+    default:
+      return <div>{code} (missing icon)</div>;
   }
 };
 

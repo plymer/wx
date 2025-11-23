@@ -2,9 +2,9 @@ import Map, { type ViewStateChangeEvent } from "react-map-gl/maplibre";
 import { positronWxMap } from "@/assets/map-styles/positron-wxmap";
 
 import useMapClock from "@/hooks/useClock";
-import { SatelliteLayer } from "./layers/data/SatelliteLayer";
-import { LightningDataLayer } from "./layers/data/LightningDataLayer";
-import { PublicRegionsOverlay } from "./layers/overlays/PublicRegionsOverlay";
+import { SatelliteLayer } from "../map/layers/data/SatelliteLayer";
+import { LightningDataLayer } from "../map/layers/data/LightningDataLayer";
+import { PublicRegionsOverlay } from "../map/layers/overlays/PublicRegionsOverlay";
 import type { MapLibreEvent } from "maplibre-gl";
 import { useEffect, useState } from "react";
 import { useLatitude, useLongitude, useMapRef, useMapStateActions, useZoom } from "@/stateStores/map/mapView";
@@ -13,9 +13,9 @@ import { DEFAULT_MAX_FRAMES } from "@/config/animation";
 import { Loader2, LocateFixed, Search } from "lucide-react";
 import { useCurrentTime } from "@/hooks/useCurrentTime";
 import { useCoords, usePublicActions } from "@/stateStores/public";
-import { GeoLocation } from "./controls/GeoLocation";
+import { GeoLocation } from "../map/controls/GeoLocation";
 import type { Position } from "geojson";
-import { RadarLayer } from "./layers/data/RadarLayer";
+import { RadarLayer } from "../map/layers/data/RadarLayer";
 import Button from "../ui/Button";
 import type { FetchStatus } from "@tanstack/react-query";
 
@@ -71,7 +71,7 @@ export const PointForecastMap = ({ setSearchCoords, fetchStatus }: Props) => {
   };
 
   return (
-    <div className="w-full rounded-md overflow-hidden">
+    <div className="w-full rounded-md overflow-clip h-[calc(100dvh/3)]">
       <Map
         initialViewState={{
           longitude,
@@ -80,7 +80,7 @@ export const PointForecastMap = ({ setSearchCoords, fetchStatus }: Props) => {
         }}
         projection={"globe"}
         onLoad={onMapLoad}
-        style={{ width: "100%", height: 300 }}
+        style={{ width: "100%", height: "inherit" }}
         onMove={onMapMove}
         mapStyle={positronWxMap}
         attributionControl={false}

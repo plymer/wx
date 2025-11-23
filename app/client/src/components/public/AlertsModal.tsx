@@ -15,8 +15,8 @@ export const AlertsModal = ({ alerts }: Props) => {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
-          disabled={alerts === undefined || alerts.length === 0}
-          className={`px-2 ${alerts && alerts.length > 0 ? (hasWarnings ? "bg-red-600" : hasWatches ? "bg-amber-400" : "bg-neutral-500") : ""}`}
+          size="sm"
+          className={`px-2 min-h-6 ${alerts && alerts.length > 0 ? (hasWarnings ? "bg-red-600" : hasWatches ? "bg-amber-400" : "bg-neutral-500") : ""}`}
         >
           <AlertTriangle /> {alerts && alerts.length > 0 ? `(${alerts.length})` : ""}
         </Button>

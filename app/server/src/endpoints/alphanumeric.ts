@@ -228,8 +228,10 @@ export const alphanumericRouter = router({
   pointForecast: publicProcedure.input(publicPointSchema).query(async ({ input }) => {
     const { lat, lon } = input;
 
+    console.log("[API] Requesting point forecast for:", lat.toFixed(3), lon.toFixed(3));
+
     // https://weather.gc.ca/api/app/v3/en/Location/53.536,-113.494?type=city
-    const apiUrl = `https://weather.gc.ca/api/app/v3/en/Location/${lat},${lon}?type=city`;
+    const apiUrl = `https://weather.gc.ca/api/app/v3/en/Location/${lat.toFixed(3)},${lon.toFixed(3)}?type=city`;
 
     try {
       const response = (await fetch(apiUrl, { headers: { "User-Agent": "PrairieWxApi/1.0" } }).then((res) =>
