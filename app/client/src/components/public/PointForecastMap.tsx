@@ -71,7 +71,7 @@ export const PointForecastMap = ({ setSearchCoords, fetchStatus }: Props) => {
   };
 
   return (
-    <div className="w-full rounded-md overflow-clip h-[calc(100dvh/3)]">
+    <div className="w-full rounded-md overflow-clip min-h-96 h-[calc(100dvh/3)]">
       <Map
         initialViewState={{
           longitude,
@@ -80,7 +80,7 @@ export const PointForecastMap = ({ setSearchCoords, fetchStatus }: Props) => {
         }}
         projection={"globe"}
         onLoad={onMapLoad}
-        style={{ width: "100%", height: "inherit" }}
+        style={{ width: "100%", height: "100%" }}
         onMove={onMapMove}
         mapStyle={positronWxMap}
         attributionControl={false}
