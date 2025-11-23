@@ -1,6 +1,6 @@
 // contains configuration for how to display/draw the vector data on the map
 
-import {
+import type {
   CircleLayerSpecification,
   FillLayerSpecification,
   FilterSpecification,

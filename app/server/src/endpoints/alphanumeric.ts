@@ -245,19 +245,23 @@ export const alphanumericRouter = router({
       const data = response[0];
       // we want to extract and transform only the relevant parts that we want to show the client
 
-      const alerts = data.alert.alerts?.map((alert) => {
-        return {
-          type: alert.type,
-          issueTime: alert.issueTime,
-          timezone: alert.timezone,
-          issueTimeText: alert.issueTimeText,
-          expiryTime: alert.expiryTime,
-          eventOnsetTime: alert.eventOnsetTime,
-          eventEndTime: alert.eventEndTime,
-          alertBannerText: alert.alertBannerText,
-          text: alert.text,
-        };
-      });
+      const alerts = data.alert.alerts
+        ?.map((alert) => {
+          if (alert.status === "ended") return undefined;
+
+          return {
+            type: alert.type,
+            issueTime: alert.issueTime,
+            timezone: alert.timezone,
+            issueTimeText: alert.issueTimeText,
+            expiryTime: alert.expiryTime,
+            eventOnsetTime: alert.eventOnsetTime,
+            eventEndTime: alert.eventEndTime,
+            alertBannerText: alert.alertBannerText,
+            text: alert.text,
+          };
+        })
+        .filter((a) => a !== undefined);
 
       const ob = data.observation;
       const aq = data.aqhi;

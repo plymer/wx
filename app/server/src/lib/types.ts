@@ -168,6 +168,23 @@ export type SfcObsPopupBundle = Record<
 
 export type Coords = { lat: number; lon: number };
 
+export type WxOAlert = {
+  alertCode: string;
+  status: "ended" | "active";
+  type: "warning" | "watch" | "advisory" | "statement";
+  issueTime: Date;
+  timezone: string;
+  issueTimeText: string;
+  expiryTime: Date;
+  eventOnsetTime: Date;
+  eventEndTime: Date;
+  alertBannerText: string;
+  alertNameShort: string;
+  text: string;
+};
+
+export type WxOPolygonAlert = Record<string, WxOAlert>;
+
 export type WxOAPIResponse = {
   displayName: string;
   lastUpdated: number;
@@ -175,17 +192,7 @@ export type WxOAPIResponse = {
     zoneId: string;
     uuid: string;
     mostSevere: string;
-    alerts: Array<{
-      type: "warning" | "watch" | "advisory" | "statement";
-      issueTime: Date;
-      timezone: string;
-      issueTimeText: string;
-      expiryTime: Date;
-      eventOnsetTime: Date;
-      eventEndTime: Date;
-      alertBannerText: string;
-      text: string;
-    }>;
+    alerts: WxOAlert[];
     lastUpdated: number;
     hwyMostSevere: string;
   };
@@ -296,4 +303,28 @@ export type WxOAPIResponse = {
   tcId: string;
   climateId: string;
   tc2Id: string;
+};
+
+export type WxOPolygonProperties = {
+  index: string;
+  name: string;
+  prov: string;
+  alerts: {
+    zoneName: string;
+    prov: string;
+    status: string;
+    locId: string;
+    feaId: string;
+    program: string;
+    wxoCode: string;
+    zones: string[];
+    alertRef: string;
+  }[];
+};
+
+export type WarningProperties = {
+  alertCode: string;
+  type: "warning" | "watch" | "advisory" | "statement";
+  issueTime: Date;
+  alertNameShort: string;
 };

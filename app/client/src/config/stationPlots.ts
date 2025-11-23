@@ -1,4 +1,4 @@
-import { SymbolLayerSpecification } from "maplibre-gl";
+import type { SymbolLayerSpecification } from "maplibre-gl";
 
 export const CAT_COLOURS = {
   lifr: "#c203fc",

@@ -1,4 +1,4 @@
-import { LineLayerSpecification, SymbolLayerSpecification } from "maplibre-gl";
+import type { LineLayerSpecification, SymbolLayerSpecification } from "maplibre-gl";
 
 export const TAF_OVERLAY: SymbolLayerSpecification = {
   id: "tafSites",

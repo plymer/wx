@@ -19,6 +19,10 @@ import { RadarLayer } from "../map/layers/data/RadarLayer";
 import Button from "../ui/Button";
 import type { FetchStatus } from "@tanstack/react-query";
 import * as turf from "@turf/turf";
+import { AlertsLayer } from "./map/AlertsLayer";
+import { SelectedFxPoint } from "./map/SelectedFxPoint";
+import { HOUR } from "@shared/lib/constants";
+import { SurfaceDataLayer } from "../map/layers/data/SurfaceDataLayer";
 
 interface Props {
   searchCoords: Position | null;
@@ -98,36 +102,12 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
             <RadarLayer />
             <LightningDataLayer />
             <PublicRegionsOverlay override />
-            <Source id="currentLocationSelected" type="geojson" data={currentLocationGeoJSON}>
-              <Layer
-                id="currentLocationSelectedIndicator"
-                type="circle"
-                paint={{
-                  "circle-radius": 8,
-                  "circle-color": "#ff00aa",
-                  "circle-stroke-color": "#ffffff",
-                  "circle-stroke-width": 2,
-                }}
-              />
-              <Layer
-                id="currentLocationSelectedText"
-                type="symbol"
-                paint={{
-                  "text-color": "#000000",
-                  "text-halo-color": "#ffffff",
-                  "text-halo-width": 2,
-                }}
-                layout={{
-                  "text-field": "Forecast Location",
-                  "text-size": 14,
-                  "text-radial-offset": 1,
-                  "text-anchor": "top-left",
-                }}
-              />
-            </Source>
+            <SurfaceDataLayer />
+            <AlertsLayer />
+            <SelectedFxPoint data={currentLocationGeoJSON} />
 
             <div className="absolute font-mono top-0 left-1/2 -translate-x-1/2 m-2 bg-primary text-primary-foreground border-neutral-400 border px-2 py-1 rounded-md text-xs">
-              {new Date(currentTime).toISOString().replace("T", " ").slice(0, -8) + "Z"}
+              {new Date(currentTime + 3 * HOUR).toISOString().replace("T", " ").slice(0, -8) + "Z"}
             </div>
 
             <div className="absolute  bottom-0 left-1/2 -translate-x-1/2 flex place-items-center gap-2 mb-2">
