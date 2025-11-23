@@ -24,7 +24,7 @@ interface Props {
 const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLayers }: Props) => {
   // subscribe to our global state stores
   const mapState = useMapStateActions();
-  const mapViewUpdater = useUpdateMapViewstate();
+  const { updateFromMapEvent } = useUpdateMapViewstate();
   const { setPopupData } = useUIActions();
 
   // set up our map clock so that our map animation is keeping up to date
@@ -59,7 +59,7 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
   };
 
   const onMove = (e: ViewStateChangeEvent) => {
-    mapViewUpdater.updateFromMapEvent(e.target, e.viewState);
+    updateFromMapEvent(e.target, e.viewState);
   };
 
   return (

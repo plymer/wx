@@ -23,6 +23,7 @@ import { AlertsLayer } from "./map/AlertsLayer";
 import { SelectedFxPoint } from "./map/SelectedFxPoint";
 import { HOUR } from "@shared/lib/constants";
 import { SurfaceDataLayer } from "../map/layers/data/SurfaceDataLayer";
+import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
 
 interface Props {
   searchCoords: Position | null;
@@ -37,6 +38,7 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
   const latitude = useLatitude();
   const longitude = useLongitude();
   const zoom = useZoom();
+  const { updateFromMapEvent } = useUpdateMapViewstate();
   const { setFrameCount, setFrame } = useAnimationActions();
   const { setCoords } = usePublicActions();
 
@@ -71,9 +73,7 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
 
   const onMapMove = (e: ViewStateChangeEvent) => {
     setCoords([e.viewState.longitude, e.viewState.latitude]);
-    mapState.setLongitude(e.viewState.longitude);
-    mapState.setLatitude(e.viewState.latitude);
-    mapState.setZoom(e.viewState.zoom);
+    updateFromMapEvent(e.target, e.viewState);
   };
 
   const currentLocationGeoJSON = turf.featureCollection([
