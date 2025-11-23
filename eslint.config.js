@@ -7,7 +7,7 @@ import tseslint from "typescript-eslint";
 export default [
   js.configs.recommended,
   ...tseslint.configs.recommended,
-  
+
   { ignores: ["dist", "*.config.cjs"] },
   {
     files: ["**/*.{ts,tsx}"],
@@ -32,6 +32,7 @@ export default [
         },
       ],
       "no-case-declarations": "off",
+      "no-fallthrough": "off",
     },
   },
 ];

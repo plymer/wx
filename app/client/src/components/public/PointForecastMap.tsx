@@ -1,4 +1,4 @@
-import Map, { type ViewStateChangeEvent } from "react-map-gl/maplibre";
+import Map, { Layer, Source, type ViewStateChangeEvent } from "react-map-gl/maplibre";
 import { positronWxMap } from "@/assets/map-styles/positron-wxmap";
 
 import useMapClock from "@/hooks/useClock";
@@ -7,24 +7,26 @@ import { LightningDataLayer } from "../map/layers/data/LightningDataLayer";
 import { PublicRegionsOverlay } from "../map/layers/overlays/PublicRegionsOverlay";
 import type { MapLibreEvent } from "maplibre-gl";
 import { useEffect, useState } from "react";
-import { useLatitude, useLongitude, useMapRef, useMapStateActions, useZoom } from "@/stateStores/map/mapView";
+import { useLatitude, useLongitude, useMapStateActions, useZoom } from "@/stateStores/map/mapView";
 import { useAnimationActions } from "@/stateStores/map/animation";
 import { DEFAULT_MAX_FRAMES } from "@/config/animation";
 import { Loader2, LocateFixed, Search } from "lucide-react";
 import { useCurrentTime } from "@/hooks/useCurrentTime";
 import { useCoords, usePublicActions } from "@/stateStores/public";
 import { GeoLocation } from "../map/controls/GeoLocation";
-import type { Position } from "geojson";
+import type { Feature, Position } from "geojson";
 import { RadarLayer } from "../map/layers/data/RadarLayer";
 import Button from "../ui/Button";
 import type { FetchStatus } from "@tanstack/react-query";
+import * as turf from "@turf/turf";
 
 interface Props {
+  searchCoords: Position | null;
   setSearchCoords: (coords: Position) => void;
   fetchStatus: FetchStatus;
 }
 
-export const PointForecastMap = ({ setSearchCoords, fetchStatus }: Props) => {
+export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }: Props) => {
   const mapState = useMapStateActions();
   const currentTime = useCurrentTime();
   const coords = useCoords();
@@ -70,6 +72,10 @@ export const PointForecastMap = ({ setSearchCoords, fetchStatus }: Props) => {
     mapState.setZoom(e.viewState.zoom);
   };
 
+  const currentLocationGeoJSON = turf.featureCollection([
+    { type: "Feature", geometry: { type: "Point", coordinates: searchCoords || [0, 0] }, properties: {} },
+  ] as Feature[]);
+
   return (
     <div className="w-full rounded-md overflow-clip min-h-96 h-[calc(100dvh/3)]">
       <Map
@@ -92,6 +98,33 @@ export const PointForecastMap = ({ setSearchCoords, fetchStatus }: Props) => {
             <RadarLayer />
             <LightningDataLayer />
             <PublicRegionsOverlay override />
+            <Source id="currentLocationSelected" type="geojson" data={currentLocationGeoJSON}>
+              <Layer
+                id="currentLocationSelectedIndicator"
+                type="circle"
+                paint={{
+                  "circle-radius": 8,
+                  "circle-color": "#ff00aa",
+                  "circle-stroke-color": "#ffffff",
+                  "circle-stroke-width": 2,
+                }}
+              />
+              <Layer
+                id="currentLocationSelectedText"
+                type="symbol"
+                paint={{
+                  "text-color": "#000000",
+                  "text-halo-color": "#ffffff",
+                  "text-halo-width": 2,
+                }}
+                layout={{
+                  "text-field": "Forecast Location",
+                  "text-size": 14,
+                  "text-radial-offset": 1,
+                  "text-anchor": "top-left",
+                }}
+              />
+            </Source>
 
             <div className="absolute font-mono top-0 left-1/2 -translate-x-1/2 m-2 bg-primary text-primary-foreground border-neutral-400 border px-2 py-1 rounded-md text-xs">
               {new Date(currentTime).toISOString().replace("T", " ").slice(0, -8) + "Z"}

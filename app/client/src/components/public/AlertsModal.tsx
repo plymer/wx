@@ -18,7 +18,8 @@ export const AlertsModal = ({ alerts }: Props) => {
           size="sm"
           className={`px-2 min-h-6 ${alerts && alerts.length > 0 ? (hasWarnings ? "bg-red-600" : hasWatches ? "bg-amber-400" : "bg-neutral-500") : ""}`}
         >
-          {alerts && alerts.length > 0 ? `${alerts.length}` : ""} <AlertTriangle />
+          {alerts && alerts.length > 0 ? `${alerts.length} ` : ""}
+          <AlertTriangle />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="max-h-[calc(100dvh-2rem)] bg-neutral-800 text-white">

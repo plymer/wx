@@ -1,2 +1,3 @@
 *.pbf
 app/client/src/assets/**/*.json
+src/assets/**/*.json

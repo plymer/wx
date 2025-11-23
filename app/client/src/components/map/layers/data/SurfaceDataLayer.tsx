@@ -22,7 +22,7 @@ import { useShowObs } from "@/stateStores/map/vectorData";
 import { HOUR, MINUTE } from "@shared/lib/constants";
 import { checkIfInBounds, filterSpacedPoints, hasValidCoordinates } from "@/lib/utils";
 import { useMemo } from "react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
 
 export const SurfaceDataLayer = () => {

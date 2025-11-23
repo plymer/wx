@@ -8,16 +8,13 @@ import { useQuery } from "@tanstack/react-query";
 import { MINUTE } from "@shared/lib/constants";
 import Button from "./ui/Button";
 import { Label } from "./ui/Label";
-import { Calendar, Info, OctagonX, Sunrise, Sunset, ThermometerSnowflake, ThermometerSun } from "lucide-react";
+import { Calendar, Info, OctagonX } from "lucide-react";
 import { PointForecastMap } from "./public/PointForecastMap";
 import type { Position } from "geojson";
 import { AlertsModal } from "./public/AlertsModal";
-import { WindContainer } from "./public/current/WindContainer";
-import { WxContainer } from "./public/current/WxContainer";
-import { AqhiContainer } from "./public/current/AqhiContainer";
-import { TemperatureContainer } from "./public/current/TemperatureContainer";
 import { NormalsContainer } from "./public/NormalsContainer";
 import { WxIcon } from "./public/WxIcon";
+import { CurrentConditions } from "./public/CurrentConditions";
 
 export default function Public() {
   const office = useOffice();
@@ -93,7 +90,6 @@ export default function Public() {
   const conditionsTimeString = conditionsTime
     ? conditionsTime.toISOString().replace("T", " ").slice(0, -8) + "Z"
     : "N/A";
-  const aqhi = currentConditions?.aqhi;
   const normals = pointForecast?.normals;
   const dailyForecasts = pointForecast?.dailyForecasts;
   const riseSet = pointForecast?.riseSet;
@@ -162,7 +158,11 @@ export default function Public() {
       )}
       {mode === "point" && (
         <div className="text-center max-md:h-[calc(100dvh-7.1rem)] md:h-[calc(100dvh-7.6rem)] flex flex-col gap-2 w-full md:max-w-[600px] mx-auto overflow-y-auto px-2">
-          <PointForecastMap setSearchCoords={setSearchCoords} fetchStatus={pointFetchStatus} />
+          <PointForecastMap
+            searchCoords={searchCoords}
+            setSearchCoords={setSearchCoords}
+            fetchStatus={pointFetchStatus}
+          />
 
           {error && (
             <div className="text-red-400 w-full flex gap-2 justify-center p-4 bg-neutral-900 rounded-md border border-black">
@@ -179,32 +179,24 @@ export default function Public() {
           {pointForecast && !error && (
             <div className="flex flex-col gap-2">
               {currentConditions && (
-                <div className="flex flex-col gap-2 border border-black bg-neutral-600 rounded-md">
+                <div className="flex flex-col border border-black bg-neutral-600 rounded-md">
                   <div className="bg-black rounded-t-md p-2 flex gap-2 justify-between place-items-center">
                     <div className="text-center mx-auto">
-                      <span>{currentConditions.siteName}</span>
+                      {currentConditions.siteName ? (
+                        <span>{currentConditions.siteName}</span>
+                      ) : (
+                        <span>No observations available</span>
+                      )}
                       {currentConditions.siteId && <span> ({currentConditions.siteId.toUpperCase()})</span>}
-                      <span className="text-[0.6rem]"> Valid at {conditionsTimeString}</span>
-                    </div>
-                    <div>
-                      <AlertsModal alerts={alerts || []} />
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <div className="grid grid-cols-4 gap-2 place-items-center px-4">
-                      <WxContainer
-                        condition={currentConditions.weather.condition}
-                        iconCode={currentConditions.iconCode}
-                      />
-                      <TemperatureContainer tt={currentConditions.weather.tt} td={currentConditions.weather.td} />
-                      <WindContainer
-                        direction={currentConditions.weather.wDir}
-                        speed={currentConditions.weather.wSpd}
-                        gust={currentConditions.weather.wGust}
-                      />
-                      <AqhiContainer aqhi={aqhi} />
+                      {currentConditions.siteName && (
+                        <span className="text-[0.6rem]"> Valid at {conditionsTimeString}</span>
+                      )}
                     </div>
 
+                    <AlertsModal alerts={alerts || []} />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {currentConditions.siteName && <CurrentConditions data={currentConditions} />}
                     <NormalsContainer normals={normals} riseSet={riseSet} />
                   </div>
                 </div>
