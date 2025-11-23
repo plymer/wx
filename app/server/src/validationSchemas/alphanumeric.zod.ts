@@ -19,6 +19,11 @@ export const publicBulletinSchema = z.strictObject({
   office: z.string().toLowerCase().trim(),
 });
 
+export const publicPointSchema = z.strictObject({
+  lat: z.coerce.number().min(-90).max(90),
+  lon: z.coerce.number().min(-180).max(180),
+});
+
 export const xmetSchema = z
   .object({
     hours: z.coerce.number().default(1),

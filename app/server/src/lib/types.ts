@@ -167,3 +167,133 @@ export type SfcObsPopupBundle = Record<
 >;
 
 export type Coords = { lat: number; lon: number };
+
+export type WxOAPIResponse = {
+  displayName: string;
+  lastUpdated: number;
+  alert: {
+    zoneId: string;
+    uuid: string;
+    mostSevere: string;
+    alerts: Array<{
+      type: "warning" | "watch" | "advisory" | "statement";
+      issueTime: Date;
+      timezone: string;
+      issueTimeText: string;
+      expiryTime: Date;
+      eventOnsetTime: Date;
+      eventEndTime: Date;
+      alertBannerText: string;
+      text: string;
+    }>;
+    lastUpdated: number;
+    hwyMostSevere: string;
+  };
+  observation: {
+    observedAt: string;
+    provinceCode: string;
+    tcid: string;
+    timeStamp: string;
+    iconCode: string;
+    condition: string;
+    temperature: {
+      metric: string;
+      metricUnrounded: string;
+    };
+    dewpoint: {
+      metric: string;
+      metricUnrounded: string;
+    };
+    feelsLike: {
+      metric: string;
+    };
+    pressure: {
+      metric: string;
+    };
+    tendency: string;
+    visibility: {
+      metric: string;
+    };
+    humidity: string;
+    windSpeed: {
+      metric: string;
+    };
+    windGust: {
+      metric: string;
+    };
+    windDirection: string;
+  };
+  dailyFcst: {
+    regionalNormals: {
+      metric: {
+        highTemp: number;
+        lowTemp: number;
+      };
+    };
+    daily: Array<{
+      date: string;
+      periodID: number;
+      periodLabel: string;
+      iconCode: string;
+      text: string;
+    }>;
+    dailyIssuedTimeEpoch: string;
+  };
+  aqhi: {
+    riskText: string;
+    aqhiVal: number;
+    epochTime: number;
+  };
+  riseSet: {
+    set: {
+      time12h: string;
+      epochTimeRounded: string;
+      time: string;
+    };
+    timeZone: string;
+    rise: {
+      time12h: string;
+      epochTimeRounded: string;
+      time: string;
+    };
+  };
+  riseSetNextDay: {
+    set: {
+      time12h: string;
+      epochTimeRounded: string;
+      time: string;
+    };
+    timeZone: string;
+    rise: {
+      time12h: string;
+      epochTimeRounded: string;
+      time: string;
+    };
+  };
+  riseData: Array<{
+    set: {
+      time12h: string;
+      epochTimeRounded: string;
+      time: string;
+    };
+    timeZone: string;
+    rise: {
+      time12h: string;
+      epochTimeRounded: string;
+      time: string;
+    };
+  }>;
+  metNotes: Array<unknown>;
+  aqhiFcst: {
+    epochTime: number;
+    daily: Array<{
+      aqhiVal: number;
+      periodID: number;
+    }>;
+  };
+  zonePoly: string;
+  province: string;
+  tcId: string;
+  climateId: string;
+  tc2Id: string;
+};

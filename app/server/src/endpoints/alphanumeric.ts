@@ -6,6 +6,7 @@ import { TRPCError } from "@trpc/server";
 import {
   metarSchema,
   publicBulletinSchema,
+  publicPointSchema,
   singleSiteSchema,
   xmetSchema,
 } from "../validationSchemas/alphanumeric.zod.js";
@@ -17,7 +18,7 @@ import { HOUR } from "../lib/constants.js";
 
 import { avwxDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
-import type { HubData, XmetGeoJSON } from "../lib/types.js";
+import type { HubData, WxOAPIResponse, XmetGeoJSON } from "../lib/types.js";
 
 const HubSites: Record<string, string> = {
   CYYZ: "Toronto Pearson Int'l Airport",
@@ -216,6 +217,98 @@ export const alphanumericRouter = router({
       }
 
       return output;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
+
+  pointForecast: publicProcedure.input(publicPointSchema).query(async ({ input }) => {
+    const { lat, lon } = input;
+
+    // https://weather.gc.ca/api/app/v3/en/Location/53.536,-113.494?type=city
+    const apiUrl = `https://weather.gc.ca/api/app/v3/en/Location/${lat},${lon}?type=city`;
+
+    try {
+      const response = (await fetch(apiUrl, { headers: { "User-Agent": "PrairieWxApi/1.0" } }).then((res) =>
+        res.json(),
+      )) as WxOAPIResponse[];
+
+      if (!response) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "No forecast data found for the provided coordinates" });
+      }
+
+      const data = response[0];
+      // we want to extract and transform only the relevant parts that we want to show the client
+
+      const alerts = data.alert.alerts?.map((alert) => {
+        return {
+          type: alert.type,
+          issueTime: alert.issueTime,
+          timezone: alert.timezone,
+          issueTimeText: alert.issueTimeText,
+          expiryTime: alert.expiryTime,
+          eventOnsetTime: alert.eventOnsetTime,
+          eventEndTime: alert.eventEndTime,
+          alertBannerText: alert.alertBannerText,
+          text: alert.text,
+        };
+      });
+
+      const ob = data.observation;
+      const aq = data.aqhi;
+      const aqFcst = data.aqhiFcst;
+
+      const aqText = aq?.riskText ? aq.riskText.replace("Risk", "").trim() : undefined;
+
+      const placeName = data.displayName;
+
+      const currentConditions = {
+        time: ob?.timeStamp,
+        siteId: ob?.tcid,
+        siteName: ob?.observedAt,
+        iconCode: ob?.iconCode,
+        weather: {
+          condition: ob?.condition,
+          tt: ob?.temperature?.metricUnrounded ?? ob?.temperature?.metric,
+          td: ob?.dewpoint?.metricUnrounded ?? ob?.dewpoint?.metric,
+          vis: ob?.visibility?.metric,
+          mslp: ob?.pressure?.metric,
+          humidity: ob?.humidity,
+          wSpd: ob?.windSpeed?.metric,
+          wDir: ob?.windDirection,
+          wGust: ob?.windGust?.metric,
+        },
+        aqhi: { value: aq?.aqhiVal, time: aq?.epochTime, text: aqText },
+      };
+
+      const normals = {
+        high: data.dailyFcst.regionalNormals.metric.highTemp,
+        low: data.dailyFcst.regionalNormals.metric.lowTemp,
+      };
+
+      const dailyForecasts = data.dailyFcst.daily.map((period) => {
+        return {
+          date: period.date,
+          id: period.periodID,
+          label: period.periodLabel,
+          text: period.text,
+          iconCode: period.iconCode,
+          aqhiVal: 9999,
+        };
+      });
+
+      aqFcst?.daily?.forEach((aqhiPeriod, index) => {
+        if (dailyForecasts[index]) {
+          dailyForecasts[index].aqhiVal = aqhiPeriod.aqhiVal;
+        }
+      });
+
+      const riseSet = { rise: data.riseSet.rise.time, set: data.riseSet.set.time };
+
+      return { placeName, currentConditions, alerts, normals, dailyForecasts, riseSet };
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",

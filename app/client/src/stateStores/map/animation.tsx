@@ -15,6 +15,7 @@ interface AnimationStateStore {
   deltaTime: number;
   loopId: NodeJS.Timeout | undefined;
   actions: {
+    setFrameCount: (count: number) => void;
     setFrame: (frame: number) => void;
     nextFrame: () => void;
     previousFrame: () => void;
@@ -43,7 +44,7 @@ const useAnimation = create<AnimationStateStore>()(
       deltaTime: 10 * MINUTE,
       loopId: undefined,
       actions: {
-        // declare methods to change animation state
+        setFrameCount: (newCount: number) => set(() => ({ frameCount: newCount })),
         setFrame: (newFrame: number) => set(() => ({ frame: newFrame })),
         nextFrame: () => set((state) => ({ frame: state.frame + 1 <= state.frameCount - 1 ? state.frame + 1 : 0 })),
         previousFrame: () => set((state) => ({ frame: state.frame - 1 >= 0 ? state.frame - 1 : state.frameCount - 1 })),

@@ -4,10 +4,14 @@ import { PUBLIC_OVERLAY } from "@/config/overlays";
 import publicRegions from "@/assets/general-overlays/public-regions.json";
 import type { FeatureCollection } from "geojson";
 
-export const PublicRegionsOverlay = () => {
+interface Props {
+  override?: boolean;
+}
+
+export const PublicRegionsOverlay = ({ override }: Props) => {
   const publicRegionsOverlay = usePublicRegionsOverlay();
 
-  if (!publicRegionsOverlay) return;
+  if (!override && !publicRegionsOverlay) return;
 
   const data = publicRegions as FeatureCollection;
 

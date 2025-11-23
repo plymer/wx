@@ -90,13 +90,6 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
       onMouseEnter={() => setCursor("pointer")}
       onMouseLeave={() => setCursor("grab")}
       onLoad={onMapLoad}
-      onMouseDown={(e) => {
-        if (e.originalEvent.button === 1) {
-          e.originalEvent.preventDefault();
-          e.originalEvent.stopPropagation();
-          alert("Public forecast extraction not yet implemented.");
-        }
-      }}
       onSourceData={(e) => {
         if (e.sourceId.includes("satellite") || e.sourceId.includes("radar")) {
           mapState.setLoadingState(true);
