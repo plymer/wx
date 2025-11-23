@@ -88,6 +88,8 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
           latitude,
           zoom,
         }}
+        pitch={0}
+        bearing={0}
         projection={"globe"}
         dragRotate={false}
         pitchWithRotate={false}
