@@ -89,6 +89,10 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
           zoom,
         }}
         projection={"globe"}
+        dragRotate={false}
+        pitchWithRotate={false}
+        touchPitch={false}
+        boxZoom={false}
         onLoad={onMapLoad}
         style={{ width: "100%", height: "100%" }}
         onMove={onMapMove}
