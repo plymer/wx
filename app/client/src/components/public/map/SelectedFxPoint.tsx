@@ -32,6 +32,7 @@ export const SelectedFxPoint = ({ data }: Props) => {
           "text-size": 14,
           "text-radial-offset": 1,
           "text-anchor": "top-left",
+          "text-allow-overlap": true,
         }}
       />
     </Source>
