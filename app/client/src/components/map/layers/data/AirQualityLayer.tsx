@@ -20,7 +20,12 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
   const lastFrame = useFrameCount() - 1;
   const displayTime = useDisplayTime();
 
-  const { data } = useQuery(api.aq.aq.queryOptions({ hours: 4 }, { enabled, refetchInterval: 10 * MINUTE }));
+  const { data } = useQuery(
+    api.aq.aq.queryOptions(
+      { hours: 4 },
+      { enabled, refetchInterval: 10 * MINUTE, trpc: { context: { skipBatch: true } } },
+    ),
+  );
 
   if (!enabled || !data) return;
 

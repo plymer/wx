@@ -1,4 +1,4 @@
-import Map, { Layer, Source, type ViewStateChangeEvent } from "react-map-gl/maplibre";
+import Map, { type ViewStateChangeEvent } from "react-map-gl/maplibre";
 import { positronWxMap } from "@/assets/map-styles/positron-wxmap";
 
 import useMapClock from "@/hooks/useClock";
@@ -19,11 +19,12 @@ import { RadarLayer } from "../map/layers/data/RadarLayer";
 import Button from "../ui/Button";
 import type { FetchStatus } from "@tanstack/react-query";
 import * as turf from "@turf/turf";
-import { AlertsLayer } from "./map/AlertsLayer";
-import { SelectedFxPoint } from "./map/SelectedFxPoint";
+
 import { HOUR } from "@shared/lib/constants";
 import { SurfaceDataLayer } from "../map/layers/data/SurfaceDataLayer";
 import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
+import { AlertsLayer } from "../map/layers/data/AlertsLayer";
+import { SelectedFxPoint } from "../map/layers/overlays/SelectedFxPoint";
 
 interface Props {
   searchCoords: Position | null;

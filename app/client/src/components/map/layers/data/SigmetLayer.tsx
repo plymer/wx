@@ -15,7 +15,12 @@ export function SigmetLayer() {
     data: sigmetData,
     isLoading,
     error,
-  } = useQuery(api.alpha.sigmets.queryOptions({ hours: 6 }, { enabled, refetchInterval: MINUTE }));
+  } = useQuery(
+    api.alpha.sigmets.queryOptions(
+      { hours: 6 },
+      { enabled, refetchInterval: MINUTE, trpc: { context: { skipBatch: true } } },
+    ),
+  );
 
   // Don't render if SIGMETs are disabled in state
   if (!enabled) return null;

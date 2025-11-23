@@ -23,6 +23,7 @@ export const LightningDataLayer = ({ belowLayer, timeRange = 15 }: Props) => {
     api.lightning.lightning.queryOptions(undefined, {
       enabled,
       refetchInterval: MINUTE,
+      trpc: { context: { skipBatch: true } },
     }),
   );
 

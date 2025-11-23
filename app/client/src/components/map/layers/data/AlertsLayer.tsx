@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Source, Layer } from "react-map-gl/maplibre";
 
 export const AlertsLayer = () => {
-  const { data } = useQuery(api.wxmap.wxmapPublicWarnings.queryOptions());
+  const { data } = useQuery(
+    api.wxmap.wxmapPublicWarnings.queryOptions(undefined, { trpc: { context: { skipBatch: true } } }),
+  );
 
   return (
     <Source id="wxo-alerts-source" type="geojson" data={data ?? { type: "FeatureCollection", features: [] }}>
