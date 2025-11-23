@@ -29,7 +29,7 @@ export const AlertsLayer = () => {
         id="wxo-alerts-layer-labels"
         type="symbol"
         paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
-        layout={{ "text-field": ["get", "alertNameShort"], "text-size": 12 }}
+        layout={{ "text-field": ["get", "alertNameShort"], "text-size": 12, "text-allow-overlap": true }}
       />
     </Source>
   );
