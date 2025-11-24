@@ -110,15 +110,15 @@ export const stationSchema = z.object({
     .string()
     .length(4, "ICAO ID must be exactly 4 characters")
     .regex(/^[A-Z0-9]{4}$/, "ICAO ID must contain only uppercase letters and numbers"),
-  iataId: z.string().optional(),
-  faaId: z.string().optional(),
-  wmoId: z.string().optional(),
+  iataId: z.string().nullable(),
+  faaId: z.string().nullable(),
+  wmoId: z.string().nullable(),
   lat: z.number(),
   lon: z.number(),
   elev: z.number(),
   site: z.string(),
-  state: z.string(),
-  country: z.string(),
+  state: z.string().nullable(),
+  country: z.string().nullable(),
   priority: z.number(),
 });
 
