@@ -32,6 +32,7 @@ async function main() {
 
     const output: StationData[] = stationData
       .map((station) => {
+        if (!station.icaoId) return undefined; // skip stations without an ICAO ID
         // parse our object and validate it against the schema
         const parsed = stationSchema.safeParse(station);
         if (!parsed.success) {
