@@ -32,10 +32,17 @@ export const SurfaceDataLayer = () => {
 
   const displayTime = useDisplayTime();
 
-  const { data } = useQuery(
+  const { data: plotData } = useQuery(
     api.wxmap.wxmapMetars.queryOptions(undefined, {
       enabled,
       refetchInterval: MINUTE,
+      trpc: { context: { skipBatch: true } },
+    }),
+  );
+
+  const { data: popupData } = useQuery(
+    api.wxmap.wxmapPopupData.queryOptions(undefined, {
+      enabled,
       trpc: { context: { skipBatch: true } },
     }),
   );
@@ -45,24 +52,24 @@ export const SurfaceDataLayer = () => {
   // use the predefined list of must-haves and then use a spatial algorithm to fill in the rest
 
   const stationPriorityList = useMemo(() => {
-    if (!data) return { min: [], med: [], global: [] };
+    if (!plotData) return { min: [], med: [], global: [] };
     const radius = { min: 240, med: 60, max: 1 };
 
     const key = "siteId";
 
     return {
-      global: [...STATION_PRIORITY_CANADA, ...filterSpacedPoints(data, radius.min, key)],
-      min: [...STATION_PRIORITY_MIN, ...filterSpacedPoints(data, radius.min, key)],
-      med: [...STATION_PRIORITY_MED, ...filterSpacedPoints(data, radius.med, key)],
+      global: [...STATION_PRIORITY_CANADA, ...filterSpacedPoints(plotData, radius.min, key)],
+      min: [...STATION_PRIORITY_MIN, ...filterSpacedPoints(plotData, radius.min, key)],
+      med: [...STATION_PRIORITY_MED, ...filterSpacedPoints(plotData, radius.med, key)],
     };
-  }, [data]);
+  }, [plotData]);
 
   // for every site in our list of data, we want to get the metar with the observation that is closest
   // to our display time without being in the future and then collapse its properties into the final output
 
-  if (!viewport || !enabled || !data) return;
+  if (!viewport || !enabled || !plotData) return;
 
-  const features = data.features.reduce<StationPlotGeoJSON["features"]>((acc, feature) => {
+  const features = plotData.features.reduce<StationPlotGeoJSON["features"]>((acc, feature) => {
     const coords = feature.geometry.coordinates;
 
     // validate the coordinates
@@ -277,7 +284,12 @@ export const SurfaceDataLayer = () => {
             ],
           }}
         />
-
+      </Source>
+      <Source
+        id="sfc-obs-interactive-target"
+        type="geojson"
+        data={popupData || { type: "FeatureCollection", features: [] }}
+      >
         {/* Interactive target (invisible circles for click detection) */}
         <Layer
           id="layer-sfc-obs-target"

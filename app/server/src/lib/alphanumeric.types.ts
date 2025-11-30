@@ -204,4 +204,5 @@ export type XmetEventData = {
     speed: number | null;
   };
   coords: Position[][] | null;
+  dataType: "sigmet";
 };

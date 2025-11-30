@@ -455,3 +455,44 @@ export function cardinalToDegrees(dir: WmoDirection): number {
   // Return the degree corresponding to the given direction
   return directionMap[dir.toUpperCase()];
 }
+
+/**
+ * limits query results to a specific number of the most recent entries per unique key value
+ *
+ * @param queryResult - the array of results to be limited
+ * @param limit - the maximum number of entries to keep per unique key value
+ * @param uniqueKey - a function that extracts the unique identifier from each item or a key name; the key name must be a string
+ * @returns a new array with limited results
+ */
+export function limitResultsByKeys<T>(
+  queryResult: T[],
+  limit: number,
+  uniqueKey: ((item: T) => string) | keyof T | (keyof T)[],
+): T[] {
+  // ff limit is zero or negative, return the original results
+  if (limit <= 0) {
+    return queryResult;
+  }
+
+  // create a function to extract the key, whether uniqueKey is a function or a property name
+  const getKey =
+    typeof uniqueKey === "function"
+      ? uniqueKey
+      : Array.isArray(uniqueKey)
+        ? (item: T) => uniqueKey.map((key) => String(item[key])).join("|") // Combine multiple keys into a composite key
+        : (item: T) => String(item[uniqueKey]);
+
+  // get the unique keys
+  const uniqueKeys = [...new Set(queryResult.map(getKey))];
+
+  // initialize result array
+  let limitedResult: T[] = [];
+
+  // for each unique key, get the latest 'limit' number of entries
+  uniqueKeys.forEach((key) => {
+    const filteredItems = queryResult.filter((item) => getKey(item) === key);
+    limitedResult = [...limitedResult, ...filteredItems.slice(-limit)];
+  });
+
+  return limitedResult;
+}

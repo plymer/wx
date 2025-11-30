@@ -139,10 +139,10 @@ export type RawIntlSigmetData = {
 };
 
 // used in intermediate steps of the api data return for /wxmap/metars
-export type MetarNoIdOrText = Prettify<Omit<MetarData, "siteId" | "rawText">>;
+export type MetarElements = Prettify<Omit<MetarData, "siteId" | "rawText">>;
 export type StationPlotData = {
   siteId: string;
-  metars: MetarNoIdOrText[];
+  metars: MetarElements[];
 };
 
 export type MetarWithStation = Prettify<
@@ -154,24 +154,29 @@ export type MetarWithStation = Prettify<
   }
 >;
 
+export type StationPlotPopupData = {
+  siteId: string;
+  siteName: string | null;
+  siteCountry: string | null;
+  siteState: string | null;
+  metars: string[];
+  taf: string | null;
+  dataType: "site";
+};
+
 // used for the rendering and filtering of station plots on the map
 export type StationPlotGeoJSON = FeatureCollection<Point, Prettify<Omit<MetarData, "rawText">>>;
 
-export type SfcObsPopupBundle = Record<
-  string,
-  {
-    metaData: { siteName: string | null; siteCountry: string | null; siteState: string | null };
-    metars: string[];
-    tafs: string[];
-  }
->;
-
 export type Coords = { lat: number; lon: number };
+
+export type AlertType = "warning" | "watch" | "advisory" | "statement";
+export type AlertColour = "grey" | "yellow" | "orange" | "red";
 
 export type WxOAlert = {
   alertCode: string;
   status: "ended" | "active";
-  type: "warning" | "watch" | "advisory" | "statement";
+  type: AlertType;
+  colour: AlertColour;
   issueTime: Date;
   timezone: string;
   issueTimeText: string;
@@ -181,6 +186,8 @@ export type WxOAlert = {
   alertBannerText: string;
   alertNameShort: string;
   text: string;
+  impact: string;
+  confidence: string;
 };
 
 export type WxOPolygonAlert = Record<string, WxOAlert>;
@@ -322,9 +329,7 @@ export type WxOPolygonProperties = {
   }[];
 };
 
-export type WarningProperties = {
-  alertCode: string;
-  type: "warning" | "watch" | "advisory" | "statement";
-  issueTime: Date;
-  alertNameShort: string;
-};
+export type WarningProperties = Pick<
+  WxOAlert,
+  "alertCode" | "type" | "issueTime" | "alertNameShort" | "colour" | "impact" | "confidence"
+>;

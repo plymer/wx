@@ -22,21 +22,14 @@ export const SurfaceDataPopup = () => {
 
   const { highlightSigWx } = useHighlightSigWx();
 
-  const { data } = useQuery(
-    api.wxmap.wxmapPopup.queryOptions(
-      { siteId: popupData?.features.map((f) => (f as any).properties.siteId).join(",") },
-      { enabled: !!popupData },
-    ),
-  );
-
-  if (!viewport || !data || !popupData || popupData.features.length === 0) return null;
+  if (!viewport || !popupData || popupData.features.length === 0) return null;
 
   const { lng, lat } = popupData.lngLat;
 
   // if we move the map too far from the popup, close it
   if (!checkIfInBounds([lng, lat], viewport)) handleClose();
 
-  const metarsFromData = data;
+  const featureList = popupData.features;
 
   return (
     <Popup
@@ -50,11 +43,23 @@ export const SurfaceDataPopup = () => {
       className="w-[400px] max-w-3/4 text-white drop-shadow-2xl bg-transparent"
     >
       <div className="flex flex-col justify-center">
-        {Object.entries(metarsFromData).map(([_siteId, entries], i) => {
+        {featureList.map((feature) => {
+          const properties = feature.properties;
+
+          const dataType = properties.dataType;
+
+          switch (dataType) {
+            case "site": {
+              return <div key={properties.siteId}>{properties.siteId}</div>;
+            }
+          }
+
+          return null;
+        })}
+
+        {/* {Object.entries(metarsFromData).map(([_siteId, entries], i) => {
           const parsedMetar =
-            entries.metars.length > 0
-              ? (formatSigWx(entries.metars[entries.metars.length - 1], "metar") as string)
-              : null;
+            entries.length > 0 ? (formatSigWx(entries.metars[entries.metars.length - 1], "metar") as string) : null;
 
           const parsedTaf =
             Object.entries(metarsFromData).length <= 1 && entries.tafs.length > 0
@@ -84,7 +89,7 @@ export const SurfaceDataPopup = () => {
               </div>
             </>
           );
-        })}
+        })} */}
         <Button className="mt-2" variant={"default"} onClick={handleClose}>
           <X />
           Close Details

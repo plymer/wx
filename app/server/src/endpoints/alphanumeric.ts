@@ -359,6 +359,8 @@ export const alphanumericRouter = router({
             bottom: xmet.hazardBottom,
           };
 
+          const dataType: "sigmet" = "sigmet";
+
           const shape = xmet.initialShape;
           const coords = processCoordinates(shape, 0, xmet.initialCoords);
           const sequenceId = !isConvectiveSigmet(header) ? `${domain}${charCode}` : `conv`;
@@ -376,6 +378,7 @@ export const alphanumericRouter = router({
             header,
             hazard,
             coords,
+            dataType,
           };
         })
         .filter((xmet) => xmet !== undefined && xmet !== null);
@@ -395,6 +398,7 @@ export const alphanumericRouter = router({
             header,
             hazard,
             coords,
+            dataType,
           } = xmet;
 
           if (!coords) return null;
@@ -417,6 +421,7 @@ export const alphanumericRouter = router({
               hazard,
               motionVector,
               text,
+              dataType,
             },
           };
         })

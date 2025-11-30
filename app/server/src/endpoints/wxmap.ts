@@ -1,12 +1,12 @@
-import { and, eq, gt, inArray } from "drizzle-orm";
+import { and, asc, eq, gt, inArray } from "drizzle-orm";
 import type { Feature, FeatureCollection, MultiPolygon, Point, Polygon } from "geojson";
 import { TRPCError } from "@trpc/server";
 
 import type {
-  MetarData,
+  MetarElements,
   MetarWithStation,
-  SfcObsPopupBundle,
   StationPlotData,
+  StationPlotPopupData,
   WarningProperties,
   WxOAlert,
   WxOPolygonAlert,
@@ -19,6 +19,7 @@ import { wxmapMetarSchema } from "../validationSchemas/wxmap.zod.js";
 import { avwxDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
 import * as turf from "@turf/turf";
+import { limitResultsByKeys } from "../lib/utils.js";
 
 // Generic function to convert METAR query results to GeoJSON features
 function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, StationPlotData>[] {
@@ -32,7 +33,7 @@ function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, Sta
     const { lat, lon } = stations;
     const existingFeature = acc.find((feature) => feature.properties.siteId === siteId);
 
-    const metarData: Omit<MetarData, "siteId" | "rawText"> = {
+    const metarData: MetarElements = {
       category,
       td,
       tt,
@@ -81,6 +82,75 @@ export const wxmapRouter = router({
     return metarFeatures;
   }),
 
+  wxmapPopupData: publicProcedure.query(async () => {
+    if (!avwxDb) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
+    }
+
+    const metarsQuery = await avwxDb.query.metars
+      .findMany({
+        where: gt(metars.validTime, new Date(Date.now() - 4 * HOUR)),
+        with: { stations: { columns: { lat: true, lon: true, country: true, name: true, state: true } } },
+        orderBy: [asc(metars.validTime)],
+      })
+      .then((results) => limitResultsByKeys(results, 3, "siteId"));
+
+    const metarList: Record<string, string[]> = {};
+    metarsQuery.forEach((m) => {
+      if (!m.rawText) return;
+
+      if (metarList[m.siteId]) {
+        metarList[m.siteId].push(m.rawText);
+      } else {
+        metarList[m.siteId] = [m.rawText];
+      }
+    });
+
+    const tafsQuery = await avwxDb.query.tafs
+      .findMany({
+        where: gt(tafs.validTime, new Date(Date.now() - 8 * HOUR)),
+        orderBy: [asc(tafs.validTime)],
+      })
+      .then((results) => limitResultsByKeys(results, 1, "siteId"));
+
+    const popupData = metarsQuery.reduce<Feature<Point, StationPlotPopupData>[]>((acc, m) => {
+      if (!m.rawText || !m.stations) return acc;
+
+      const siteId = m.siteId;
+
+      const { lat, lon, name: siteName, country: siteCountry, state: siteState } = m.stations;
+
+      const currentTaf = tafsQuery.find((t) => t.siteId === siteId);
+
+      const existingFeature = acc.find((feature) => feature.properties.siteId === siteId);
+
+      if (existingFeature) {
+        return acc;
+      } else {
+        const newFeature: Feature<Point, StationPlotPopupData> = {
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [lon, lat],
+          },
+          properties: {
+            siteId,
+            siteName,
+            siteCountry,
+            siteState,
+            metars: metarList[siteId] || [],
+            taf: currentTaf ? currentTaf.rawText : null,
+            dataType: "site",
+          },
+        };
+        acc.push(newFeature);
+        return acc;
+      }
+    }, []);
+
+    return turf.featureCollection(popupData);
+  }),
+
   wxmapPublicWarnings: publicProcedure.query(async (): Promise<FeatureCollection<MultiPolygon, WarningProperties>> => {
     const metaDataSourceUrl = "https://weather.gc.ca/data/dms/alert_geojson_v2/alerts.public.en.geojson";
 
@@ -123,6 +193,9 @@ export const wxmapRouter = router({
             type: alertData.type,
             issueTime: alertData.issueTime,
             alertNameShort: alertData.alertNameShort,
+            colour: alertData.colour,
+            impact: alertData.impact,
+            confidence: alertData.confidence,
           },
         };
 
@@ -205,47 +278,5 @@ export const wxmapRouter = router({
 
     // simplify the polygons to reduce complexity, improve client performance, and reduce payload size
     return turf.simplify(dataCollection, { tolerance: 0.001, highQuality: false, mutate: true });
-  }),
-
-  wxmapPopup: publicProcedure.input(wxmapMetarSchema).query(async ({ input }) => {
-    if (!avwxDb) {
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
-    }
-
-    const { siteId } = input;
-
-    if (!siteId || siteId.length === 0) {
-      return {};
-    }
-
-    const combinedQuery = await avwxDb
-      .select({
-        siteId: stations.siteId,
-        siteName: stations.name,
-        siteCountry: stations.country,
-        siteState: stations.state,
-        metarText: metars.rawText,
-        tafText: tafs.rawText,
-      })
-      .from(stations)
-      .leftJoin(metars, and(eq(stations.siteId, metars.siteId), gt(metars.validTime, new Date(Date.now() - 2 * HOUR))))
-      .leftJoin(tafs, and(eq(stations.siteId, tafs.siteId), gt(tafs.validTime, new Date(Date.now() - 6 * HOUR))))
-      .where(inArray(stations.siteId, siteId));
-
-    return combinedQuery.reduce<SfcObsPopupBundle>((acc, m) => {
-      if (!m.metarText) return acc;
-      if (!acc[m.siteId]) {
-        acc[m.siteId] = {
-          metaData: { siteName: null, siteCountry: null, siteState: null },
-          metars: [],
-          tafs: [],
-        };
-      }
-      acc[m.siteId].metaData = { siteName: m.siteName, siteCountry: m.siteCountry, siteState: m.siteState };
-      acc[m.siteId].metars.push(m.metarText);
-      if (m.tafText) acc[m.siteId].tafs.push(m.tafText);
-
-      return acc;
-    }, {});
   }),
 });
