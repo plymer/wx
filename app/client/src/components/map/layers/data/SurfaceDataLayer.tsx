@@ -1,7 +1,7 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
 
-import type { StationPlotGeoJSON } from "@shared/lib/types";
+import type { StationPlotGeoJSON, StationPlotPopupData } from "@shared/lib/types";
 
 import { ZOOM_THRESHOLDS } from "@/config/map";
 import {
@@ -24,6 +24,7 @@ import { checkIfInBounds, filterSpacedPoints, hasValidCoordinates } from "@/lib/
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
+import type { Feature, FeatureCollection, Point } from "geojson";
 
 export const SurfaceDataLayer = () => {
   const zoom = useZoom();
@@ -53,7 +54,7 @@ export const SurfaceDataLayer = () => {
 
   const stationPriorityList = useMemo(() => {
     if (!plotData) return { min: [], med: [], global: [] };
-    const radius = { min: 240, med: 60, max: 1 };
+    const radius = { min: 180, med: 100, max: 1 };
 
     const key = "siteId";
 
@@ -113,7 +114,7 @@ export const SurfaceDataLayer = () => {
     return acc;
   }, []);
 
-  const resultFC: StationPlotGeoJSON = {
+  const filteredPlots: StationPlotGeoJSON = {
     type: "FeatureCollection",
     features,
   };
@@ -125,7 +126,7 @@ export const SurfaceDataLayer = () => {
         id="cullable-plot-data"
         key="cullable-plot-data"
         type="geojson"
-        data={resultFC}
+        data={filteredPlots}
         cluster={true}
         clusterRadius={20}
         clusterMaxZoom={14}
@@ -199,7 +200,7 @@ export const SurfaceDataLayer = () => {
       </Source>
 
       {/* Non-clustered source for persistent elements */}
-      <Source id="persistent-sfc-data" key="persistent-sfc-data" type="geojson" data={resultFC}>
+      <Source id="persistent-sfc-data" key="persistent-sfc-data" type="geojson" data={filteredPlots}>
         {/* Station dots */}
         <Layer
           beforeId="layer-sfc-obs-gust"
@@ -308,6 +309,13 @@ export const SurfaceDataLayer = () => {
             ],
             "circle-opacity": 0,
           }}
+        />
+        <Layer
+          id="layer-sfc-obs-target-cross"
+          beforeId="layer-sfc-obs-windbarb"
+          type="symbol"
+          paint={{ "text-opacity": ["step", ["zoom"], 0, ZOOM_THRESHOLDS.mini + 0.5, 1, ZOOM_THRESHOLDS.reduced, 1] }}
+          layout={{ "text-field": "+", "text-allow-overlap": true }}
         />
       </Source>
     </>

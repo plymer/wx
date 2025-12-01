@@ -46,7 +46,7 @@ export const STATION_TEXT_STYLE: SymbolLayerSpecification = {
 };
 
 export const ICON_SIZES = {
-  mini: { station: 0.125, windbarb: 0.5 },
+  mini: { station: 0.4, windbarb: 0.5 },
   reduced: { station: 0.6, windbarb: 0.75 },
   maximum: { station: 0.8, windbarb: 1 },
 };
