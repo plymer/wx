@@ -7,6 +7,7 @@ import Button from "./ui/Button";
 import { PRODUCTS } from "@/config/aviationProducts";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
+import { Activity } from "react";
 
 export default function Aviation() {
   const product = useAvProduct();
@@ -37,19 +38,29 @@ export default function Aviation() {
         </nav>
 
         {/* gfa section */}
-        {product === "gfa" && <AvChartsGFA product={product} data={gfaData} />}
+        <Activity mode={product === "gfa" ? "visible" : "hidden"}>
+          <AvChartsGFA product={product} data={gfaData} />
+        </Activity>
 
         {/* lgf section */}
-        {product === "lgf" && <AvChartsOther product={product} data={lgfData} />}
+        <Activity mode={product === "lgf" ? "visible" : "hidden"}>
+          <AvChartsOther product={product} data={lgfData} />
+        </Activity>
 
         {/* hlt section */}
-        {product === "hlt" && <AvChartsOther product={product} data={hltData} />}
+        <Activity mode={product === "hlt" ? "visible" : "hidden"}>
+          <AvChartsOther product={product} data={hltData} />
+        </Activity>
 
         {/* sigwx section */}
-        {product === "sigwx" && <AvChartsOther product={product} data={sigwxData} />}
+        <Activity mode={product === "sigwx" ? "visible" : "hidden"}>
+          <AvChartsOther product={product} data={sigwxData} />
+        </Activity>
 
         {/* hub discussion section */}
-        {product === "hubs" && <HubDiscussion hub={hub} />}
+        <Activity mode={product === "hubs" ? "visible" : "hidden"}>
+          <HubDiscussion hub={hub} />
+        </Activity>
       </div>
     </>
   );

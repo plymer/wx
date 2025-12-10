@@ -2,7 +2,7 @@ import { useBulletin, useCoords, useMode, useOffice, usePublicActions } from "@/
 
 import { PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { api } from "@/lib/trpc";
-import { useEffect, useState } from "react";
+import { Activity, useEffect, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 import { useQuery } from "@tanstack/react-query";
 import { MINUTE } from "@shared/lib/constants";
@@ -111,7 +111,8 @@ export default function Public() {
           Point Forecast
         </Button>
       </div>
-      {mode === "text" && (
+
+      <Activity mode={mode === "text" ? "visible" : "hidden"}>
         <div className="h-[calc(100dvh-7.1rem)] md:h-[calc(100dvh-7.6rem)] flex flex-col gap-2 overflow-hidden px-2">
           <div className="flex place-items-center border-b-2 border-white pb-2 gap-2 w-full md:max-w-[600px] mx-auto">
             <Label htmlFor="officeSelect">Office:</Label>
@@ -155,7 +156,16 @@ export default function Public() {
 
           {productName && !bulletinContent && <pre>No Product available</pre>}
         </div>
-      )}
+      </Activity>
+      {/*
+      
+      ---
+      
+      We cannot use <Activity> for anything that contains a map, because `react-map-gl`'s MapLibre wrapper does not currently support Suspending - it unloads the map style and loses the WebGL context, which causes crashes
+
+      ---
+      
+       */}
       {mode === "point" && (
         <div className="text-center max-md:h-[calc(100dvh-7.1rem)] md:h-[calc(100dvh-7.6rem)] flex flex-col gap-2 w-full md:max-w-[600px] mx-auto overflow-y-auto px-2">
           <PointForecastMap
