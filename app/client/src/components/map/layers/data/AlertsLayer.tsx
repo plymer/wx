@@ -19,6 +19,12 @@ export const AlertsLayer = () => {
         }}
       />
       <Layer
+        id="wxo-alerts-layer-labels"
+        type="symbol"
+        paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
+        layout={{ "text-field": ["get", "alertNameShort"], "text-size": 12, "text-allow-overlap": true }}
+      />
+      <Layer
         id="wxo-alerts-layer-outline"
         beforeId="wxo-alerts-layer-labels"
         type="line"
@@ -26,12 +32,6 @@ export const AlertsLayer = () => {
           "line-color": ["match", ["get", "type"], "warning", "#ff0000", "watch", "#ffff00", "#808080"],
           "line-opacity": 0.85,
         }}
-      />
-      <Layer
-        id="wxo-alerts-layer-labels"
-        type="symbol"
-        paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
-        layout={{ "text-field": ["get", "alertNameShort"], "text-size": 12, "text-allow-overlap": true }}
       />
     </Source>
   );
