@@ -314,8 +314,21 @@ export const SurfaceDataLayer = () => {
           id="layer-sfc-obs-target-cross"
           beforeId="layer-sfc-obs-windbarb"
           type="symbol"
-          paint={{ "text-opacity": ["step", ["zoom"], 0, ZOOM_THRESHOLDS.mini + 0.5, 1, ZOOM_THRESHOLDS.reduced, 1] }}
-          layout={{ "text-field": "+", "text-allow-overlap": true }}
+          paint={{
+            "text-opacity": [
+              "interpolate",
+              ["linear"],
+              ["zoom"],
+              ZOOM_THRESHOLDS.mini + 1,
+              0,
+              ZOOM_THRESHOLDS.reduced,
+              1,
+            ],
+          }}
+          layout={{
+            "text-field": "+",
+            "text-allow-overlap": true,
+          }}
         />
       </Source>
     </>
