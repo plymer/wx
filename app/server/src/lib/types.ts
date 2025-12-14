@@ -165,7 +165,10 @@ export type StationPlotPopupData = {
 };
 
 // used for the rendering and filtering of station plots on the map
-export type StationPlotGeoJSON = FeatureCollection<Point, Prettify<Omit<MetarData, "rawText">>>;
+export type StationPlotGeoJSON = FeatureCollection<
+  Point,
+  Prettify<Omit<MetarData, "rawText"> & { validTimeString: string }>
+>;
 
 export type Coords = { lat: number; lon: number };
 
