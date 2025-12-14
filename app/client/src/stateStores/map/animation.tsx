@@ -14,6 +14,7 @@ interface AnimationStateStore {
   endTime: number;
   deltaTime: number;
   loopId: NodeJS.Timeout | undefined;
+  isStatic: boolean;
   actions: {
     setFrameCount: (count: number) => void;
     setFrame: (frame: number) => void;
@@ -28,6 +29,7 @@ interface AnimationStateStore {
     setEndTime: (time: number) => void;
     setDeltaTime: (deltaTime: number) => void;
     setLoopId: (id: NodeJS.Timeout) => void;
+    setIsStatic: (isStatic: boolean) => void;
   };
 }
 
@@ -43,6 +45,7 @@ const useAnimation = create<AnimationStateStore>()(
       startTime: Date.now() - 3 * HOUR,
       deltaTime: 10 * MINUTE,
       loopId: undefined,
+      isStatic: false,
       actions: {
         setFrameCount: (newCount: number) => set(() => ({ frameCount: newCount })),
         setFrame: (newFrame: number) => set(() => ({ frame: newFrame })),
@@ -57,6 +60,7 @@ const useAnimation = create<AnimationStateStore>()(
         setStartTime: (newTime: number) => set(() => ({ startTime: newTime })),
         setDeltaTime: (newDeltaTime: number) => set(() => ({ deltaTime: newDeltaTime })),
         setLoopId: (newId: NodeJS.Timeout) => set(() => ({ loopId: newId })),
+        setIsStatic: (isStatic: boolean) => set(() => ({ isStatic })),
       },
     }),
     {
@@ -77,4 +81,5 @@ export const useStartTime = () => useAnimation((state) => state.startTime);
 export const useEndTime = () => useAnimation((state) => state.endTime);
 export const useDeltaTime = () => useAnimation((state) => state.deltaTime);
 export const useLoopId = () => useAnimation((state) => state.loopId);
+export const useIsStatic = () => useAnimation((state) => state.isStatic);
 export const useAnimationActions = () => useAnimation((state) => state.actions);

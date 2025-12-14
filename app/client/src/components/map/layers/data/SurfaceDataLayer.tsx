@@ -1,7 +1,7 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
 
-import type { StationPlotGeoJSON, StationPlotPopupData } from "@shared/lib/types";
+import type { StationPlotGeoJSON } from "@shared/lib/types";
 
 import { ZOOM_THRESHOLDS } from "@/config/map";
 import {
@@ -24,7 +24,6 @@ import { checkIfInBounds, filterSpacedPoints, hasValidCoordinates } from "@/lib/
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
-import type { Feature, FeatureCollection, Point } from "geojson";
 
 export const SurfaceDataLayer = () => {
   const zoom = useZoom();

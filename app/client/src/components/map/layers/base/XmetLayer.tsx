@@ -10,7 +10,7 @@ import type { XmetTypes, XmetAPIData, XmetGeoJSON } from "@/lib/types";
 // vector data configs
 import { AIRMET_DISPLAY, AIRMET_DISPLAY_OUTLINE, SIGMET_DISPLAY, SIGMET_DISPLAY_OUTLINE } from "@/config/vectorData";
 
-import { useCurrentTime } from "@/hooks/useCurrentTime";
+import { useDisplayTime } from "@/hooks/useDisplayTime";
 import { HOUR, MINUTE } from "@shared/lib/constants";
 
 interface Props {
@@ -64,12 +64,12 @@ const dedupeFeatures = (features: Feature<MultiPolygon, XmetAPIData>[]) => {
   });
 };
 
-const applyMotionVector = (currentTime: number, startTime: number, feature: Feature<MultiPolygon, XmetAPIData>) => {
+const applyMotionVector = (displayTime: number, startTime: number, feature: Feature<MultiPolygon, XmetAPIData>) => {
   // if we have no motion vector, our object is stationary so bail out
   if (!feature || !feature.properties || !feature.properties.motionVector) return feature;
 
   // calculate the elapsed time in milliseconds
-  const elapsedTime = (currentTime - startTime) / HOUR;
+  const elapsedTime = (displayTime - startTime) / HOUR;
 
   // speed is in knots
   const spd = feature.properties.motionVector.speed;
@@ -95,7 +95,7 @@ const getCoM = (feature: Feature<MultiPolygon, XmetAPIData>) => {
 };
 
 const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
-  const currentTime = useCurrentTime();
+  const displayTime = useDisplayTime();
 
   const processedData = useMemo(() => {
     if (!jsonData) return null;
@@ -161,13 +161,13 @@ const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
       // if we have no properties or null coordinates (a cancelled feature), just filter this feature out
       if (!f.properties || f.geometry.coordinates[0] === null) return false;
 
-      return f.properties.startTime <= currentTime && f.properties.endTime > currentTime;
+      return f.properties.startTime <= displayTime && f.properties.endTime > displayTime;
     })
     .map((f) => {
       // apply our motion vector if applicable
 
       if ((dataType === "airmet" || dataType === "sigmet") && f.properties)
-        return applyMotionVector(currentTime, f.properties.startTime, f);
+        return applyMotionVector(displayTime, f.properties.startTime, f);
       else return f;
     })
     .filter((f) => f !== null || f !== undefined);
