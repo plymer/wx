@@ -40,7 +40,7 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
   const longitude = useLongitude();
   const zoom = useZoom();
   const { updateFromMapEvent } = useUpdateMapViewstate();
-  const { setFrameCount, setFrame } = useAnimationActions();
+  const { setFrameCount, setFrame, setStartTime } = useAnimationActions();
   const { setCoords } = usePublicActions();
 
   useMapClock();
@@ -55,11 +55,13 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
   useEffect(() => {
     setFrameCount(1);
     setFrame(0);
+    setStartTime(Date.now())
 
     return () => {
       mapState.setMapRef(null);
       setFrameCount(DEFAULT_MAX_FRAMES + 1);
       setFrame(DEFAULT_MAX_FRAMES);
+      setStartTime(Date.now() - 3 * HOUR)
     };
   }, []);
 
