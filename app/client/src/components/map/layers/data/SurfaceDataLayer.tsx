@@ -1,7 +1,7 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
 
-import type { StationPlotGeoJSON, StationPlotPopupData } from "@shared/lib/types";
+import type { StationPlotGeoJSON } from "@shared/lib/types";
 
 import { ZOOM_THRESHOLDS } from "@/config/map";
 import {
@@ -24,7 +24,6 @@ import { checkIfInBounds, filterSpacedPoints, hasValidCoordinates } from "@/lib/
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
-import type { Feature, FeatureCollection, Point } from "geojson";
 
 export const SurfaceDataLayer = () => {
   const zoom = useZoom();
@@ -96,7 +95,7 @@ export const SurfaceDataLayer = () => {
       })
       .find(
         (m) =>
-          new Date(m.validTime).getTime() <= displayTime && new Date(m.validTime).getTime() >= displayTime - 2 * HOUR,
+          new Date(m.validTime).getTime() < displayTime && new Date(m.validTime).getTime() >= displayTime - 2 * HOUR,
       );
 
     if (metar) {
@@ -106,6 +105,7 @@ export const SurfaceDataLayer = () => {
         properties: {
           ...metar,
           validTime: new Date(metar.validTime),
+          validTimeString: (new Date(metar.validTime).toISOString().replace("T", " ").slice(11, -8) + "Z").trim(),
           siteId: feature.properties.siteId,
         },
       });
@@ -167,6 +167,7 @@ export const SurfaceDataLayer = () => {
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "tt"],
             "text-offset": [-1.5, -1.5],
+            "text-size": 10,
             visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
           }}
         />
@@ -180,6 +181,21 @@ export const SurfaceDataLayer = () => {
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "td"],
             "text-offset": [-1.5, 1.5],
+            "text-size": 10,
+            visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
+          }}
+        />
+
+        {/* valid time */}
+        <Layer
+          {...STATION_TEXT_STYLE}
+          id="layer-sfc-obs-valid-time"
+          filter={UNCLUSTERED}
+          layout={{
+            ...STATION_TEXT_STYLE.layout,
+            "text-field": ["get", "validTimeString"],
+            "text-offset": [0, 3],
+            "text-size": 10,
             visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
           }}
         />
@@ -326,6 +342,7 @@ export const SurfaceDataLayer = () => {
             ],
           }}
           layout={{
+            "text-font": ["Consolas-Regular"],
             "text-field": "+",
             "text-allow-overlap": true,
           }}

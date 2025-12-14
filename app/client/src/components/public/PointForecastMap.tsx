@@ -11,7 +11,7 @@ import { useLatitude, useLongitude, useMapStateActions, useZoom } from "@/stateS
 import { useAnimationActions } from "@/stateStores/map/animation";
 import { DEFAULT_MAX_FRAMES } from "@/config/animation";
 import { Loader2, LocateFixed, Search } from "lucide-react";
-import { useCurrentTime } from "@/hooks/useCurrentTime";
+
 import { useCoords, usePublicActions } from "@/stateStores/public";
 import { GeoLocation } from "../map/controls/GeoLocation";
 import type { Feature, Position } from "geojson";
@@ -25,6 +25,7 @@ import { SurfaceDataLayer } from "../map/layers/data/SurfaceDataLayer";
 import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
 import { AlertsLayer } from "../map/layers/data/AlertsLayer";
 import { SelectedFxPoint } from "../map/layers/overlays/SelectedFxPoint";
+import { useDisplayTime } from "@/hooks/useDisplayTime";
 
 interface Props {
   searchCoords: Position | null;
@@ -34,11 +35,12 @@ interface Props {
 
 export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }: Props) => {
   const mapState = useMapStateActions();
-  const currentTime = useCurrentTime();
+  const displayTime = useDisplayTime();
   const coords = useCoords();
   const latitude = useLatitude();
   const longitude = useLongitude();
   const zoom = useZoom();
+
   const { updateFromMapEvent } = useUpdateMapViewstate();
   const { setFrameCount, setFrame, setStartTime } = useAnimationActions();
   const { setCoords } = usePublicActions();
@@ -55,13 +57,16 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
   useEffect(() => {
     setFrameCount(1);
     setFrame(0);
-    setStartTime(Date.now())
+    setStartTime(Date.now());
+
+    console.log("Mounting map, setting map reference in state");
 
     return () => {
+      console.log("Unmounting map, clearing map reference from state");
       mapState.setMapRef(null);
       setFrameCount(DEFAULT_MAX_FRAMES + 1);
       setFrame(DEFAULT_MAX_FRAMES);
-      setStartTime(Date.now() - 3 * HOUR)
+      setStartTime(Date.now() - 3 * HOUR);
     };
   }, []);
 
@@ -116,7 +121,7 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
             <SelectedFxPoint data={currentLocationGeoJSON} />
 
             <div className="absolute font-mono top-0 left-1/2 -translate-x-1/2 m-2 bg-primary text-primary-foreground border-neutral-400 border px-2 py-1 rounded-md text-xs">
-              {new Date(currentTime + 3 * HOUR).toISOString().replace("T", " ").slice(0, -8) + "Z"}
+              {new Date(displayTime).toISOString().replace("T", " ").slice(0, -8) + "Z"}
             </div>
 
             <div className="absolute  bottom-0 left-1/2 -translate-x-1/2 flex place-items-center gap-2 mb-2">
