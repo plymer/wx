@@ -21,6 +21,7 @@
     "deploy": "pm2 stop beta.config.cjs && pnpm install && pnpm build && pm2 start beta.config.cjs && pm2 save",
     "sprites:icons": "spreet --sdf public/sprites/icons public/sprites/icons && spreet --retina --sdf public/sprites/icons public/sprites/icons@2x",
     "db:push": "pnpm run aqdb:push && pnpm run avwxdb:push",
+    "db:rebuild": "docker compose down -v && docker compose up -d",
     "aqdb:push": "drizzle-kit push --config aq.drizzle.config.ts",
     "avwxdb:push": "drizzle-kit push --config avwx.drizzle.config.ts"
   },
