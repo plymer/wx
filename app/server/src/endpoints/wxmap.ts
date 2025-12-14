@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, inArray } from "drizzle-orm";
+import { asc, gt } from "drizzle-orm";
 import type { Feature, FeatureCollection, MultiPolygon, Point, Polygon } from "geojson";
 import { TRPCError } from "@trpc/server";
 
@@ -12,9 +12,8 @@ import type {
   WxOPolygonAlert,
   WxOPolygonProperties,
 } from "../lib/types.js";
-import { metars, stations, tafs } from "../db/tables/avwx.drizzle.js";
+import { metars, tafs } from "../db/tables/avwx.drizzle.js";
 import { HOUR } from "../lib/constants.js";
-import { wxmapMetarSchema } from "../validationSchemas/wxmap.zod.js";
 
 import { avwxDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
