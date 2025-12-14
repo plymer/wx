@@ -9,9 +9,8 @@ import type { MapLibreEvent } from "maplibre-gl";
 import { useEffect, useState } from "react";
 import { useLatitude, useLongitude, useMapStateActions, useZoom } from "@/stateStores/map/mapView";
 import { useAnimationActions } from "@/stateStores/map/animation";
-import { DEFAULT_MAX_FRAMES } from "@/config/animation";
 import { Loader2, LocateFixed, Search } from "lucide-react";
-import { useCurrentTime } from "@/hooks/useCurrentTime";
+import { useDisplayTime } from "@/hooks/useDisplayTime";
 import { useCoords, usePublicActions } from "@/stateStores/public";
 import { GeoLocation } from "../map/controls/GeoLocation";
 import type { Feature, Position } from "geojson";
@@ -19,8 +18,6 @@ import { RadarLayer } from "../map/layers/data/RadarLayer";
 import Button from "../ui/Button";
 import type { FetchStatus } from "@tanstack/react-query";
 import * as turf from "@turf/turf";
-
-import { HOUR } from "@shared/lib/constants";
 import { SurfaceDataLayer } from "../map/layers/data/SurfaceDataLayer";
 import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
 import { AlertsLayer } from "../map/layers/data/AlertsLayer";
@@ -34,13 +31,13 @@ interface Props {
 
 export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }: Props) => {
   const mapState = useMapStateActions();
-  const currentTime = useCurrentTime();
+  const displayTime = useDisplayTime();
   const coords = useCoords();
   const latitude = useLatitude();
   const longitude = useLongitude();
   const zoom = useZoom();
   const { updateFromMapEvent } = useUpdateMapViewstate();
-  const { setFrameCount, setFrame, setStartTime } = useAnimationActions();
+  const { setIsStatic } = useAnimationActions();
   const { setCoords } = usePublicActions();
 
   useMapClock();
@@ -53,15 +50,11 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
 
   // when we unmount the map, clear the map reference from global state
   useEffect(() => {
-    setFrameCount(1);
-    setFrame(0);
-    setStartTime(Date.now())
+    setIsStatic(true);
 
     return () => {
       mapState.setMapRef(null);
-      setFrameCount(DEFAULT_MAX_FRAMES + 1);
-      setFrame(DEFAULT_MAX_FRAMES);
-      setStartTime(Date.now() - 3 * HOUR)
+      setIsStatic(false);
     };
   }, []);
 
@@ -116,7 +109,7 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
             <SelectedFxPoint data={currentLocationGeoJSON} />
 
             <div className="absolute font-mono top-0 left-1/2 -translate-x-1/2 m-2 bg-primary text-primary-foreground border-neutral-400 border px-2 py-1 rounded-md text-xs">
-              {new Date(currentTime + 3 * HOUR).toISOString().replace("T", " ").slice(0, -8) + "Z"}
+              {new Date(displayTime).toISOString().replace("T", " ").slice(0, -8) + "Z"}
             </div>
 
             <div className="absolute  bottom-0 left-1/2 -translate-x-1/2 flex place-items-center gap-2 mb-2">

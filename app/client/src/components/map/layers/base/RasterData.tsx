@@ -1,7 +1,14 @@
 import { Layer, type RasterSourceSpecification, Source, useMap } from "react-map-gl/maplibre";
 import { useEffect, useState } from "react";
 
-import { useAnimationState, useDeltaTime, useFrame, useFrameCount, useStartTime } from "@/stateStores/map/animation";
+import {
+  useAnimationState,
+  useDeltaTime,
+  useFrame,
+  useFrameCount,
+  useStartTime,
+  useIsStatic,
+} from "@/stateStores/map/animation";
 import { makeISOTimeStamp } from "@/lib/utils";
 import {
   EUMETSAT_GETMAP,
@@ -33,6 +40,7 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
     startTime: useStartTime(),
     frameCount: useFrameCount(),
     deltaTime: useDeltaTime(),
+    isStatic: useIsStatic(),
   };
 
   const map = useMap().current!;
@@ -164,6 +172,7 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
         />
       </Source>
       {init &&
+        !animation.isStatic &&
         timeSteps.map((u, index) => {
           if (index === maxFrame) return; // don't render the max frame again
           return (
