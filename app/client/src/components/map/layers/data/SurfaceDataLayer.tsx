@@ -105,6 +105,7 @@ export const SurfaceDataLayer = () => {
         geometry: feature.geometry,
         properties: {
           ...metar,
+          validTimeString: new Date(metar.validTime).toISOString().replace("T", " ").slice(11, -8),
           validTime: new Date(metar.validTime),
           siteId: feature.properties.siteId,
         },
@@ -167,6 +168,7 @@ export const SurfaceDataLayer = () => {
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "tt"],
             "text-offset": [-1.5, -1.5],
+            "text-size": 10,
             visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
           }}
         />
@@ -180,6 +182,21 @@ export const SurfaceDataLayer = () => {
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "td"],
             "text-offset": [-1.5, 1.5],
+            "text-size": 10,
+            visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
+          }}
+        />
+
+        {/* Valid Time */}
+        <Layer
+          {...STATION_TEXT_STYLE}
+          id="layer-sfc-obs-valid-time"
+          filter={UNCLUSTERED}
+          layout={{
+            ...STATION_TEXT_STYLE.layout,
+            "text-field": ["get", "validTimeString"],
+            "text-offset": [0, 3],
+            "text-size": 10,
             visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
           }}
         />
