@@ -5,6 +5,7 @@ import { z } from "zod";
 import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation.js";
 import { aqData } from "../db/tables/aq.drizzle.js";
 import { XMET_TYPES } from "../config/alphanumeric.config.js";
+import type { OFFICE_LIST, OUTLOOKS_CONFIG, REGION_LIST } from "../config/charts.config.js";
 
 export type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -20,6 +21,21 @@ export type OtherChartData = {
   domain: string;
   images: string[];
 };
+
+export type OutlookData = {
+  [Office in keyof typeof OUTLOOKS_CONFIG] : {
+      [Region in ValidOfficeRegions[Office]] : {
+          title: Region;
+          url: string;
+      }[]
+  }[];
+}
+
+export type OfficeList = typeof OFFICE_LIST[number];
+export type RegionList = typeof REGION_LIST[number];
+export type ValidOfficeRegions = {
+    [K in keyof typeof OUTLOOKS_CONFIG]: (typeof OUTLOOKS_CONFIG)[K][number]
+}
 
 export type HubData = {
   siteName: string;
