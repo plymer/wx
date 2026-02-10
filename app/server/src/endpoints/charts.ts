@@ -2,7 +2,9 @@ import { TRPCError } from "@trpc/server";
 
 import type { NavCanImageList, NavCanResponse } from "../lib/alphanumeric.types.js";
 import { publicProcedure, router } from "../lib/trpc.js";
-import type { GFAData, OtherChartData } from "../lib/types.js";
+import type { GFAData, OtherChartData, OutlookData } from "../lib/types.js";
+import path from "path";
+import { OUTLOOK_ROOT_DIR } from "../config/charts.config.js";
 
 export const chartsRouter = router({
   gfa: publicProcedure.query(async (): Promise<GFAData[]> => {
@@ -39,6 +41,27 @@ export const chartsRouter = router({
       return Object.keys(results).map((d) => {
         return { domain: d, cldwx: results[d].cldwx, turbc: results[d].turbc };
       });
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
+
+  swo: publicProcedure.query(async (): Promise<OutlookData | null> => {
+    try {
+      const dirPath = path.join(OUTLOOK_ROOT_DIR, "swo", "today");
+      return null;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
+  tso: publicProcedure.query(async () => {
+    try {
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",

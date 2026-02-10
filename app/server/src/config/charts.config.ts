@@ -1,15 +1,3 @@
-export const OFFICE_LIST = ["pspc", "paspc", "ospc", "qspc", "aspc", "nlwo"] as const;
-export const REGION_LIST = ["prairies", "bc", "mackenzie"] as const;
-
-export const OUTLOOKS_CONFIG = {
-  pspc: ["bc", "yt", "bc_yt"],
-  paspc: ["prairies", "mackenzie"],
-  ospc: [],
-  qspc: [],
-  aspc: [],
-  nwlo: [],
-} as const;
-
 export const OFFICE_REGION_MAP = {
   PSPC: {
     "1_PSPC": "BC & Yukon",
@@ -74,3 +62,5 @@ export const OFFICE_REGION_MAP = {
   },
   NLWO: { NL: "Newfoundland" },
 } as const;
+
+export const OUTLOOK_ROOT_DIR = "~/data/" as const;
