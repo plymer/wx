@@ -12,7 +12,10 @@ import { drizzle } from "drizzle-orm/mysql2";
 import { sql } from "drizzle-orm/sql";
 import { createGunzip } from "zlib";
 import { XMLParser } from "fast-xml-parser";
-import type { WmoDirection } from "./types.js";
+import type { Panel, RegionData, WmoDirection } from "./types.js";
+import { OFFICE_REGION_MAP, OUTLOOK_NAV_DIR, OUTLOOK_ROOT_DIR } from "../config/charts.config.js";
+import path from "path";
+import { existsSync, readdirSync, statSync } from "fs";
 
 /**
  *
@@ -495,4 +498,58 @@ export function limitResultsByKeys<T>(
   });
 
   return limitedResult;
+}
+
+export function outlookHandler(product: string): Record<string, Record<string, RegionData>> | null {
+  const result: Record<string, Record<string, RegionData>> = {};
+  const dirPath = path.join(OUTLOOK_ROOT_DIR, product, "today");
+  console.log("[API] Loading", product, "charts");
+
+  if (!existsSync(dirPath)) {
+    console.warn(`[API] ${product} directory does not exist at path: ${dirPath}`);
+    return null;
+  }
+
+  const officeDir = readdirSync(dirPath, { withFileTypes: true, recursive: true });
+  for (const entry of officeDir) {
+    if (entry.isFile()) {
+      const [, office, region, valid] =
+        entry.name.match(/([a-zA-Z]+)(?:\-)([0-9a-zA-z\_]+)(?:\-)([0-9a-zA-z\_]+)/) || [];
+      const officeKey = office as keyof typeof OFFICE_REGION_MAP;
+      const regionKey = region.toLowerCase() as keyof (typeof OFFICE_REGION_MAP)[typeof officeKey];
+
+      if (office && region && valid) {
+        const stats = statSync(path.join(entry.parentPath, entry.name));
+        // Create the panel object
+        const panel: Panel = {
+          id: entry.name,
+          name: OFFICE_REGION_MAP[officeKey][regionKey] || region,
+          date: stats.mtime.toUTCString(),
+          product: product,
+          office,
+          region,
+          valid,
+          url: `${OUTLOOK_NAV_DIR}/swo/today/${office}/${entry.name}`,
+        };
+
+        // Initialize office if it doesn't exist
+        if (!result[office]) {
+          result[office] = {};
+        }
+
+        // Add or update region data
+        if (result[office][region]) {
+          result[office][region].panels.push(panel);
+        } else {
+          result[office][region] = {
+            office,
+            id: region,
+            name: OFFICE_REGION_MAP[officeKey][regionKey] || region,
+            panels: [panel],
+          };
+        }
+      }
+    }
+  }
+  return result;
 }

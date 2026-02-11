@@ -23,17 +23,24 @@ export type OtherChartData = {
 };
 
 export type OutlookData = {
-  [Office in keyof typeof OFFICE_REGION_MAP]: {
-    [Region in keyof (typeof OFFICE_REGION_MAP)[Office]]: {
+  [Office in keyof typeof OFFICE_REGION_MAP]?: {
+    [Region in keyof (typeof OFFICE_REGION_MAP)[Office]]?: {
       office: Office;
       id: Region;
       name: (typeof OFFICE_REGION_MAP)[Office][Region];
-      panels: Panels[];
+      panels: Panel[];
     }[];
   }[];
 };
 
-export type Panels = {
+export type RegionData = {
+  office: string;
+  id: string;
+  name: string;
+  panels: Panel[];
+};
+
+export type Panel = {
   id: string;
   name: string;
   date: string;
