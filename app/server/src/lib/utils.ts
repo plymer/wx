@@ -507,7 +507,7 @@ export function outlookHandler(product: string): Record<string, Record<string, R
 
   if (!existsSync(dirPath)) {
     console.warn(`[API] ${product} directory does not exist at path: ${dirPath}`);
-    return null;
+    return {};
   }
 
   const officeDir = readdirSync(dirPath, { withFileTypes: true, recursive: true });

@@ -52,7 +52,7 @@ export const chartsRouter = router({
     }
   }),
 
-  swo: publicProcedure.query(async (): Promise<OutlookData | null> => {
+  swo: publicProcedure.query(async (): Promise<OutlookData> => {
     try {
       const result = outlookHandler("swo");
       return result as OutlookData;
@@ -63,7 +63,7 @@ export const chartsRouter = router({
       });
     }
   }),
-  tso: publicProcedure.query(async (): Promise<OutlookData | null> => {
+  tso: publicProcedure.query(async (): Promise<OutlookData> => {
     try {
       const result = outlookHandler("tso");
       return result as OutlookData;
