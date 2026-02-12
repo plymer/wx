@@ -2,7 +2,7 @@ export const OUTLOOK_ROOT_DIR = "/home/carlsenr/data/" as const;
 export const OUTLOOK_NAV_DIR = "https://www.prairiewx.ca/conv_otlk/images" as const;
 
 export const OFFICE_REGION_MAP = {
-  PSPC: {
+  pspc: {
     "1_pspc": "BC & Yukon",
     "2_bc": "British Columbia",
     "2_yt": "Yukon",
@@ -13,7 +13,7 @@ export const OFFICE_REGION_MAP = {
     flexible: "Flexible",
     flexible_ops: "Flexible Ops",
   },
-  PASPC: {
+  paspc: {
     paspc: "Prairies & Arctic",
     ab: "Alberta",
     arctic: "Arctic",
@@ -30,7 +30,7 @@ export const OFFICE_REGION_MAP = {
     prairies: "Prairies",
     sk: "Saskatchewan",
   },
-  OSPC: {
+  ospc: {
     "1_ospc": "Ontario",
     "2_on_n": "Northern Ontario",
     "2_on_s": "Southern Ontario",
@@ -40,7 +40,7 @@ export const OFFICE_REGION_MAP = {
     on_s: "Southern Ontario",
     flexible: "Flexible",
   },
-  QSPC: {
+  qspc: {
     "1_qspc": "Quebec",
     "2_qc_n": "Northern Quebec",
     "2_qc_s": "Southern Quebec",
@@ -50,7 +50,7 @@ export const OFFICE_REGION_MAP = {
     qc_s: "Southern Quebec",
     flexible: "Flexible",
   },
-  ASPC: {
+  aspc: {
     "1_aspc": "Atlantic",
     "2_nb": "New Brunswick",
     "2_nb-ns-pei": "Maritimes",
@@ -63,5 +63,5 @@ export const OFFICE_REGION_MAP = {
     maritimes: "Maritimes",
     nl: "Newfoundland",
   },
-  NLWO: { nl: "Newfoundland" },
+  nlwo: { nl: "Newfoundland" },
 } as const;

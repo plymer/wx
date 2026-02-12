@@ -515,7 +515,7 @@ export function outlookHandler(product: string): Record<string, Record<string, R
     if (entry.isFile()) {
       const [, office, region, valid] =
         entry.name.match(/([a-zA-Z]+)(?:\-)([0-9a-zA-z\_]+)(?:\-)([0-9a-zA-z\_]+)/) || [];
-      const officeKey = office as keyof typeof OFFICE_REGION_MAP;
+      const officeKey = office.toLowerCase() as keyof typeof OFFICE_REGION_MAP;
       const regionKey = region.toLowerCase() as keyof (typeof OFFICE_REGION_MAP)[typeof officeKey];
 
       if (office && region && valid) {

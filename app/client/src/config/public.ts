@@ -21,7 +21,7 @@ export const PUBLIC_FORECAST_CONFIG = {
     },
   },
   paspcwpg: {
-    longName: "Prairie and Arctic Storm Prediction Centre",
+    longName: "Winnipeg Storm Prediction Centre",
     shortName: "PASPC-Wpg",
     city: "Winnipeg",
     products: {
@@ -60,5 +60,18 @@ export const PUBLIC_FORECAST_CONFIG = {
     shortName: "NLWO",
     city: "Gander",
     products: {},
+  },
+} as const;
+
+export const OUTLOOK_CONFIG = {
+  pspc: { id: "PSPC", name: "Pacific Storm Prediction Centre" },
+  paspc: { id: "PASPC", name: "Prairie and Arctic Storm Prediction Centre" },
+  ospc: { id: "OSPC", name: "Ontario Storm Prediction Centre" },
+  qspc: { id: "QSPC", name: "Quebec Storm Prediction Centre" },
+  aspc: { id: "ASPC", name: "Atlantic Storm Prediction Centre" },
+  nlwo: { id: "NLWO", name: "Newfoundland and Labrador Weather Office" },
+  product: {
+    swo: "Significant Weather Outlook",
+    tso: "Thunderstorm Outlook",
   },
 } as const;

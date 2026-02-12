@@ -5,7 +5,7 @@ import { API_CONFIG } from "../config/api";
 import { AVIATION_PRODUCTS } from "../config/aviationProducts";
 import { LAYER_TABS, MAP_LINES, MAP_OPTIONS_TABS, MAP_PROJECTIONS, ZOOM_THRESHOLDS } from "../config/map";
 import { APP_MODES_LIST } from "../config/modes";
-import { PUBLIC_FORECAST_CONFIG } from "../config/public";
+import { OUTLOOK_CONFIG, PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { RADAR_PRODUCTS, RASTER_DATA_TYPES, SATELLITE_CHANNELS, SATELLITES } from "../config/rasterData";
 import { VECTOR_DATA_TYPES, XMET_TYPES } from "../config/vectorData";
 
@@ -141,6 +141,8 @@ export type OverlayOptions = {
 export type PublicBulletin = string;
 
 export type PublicForecastOffice = keyof typeof PUBLIC_FORECAST_CONFIG;
+
+export type OutlookOffice = keyof typeof OUTLOOK_CONFIG;
 
 export type VectorDataTypes = (typeof VECTOR_DATA_TYPES)[number];
 

@@ -13,5 +13,8 @@
   },
   "overrides": {
     "vite": "npm:rolldown-vite@latest"
+  },
+  "dependencies": {
+    "embla-carousel-react": "^8.6.0"
   }
 }
