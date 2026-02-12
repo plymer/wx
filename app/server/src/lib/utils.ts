@@ -500,14 +500,14 @@ export function limitResultsByKeys<T>(
   return limitedResult;
 }
 
-export function outlookHandler(product: string): Record<string, Record<string, RegionData>> | null {
+export function outlookHandler(product: string): Record<string, Record<string, RegionData>> | undefined {
   const result: Record<string, Record<string, RegionData>> = {};
   const dirPath = path.join(OUTLOOK_ROOT_DIR, product, "today");
   console.log("[API] Loading", product, "charts");
-
+  console.log(`[API] Looking for charts in directory: ${dirPath}`);
   if (!existsSync(dirPath)) {
     console.warn(`[API] ${product} directory does not exist at path: ${dirPath}`);
-    return {};
+    return undefined;
   }
 
   const officeDir = readdirSync(dirPath, { withFileTypes: true, recursive: true });
@@ -529,7 +529,7 @@ export function outlookHandler(product: string): Record<string, Record<string, R
           office,
           region,
           valid,
-          url: `${OUTLOOK_NAV_DIR}/swo/today/${office}/${entry.name}`,
+          url: `${OUTLOOK_NAV_DIR}/${product}/today/${office}/${entry.name}`,
         };
 
         // Initialize office if it doesn't exist

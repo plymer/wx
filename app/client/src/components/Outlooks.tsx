@@ -11,13 +11,15 @@ export default function Outlooks() {
   const { data: swoData } = useQuery(api.charts.swo.queryOptions());
   const { data: tsoData } = useQuery(api.charts.tso.queryOptions());
 
+  console.log(tsoData);
+
   return (
     <>
       <div className="bg-neutral-800 text-white min-h-(--max-avn-height) max-md:min-h-(--md-avn-height)">
         <nav className="md:p-2 max-md:pt-2">
-          <label className="me-2 max-md:hidden">Product:</label>
-          {swoData && tsoData && (
+          {swoData != undefined && tsoData != undefined && (
             <>
+              <label className="me-2 max-md:hidden">Product:</label>
               <Button
                 className={`${
                   product === "swo" ? "active" : ""
