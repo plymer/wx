@@ -504,7 +504,6 @@ export function outlookHandler(product: string): Record<string, Record<string, R
   const result: Record<string, Record<string, RegionData>> = {};
   const dirPath = path.join(OUTLOOK_ROOT_DIR, product, "today");
   console.log("[API] Loading", product, "charts");
-  console.log(`[API] Looking for charts in directory: ${dirPath}`);
   if (!existsSync(dirPath)) {
     console.warn(`[API] ${product} directory does not exist at path: ${dirPath}`);
     return undefined;

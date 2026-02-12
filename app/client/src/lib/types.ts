@@ -116,6 +116,28 @@ export type OtherChartData = {
   images: string[];
 };
 
+export type OutlookData = {
+  [office: string]: {
+    [region: string]: {
+      office: string;
+      id: string;
+      name: string;
+      panels: Panel[];
+    }[];
+  }[];
+};
+
+export type Panel = {
+  id: string;
+  name: string;
+  date: string;
+  product: string;
+  office: string;
+  region: string;
+  valid: string;
+  url: string;
+};
+
 export type HubData = {
   siteName: string;
   header: string;

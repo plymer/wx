@@ -70,8 +70,6 @@ export const OUTLOOK_CONFIG = {
   qspc: { id: "QSPC", name: "Quebec Storm Prediction Centre" },
   aspc: { id: "ASPC", name: "Atlantic Storm Prediction Centre" },
   nlwo: { id: "NLWO", name: "Newfoundland and Labrador Weather Office" },
-  product: {
-    swo: "Significant Weather Outlook",
-    tso: "Thunderstorm Outlook",
-  },
 } as const;
+
+export const OFFICES = Object.keys(OUTLOOK_CONFIG) as (keyof typeof OUTLOOK_CONFIG)[];
