@@ -2,11 +2,8 @@ import { TRPCError } from "@trpc/server";
 
 import type { NavCanImageList, NavCanResponse } from "../lib/alphanumeric.types.js";
 import { publicProcedure, router } from "../lib/trpc.js";
-import type { GFAData, OtherChartData, OutlookData, Panel, RegionData } from "../lib/types.js";
-import path from "path";
-import { OUTLOOK_NAV_DIR, OUTLOOK_ROOT_DIR } from "../config/charts.config.js";
-import { existsSync, readdirSync, stat, statSync } from "fs";
-import { OFFICE_REGION_MAP } from "../config/charts.config.js";
+import type { GFAData, OtherChartData, OutlookData } from "../lib/types.js";
+
 import { outlookHandler } from "../lib/utils.js";
 
 export const chartsRouter = router({
@@ -52,10 +49,9 @@ export const chartsRouter = router({
     }
   }),
 
-  swo: publicProcedure.query(async (): Promise<OutlookData> => {
+  swo: publicProcedure.query(async (): Promise<OutlookData | undefined> => {
     try {
-      const result = outlookHandler("swo");
-      return result as OutlookData;
+      return outlookHandler("swo");
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
@@ -63,10 +59,9 @@ export const chartsRouter = router({
       });
     }
   }),
-  tso: publicProcedure.query(async (): Promise<OutlookData> => {
+  tso: publicProcedure.query(async (): Promise<OutlookData | undefined> => {
     try {
-      const result = outlookHandler("tso");
-      return result as OutlookData;
+      return outlookHandler("tso");
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",

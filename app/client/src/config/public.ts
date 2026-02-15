@@ -71,5 +71,3 @@ export const OUTLOOK_CONFIG = {
   aspc: { id: "ASPC", name: "Atlantic Storm Prediction Centre" },
   nlwo: { id: "NLWO", name: "Newfoundland and Labrador Weather Office" },
 } as const;
-
-export const OFFICES = Object.keys(OUTLOOK_CONFIG) as (keyof typeof OUTLOOK_CONFIG)[];

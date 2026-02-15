@@ -1,19 +1,18 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { OutlookOffice, PublicForecastOffice } from "../lib/types";
-import type { Position } from "geojson";
+import type { OutlookOffice } from "../lib/types";
 
 // type definition for better DX
 type OutlookState = {
   office: OutlookOffice;
-  region: string;
+  region: string | null;
   product: "swo" | "tso";
-  valid: string;
+  valid: string | null;
   actions: {
     setOffice: (office: OutlookOffice) => void;
-    setRegion: (region: string) => void;
+    setRegion: (region: string | null) => void;
     setProduct: (product: "swo" | "tso") => void;
-    setValid: (valid: string) => void;
+    setValid: (valid: string | null) => void;
   };
 };
 
@@ -21,17 +20,15 @@ type OutlookState = {
 const useOutlookState = create<OutlookState>()(
   persist(
     (set) => ({
-      product: "swo",
       office: "paspc",
-      region: "",
-      valid: "",
-
-      coords: null,
+      region: null,
+      product: "swo",
+      valid: null,
       actions: {
-        setProduct: (newProduct: "swo" | "tso") => set({ product: newProduct, region: "", valid: "" }),
-        setOffice: (newOffice: OutlookOffice) => set({ office: newOffice, region: "", valid: "" }),
-        setRegion: (newRegion: string) => set({ region: newRegion, valid: "" }),
-        setValid: (newValid: string) => set({ valid: newValid }),
+        setProduct: (newProduct: "swo" | "tso") => set({ product: newProduct, region: null, valid: null }),
+        setOffice: (newOffice: OutlookOffice) => set({ office: newOffice, region: null, valid: null }),
+        setRegion: (newRegion: string | null) => set({ region: newRegion, valid: null }),
+        setValid: (newValid: string | null) => set({ valid: newValid }),
       },
     }),
     {

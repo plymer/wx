@@ -1,13 +1,12 @@
 import { api } from "@/lib/trpc";
-import { useOutlookActions, useOutlookOffice, useOutlookProduct, useOutlookRegion } from "@/stateStores/outlook";
+import { useOutlookActions, useOutlookProduct } from "@/stateStores/outlook";
 import { useQuery } from "@tanstack/react-query";
 import Button from "./ui/Button";
-import { OUTLOOK_CONFIG } from "@/config/public";
+
 import OutlookContainer from "./outlook/OutlookContainer";
 
 export default function Outlooks() {
   const product = useOutlookProduct();
-  const office = useOutlookOffice();
   const actions = useOutlookActions();
 
   const { data: swoData } = useQuery(api.charts.swo.queryOptions());
@@ -16,7 +15,7 @@ export default function Outlooks() {
 
   return (
     <div className="bg-neutral-800 text-white min-h-(--max-avn-height) max-md:min-h-(--md-avn-height)">
-      {swoData != undefined && tsoData != undefined && (
+      {swoData !== undefined && tsoData !== undefined && (
         <nav className="md:p-2 max-md:pt-2">
           <label className="me-2 max-md:hidden">Product:</label>
           <Button

@@ -116,16 +116,21 @@ export type OtherChartData = {
   images: string[];
 };
 
-export type OutlookData = {
-  [office: string]: {
-    [region: string]: {
-      office: string;
-      id: string;
-      name: string;
-      panels: Panel[];
-    }[];
-  }[];
-};
+// export type OutlookData = {
+//   [office: string]: {
+//     [region: string]: {
+//       office: string;
+//       id: string;
+//       name: string;
+//       panels: Panel[];
+//     }[];
+//   }[];
+// };
+
+export type OutlookData = Record<
+  OutlookOffice,
+  Record<string, { office: string; id: string; name: string; panels: Panel[] }[]>
+>;
 
 export type Panel = {
   id: string;

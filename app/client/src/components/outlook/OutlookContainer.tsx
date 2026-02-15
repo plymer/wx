@@ -2,10 +2,9 @@ import type { OUTLOOK_CONFIG } from "@/config/public";
 import type { OutlookData } from "@/lib/types";
 import Button from "../ui/Button";
 import { useOutlookActions, useOutlookOffice } from "@/stateStores/outlook";
-import type { Key, ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
 
 interface Props {
-  data?: OutlookData;
+  data: OutlookData | undefined;
 }
 
 const OutlookContainer = ({ data }: Props) => {
@@ -17,7 +16,6 @@ const OutlookContainer = ({ data }: Props) => {
     return <p className="text-sm italic">No outlooks available for this office.</p>;
   }
 
-  console.log(officeData);
   return (
     <>
       <nav className="md:p-2 max-md:pt-2">
@@ -36,7 +34,7 @@ const OutlookContainer = ({ data }: Props) => {
       </nav>
       <nav className="md:p-2 max-md:pt-2">
         <label className="me-2 max-md:hidden">Region:</label>
-        {Object.entries(officeData).map(([regionKey, regionArray]) =>
+        {Object.entries(officeData).map(([_regionKey, regionArray]) =>
           regionArray.map((item: { id: string; office: string; name: string }) => (
             <Button
               key={item.id}

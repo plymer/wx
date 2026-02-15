@@ -5,7 +5,7 @@ import { z } from "zod";
 import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation.js";
 import { aqData } from "../db/tables/aq.drizzle.js";
 import { XMET_TYPES } from "../config/alphanumeric.config.js";
-import type { OFFICE_REGION_MAP } from "../config/charts.config.js";
+import type { OUTLOOK_OFFICES } from "../config/charts.config.js";
 
 export type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -22,19 +22,23 @@ export type OtherChartData = {
   images: string[];
 };
 
-export type OutlookData = {
-  [Office in keyof typeof OFFICE_REGION_MAP]?: {
-    [Region in keyof (typeof OFFICE_REGION_MAP)[Office]]?: {
-      office: Office;
-      id: Region;
-      name: (typeof OFFICE_REGION_MAP)[Office][Region];
-      panels: Panel[];
-    }[];
-  }[];
-};
+// export type OutlookData = {
+//   [Office in keyof typeof OFFICE_REGION_MAP]?: {
+//     [Region in keyof (typeof OFFICE_REGION_MAP)[Office]]?: {
+//       office: Office;
+//       id: Region;
+//       name: (typeof OFFICE_REGION_MAP)[Office][Region];
+//       panels: Panel[];
+//     }[];
+//   }[];
+// };
+
+export type OutlookOffices = (typeof OUTLOOK_OFFICES)[number];
+
+export type OutlookData = Record<OutlookOffices, Record<string, RegionData[]>>;
 
 export type RegionData = {
-  office: string;
+  office: OutlookOffices;
   id: string;
   name: string;
   panels: Panel[];
@@ -45,7 +49,7 @@ export type Panel = {
   name: string;
   date: string;
   product: string;
-  office: string;
+  office: OutlookOffices;
   region: string;
   valid: string;
   url: string;
