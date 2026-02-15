@@ -3,6 +3,7 @@ import { useOutlookActions, useOutlookOffice, useOutlookProduct, useOutlookRegio
 import { useQuery } from "@tanstack/react-query";
 import Button from "./ui/Button";
 import { OUTLOOK_CONFIG } from "@/config/public";
+import OutlookContainer from "./outlook/OutlookContainer";
 
 export default function Outlooks() {
   const product = useOutlookProduct();
@@ -11,6 +12,7 @@ export default function Outlooks() {
 
   const { data: swoData } = useQuery(api.charts.swo.queryOptions());
   const { data: tsoData } = useQuery(api.charts.tso.queryOptions());
+  const currentData = product === "swo" ? swoData : tsoData;
 
   return (
     <div className="bg-neutral-800 text-white min-h-(--max-avn-height) max-md:min-h-(--md-avn-height)">
@@ -35,20 +37,7 @@ export default function Outlooks() {
           </Button>
         </nav>
       )}
-      <nav className="md:p-2 max-md:pt-2">
-        <label className="me-2 max-md:hidden">Office:</label>
-        {(Object.keys(swoData ?? {}) as Array<keyof typeof OUTLOOK_CONFIG>).map((o) => (
-          <Button
-            key={o}
-            className={`${
-              office === o ? "active" : ""
-            } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
-            onClick={() => actions.setOffice(o as keyof typeof OUTLOOK_CONFIG)}
-          >
-            {o}
-          </Button>
-        ))}
-      </nav>
+      <OutlookContainer data={currentData} />
     </div>
   );
 }

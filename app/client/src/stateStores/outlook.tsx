@@ -28,9 +28,9 @@ const useOutlookState = create<OutlookState>()(
 
       coords: null,
       actions: {
-        setOffice: (newOffice: OutlookOffice) => set({ office: newOffice }),
-        setRegion: (newRegion: string) => set({ region: newRegion }),
-        setProduct: (newProduct: "swo" | "tso") => set({ product: newProduct }),
+        setProduct: (newProduct: "swo" | "tso") => set({ product: newProduct, region: "", valid: "" }),
+        setOffice: (newOffice: OutlookOffice) => set({ office: newOffice, region: "", valid: "" }),
+        setRegion: (newRegion: string) => set({ region: newRegion, valid: "" }),
         setValid: (newValid: string) => set({ valid: newValid }),
       },
     }),
