@@ -9,6 +9,7 @@ export const OFFICE_REGION_MAP = {
   "2_yt": "Yukon",
   bc: "British Columbia",
   bc_yt: "BC & The Yukon",
+  "bc-yt": "BC & The Yukon",
   assessment: "Assessment",
   avalanche: "Avalanche",
   flexible: "Flexible",

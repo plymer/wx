@@ -1,7 +1,9 @@
 import type { OUTLOOK_CONFIG } from "@/config/public";
 import type { OutlookData } from "@/lib/types";
 import Button from "../ui/Button";
-import { useOutlookActions, useOutlookOffice } from "@/stateStores/outlook";
+import { useOutlookActions, useOutlookOffice, useOutlookRegion, useOutlookValid } from "@/stateStores/outlook";
+import OutlookGrid from "./OutlookGrid";
+import OutlookCarousel from "./OutlookCarousel";
 
 interface Props {
   data: OutlookData | undefined;
@@ -9,8 +11,15 @@ interface Props {
 
 const OutlookContainer = ({ data }: Props) => {
   const office = useOutlookOffice();
+  const region = useOutlookRegion();
+  const valid = useOutlookValid();
   const actions = useOutlookActions();
   const officeData = data ? data[office] : null;
+
+  console.log("Selected office:", office);
+  console.log("Selected region:", region);
+  console.log("Is the selection valid?", valid);
+  console.log("Office data:", officeData);
 
   if (officeData == null || data === undefined) {
     return <p className="text-sm italic">No outlooks available for this office.</p>;
@@ -28,7 +37,7 @@ const OutlookContainer = ({ data }: Props) => {
             } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
             onClick={() => actions.setOffice(o as keyof typeof OUTLOOK_CONFIG)}
           >
-            {o}
+            {o.toLocaleUpperCase()}
           </Button>
         ))}
       </nav>
@@ -39,7 +48,7 @@ const OutlookContainer = ({ data }: Props) => {
             <Button
               key={item.id}
               className={`${
-                item.office === office ? "active" : ""
+                item.id === region ? "active" : ""
               } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
               onClick={() => actions.setRegion(item.id)}
             >
@@ -48,6 +57,8 @@ const OutlookContainer = ({ data }: Props) => {
           )),
         )}
       </nav>
+      {!valid && <OutlookGrid />}
+      {valid && <OutlookCarousel />}
     </>
   );
 };

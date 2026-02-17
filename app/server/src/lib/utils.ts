@@ -13,7 +13,7 @@ import { sql } from "drizzle-orm/sql";
 import { createGunzip } from "zlib";
 import { XMLParser } from "fast-xml-parser";
 import type { OutlookData, Panel, RegionData, WmoDirection } from "./types.js";
-import { OUTLOOK_NAV_DIR, OUTLOOK_ROOT_DIR } from "../config/charts.config.js";
+import { OFFICE_REGION_MAP, OUTLOOK_NAV_DIR, OUTLOOK_ROOT_DIR } from "../config/charts.config.js";
 import path from "path";
 import { existsSync, readdirSync, statSync } from "fs";
 import { outlookOfficeSchema, outlookRegionSchema } from "./validation.js";
@@ -514,7 +514,8 @@ export function outlookHandler(product: string) {
   for (const entry of officeDir) {
     if (!entry.isFile()) continue;
 
-    const [, office, region, valid] = entry.name.match(/([a-zA-Z]+)(?:-)([0-9a-zA-z_]+)(?:-)([0-9a-zA-z_]+)/) || [];
+    const [, office, region, valid] =
+      entry.name.match(/([a-zA-Z]+)(?:\-)([0-9a-zA-z\_\-]+)(?:\-)([0-9a-zA-z\_]+)/) || [];
 
     // use zod to validate our office and region values, and to transform them into the correct format if necessary (lowercasing them and comparing them against the lookups in our config)
     const { data: officeKey, success: officeParsed } = outlookOfficeSchema.safeParse(office);
@@ -524,14 +525,14 @@ export function outlookHandler(product: string) {
       continue;
     }
 
-    const { data: regionName, success: regionParsed } = outlookRegionSchema.safeParse(region);
+    const { data: regionKey, success: regionParsed } = outlookRegionSchema.safeParse(region);
 
     if (!regionParsed) {
-      console.warn(`[API] Skipping file with invalid region: ${entry.name}`);
+      console.warn(`[API] Skipping file with invalid region: ${region}`);
       continue;
     }
 
-    if (regionName === undefined || officeKey === undefined) {
+    if (regionKey === undefined || officeKey === undefined) {
       console.warn(`[API] Skipping file with undefined office or region: ${entry.name}`);
       continue;
     }
@@ -541,11 +542,11 @@ export function outlookHandler(product: string) {
       // Create the panel object
       const panel: Panel = {
         id: entry.name,
-        name: regionName,
+        name: OFFICE_REGION_MAP[regionKey as keyof typeof OFFICE_REGION_MAP],
         date: stats.mtime.toUTCString(),
         product,
         office: officeKey,
-        region,
+        region: regionKey,
         valid,
         url: `${OUTLOOK_NAV_DIR}/${product}/today/${officeKey}/${entry.name}`,
       };
@@ -562,7 +563,7 @@ export function outlookHandler(product: string) {
         const regionData: RegionData = {
           office: officeKey,
           id: region,
-          name: regionName,
+          name: OFFICE_REGION_MAP[regionKey as keyof typeof OFFICE_REGION_MAP],
           panels: [panel],
         };
 
@@ -570,5 +571,6 @@ export function outlookHandler(product: string) {
       }
     }
   }
+
   return result;
 }

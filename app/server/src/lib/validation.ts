@@ -261,10 +261,10 @@ export const outlookRegionSchema = z
   .string()
   .trim()
   .toLowerCase()
-  .refine((val) => Object.values(OFFICE_REGION_MAP).some((region) => region.toLowerCase() === val), {
+  .refine((val) => Object.keys(OFFICE_REGION_MAP).some((region) => region.toLowerCase() === val), {
     message: "Invalid region",
   })
   .transform((val) => {
-    const regionEntry = Object.entries(OFFICE_REGION_MAP).find(([, region]) => region.toLowerCase() === val);
+    const regionEntry = Object.keys(OFFICE_REGION_MAP).find(([, region]) => region.toLowerCase() === val);
     return regionEntry ? regionEntry[0] : val;
   });
