@@ -57,7 +57,8 @@ const OutlookContainer = ({ data }: Props) => {
           )),
         )}
       </nav>
-      {!valid && <OutlookGrid />}
+      console.log("officeData:", officeData);
+      {!valid && <OutlookGrid data={officeData} />}
       {valid && <OutlookCarousel />}
     </>
   );

@@ -127,10 +127,14 @@ export type OtherChartData = {
 //   }[];
 // };
 
-export type OutlookData = Record<
-  OutlookOffice,
-  Record<string, { office: string; id: string; name: string; panels: Panel[] }[]>
->;
+export type OutlookData = Record<OutlookOffice, Record<string, Region[]>>;
+
+export type Region = {
+  office: string;
+  id: string;
+  name: string;
+  panels: Panel[];
+};
 
 export type Panel = {
   id: string;
