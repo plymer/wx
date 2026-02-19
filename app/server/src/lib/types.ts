@@ -35,7 +35,7 @@ export type OtherChartData = {
 
 export type OutlookOffices = (typeof OUTLOOK_OFFICES)[number];
 
-export type OutlookData = Record<OutlookOffices, Record<string, RegionData[]>>;
+export type OutlookData = Record<OutlookOffices, Record<string, RegionData>>;
 
 export type RegionData = {
   office: OutlookOffices;

@@ -1,16 +1,27 @@
 import type { Panel } from "@/lib/types";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/Card";
 
 interface OutlookCardProps {
-  data: Panel;
+  panel: Panel;
+  onClick?: () => void;
 }
 
-const OutlookCard = ({ data }: OutlookCardProps) => {
+const OutlookCard = ({ panel, onClick }: OutlookCardProps) => {
   return (
-    <div className="p-4 border border-gray-300 rounded-md">
-      <h3 className="text-lg font-semibold">{data.name}</h3>
-      <p className="text-sm">{data.product}</p>
-      <p className="text-xs text-gray-500">{data.valid}</p>
-    </div>
+    <>
+      <Card onClick={onClick}>
+        <CardHeader>
+          <CardTitle>{panel.valid}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div>
+            {panel.url}
+            <img src={panel.url} />
+          </div>
+        </CardContent>
+        <CardFooter>Panel created: {panel.date}</CardFooter>
+      </Card>
+    </>
   );
 };
 export default OutlookCard;

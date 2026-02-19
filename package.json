@@ -39,6 +39,7 @@
     "dotenv": "^17.2.2",
     "drizzle-kit": "^0.31.8",
     "drizzle-orm": "^0.45.1",
+    "embla-carousel-react": "^8.6.0",
     "fast-xml-parser": "^5.2.5",
     "lucide-react": "^0.540.0",
     "maplibre-gl": "^5.14.0",

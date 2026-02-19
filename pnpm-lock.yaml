@@ -47,6 +47,9 @@ importers:
       drizzle-orm:
         specifier: ^0.45.1
         version: 0.45.1(mysql2@3.15.3)
+      embla-carousel-react:
+        specifier: ^8.6.0
+        version: 8.6.0(react@19.2.2)
       fast-xml-parser:
         specifier: ^5.2.5
         version: 5.3.0

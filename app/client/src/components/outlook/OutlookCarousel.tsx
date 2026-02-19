@@ -1,8 +1,19 @@
-const OutlookCarousel = () => {
+import type { Region } from "@/lib/types";
+import { Carousel, CarouselContent } from "../ui/Carousel";
+import { useOutlookRegion, useOutlookValid } from "@/stateStores/outlook";
+
+interface OutlookCarouselProps {
+  officeData: Record<string, Region>;
+}
+
+const OutlookCarousel = ({ officeData }: OutlookCarouselProps) => {
+  const valid = useOutlookValid();
+  const region = useOutlookRegion();
+
   return (
-    <div className="p-4">
-      <p className="text-sm italic">Outlook carousel will be displayed here.</p>
-    </div>
+    <Carousel>
+      <CarouselContent></CarouselContent>
+    </Carousel>
   );
 };
 export default OutlookCarousel;

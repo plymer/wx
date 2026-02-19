@@ -127,7 +127,7 @@ export type OtherChartData = {
 //   }[];
 // };
 
-export type OutlookData = Record<OutlookOffice, Record<string, Region[]>>;
+export type OutlookData = Record<OutlookOffice, Record<string, Region>>;
 
 export type Region = {
   office: string;

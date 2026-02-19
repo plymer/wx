@@ -16,11 +16,6 @@ const OutlookContainer = ({ data }: Props) => {
   const actions = useOutlookActions();
   const officeData = data ? data[office] : null;
 
-  console.log("Selected office:", office);
-  console.log("Selected region:", region);
-  console.log("Is the selection valid?", valid);
-  console.log("Office data:", officeData);
-
   if (officeData == null || data === undefined) {
     return <p className="text-sm italic">No outlooks available for this office.</p>;
   }
@@ -43,23 +38,21 @@ const OutlookContainer = ({ data }: Props) => {
       </nav>
       <nav className="md:p-2 max-md:pt-2">
         <label className="me-2 max-md:hidden">Region:</label>
-        {Object.entries(officeData).map(([_regionKey, regionArray]) =>
-          regionArray.map((item: { id: string; office: string; name: string }) => (
+        {officeData &&
+          Object.entries(officeData).map(([regionKey, regionData]) => (
             <Button
-              key={item.id}
+              key={regionKey}
               className={`${
-                item.id === region ? "active" : ""
+                region === regionKey ? "active" : ""
               } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
-              onClick={() => actions.setRegion(item.id)}
+              onClick={() => actions.setRegion(regionKey)}
             >
-              {item.name}
+              {regionData.name}
             </Button>
-          )),
-        )}
+          ))}
       </nav>
-      console.log("officeData:", officeData);
-      {!valid && <OutlookGrid data={officeData} />}
-      {valid && <OutlookCarousel />}
+      {!valid && <OutlookGrid officeData={officeData} />}
+      {valid && <OutlookCarousel officeData={officeData} />}
     </>
   );
 };

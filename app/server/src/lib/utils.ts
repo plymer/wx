@@ -557,8 +557,8 @@ export function outlookHandler(product: string) {
       // Add or update region data
       const existingRegionData = result[officeKey][region];
 
-      if (existingRegionData && existingRegionData.length > 0) {
-        existingRegionData[0].panels.push(panel);
+      if (existingRegionData) {
+        existingRegionData.panels.push(panel);
       } else {
         const regionData: RegionData = {
           office: officeKey,
@@ -567,7 +567,7 @@ export function outlookHandler(product: string) {
           panels: [panel],
         };
 
-        result[officeKey][region] = [regionData];
+        result[officeKey][region] = regionData;
       }
     }
   }
