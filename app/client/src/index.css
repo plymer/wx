@@ -66,8 +66,8 @@
   :root {
     --background: #fff;
     --foreground: #262626;
-    --card: #fff;
-    --card-foreground: #262626;
+    --card: ##262626;
+    --card-foreground: ##fff;
     --popover: #fff;
     --popover-foreground: #262626;
     --primary: #171717;

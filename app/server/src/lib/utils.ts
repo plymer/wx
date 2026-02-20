@@ -537,6 +537,8 @@ export function outlookHandler(product: string) {
       continue;
     }
 
+    console.log(`[API] Processing file: ${entry.name} (Office: ${officeKey}, Region: ${regionKey}, Valid: ${valid})`);
+
     if (office && region && valid) {
       const stats = statSync(path.join(entry.parentPath, entry.name));
       // Create the panel object

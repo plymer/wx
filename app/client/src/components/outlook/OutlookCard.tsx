@@ -6,16 +6,20 @@ interface OutlookCardProps {
   onClick?: () => void;
 }
 
+const prettyValid = (valid: string): string => {
+  let returnValid = "Day " + valid.split("_")[1];
+  return returnValid;
+};
+
 const OutlookCard = ({ panel, onClick }: OutlookCardProps) => {
   return (
     <>
       <Card onClick={onClick}>
         <CardHeader>
-          <CardTitle>{panel.valid}</CardTitle>
+          <CardTitle>{prettyValid(panel.valid)}</CardTitle>
         </CardHeader>
         <CardContent>
           <div>
-            {panel.url}
             <img src={panel.url} />
           </div>
         </CardContent>
