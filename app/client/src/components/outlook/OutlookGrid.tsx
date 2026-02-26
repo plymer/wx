@@ -6,6 +6,13 @@ interface OutlookGridProps {
   officeData: Record<string, Region>;
 }
 
+const columnHelper = (regionData: Region) => {
+  let columns = 3;
+  //something here for use on a phone
+  //if (columns < 3) return columns;
+  return regionData.panels.length < 3 ? regionData.panels.length : regionData.panels.length % 2 === 0 ? 2 : 3;
+};
+
 const OutlookGrid = ({ officeData }: OutlookGridProps) => {
   const region = useOutlookRegion();
   const actions = useOutlookActions();
@@ -24,7 +31,7 @@ const OutlookGrid = ({ officeData }: OutlookGridProps) => {
             <div
               className="grid gap-2"
               style={{
-                gridTemplateColumns: `repeat(${regionData.panels.length < 3 ? regionData.panels.length : regionData.panels.length % 2 === 0 ? 2 : 3}, minmax(0, 1fr))`,
+                gridTemplateColumns: `repeat(${columnHelper(regionData)}, minmax(0, 1fr))`,
               }}
             >
               {regionData.panels.map((panel: Panel) => (

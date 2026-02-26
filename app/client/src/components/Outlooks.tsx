@@ -15,7 +15,7 @@ export default function Outlooks() {
 
   return (
     <div className="bg-neutral-800 text-white min-h-(--max-avn-height) max-md:min-h-(--md-avn-height)">
-      {swoData !== undefined && tsoData !== undefined && (
+      {Object.keys(tsoData || {}).length > 0 && Object.keys(tsoData || {}).length > 0 && (
         <nav className="md:p-2 max-md:pt-2">
           <label className="me-2 max-md:hidden">Product:</label>
           <Button
