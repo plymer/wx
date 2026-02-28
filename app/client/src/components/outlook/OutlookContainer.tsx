@@ -34,9 +34,6 @@ const OutlookContainer = ({ data }: Props) => {
   const selectedRegion = useMemo(() => {
     if (region && regionsInOffice.includes(region)) {
       return region;
-    } else if (regionsInOffice.length > 0) {
-      actions.setRegion(regionsInOffice[0]);
-      return regionsInOffice[0];
     } else {
       return null;
     }
@@ -54,10 +51,6 @@ const OutlookContainer = ({ data }: Props) => {
 
   if (selectedOffice === null) {
     return <p className="text-sm italic">No outlooks available for this office.</p>;
-  }
-
-  if (selectedRegion === null) {
-    return <p className="text-sm italic">No outlooks available for this region.</p>;
   }
 
   return (
@@ -78,6 +71,14 @@ const OutlookContainer = ({ data }: Props) => {
       </nav>
       <nav className="flex justify-center items-center md:p-2 max-md:pt-2">
         <label className="me-2 max-md:hidden">Region:</label>
+        <Button
+          className={`${
+            selectedRegion === null ? "active" : ""
+          } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md grow`}
+          onClick={() => actions.setRegion(null)}
+        >
+          All
+        </Button>
         {officeData &&
           Object.entries(officeData).map(([regionKey, regionData]) => (
             <Button
