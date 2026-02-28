@@ -18,6 +18,7 @@ const OutlookContainer = ({ data }: Props) => {
 
   const officesInData = data ? Object.keys(data) : [];
   const regionsInOffice = office && data && data[office] ? Object.keys(data[office]) : [];
+  const onlyOneRegion = regionsInOffice.length === 1;
 
   // select the office and region stored in state, unless those choices don't exist in the current API data; then we default back to the 0th office and it's 0th region in the data (if they exist)
   const selectedOffice: OutlookOffice | null = useMemo(() => {
@@ -71,17 +72,20 @@ const OutlookContainer = ({ data }: Props) => {
       </nav>
       <nav className="flex justify-center items-center md:p-2 max-md:pt-2">
         <label className="me-2 max-md:hidden">Region:</label>
-        <Button
-          className={`${
-            selectedRegion === null ? "active" : ""
-          } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md grow`}
-          onClick={() => actions.setRegion(null)}
-        >
-          All
-        </Button>
+        {!onlyOneRegion && (
+          <Button
+            className={`${
+              selectedRegion === null ? "active" : ""
+            } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md grow`}
+            onClick={() => actions.setRegion(null)}
+          >
+            All
+          </Button>
+        )}
         {officeData &&
           Object.entries(officeData).map(([regionKey, regionData]) => (
             <Button
+              disabled={onlyOneRegion}
               key={regionKey}
               className={`${
                 selectedRegion === regionKey ? "active" : ""

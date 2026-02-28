@@ -7,7 +7,7 @@
 #server things
 .htaccess
 tmp/
-conv_otlk/
+
 
 # Dist
 node_modules
