@@ -66,6 +66,19 @@ export const API_CONFIG = {
     },
 
     {
+      data: "swo",
+      url: "/charts/swo",
+      description: "returns all valid significant weather outlooks, nationally",
+      params: null,
+    },
+    {
+      data: "tso",
+      url: "/charts/tso",
+      description: "returns all valid thunderstorm outlooks, nationally",
+      params: null,
+    },
+
+    {
       data: "sigmets",
       url: "/alpha/sigmets",
       description: "returns sigmet geojson",

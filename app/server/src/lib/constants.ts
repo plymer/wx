@@ -5,3 +5,7 @@ export const MINUTE = 60_000;
 
 export const DEFAULT_LETTER_ID = "-";
 export const DEFAULT_NUMBER_ID = 0;
+
+export const DEFAULT_REMOTE_HEADERS = {
+  "User-Agent": "PrairieWxApi/1.0",
+};

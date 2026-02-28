@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 
 import type { LightningFC } from "../lib/lightning.types.js";
 import { publicProcedure, router } from "../lib/trpc.js";
+import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
 
 export const lightningRouter = router({
   lightning: publicProcedure.query(async () => {
@@ -31,9 +32,8 @@ export const lightningRouter = router({
       const responses = (
         await Promise.all(
           urlList.map(async (url) =>
-            fetch(url)
-              .then((res) => res.json())
-              .then((data) => data as LightningFC)
+            fetch(url, { headers: DEFAULT_REMOTE_HEADERS })
+              .then((res) => res.json() as Promise<LightningFC>)
               .catch((err) => {
                 console.error(`Error fetching data from ${url}:`, err.message);
                 return null;

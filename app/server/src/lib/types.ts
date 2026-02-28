@@ -5,6 +5,7 @@ import { z } from "zod";
 import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation.js";
 import { aqData } from "../db/tables/aq.drizzle.js";
 import { XMET_TYPES } from "../config/alphanumeric.config.js";
+import type { OUTLOOK_OFFICES } from "../config/charts.config.js";
 
 export type Prettify<T> = {
   [K in keyof T]: T[K];
@@ -19,6 +20,28 @@ export type GFAData = {
 export type OtherChartData = {
   domain: string;
   images: string[];
+};
+
+export type OutlookOffices = (typeof OUTLOOK_OFFICES)[number];
+
+export type OutlookData = Record<OutlookOffices, Record<string, RegionData>>;
+
+export type RegionData = {
+  office: OutlookOffices;
+  id: string;
+  name: string;
+  panels: Panel[];
+};
+
+export type Panel = {
+  id: string;
+  name: string;
+  date: string;
+  product: string;
+  office: OutlookOffices;
+  region: string;
+  validPeriod: string;
+  url: string;
 };
 
 export type HubData = {

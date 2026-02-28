@@ -5,7 +5,7 @@ import { API_CONFIG } from "../config/api";
 import { AVIATION_PRODUCTS } from "../config/aviationProducts";
 import { LAYER_TABS, MAP_LINES, MAP_OPTIONS_TABS, MAP_PROJECTIONS, ZOOM_THRESHOLDS } from "../config/map";
 import { APP_MODES_LIST } from "../config/modes";
-import { PUBLIC_FORECAST_CONFIG } from "../config/public";
+import { OUTLOOK_CONFIG, PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { RADAR_PRODUCTS, RASTER_DATA_TYPES, SATELLITE_CHANNELS, SATELLITES } from "../config/rasterData";
 import { VECTOR_DATA_TYPES, XMET_TYPES } from "../config/vectorData";
 
@@ -116,6 +116,37 @@ export type OtherChartData = {
   images: string[];
 };
 
+// export type OutlookData = {
+//   [office: string]: {
+//     [region: string]: {
+//       office: string;
+//       id: string;
+//       name: string;
+//       panels: Panel[];
+//     }[];
+//   }[];
+// };
+
+export type OutlookData = Record<OutlookOffice, Record<string, Region>>;
+
+export type Region = {
+  office: string;
+  id: string;
+  name: string;
+  panels: Panel[];
+};
+
+export type Panel = {
+  id: string;
+  name: string;
+  date: string;
+  product: string;
+  office: string;
+  region: string;
+  validPeriod: string;
+  url: string;
+};
+
 export type HubData = {
   siteName: string;
   header: string;
@@ -141,6 +172,8 @@ export type OverlayOptions = {
 export type PublicBulletin = string;
 
 export type PublicForecastOffice = keyof typeof PUBLIC_FORECAST_CONFIG;
+
+export type OutlookOffice = keyof typeof OUTLOOK_CONFIG;
 
 export type VectorDataTypes = (typeof VECTOR_DATA_TYPES)[number];
 

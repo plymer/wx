@@ -14,7 +14,7 @@ import type { HubDiscussion, XmetEventData } from "../lib/alphanumeric.types.js"
 import { isConvectiveSigmet, leadZero, processCoordinates } from "../lib/utils.js";
 
 import { metars, sigmets, stations, tafs } from "../db/tables/avwx.drizzle.js";
-import { HOUR } from "../lib/constants.js";
+import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 
 import { avwxDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
@@ -153,7 +153,7 @@ export const alphanumericRouter = router({
     const url = "https://metaviation.az.ec.gc.ca/hubwx/scripts/getForecasterNotes.php";
 
     try {
-      const hubs: HubDiscussion = await fetch(url)
+      const hubs: HubDiscussion = await fetch(url, { headers: DEFAULT_REMOTE_HEADERS })
         .then((hub) => hub.json())
         .then((data) => data as HubDiscussion);
 
@@ -194,7 +194,9 @@ export const alphanumericRouter = router({
     console.log("requesting bulletin from:", searchUrl);
 
     try {
-      const bulletinData: string = await fetch(searchUrl).then((bulletin) => bulletin.text());
+      const bulletinData: string = await fetch(searchUrl, { headers: DEFAULT_REMOTE_HEADERS }).then((bulletin) =>
+        bulletin.text(),
+      );
 
       if (bulletinData.length === 0) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Bulletin data is empty" });
@@ -234,7 +236,7 @@ export const alphanumericRouter = router({
     const apiUrl = `https://weather.gc.ca/api/app/v3/en/Location/${lat.toFixed(3)},${lon.toFixed(3)}?type=city`;
 
     try {
-      const response = (await fetch(apiUrl, { headers: { "User-Agent": "PrairieWxApi/1.0" } }).then((res) =>
+      const response = (await fetch(apiUrl, { headers: DEFAULT_REMOTE_HEADERS }).then((res) =>
         res.json(),
       )) as WxOAPIResponse[];
 
