@@ -15,27 +15,28 @@ export default function Outlooks() {
 
   return (
     <div className="bg-neutral-800 text-white min-h-(--max-avn-height) max-md:min-h-(--md-avn-height)">
-      {Object.keys(tsoData || {}).length > 0 && Object.keys(tsoData || {}).length > 0 && (
-        <nav className="md:p-2 max-md:pt-2">
-          <label className="me-2 max-md:hidden">Product:</label>
-          <Button
-            className={`${
-              product === "swo" ? "active" : ""
-            } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
-            onClick={() => actions.setProduct("swo")}
-          >
-            SWO
-          </Button>
-          <Button
-            className={`${
-              product === "tso" ? "active" : ""
-            } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
-            onClick={() => actions.setProduct("tso")}
-          >
-            TSO
-          </Button>
-        </nav>
-      )}
+      <nav className="md:p-2 max-md:pt-2">
+        <label className="me-2 max-md:hidden">Product:</label>
+        <Button
+          disabled={swoData === undefined}
+          className={`${
+            product === "swo" ? "active" : ""
+          } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
+          onClick={() => actions.setProduct("swo")}
+        >
+          SWO
+        </Button>
+        <Button
+          disabled={tsoData === undefined}
+          className={`${
+            product === "tso" ? "active" : ""
+          } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
+          onClick={() => actions.setProduct("tso")}
+        >
+          TSO
+        </Button>
+      </nav>
+
       <OutlookContainer data={currentData} />
     </div>
   );

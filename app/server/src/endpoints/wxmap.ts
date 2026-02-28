@@ -13,7 +13,7 @@ import type {
   WxOPolygonProperties,
 } from "../lib/types.js";
 import { metars, tafs } from "../db/tables/avwx.drizzle.js";
-import { HOUR } from "../lib/constants.js";
+import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 
 import { avwxDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
@@ -151,9 +151,9 @@ export const wxmapRouter = router({
   }),
 
   wxmapPublicWarnings: publicProcedure.query(async (): Promise<FeatureCollection<MultiPolygon, WarningProperties>> => {
-    const metaDataSourceUrl = "https://weather.gc.ca/data/dms/alert_geojson_v2/alerts.public.en.geojson";
+    const metaDataSourceUrl = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.en.geojson";
 
-    const response = await fetch(metaDataSourceUrl, { headers: { "User-Agent": "PrairieWxApi/1.0" } });
+    const response = await fetch(metaDataSourceUrl, { headers: DEFAULT_REMOTE_HEADERS });
     if (!response.ok) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",

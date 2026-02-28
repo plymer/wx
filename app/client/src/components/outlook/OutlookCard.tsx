@@ -7,7 +7,7 @@ interface OutlookCardProps {
 }
 
 const prettyValid = (valid: string): string => {
-  let returnValid = "Day " + valid.split("_")[1];
+  const returnValid = "Day " + valid.split("_")[1];
   return returnValid;
 };
 

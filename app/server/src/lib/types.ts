@@ -22,17 +22,6 @@ export type OtherChartData = {
   images: string[];
 };
 
-// export type OutlookData = {
-//   [Office in keyof typeof OFFICE_REGION_MAP]?: {
-//     [Region in keyof (typeof OFFICE_REGION_MAP)[Office]]?: {
-//       office: Office;
-//       id: Region;
-//       name: (typeof OFFICE_REGION_MAP)[Office][Region];
-//       panels: Panel[];
-//     }[];
-//   }[];
-// };
-
 export type OutlookOffices = (typeof OUTLOOK_OFFICES)[number];
 
 export type OutlookData = Record<OutlookOffices, Record<string, RegionData>>;

@@ -1,22 +1,23 @@
+import { existsSync, readdirSync, statSync } from "fs";
+import path from "path";
 import suncalc, { type GetTimesResult } from "suncalc";
+import { createGunzip } from "zlib";
 import * as turf from "@turf/turf";
+import { XMLParser } from "fast-xml-parser";
 import type { Position } from "geojson";
+import { drizzle, MySql2Database } from "drizzle-orm/mysql2";
+import { createPool, type Pool } from "mysql2/promise";
+import { Relations } from "drizzle-orm";
+import { sql } from "drizzle-orm/sql";
+import type { MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 import "dotenv/config";
 
 import type { LatLon, SunTimes } from "./common.types.js";
 import type { XmetShapes } from "./alphanumeric.types.js";
-import { MINUTE } from "./constants.js";
+import { DEFAULT_REMOTE_HEADERS, MINUTE } from "./constants.js";
 
-import { Relations } from "drizzle-orm";
-import type { MySqlTableWithColumns } from "drizzle-orm/mysql-core";
-import { drizzle } from "drizzle-orm/mysql2";
-import { sql } from "drizzle-orm/sql";
-import { createGunzip } from "zlib";
-import { XMLParser } from "fast-xml-parser";
 import type { OutlookData, Panel, RegionData, WmoDirection } from "./types.js";
 import { OFFICE_REGION_MAP, OUTLOOK_NAV_DIR } from "../config/charts.config.js";
-import path from "path";
-import { existsSync, readdirSync, statSync } from "fs";
 import { outlookOfficeSchema, outlookRegionSchema } from "./validation.js";
 
 /**
@@ -164,8 +165,6 @@ export function processCoordinates(shape: XmetShapes | null, bufferSize: number 
     return null;
   }
 
-  let output;
-
   switch (shape) {
     case "point":
       if (!bufferSize) return null;
@@ -173,8 +172,7 @@ export function processCoordinates(shape: XmetShapes | null, bufferSize: number 
       const circle = turf.circle(coordsList[0], bufferSize, { steps: 24, units: "nauticalmiles" });
 
       // return the coordinates of the circle polygon
-      output = circle.geometry.coordinates;
-      break;
+      return circle.geometry.coordinates;
     case "line":
       if (!bufferSize) return null;
       // we need to build two line offsets from the original line, and then weld them back together into a polygon
@@ -194,9 +192,8 @@ export function processCoordinates(shape: XmetShapes | null, bufferSize: number 
       // create a polygon from the combined coordinates
       const polygon = turf.polygon([coordinates]);
 
-      output = polygon.geometry.coordinates;
+      return polygon.geometry.coordinates;
 
-      break;
     case "polygon":
       if (coordsList.length < 3) {
         console.log("Error - A closed polygon must have at least 4 points", shape, bufferSize, coords);
@@ -225,115 +222,25 @@ export function processCoordinates(shape: XmetShapes | null, bufferSize: number 
           }
 
           // if we have three valid points, we need to close the polygon by adding the first point to the end of the list
-          output = [[...coordsList, coordsList[0]]];
-          break;
+          return [[...coordsList, coordsList[0]]];
         }
 
         // if we have more than 3 points, check if the first and last points are the same
         if (firstAndLastAreSame(coordsList)) {
           // if they are the same, return the coordsList as is because this should be a valid polygon
-          output = [coordsList];
+          return [coordsList];
         } else {
           // if not, add the first point to the end of the list to close the polygon
-          output = [[...coordsList, coordsList[0]]];
+          return [[...coordsList, coordsList[0]]];
         }
       }
-      break;
+    default:
+      return null;
   }
-
-  return output as Position[][];
 }
 
 export function firstAndLastAreSame(coords: Position[]) {
   return coords[0][0] === coords[coords.length - 1][0] && coords[0][1] === coords[coords.length - 1][1];
-}
-
-export function computeCoordinates(
-  shape: string,
-  bufferSize: number | undefined,
-  coordinates?: LatLon[] | undefined,
-): LatLon[] | undefined {
-  // console.log("computing coordinates for", shape, bufferSize, coordinateTimes);
-
-  if (shape === "Canceled") return undefined;
-
-  if (shape !== "Canceled" && !coordinates) return undefined;
-
-  // convert bufferSize from NM into decimal degrees
-  // 60 NM = 1 degree of latitude
-  // we can also use a more complicated conversion involving longitude but for now this is fine
-  const buffer = (bufferSize && bufferSize / 60) || 1;
-
-  switch (shape) {
-    case "circle":
-      // use turf to calculate points on a circle depending on its radius and a default precision
-      break;
-    case "line_corridor":
-      // a line_corridor has a minimum of 2 points, up to a maximum of 9(?)
-      // calculate the normals for the line, and use that to calculate the outline of the polygon
-      // check the tangent at the point and then calculate the normal of the tangent itself
-
-      const output: LatLon[] = [];
-
-      if (coordinates) {
-        coordinates.forEach((point, index) => {
-          const current = point; // the current point we're working with
-          const next = coordinates[(index + 1) % coordinates.length]; // the next point in the sequence, or the first point
-
-          let normal: LatLon;
-
-          // the first and last points will calculate their normals based on the current and next/previous points
-          //   but if we have three or more points, we have to calculate the tangent
-          if (index === 0) {
-            normal = computeNormalVector(current, next);
-          } else if (index === coordinates.length - 1) {
-            normal = computeNormalVector(next, current);
-          } else {
-            const tangent = computeTangentVector(coordinates[index - 1], current, next);
-            normal = { lat: -tangent.lon, lon: tangent.lat };
-          }
-
-          output.push(
-            { lat: current.lat + normal.lat * buffer, lon: current.lon + normal.lon * buffer },
-            { lat: current.lat - normal.lat * buffer, lon: current.lon - normal.lon * buffer },
-          );
-        });
-      }
-      return output;
-  }
-}
-
-// given two points, calculate the normal (perpendicular) to the line segment
-function computeNormalVector(p1: LatLon, p2: LatLon): LatLon {
-  // calculate the slope of the line between the two points
-  const dLon = p2.lon - p1.lon;
-  const dLat = p2.lat - p1.lat;
-
-  // channel your inner pythagoras
-  const length = Math.sqrt(dLon * dLon + dLat * dLat);
-
-  return { lat: -dLon / length, lon: dLat / length };
-}
-
-// given three points, calculate the tangent at the second point
-function computeTangentVector(p1: LatLon, p2: LatLon, p3: LatLon): LatLon {
-  // calculate the vector from p1-p2, and p2-p3
-  const v1 = { lat: p2.lat - p1.lat, lon: p2.lon - p1.lon };
-  const v2 = { lat: p3.lat - p2.lat, lon: p3.lon - p2.lon };
-
-  // normalize our tangent vectors (pythagoras part 2, electric boogaloo)
-  const l1 = Math.sqrt(v1.lat * v1.lat + v1.lon * v1.lon);
-  const l2 = Math.sqrt(v2.lat * v2.lat + v2.lon * v2.lon);
-
-  const v1n = { lat: v1.lat / l1, lon: v1.lon / l1 };
-  const v2n = { lat: v2.lat / l2, lon: v2.lon / l2 };
-
-  // use the average of the two tangents to calculate our final point to output
-  const tangent = { lat: (v1n.lat + v2n.lat) / 2, lon: (v1n.lon + v2n.lon) / 2 };
-  const length = Math.sqrt(tangent.lat * tangent.lat + tangent.lon * tangent.lon);
-
-  // return the length-normalized tangent
-  return { lat: tangent.lat / length, lon: tangent.lon / length };
 }
 
 export function isConvectiveSigmet(header: string): boolean {
@@ -343,14 +250,14 @@ export function isConvectiveSigmet(header: string): boolean {
 export async function generateDbConnection<
   TSchema extends Record<string, MySqlTableWithColumns<any> | Relations<any, any>>,
 >(dbName: string, dbSchema: TSchema) {
-  const connectionString = genDbConnString(dbName);
+  const connectionPool = getDbConnectionPool(dbName);
 
-  if (!connectionString) {
+  if (!connectionPool) {
     console.error(`[${dbName.toUpperCase()}] Database credentials are not set.`);
     return undefined;
   }
 
-  const db = drizzle(connectionString, { mode: "default", schema: dbSchema });
+  const db = drizzle(connectionPool, { mode: "default", schema: dbSchema });
 
   const isConnected = await testDbConnection(db, dbName);
 
@@ -358,7 +265,7 @@ export async function generateDbConnection<
   else return undefined;
 }
 
-export function genDbConnString(dbName: string) {
+export function getDbConnectionPool(dbName: string) {
   const userName = process.env.AM_I_A_SERVER ? `${dbName}user` : "root";
   const password = process.env.DB_PASSWORD;
   if (!password) {
@@ -366,10 +273,26 @@ export function genDbConnString(dbName: string) {
     return undefined;
   }
 
-  return `mysql://${userName}:${password}@localhost:3306/${dbName}`;
+  const connection = createPool({
+    host: "localhost",
+    port: 3306,
+    user: userName,
+    password: password,
+    database: dbName,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+  });
+
+  return connection;
 }
 
-export async function testDbConnection(db: ReturnType<typeof drizzle>, dbName: string) {
+export async function testDbConnection<TSchema extends Record<string, unknown>>(
+  db: MySql2Database<TSchema> & {
+    $client: Pool;
+  },
+  dbName: string,
+) {
   try {
     await db.execute(sql`SELECT 1`);
     console.log(`[${dbName.toUpperCase()}] Database connection is valid.`);
@@ -383,7 +306,7 @@ export async function testDbConnection(db: ReturnType<typeof drizzle>, dbName: s
 export async function readGzipFile(url: string, dbName: string) {
   try {
     // fetch the compressed data
-    const arrayBuffer = await fetch(url).then((res) => {
+    const arrayBuffer = await fetch(url, { headers: DEFAULT_REMOTE_HEADERS }).then((res) => {
       if (!res.ok) {
         throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
       }
@@ -513,7 +436,7 @@ export function outlookHandler(product: string) {
   console.log("[API] Loading", product, "charts");
   if (!existsSync(dirPath)) {
     console.warn(`[API] ${product} directory does not exist at path: ${dirPath}`);
-    return {} as OutlookData;
+    return undefined;
   }
 
   const officeDir = readdirSync(dirPath, { withFileTypes: true, recursive: true });
@@ -580,5 +503,6 @@ export function outlookHandler(product: string) {
     }
   }
 
-  return result;
+  // add an explicit check to see if we have valid date, otherwise return explicitly undefined
+  return Object.keys(result).length > 0 ? result : undefined;
 }

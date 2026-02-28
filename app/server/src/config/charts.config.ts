@@ -1,5 +1,7 @@
 export const OUTLOOK_NAV_DIR = "https://www.prairiewx.ca/conv_otlk/images" as const;
 
+export const NAVCAN_IMAGE_URL = "https://plan.navcanada.ca/weather/images/";
+
 export const OUTLOOK_OFFICES = ["pspc", "paspc", "ospc", "qspc", "aspc", "nlwo"] as const;
 
 export const OFFICE_REGION_MAP = {

@@ -5,6 +5,7 @@ import { DATA_CUTOFF, EUMETSAT_GETCAPABILITIES, GEOMET_GETCAPABILITIES } from ".
 import { goesProductSchema, radarProductSchema, realtimeLayersSchema } from "../validationSchemas/wms.zod.js";
 import { WMSXMLParser } from "../lib/xml-parser.js";
 import { publicProcedure, router } from "../lib/trpc.js";
+import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
 
 export const wmsRouter = router({
   radar: publicProcedure.input(radarProductSchema).query(async ({ input }) => {
@@ -15,8 +16,8 @@ export const wmsRouter = router({
     try {
       const { parser } = new WMSXMLParser();
 
-      const xml = await fetch(`${GEOMET_GETCAPABILITIES}&layers=${product}`).then(async (response) =>
-        parser.parse(await response.text()),
+      const xml = await fetch(`${GEOMET_GETCAPABILITIES}&layers=${product}`, { headers: DEFAULT_REMOTE_HEADERS }).then(
+        async (response) => parser.parse(await response.text()),
       );
 
       const layerData = xml.wmsCapabilities.capability.layer.layer.layer.layer;
@@ -48,9 +49,9 @@ export const wmsRouter = router({
     try {
       const { parser } = new WMSXMLParser();
 
-      const xml = await fetch(`${GEOMET_GETCAPABILITIES}&layers=${domainString}_${product}`).then(async (response) =>
-        parser.parse(await response.text()),
-      );
+      const xml = await fetch(`${GEOMET_GETCAPABILITIES}&layers=${domainString}_${product}`, {
+        headers: DEFAULT_REMOTE_HEADERS,
+      }).then(async (response) => parser.parse(await response.text()));
 
       const layerData = xml.wmsCapabilities.capability.layer.layer.layer.layer.layer;
 
@@ -77,7 +78,9 @@ export const wmsRouter = router({
     try {
       const { parser } = new WMSXMLParser();
 
-      const xml = await fetch(EUMETSAT_GETCAPABILITIES).then(async (response) => parser.parse(await response.text()));
+      const xml = await fetch(EUMETSAT_GETCAPABILITIES, { headers: DEFAULT_REMOTE_HEADERS }).then(async (response) =>
+        parser.parse(await response.text()),
+      );
 
       const allLayers: WMSLayer[] = xml.wmsCapabilities.capability.layer.layer
         .filter((layer: any) => layer.title.includes("- 0 degree"))

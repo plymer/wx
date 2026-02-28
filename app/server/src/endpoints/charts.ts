@@ -1,13 +1,14 @@
 import { TRPCError } from "@trpc/server";
 
-import type { NavCanImageList, NavCanResponse } from "../lib/alphanumeric.types.js";
 import { publicProcedure, router } from "../lib/trpc.js";
+import type { NavCanImageList, NavCanResponse } from "../lib/alphanumeric.types.js";
 import type { GFAData, OtherChartData, OutlookData } from "../lib/types.js";
 
 import { outlookHandler } from "../lib/utils.js";
+import { NAVCAN_IMAGE_URL } from "../config/charts.config.js";
 
 export const chartsRouter = router({
-  gfa: publicProcedure.query(async (): Promise<GFAData[]> => {
+  gfa: publicProcedure.query(async (): Promise<GFAData[] | undefined> => {
     try {
       const url =
         "https://plan.navcanada.ca/weather/api/alpha/?site=CYEG&site=CYVR&site=CYZF&site=CYFB&site=CYYZ&site=CYHZ&site=CYRB&image=GFA/CLDWX&image=GFA/TURBC";
@@ -21,22 +22,24 @@ export const chartsRouter = router({
 
       const results: Record<string, { cldwx: string[]; turbc: string[] }> = {};
       rawList.forEach((gfa) => {
-        if (Object.hasOwn(results, gfa.geography.toLowerCase())) {
-          Object.assign(results[gfa.geography.toLowerCase()], {
-            [gfa.sub_product.toLowerCase()]: gfa.frame_lists[2].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
-            ),
+        const geography = gfa.geography.toLowerCase();
+        const imageFrames = gfa.frame_lists[2].frames;
+        const subProduct = gfa.sub_product.toLowerCase();
+
+        if (Object.hasOwn(results, geography)) {
+          Object.assign(results[geography], {
+            [subProduct]: imageFrames.map((f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`),
           });
         } else {
           Object.assign(results, {
             [gfa.geography.toLowerCase()]: {
-              [gfa.sub_product.toLowerCase()]: gfa.frame_lists[2].frames.map(
-                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
-              ),
+              [subProduct]: imageFrames.map((f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`),
             },
           });
         }
       });
+
+      if (!Object.keys(results).length || Object.keys(results).length === 0) return undefined;
 
       return Object.keys(results).map((d) => {
         return { domain: d, cldwx: results[d].cldwx, turbc: results[d].turbc };
@@ -49,28 +52,7 @@ export const chartsRouter = router({
     }
   }),
 
-  swo: publicProcedure.query(async (): Promise<OutlookData> => {
-    try {
-      return outlookHandler("swo");
-    } catch (error) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  }),
-  tso: publicProcedure.query(async (): Promise<OutlookData> => {
-    try {
-      return outlookHandler("tso");
-    } catch (error) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  }),
-
-  sigwx: publicProcedure.query(async (): Promise<OtherChartData[]> => {
+  sigwx: publicProcedure.query(async (): Promise<OtherChartData[] | undefined> => {
     try {
       const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=SIG_WX//MID_LEVEL/*";
 
@@ -84,27 +66,26 @@ export const chartsRouter = router({
       const results: Record<string, string[]> = {};
 
       rawList.forEach((p) => {
-        const product = p.product.toLowerCase();
+        const sub_geography = p.sub_geography.toLowerCase();
+        const imageFrames = p.frame_lists[0].frames;
 
-        if (Object.hasOwn(results, product)) {
-          Object.assign(results[product], {
-            [p.sub_geography.toLowerCase()]: p.frame_lists[0].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
+        if (Object.hasOwn(results, sub_geography)) {
+          Object.assign(results[sub_geography], {
+            [p.sub_geography.toLowerCase()]: imageFrames.map(
+              (f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`,
             ),
           });
         } else {
           Object.assign(results, {
-            [product]: {
-              [p.sub_geography.toLowerCase()]: p.frame_lists[0].frames.map(
-                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
-              ),
-            },
+            [sub_geography]: imageFrames.map((f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`),
           });
         }
       });
 
-      return Object.entries(results["sig_wx"]).reduce((acc: { domain: string; images: string[] }[], [key, val]) => {
-        acc.push({ domain: key, images: val as unknown as string[] });
+      if (!Object.keys(results).length || Object.keys(results).length === 0) return undefined;
+
+      return Object.entries(results).reduce((acc: { domain: string; images: string[] }[], [domain, images]) => {
+        acc.push({ domain, images });
         return acc;
       }, []);
     } catch (error) {
@@ -115,7 +96,7 @@ export const chartsRouter = router({
     }
   }),
 
-  hlt: publicProcedure.query(async (): Promise<OtherChartData[]> => {
+  hlt: publicProcedure.query(async (): Promise<OtherChartData[] | undefined> => {
     try {
       const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=TURBULENCE";
 
@@ -128,27 +109,24 @@ export const chartsRouter = router({
 
       const results: Record<string, string[]> = {};
       rawList.forEach((p) => {
-        const product = p.product.toLowerCase();
+        const geography = p.geography.toLowerCase();
+        const imageFrames = p.frame_lists[0].frames;
 
-        if (Object.hasOwn(results, product)) {
-          Object.assign(results[product], {
-            [p.geography.toLowerCase()]: p.frame_lists[0].frames.map(
-              (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
-            ),
+        if (Object.hasOwn(results, geography)) {
+          Object.assign(results[geography], {
+            [geography]: imageFrames.map((f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`),
           });
         } else {
           Object.assign(results, {
-            [product]: {
-              [p.geography.toLowerCase()]: p.frame_lists[0].frames.map(
-                (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
-              ),
-            },
+            [geography]: imageFrames.map((f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`),
           });
         }
       });
 
-      return Object.entries(results["turbulence"]).reduce((acc: { domain: string; images: string[] }[], [key, val]) => {
-        acc.push({ domain: key, images: val as unknown as string[] });
+      if (!Object.keys(results).length || Object.keys(results).length === 0) return undefined;
+
+      return Object.entries(results).reduce((acc: { domain: string; images: string[] }[], [domain, images]) => {
+        acc.push({ domain, images });
         return acc;
       }, []);
     } catch (error) {
@@ -159,7 +137,7 @@ export const chartsRouter = router({
     }
   }),
 
-  lgf: publicProcedure.query(async (): Promise<OtherChartData[]> => {
+  lgf: publicProcedure.query(async (): Promise<OtherChartData[] | undefined> => {
     try {
       const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CZVR&image=LGF";
 
@@ -174,10 +152,12 @@ export const chartsRouter = router({
       rawList.forEach((lgf) => {
         Object.assign(results, {
           [lgf.geography.toLowerCase()]: lgf.frame_lists[lgf.frame_lists.length - 1].frames.map(
-            (f) => "https://plan.navcanada.ca/weather/images/" + f.images[f.images.length - 1].id + ".image",
+            (f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`,
           ),
         });
       });
+
+      if (!Object.keys(results).length || Object.keys(results).length === 0) return undefined;
 
       return Object.keys(results).map((p) => {
         return { domain: p, images: results[p] };
@@ -277,6 +257,26 @@ export const chartsRouter = router({
       });
 
       return output;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
+  swo: publicProcedure.query(async (): Promise<OutlookData | undefined> => {
+    try {
+      return outlookHandler("swo");
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
+  tso: publicProcedure.query(async (): Promise<OutlookData | undefined> => {
+    try {
+      return outlookHandler("tso");
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
