@@ -20,6 +20,7 @@ export default defineConfig({
       manifest: false,
       workbox: {
         maximumFileSizeToCacheInBytes: 3000000,
+        navigateFallbackDenylist: [/^\/api\//, /^\/images\//, /^\/conv_otlk\/?$/],
       },
     }),
   ],
