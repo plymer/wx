@@ -14,7 +14,7 @@ import {
   STATION_TEXT_STYLE,
   WINDBARB_COLOURS,
 } from "@/config/stationPlots";
-import { UNCLUSTERED } from "@/config/vectorData";
+import { AWC_ATTRIBUTION, UNCLUSTERED } from "@/config/vectorData";
 
 import { useViewportBounds, useZoom } from "@/stateStores/map/mapView";
 import { useShowObs } from "@/stateStores/map/vectorData";
@@ -123,6 +123,7 @@ export const SurfaceDataLayer = () => {
     <>
       {/* Clustered source for text that can be culled when too dense */}
       <Source
+        attribution={AWC_ATTRIBUTION}
         id="cullable-plot-data"
         key="cullable-plot-data"
         type="geojson"

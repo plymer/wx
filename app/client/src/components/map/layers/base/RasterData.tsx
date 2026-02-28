@@ -17,6 +17,8 @@ import {
   GOES_EAST_BOUNDS,
   MAP_BOUNDS,
   EUMETSAT_BOUNDS,
+  EUMETSAT_ATTRIBUTION,
+  GEOMET_ATTRIBUTION,
 } from "@/config/rasterData";
 import type { WMSDomains, WMSLayer } from "@shared/lib/types";
 import type { TransitionSpecification } from "maplibre-gl";
@@ -61,6 +63,7 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
   const layerId = "layer-" + apiData.type + "-" + apiData.domain;
 
   const source: RasterSourceSpecification = {
+    attribution: apiData.domain === "europe" ? EUMETSAT_ATTRIBUTION : GEOMET_ATTRIBUTION,
     type: "raster",
     tileSize: 256,
     bounds:

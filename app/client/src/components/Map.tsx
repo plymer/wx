@@ -5,7 +5,7 @@ import WeatherMap from "./map/WeatherMap";
 
 import { positronWxMap } from "@/assets/map-styles/positron-wxmap.js";
 
-import type { ViewState } from "react-map-gl/maplibre";
+import { AttributionControl, ScaleControl, type ViewState } from "react-map-gl/maplibre";
 import MapLoadingIndicator from "./ui/MapLoadingIndicator";
 import { GeoLocation } from "./map/controls/GeoLocation";
 import {
@@ -19,8 +19,7 @@ import {
 } from "@/stateStores/map/mapView";
 import { useAnimationActions } from "@/stateStores/map/animation";
 
-import OptionsMapOverlays from "./map/controls/OptionsMapOverlays";
-import OptionsRealtimeData from "./map/controls/OptionsRealtimeData";
+import MapOptions from "./map/controls/MapOptions";
 import { SatelliteLayer } from "./map/layers/data/SatelliteLayer";
 import { RadarLayer } from "./map/layers/data/RadarLayer";
 import { TAFOverlay } from "./map/layers/overlays/TAFOverlay";
@@ -73,49 +72,53 @@ export default function WxMap() {
         basemap={mapStyle}
         interactiveLayers={interactiveLayers}
       >
-        <>
-          {/* <AttributionControl
-            compact
-            position="top-right"
-            style={{ backgroundColor: "var(--accent)", color: "var(--secondary)", border: "1px solid var(--primary)" }}
-          /> */}
+        <ScaleControl
+          position="bottom-right"
+          style={{
+            backgroundColor: "rgba(0,0,0,0.25)",
+            color: "white",
+            fontWeight: "bold",
+            borderColor: "rgba(255,255,255,0.6)",
+          }}
+        />
+        <AttributionControl
+          compact
+          position="bottom-right"
+          style={{ backgroundColor: "var(--accent)", color: "var(--secondary)", border: "1px solid var(--primary)" }}
+        />
 
-          {/* <DataAttributions className="absolute bottom-0 right-0 rounded-md max-w-1/2 bg-accent border-1 border-black text-white m-2" /> */}
+        <TerrainRGB />
 
-          <TerrainRGB />
+        <SatelliteLayer domain="west" />
+        <SatelliteLayer domain="east" />
+        <SatelliteLayer domain="europe" />
+        <RadarLayer />
 
-          <SatelliteLayer domain="west" />
-          <SatelliteLayer domain="east" />
-          <SatelliteLayer domain="europe" />
-          <RadarLayer />
+        <AirQualityLayer />
 
-          <AirQualityLayer />
+        <SurfaceDataLayer />
 
-          <SurfaceDataLayer />
+        <SigmetLayer />
 
-          <SigmetLayer />
+        <TAFOverlay />
+        <BedpostOverlay />
+        <FIROverlay />
+        <GFAOverlay />
+        <LGFOverlay />
+        <PublicRegionsOverlay />
+        <MarineRegionsOverlay />
 
-          <TAFOverlay />
-          <BedpostOverlay />
-          <FIROverlay />
-          <GFAOverlay />
-          <LGFOverlay />
-          <PublicRegionsOverlay />
-          <MarineRegionsOverlay />
+        <AlertsLayer />
 
-          <AlertsLayer />
+        <LightningDataLayer timeRange={15} />
 
-          <LightningDataLayer timeRange={15} />
+        <SurfaceDataPopup />
 
-          <SurfaceDataPopup />
-
-          <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
-            <OptionsRealtimeData />
-            <OptionsMapOverlays />
-            <GeoLocation />
-          </div>
-          <MapLoadingIndicator show={loadingState} />
-        </>
+        <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
+          <MapOptions />
+          <GeoLocation />
+        </div>
+        <MapLoadingIndicator show={loadingState} />
       </WeatherMap>
       <AnimationControls className="w-full flex justify-center border-t-2 border-black bg-neutral-800 px-2 text-white max-md:pb-8" />
     </div>

@@ -8,9 +8,9 @@ export const GEOMET_GETMAP =
 export const EUMETSAT_GETMAP =
   "https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=";
 
-export const GEOMET_ATTRIBUTION = {
-  en: `<a href='https://weather.gc.ca/'> © Environment and Climate Change Canada</a>`,
-};
+export const GEOMET_ATTRIBUTION = "<a href='https://weather.gc.ca/'>ECCC / MSC</a>";
+
+export const EUMETSAT_ATTRIBUTION = "<a href='https://view.eumetsat.int/'>EUMETSAT</a>";
 
 // define which satellites we have access to
 export const SATELLITES = ["GOES-East", "GOES-West"] as const;

@@ -54,7 +54,7 @@ export const LightningDataLayer = ({ belowLayer, timeRange = 15 }: Props) => {
     <>
       <Source
         type="geojson"
-        attribution={GEOMET_ATTRIBUTION["en"]}
+        attribution={GEOMET_ATTRIBUTION}
         key="lightning-data-source"
         data={filteredData}
         id="lightning-data"

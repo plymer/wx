@@ -18,7 +18,7 @@ interface Props {
   mapProjection: MapProjections;
   basemap: StyleSpecification;
   interactiveLayers?: string[];
-  children?: ReactElement<any, any>;
+  children?: ReactElement<any, any>[] | ReactElement<any, any>;
 }
 
 const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLayers }: Props) => {

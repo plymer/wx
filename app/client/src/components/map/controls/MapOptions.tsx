@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { CloudLightning, Layers, Radar, Satellite } from "lucide-react";
+import { CloudLightning, Globe, Layers, Radar, Satellite, ScanEye, Map, List } from "lucide-react";
 
 import { SATELLITE_CHANNELS } from "@/config/rasterData";
 
@@ -28,8 +28,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 import Button, { type ButtonProps } from "@/components/ui/Button";
 import DataToggle from "@/components/ui/DataToggle";
+import { useMapStateActions, useProjection } from "@/stateStores/map/mapView";
+import {
+  useGFAOverlay,
+  useLGFOverlay,
+  useFIROverlay,
+  useTAFsOverlay,
+  useBedpostsOverlay,
+  usePublicRegionsOverlay,
+  useMarineRegionsOverlay,
+  useVectorOverlayActions,
+} from "@/stateStores/map/overlays";
 
-export default function OptionsRealtimeData({ ...props }: ButtonProps) {
+export default function MapOptions({ ...props }: ButtonProps) {
   // local state
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -51,11 +62,25 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
     radarProduct: useRadarProduct(),
   };
 
+  const overlays = {
+    showGFA: useGFAOverlay(),
+    showLGF: useLGFOverlay(),
+    showFIR: useFIROverlay(),
+    showTAFs: useTAFsOverlay(),
+    showBedposts: useBedpostsOverlay(),
+    showPublicRegions: usePublicRegionsOverlay(),
+    showMarineRegions: useMarineRegionsOverlay(),
+  };
+
+  const map = { projection: useProjection() };
+
   const tab = useLayersTab();
 
+  const overlayActions = useVectorOverlayActions();
   const rasterActions = useRasterStateActions();
   const vectorActions = useVectorActions();
   const UIActions = useUIActions();
+  const mapActions = useMapStateActions();
 
   // vector options config
   const VECTOR_DATA_OPTIONS: ToggleDataOption[] = [
@@ -98,6 +123,52 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
     // },
   ] as const;
 
+  // vector options config
+  const OVERLAYS: ToggleDataOption[] = [
+    {
+      type: "fir",
+      name: "FIR Boundaries",
+      state: overlays.showFIR,
+      toggle: overlayActions.toggleFir,
+    },
+    {
+      type: "lgf",
+      name: "LGF Boundaries",
+      state: overlays.showLGF,
+      toggle: overlayActions.toggleLgf,
+    },
+    {
+      type: "gfa",
+      name: "GFA Boundaries",
+      state: overlays.showGFA,
+      toggle: overlayActions.toggleGfa,
+    },
+    {
+      type: "tafs",
+      name: "TAF Sites",
+      state: overlays.showTAFs,
+      toggle: overlayActions.toggleTafs,
+    },
+    {
+      type: "bedposts",
+      name: "Hub Bedposts",
+      state: overlays.showBedposts,
+      toggle: overlayActions.toggleBedposts,
+    },
+    {
+      type: "publicRegions",
+      name: "Public Regions",
+      state: overlays.showPublicRegions,
+      toggle: overlayActions.togglePublicRegions,
+    },
+    {
+      type: "marineRegions",
+      name: "Marine Regions",
+      state: overlays.showMarineRegions,
+      toggle: overlayActions.toggleMarineRegions,
+    },
+  ] as const;
+
   return (
     <div className="w-full">
       <Drawer open={isOpen} onOpenChange={setIsOpen}>
@@ -109,24 +180,36 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
           </Button>
         </DrawerTrigger>
         <DrawerContent className="border-black bg-gray-800 text-white">
-          <div className="text-black mx-auto my-4 w-full max-w-md p-2 bg-white border-neutral-400 rounded-md border-px">
+          <div className="text-black mx-auto my-4 w-fit p-2 bg-white border-neutral-400 rounded-md border-px">
             <Tabs
               value={tab}
               onValueChange={UIActions.setLayersTab as (value: string) => void}
               className="w-full min-h-[25svh]"
             >
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="other">
-                  <CloudLightning className="me-2 size-6" />
-                  Wx Plots
+                  <CloudLightning className="shrink-0 me-2 size-6" />
+                  <span className="max-md:hidden">Wx Plots</span>
+                  <span className="md:hidden">Wx</span>
                 </TabsTrigger>
                 <TabsTrigger value="satellite">
-                  <Satellite className="me-2 size-6" />
-                  Satellite
+                  <Satellite className="shrink-0 me-2 size-6" />
+                  <span className="max-md:hidden">Satellite</span>
+                  <span className="md:hidden">Sat</span>
                 </TabsTrigger>
                 <TabsTrigger value="radar">
-                  <Radar className="me-2 size-6" />
+                  <Radar className="shrink-0 me-2 size-6" />
                   Radar
+                </TabsTrigger>
+                <TabsTrigger value="projection">
+                  <ScanEye className="shrink-0 me-2 size-6" />
+                  <span className="max-md:hidden">Projection</span>
+                  <span className="md:hidden">Proj</span>
+                </TabsTrigger>
+                <TabsTrigger value="overlays">
+                  <List className="shrink-0 me-2 size-6" />
+                  <span className="max-md:hidden">Geography</span>
+                  <span className="md:hidden">Geo</span>
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="satellite">
@@ -196,6 +279,39 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
                     className="flex items-center justify-between p-2 rounded-md text-black border border-input"
                   />
                 ))}
+              </TabsContent>
+              <TabsContent value="projection">
+                <div className="flex items-center">
+                  <Button
+                    type="button"
+                    variant="drawer"
+                    onClick={() => mapActions.setProjection("globe")}
+                    className={`${map.projection === "globe" && "active"}`}
+                  >
+                    <Globe className="me-2 size-6" />
+                    Globe
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="drawer"
+                    onClick={() => mapActions.setProjection("mercator")}
+                    className={`${map.projection === "mercator" && "active"}`}
+                  >
+                    <Map className="me-2 size-6" />
+                    Mercator
+                  </Button>
+                </div>
+              </TabsContent>
+              <TabsContent value="overlays">
+                <div className="grid grid-cols-2 gap-2">
+                  {OVERLAYS.map((item, i) => (
+                    <DataToggle
+                      key={i}
+                      dataOption={item}
+                      className="flex items-center justify-between p-2 rounded-md  text-black border border-input"
+                    />
+                  ))}
+                </div>
               </TabsContent>
             </Tabs>
           </div>
