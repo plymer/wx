@@ -19,7 +19,7 @@ export const AlertsLayer = ({ override }: Props) => {
   return (
     <Source id="wxo-alerts-source" type="geojson" data={data ?? { type: "FeatureCollection", features: [] }}>
       <Layer
-        id="wxo-alerts-layer"
+        id="layer-wxo-alerts"
         beforeId="tunnel_motorway_casing"
         type="fill"
         paint={{
@@ -28,14 +28,14 @@ export const AlertsLayer = ({ override }: Props) => {
         }}
       />
       <Layer
-        id="wxo-alerts-layer-labels"
+        id="layer-wxo-alerts-labels"
         type="symbol"
         paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
         layout={{ "text-field": ["get", "alertNameShort"], "text-size": 12, "text-allow-overlap": true }}
       />
       <Layer
-        id="wxo-alerts-layer-outline"
-        beforeId="wxo-alerts-layer-labels"
+        id="layer-wxo-alerts-outline"
+        beforeId="layer-wxo-alerts-labels"
         type="line"
         paint={{
           "line-color": ["match", ["get", "type"], "warning", "#ff0000", "watch", "#ffff00", "#808080"],

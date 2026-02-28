@@ -5,9 +5,9 @@ import { usePopupData, useUIActions } from "@/stateStores/map/ui";
 import { useRef } from "react";
 import { Popup, type PopupInstance } from "react-map-gl/maplibre";
 import Button from "../ui/Button";
-import { AlertTriangle, X } from "lucide-react";
+import { AlertTriangle, CircleAlert, OctagonAlert, OctagonX, X } from "lucide-react";
 import { useViewportBounds } from "@/stateStores/map/mapView";
-import type { StationPlotPopupData } from "@shared/lib/types";
+import type { StationPlotPopupData, WarningProperties } from "@shared/lib/types";
 import type { XmetEventData } from "@shared/lib/alphanumeric.types";
 
 const extractEventName = (text: string): string | null => {
@@ -63,8 +63,8 @@ export const SurfaceDataPopup = () => {
       closeOnMove={false}
       className="w-[400px] max-w-3/4 text-white bg-transparent"
     >
-      <div className="flex flex-col justify-center">
-        <div className="max-h-[33dvh] overflow-y-auto">
+      <div className="flex flex-col gap-2 justify-center">
+        <div className="flex flex-col gap-2 max-h-[33dvh] overflow-y-auto">
           {featureList
             .sort((a, b) => {
               if (a.properties.dataType === "sigmet" && b.properties.dataType !== "sigmet") {
@@ -171,13 +171,40 @@ export const SurfaceDataPopup = () => {
                     </div>
                   );
                 }
+                case "publicAlert":
+                  const alertProps = feature.properties as WarningProperties;
+
+                  const headerColour =
+                    alertProps.type === "warning"
+                      ? "text-red-500"
+                      : alertProps.type === "watch"
+                        ? "text-yellow-400"
+                        : "text-neutral-400";
+
+                  return (
+                    <div
+                      className={`grid grid-cols-5 gap-2  items-center text-center ${headerColour} border border-neutral-600 rounded-md p-2`}
+                    >
+                      <div className="flex justify-center">
+                        {alertProps.type !== "watch" && alertProps.type !== "warning" && <CircleAlert />}
+                        {alertProps.type === "watch" && <OctagonAlert />}
+                        {alertProps.type === "warning" && <OctagonX />}
+                      </div>
+                      <div className=" col-span-4 flex gap-1 items-center font-bold justify-left">
+                        {alertProps.type.slice(0, 1).toUpperCase()}
+                        {alertProps.type.slice(1)}
+                        {" -  "}
+                        {alertProps.alertNameShort.replace(`(${alertProps.type})`, "")}
+                      </div>
+                    </div>
+                  );
               }
 
               return null;
             })}
         </div>
 
-        <Button className="mt-2" variant={"default"} onClick={handleClose}>
+        <Button variant={"default"} onClick={handleClose}>
           <X />
           Close Details
         </Button>

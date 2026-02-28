@@ -195,6 +195,7 @@ export const wxmapRouter = router({
             colour: alertData.colour,
             impact: alertData.impact,
             confidence: alertData.confidence,
+            dataType: "publicAlert",
           },
         };
 

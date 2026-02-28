@@ -355,7 +355,8 @@ export type WxOPolygonProperties = {
   }[];
 };
 
-export type WarningProperties = Pick<
-  WxOAlert,
-  "alertCode" | "type" | "issueTime" | "alertNameShort" | "colour" | "impact" | "confidence"
+export type WarningProperties = Prettify<
+  Pick<WxOAlert, "alertCode" | "type" | "issueTime" | "alertNameShort" | "colour" | "impact" | "confidence"> & {
+    dataType: "publicAlert";
+  }
 >;
