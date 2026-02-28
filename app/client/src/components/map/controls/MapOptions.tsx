@@ -187,29 +187,25 @@ export default function MapOptions({ ...props }: ButtonProps) {
               className="w-full min-h-[25svh]"
             >
               <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="other">
-                  <CloudLightning className="shrink-0 me-2 size-6" />
+                <TabsTrigger value="other" className="flex justify-center gap-2">
+                  <CloudLightning className="shrink-0  size-6" />
                   <span className="max-md:hidden">Wx Plots</span>
-                  <span className="md:hidden">Wx</span>
                 </TabsTrigger>
-                <TabsTrigger value="satellite">
-                  <Satellite className="shrink-0 me-2 size-6" />
+                <TabsTrigger value="satellite" className="flex justify-center gap-2">
+                  <Satellite className="shrink-0  size-6" />
                   <span className="max-md:hidden">Satellite</span>
-                  <span className="md:hidden">Sat</span>
                 </TabsTrigger>
-                <TabsTrigger value="radar">
-                  <Radar className="shrink-0 me-2 size-6" />
-                  Radar
+                <TabsTrigger value="radar" className="flex justify-center gap-2">
+                  <Radar className="shrink-0 size-6" />
+                  <span className="max-md:hidden">Radar</span>
                 </TabsTrigger>
-                <TabsTrigger value="projection">
-                  <ScanEye className="shrink-0 me-2 size-6" />
+                <TabsTrigger value="projection" className="flex justify-center gap-2">
+                  <ScanEye className="shrink-0  size-6" />
                   <span className="max-md:hidden">Projection</span>
-                  <span className="md:hidden">Proj</span>
                 </TabsTrigger>
-                <TabsTrigger value="overlays">
-                  <List className="shrink-0 me-2 size-6" />
+                <TabsTrigger value="overlays" className="flex justify-center gap-2">
+                  <List className="shrink-0  size-6" />
                   <span className="max-md:hidden">Geography</span>
-                  <span className="md:hidden">Geo</span>
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="satellite">
