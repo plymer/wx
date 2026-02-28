@@ -11,7 +11,7 @@ import type {
 export const CLUSTERED: FilterSpecification = ["has", "point_count"];
 export const UNCLUSTERED: FilterSpecification = ["!", ["has", "point_count"]];
 
-export const AWC_ATTRIBUTION = "<a href='https://www.aviationweather.gov/'>Aviation Weather Center</a>";
+export const AWC_ATTRIBUTION = "<a href='https://www.aviationweather.gov/'>NOAA AWC</a>";
 
 export const VECTOR_DATA_TYPES = [
   "surfaceObs",

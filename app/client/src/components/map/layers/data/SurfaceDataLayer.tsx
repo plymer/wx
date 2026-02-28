@@ -217,7 +217,13 @@ export const SurfaceDataLayer = () => {
       </Source>
 
       {/* Non-clustered source for persistent elements */}
-      <Source id="persistent-sfc-data" key="persistent-sfc-data" type="geojson" data={filteredPlots}>
+      <Source
+        attribution={AWC_ATTRIBUTION}
+        id="persistent-sfc-data"
+        key="persistent-sfc-data"
+        type="geojson"
+        data={filteredPlots}
+      >
         {/* Station dots */}
         <Layer
           beforeId="layer-sfc-obs-gust"
