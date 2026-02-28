@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "version": "0.57.0",
+  "version": "1.0.0_rc1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,8 +13,5 @@
   },
   "overrides": {
     "vite": "npm:rolldown-vite@latest"
-  },
-  "dependencies": {
-    "embla-carousel-react": "^8.6.0"
   }
 }
