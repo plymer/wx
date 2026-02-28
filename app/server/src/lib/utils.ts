@@ -436,7 +436,7 @@ export function outlookHandler(product: string) {
   console.log("[API] Loading", product, "charts");
   if (!existsSync(dirPath)) {
     console.warn(`[API] ${product} directory does not exist at path: ${dirPath}`);
-    return undefined;
+    return null;
   }
 
   const officeDir = readdirSync(dirPath, { withFileTypes: true, recursive: true });
@@ -444,7 +444,8 @@ export function outlookHandler(product: string) {
   for (const entry of officeDir) {
     if (!entry.isFile()) continue;
 
-    const [, office, region, valid] = entry.name.match(/([a-zA-Z]+)(?:-)([0-9a-zA-z_-]+)(?:-)([0-9a-zA-z_]+)/) || [];
+    const [, office, region, validPeriod] =
+      entry.name.match(/([a-zA-Z]+)(?:-)([0-9a-zA-z_-]+)(?:-)([0-9a-zA-z_]+)/) || [];
 
     // use zod to validate our office and region values, and to transform them into the correct format if necessary (lowercasing them and comparing them against the lookups in our config)
     const { data: officeKey, success: officeParsed } = outlookOfficeSchema.safeParse(office);
@@ -466,9 +467,11 @@ export function outlookHandler(product: string) {
       continue;
     }
 
-    console.log(`[API] Processing file: ${entry.name} (Office: ${officeKey}, Region: ${regionKey}, Valid: ${valid})`);
+    console.log(
+      `[API] Processing file: ${entry.name} (Office: ${officeKey}, Region: ${regionKey}, Valid: ${validPeriod})`,
+    );
 
-    if (office && region && valid) {
+    if (office && region && validPeriod) {
       const stats = statSync(path.join(entry.parentPath, entry.name));
       // Create the panel object
       const panel: Panel = {
@@ -478,7 +481,7 @@ export function outlookHandler(product: string) {
         product,
         office: officeKey,
         region: regionKey,
-        valid,
+        validPeriod,
         url: `${OUTLOOK_NAV_DIR}/${product}/today/${officeKey}/${entry.name}`,
       };
 
@@ -504,5 +507,5 @@ export function outlookHandler(product: string) {
   }
 
   // add an explicit check to see if we have valid date, otherwise return explicitly undefined
-  return Object.keys(result).length > 0 ? result : undefined;
+  return Object.keys(result).length > 0 ? result : null;
 }

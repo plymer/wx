@@ -40,7 +40,7 @@ export type Panel = {
   product: string;
   office: OutlookOffices;
   region: string;
-  valid: string;
+  validPeriod: string;
   url: string;
 };
 

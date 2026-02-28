@@ -1,29 +1,40 @@
 import type { Panel } from "@/lib/types";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
 
 interface OutlookCardProps {
   panel: Panel;
   onClick?: () => void;
 }
 
-const prettyValid = (valid: string): string => {
-  const returnValid = "Day " + valid.split("_")[1];
-  return returnValid;
-};
-
 const OutlookCard = ({ panel, onClick }: OutlookCardProps) => {
   return (
     <>
-      <Card onClick={onClick}>
+      <Card
+        onClick={onClick}
+        className="border-neutral-300 border-2 bg-neutral-700 cursor-pointer hover:bg-neutral-600"
+      >
         <CardHeader>
-          <CardTitle>{prettyValid(panel.valid)}</CardTitle>
+          <CardTitle className="flex gap-4 items-center justify-center">
+            <div className="font-bold text-xl">{`Day ${panel.validPeriod.split("_")[1]}`}</div>
+            <div className="italic text-xs">
+              (Panel created:{" "}
+              {new Date(panel.date).toLocaleString("UTC", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                timeZone: "UTC",
+                hour12: false,
+                timeZoneName: "short",
+              })}
+              )
+            </div>
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div>
-            <img src={panel.url} />
-          </div>
+          <img src={panel.url} />
         </CardContent>
-        <CardFooter>Panel created: {panel.date}</CardFooter>
       </Card>
     </>
   );

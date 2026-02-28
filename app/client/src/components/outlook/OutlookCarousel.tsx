@@ -10,7 +10,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "../ui/Carousel";
-import { useOutlookRegion, useOutlookValid } from "@/stateStores/outlook";
+import { useOutlookActions, useOutlookRegion, useOutlookValidPeriod } from "@/stateStores/outlook";
 import { useEffect, useState } from "react";
 
 interface OutlookCarouselProps {
@@ -18,14 +18,30 @@ interface OutlookCarouselProps {
 }
 
 const validIndex = (valid: string, panels: Panel[]): number => {
-  return panels.findIndex((panel) => panel.valid === valid);
+  return panels.findIndex((panel) => panel.validPeriod === valid);
 };
 
 const OutlookCarousel = ({ officeData }: OutlookCarouselProps) => {
-  const valid = useOutlookValid();
+  const valid = useOutlookValidPeriod();
   const region = useOutlookRegion();
+  const { setRegion } = useOutlookActions();
 
   const [api, setApi] = useState<CarouselApi>();
+
+  useEffect(() => {
+    const handleCloseCarousel = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setRegion(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleCloseCarousel);
+
+    return () => {
+      window.removeEventListener("keydown", handleCloseCarousel);
+    };
+  }, [setRegion]);
 
   useEffect(() => {
     if (api && valid) {
@@ -41,11 +57,13 @@ const OutlookCarousel = ({ officeData }: OutlookCarouselProps) => {
       <Carousel setApi={setApi} opts={{ align: "center" }} className="w-full max-w-6xl mx-auto">
         <CarouselContent>
           {officeData.panels.map((panel) => (
-            <CarouselItem key={panel.id}>{<OutlookCard panel={panel} />}</CarouselItem>
+            <CarouselItem key={panel.id} onClick={() => setRegion(null)}>
+              {<OutlookCard panel={panel} />}
+            </CarouselItem>
           ))}
         </CarouselContent>
         <CarouselPrevious className="left-4 absolute" />
-        <CarouselNext className="right-4 absolute" />{" "}
+        <CarouselNext className="right-4 absolute" />
       </Carousel>
     </div>
   );

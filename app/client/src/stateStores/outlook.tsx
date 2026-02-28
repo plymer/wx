@@ -4,15 +4,15 @@ import type { OutlookOffice } from "../lib/types";
 
 // type definition for better DX
 type OutlookState = {
-  office: OutlookOffice;
+  office: OutlookOffice | null;
   region: string | null;
   product: "swo" | "tso";
-  valid: string | null;
+  validPeriod: string | null;
   actions: {
     setOffice: (office: OutlookOffice) => void;
     setRegion: (region: string | null) => void;
     setProduct: (product: "swo" | "tso") => void;
-    setValid: (valid: string | null) => void;
+    setValidPeriod: (period: string | null) => void;
   };
 };
 
@@ -20,15 +20,15 @@ type OutlookState = {
 const useOutlookState = create<OutlookState>()(
   persist(
     (set) => ({
-      office: "paspc",
+      office: null,
       region: null,
       product: "swo",
-      valid: null,
+      validPeriod: null,
       actions: {
-        setProduct: (newProduct: "swo" | "tso") => set({ product: newProduct, region: null, valid: null }),
-        setOffice: (newOffice: OutlookOffice) => set({ office: newOffice, region: null, valid: null }),
-        setRegion: (newRegion: string | null) => set({ region: newRegion, valid: null }),
-        setValid: (newValid: string | null) => set({ valid: newValid }),
+        setProduct: (newProduct: "swo" | "tso") => set({ product: newProduct, region: null, validPeriod: null }),
+        setOffice: (newOffice: OutlookOffice) => set({ office: newOffice, region: null, validPeriod: null }),
+        setRegion: (newRegion: string | null) => set({ region: newRegion, validPeriod: null }),
+        setValidPeriod: (newPeriod: string | null) => set({ validPeriod: newPeriod }),
       },
     }),
     {
@@ -37,7 +37,7 @@ const useOutlookState = create<OutlookState>()(
           office: state.office,
           region: state.region,
           product: state.product,
-          valid: state.valid,
+          valid: state.validPeriod,
         }) as Partial<OutlookState>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as OutlookState) }),
       name: "outlookOptions",
@@ -50,5 +50,5 @@ const useOutlookState = create<OutlookState>()(
 export const useOutlookOffice = () => useOutlookState((state) => state.office);
 export const useOutlookRegion = () => useOutlookState((state) => state.region);
 export const useOutlookProduct = () => useOutlookState((state) => state.product);
-export const useOutlookValid = () => useOutlookState((state) => state.valid);
+export const useOutlookValidPeriod = () => useOutlookState((state) => state.validPeriod);
 export const useOutlookActions = () => useOutlookState((state) => state.actions);
