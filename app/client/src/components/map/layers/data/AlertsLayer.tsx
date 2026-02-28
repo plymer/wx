@@ -1,11 +1,20 @@
 import { api } from "@/lib/trpc";
+import { useShowPublicAlerts } from "@/stateStores/map/vectorData";
 import { useQuery } from "@tanstack/react-query";
 import { Source, Layer } from "react-map-gl/maplibre";
 
-export const AlertsLayer = () => {
+interface Props {
+  override?: boolean;
+}
+
+export const AlertsLayer = ({ override }: Props) => {
+  const enabled = useShowPublicAlerts();
+
   const { data } = useQuery(
     api.wxmap.wxmapPublicWarnings.queryOptions(undefined, { trpc: { context: { skipBatch: true } } }),
   );
+
+  if (!override && !enabled) return null;
 
   return (
     <Source id="wxo-alerts-source" type="geojson" data={data ?? { type: "FeatureCollection", features: [] }}>

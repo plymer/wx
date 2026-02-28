@@ -8,6 +8,7 @@ interface VectorStateStore {
   showPIREPs: boolean;
   showSIGMETs: boolean;
   showAIRMETs: boolean;
+  showPublicAlerts: boolean;
   actions: {
     toggleAQ: () => void;
     toggleLightning: () => void;
@@ -15,6 +16,7 @@ interface VectorStateStore {
     togglePIREPs: () => void;
     toggleSIGMETs: () => void;
     toggleAIRMETs: () => void;
+    togglePublicAlerts: () => void;
   };
 }
 
@@ -28,6 +30,7 @@ const useVectorData = create<VectorStateStore>()(
       showPIREPs: true,
       showSIGMETs: true,
       showAIRMETs: true,
+      showPublicAlerts: true,
       actions: {
         toggleAQ: () => set((state) => ({ showAQ: !state.showAQ })),
         toggleLightning: () => set((state) => ({ showLightning: !state.showLightning })),
@@ -35,6 +38,7 @@ const useVectorData = create<VectorStateStore>()(
         togglePIREPs: () => set((state) => ({ showPIREPs: !state.showPIREPs })),
         toggleSIGMETs: () => set((state) => ({ showSIGMETs: !state.showSIGMETs })),
         toggleAIRMETs: () => set((state) => ({ showAIRMETs: !state.showAIRMETs })),
+        togglePublicAlerts: () => set((state) => ({ showPublicAlerts: !state.showPublicAlerts })),
       },
     }),
     {
@@ -46,6 +50,7 @@ const useVectorData = create<VectorStateStore>()(
           showPIREPs: state.showPIREPs,
           showAIRMETs: state.showAIRMETs,
           showSIGMETs: state.showSIGMETs,
+          showPublicAlerts: state.showPublicAlerts,
         }) as Partial<VectorStateStore>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as VectorStateStore) }),
       name: "vectorDataOptions",
@@ -60,4 +65,5 @@ export const useShowObs = () => useVectorData((state) => state.showObs);
 export const useShowPIREPs = () => useVectorData((state) => state.showPIREPs);
 export const useShowSIGMETs = () => useVectorData((state) => state.showSIGMETs);
 export const useShowAIRMETs = () => useVectorData((state) => state.showAIRMETs);
+export const useShowPublicAlerts = () => useVectorData((state) => state.showPublicAlerts);
 export const useVectorActions = () => useVectorData((state) => state.actions);

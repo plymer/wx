@@ -36,6 +36,7 @@ import { SurfaceDataPopup } from "./map/SurfaceDataPopup";
 import { AirQualityLayer } from "./map/layers/data/AirQualityLayer";
 import { SigmetLayer } from "./map/layers/data/SigmetLayer";
 import { TerrainRGB } from "./map/layers/base/TerrainRGB";
+import { AlertsLayer } from "./map/layers/data/AlertsLayer";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -101,6 +102,8 @@ export default function WxMap() {
           <LGFOverlay />
           <PublicRegionsOverlay />
           <MarineRegionsOverlay />
+
+          <AlertsLayer />
 
           <LightningDataLayer timeRange={15} />
 

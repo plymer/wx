@@ -19,6 +19,7 @@ import {
   useShowSIGMETs,
   useVectorActions,
   useShowAQ,
+  useShowPublicAlerts,
 } from "@/stateStores/map/vectorData";
 import type { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
@@ -40,6 +41,7 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
     showPIREPs: useShowPIREPs(),
     showSIGMETs: useShowSIGMETs(),
     showAIRMETs: useShowAIRMETs(),
+    showPublicAlerts: useShowPublicAlerts(),
   };
 
   const raster = {
@@ -70,11 +72,17 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
       state: vector.showObs,
       toggle: vectorActions.toggleObs,
     },
+    // {
+    //   type: "pirep",
+    //   name: "PIREPs",
+    //   state: vector.showPIREPs,
+    //   toggle: vectorActions.togglePIREPs,
+    // },
     {
-      type: "pirep",
-      name: "PIREPs",
-      state: vector.showPIREPs,
-      toggle: vectorActions.togglePIREPs,
+      type: "publicAlerts",
+      name: "Public Alerts",
+      state: vector.showPublicAlerts,
+      toggle: vectorActions.togglePublicAlerts,
     },
     {
       type: "sigmet",
@@ -82,12 +90,12 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
       state: vector.showSIGMETs,
       toggle: vectorActions.toggleSIGMETs,
     },
-    {
-      type: "airmet",
-      name: "AIRMETs",
-      state: vector.showAIRMETs,
-      toggle: vectorActions.toggleAIRMETs,
-    },
+    // {
+    //   type: "airmet",
+    //   name: "AIRMETs",
+    //   state: vector.showAIRMETs,
+    //   toggle: vectorActions.toggleAIRMETs,
+    // },
   ] as const;
 
   return (
@@ -167,7 +175,7 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
                     disabled={!raster.showRadar}
                     className={`${raster.radarProduct === "RADAR_1KM_RRAI" && "active"}`}
                   >
-                    1KM Rain CAPPI
+                    Rain Rate
                   </Button>
                   <Button
                     type="button"
@@ -176,7 +184,7 @@ export default function OptionsRealtimeData({ ...props }: ButtonProps) {
                     disabled={!raster.showRadar}
                     className={`${raster.radarProduct === "RADAR_1KM_RSNO" && "active"}`}
                   >
-                    1KM Snow CAPPI
+                    Snow Rate
                   </Button>
                 </div>
               </TabsContent>
