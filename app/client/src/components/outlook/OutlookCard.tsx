@@ -18,7 +18,7 @@ const OutlookCard = ({ panel, onClick }: OutlookCardProps) => {
             <div className="font-bold text-xl">{`Day ${panel.validPeriod.split("_")[1]}`}</div>
             <div className="italic text-xs">
               (Panel created:{" "}
-              {new Date(panel.date).toLocaleString("UTC", {
+              {new Date(panel.date).toLocaleString("en-CA", {
                 year: "numeric",
                 month: "2-digit",
                 day: "2-digit",
