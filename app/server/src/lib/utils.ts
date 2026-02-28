@@ -17,7 +17,7 @@ import type { XmetShapes } from "./alphanumeric.types.js";
 import { DEFAULT_REMOTE_HEADERS, MINUTE } from "./constants.js";
 
 import type { OutlookData, Panel, RegionData, WmoDirection } from "./types.js";
-import { OFFICE_REGION_MAP, OUTLOOK_NAV_DIR } from "../config/charts.config.js";
+import { OFFICE_REGION_MAP } from "../config/charts.config.js";
 import { outlookOfficeSchema, outlookRegionSchema } from "./validation.js";
 
 /**
@@ -482,7 +482,7 @@ export function outlookHandler(product: string) {
         office: officeKey,
         region: regionKey,
         validPeriod,
-        url: `${OUTLOOK_NAV_DIR}/${product}/today/${officeKey}/${entry.name}`,
+        url: `/images/${product}/today/${officeKey}/${entry.name}`,
       };
 
       // Initialize office if it doesn't exist
