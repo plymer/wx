@@ -476,7 +476,7 @@ export function outlookHandler(product: string) {
 
       console.log(`/images/${product}/today/${officeKey}/${entry.name}`);
 
-      console.log(stats.mtime.toUTCString());
+      console.log(JSON.stringify(stats, null, 2));
       // Create the panel object
       const panel: Panel = {
         id: entry.name,
