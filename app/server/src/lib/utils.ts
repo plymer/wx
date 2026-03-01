@@ -474,9 +474,11 @@ export function outlookHandler(product: string) {
     if (office && region && validPeriod) {
       const stats = statSync(path.join(entry.parentPath, entry.name));
 
-      console.log(`/images/${product}/today/${officeKey}/${entry.name}`);
-
-      console.log(JSON.stringify(stats, null, 2));
+      console.log(`File stats for ${entry.name}:`, {
+        atime: stats.atime.toISOString(),
+        mtime: stats.mtime.toISOString(),
+        ctime: stats.ctime.toISOString(),
+      });
       // Create the panel object
       const panel: Panel = {
         id: entry.name,
