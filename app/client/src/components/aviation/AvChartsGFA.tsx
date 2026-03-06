@@ -33,6 +33,8 @@ const AvChartsGFA = ({ product, data }: Props) => {
 
   const currentProductData = data.find((d) => d.domain === domain);
 
+  console.log(currentProduct, domain, subProduct, timeStep);
+
   // build the image url
   const imageUrl = currentProductData && currentProductData[subProduct][timeStep];
 
