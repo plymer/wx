@@ -1,5 +1,4 @@
 import { Layer, type RasterSourceSpecification, Source, useMap } from "react-map-gl/maplibre";
-import { useEffect, useState } from "react";
 
 import {
   useAnimationState,
@@ -26,7 +25,6 @@ import type { TransitionSpecification } from "maplibre-gl";
 interface Props {
   belowLayer?: string;
   apiData?: WMSLayer;
-  initDelay?: number;
 }
 
 const makeTileRequestString = (domain: WMSDomains, layerName: string, validTime: number) => {
@@ -35,7 +33,7 @@ const makeTileRequestString = (domain: WMSDomains, layerName: string, validTime:
   return `${baseUrl}${layerName}&time=${makeISOTimeStamp(validTime, "data")}`;
 };
 
-const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
+const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
   const animation = {
     state: useAnimationState(),
     currentFrame: useFrame(),
@@ -47,18 +45,12 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
 
   const map = useMap().current!;
 
-  const [init, isInit] = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => isInit(true), initDelay ?? 300);
-  }, []);
-
   // safety checks
 
   if (!apiData || !apiData.timeSteps || apiData.timeSteps.length === 0) return;
 
   // if the belowLayer is not in the map's layers, we cannot render this layer
-  if (!belowLayer || !map.getLayer(belowLayer)) belowLayer = "wateroutline"; // default to the radar layer
+  if (!belowLayer || !map.getLayer(belowLayer)) belowLayer = "wateroutline";
 
   const layerId = "layer-" + apiData.type + "-" + apiData.domain;
 
@@ -94,66 +86,15 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
     timeSteps.splice(0, timeStepsDiff);
   }
 
-  /*
-  rules for smooth animation:
-   1. absolutely NO tile source must change, otherwise the layer will dump the previous tiles and re-initialize new ones, leading to the checkerboard pattern and a poor UX. i do not believe this behaviour can be changed as it is inherent in both mapbox and maplibre.
-
-
-   i am leaving this here as a testament to my stupidity:
-  2. the previous frame must be rendered under the current frame in order to prevent the flickering of layers due to an inherent, unchangeable (as of 2024-09-02) 300ms fadeout for each layer. the property "raster-fade-duration" does not do anything as of this time.
-  */
-
   const maxFrameId = `${layerId}-${animation.frameCount - 1}`;
   const maxFrame = animation.frameCount - 1;
 
-  // we draw the maxFrame first upon mounting the component, we wait the init delay timeout and then add all of the other frames, referencing the maxFrameId as the beforeId to ensure that it will always be the top-most layer rendered
-
   const transition: TransitionSpecification = { duration: 0 };
 
-  // this implementation works for very slow frame changes but is limited by network performance
-  //   i need to figure out what is happening to the tiles or tilecache when the sources change on the layers
-  // const currentLayer = `${layerId}-${animation.currentFrame}`;
-  // const prevLayer = animation.currentFrame > 0 ? `${layerId}-${animation.currentFrame - 1}` : undefined;
-  // const nextLayer = animation.currentFrame < maxFrame ? `${layerId}-${animation.currentFrame + 1}` : undefined;
-  // return (
-  //   <>
-  //     {timeSteps.map((ts, index) => {
-  //       console.log("sourceId", `${layerId}-${index}`);
-  //       return (
-  //         <Source
-  //           {...source}
-  //           key={`source-${layerId}-${index}`}
-  //           tiles={[makeTileRequestString(apiData.domain, apiData.name, ts.validTime)]}
-  //           id={`${layerId}-${index}`}
-  //           // isPaused={isMoving}
-  //         />
-  //       );
-  //     })}
-  //     {prevLayer && (
-  //       <Layer
-  //         key={`layer-${prevLayer}`}
-  //         type="raster"
-  //         source={prevLayer}
-  //         paint={{ "raster-opacity": 0, "raster-opacity-transition": transition }}
-  //       />
-  //     )}
-  //     <Layer
-  //       key={`layer-${currentLayer}`}
-  //       source={currentLayer}
-  //       type="raster"
-  //       beforeId={belowLayer}
-  //       paint={{ "raster-opacity-transition": transition }}
-  //     />
-  //     {nextLayer && (
-  //       <Layer
-  //         key={`layer-${nextLayer}`}
-  //         type="raster"
-  //         source={nextLayer}
-  //         paint={{ "raster-opacity": 0, "raster-opacity-transition": transition }}
-  //       />
-  //     )}
-  //   </>
-  // );
+  /*
+  rule for smooth animation:
+   absolutely NO tile source must change, otherwise the layer will dump the previous tiles and re-initialize new ones, leading to the checkerboard pattern and a poor UX. i do not believe this behaviour can be changed as it is inherent in both mapbox and maplibre.
+  */
 
   return (
     <>
@@ -165,7 +106,6 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
       >
         <Layer
           type="raster"
-          source={maxFrameId}
           id={maxFrameId}
           beforeId={belowLayer}
           paint={{
@@ -174,8 +114,7 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
           }}
         />
       </Source>
-      {init &&
-        !animation.isStatic &&
+      {!animation.isStatic &&
         timeSteps.map((u, index) => {
           if (index === maxFrame) return; // don't render the max frame again
           return (
@@ -187,9 +126,8 @@ const RasterDataLayer = ({ belowLayer, apiData, initDelay }: Props) => {
             >
               <Layer
                 type="raster"
-                source={`${layerId}-${index}`}
                 id={`${layerId}-${index}`}
-                beforeId={maxFrameId} // we set this to the max frame's id
+                beforeId={belowLayer}
                 paint={{
                   "raster-opacity-transition": transition,
                   "raster-opacity": animation.currentFrame === index ? 1 : 0,

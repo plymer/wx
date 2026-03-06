@@ -13,12 +13,15 @@ import type {
   WxOPolygonProperties,
 } from "../lib/types.js";
 import { metars, tafs } from "../db/tables/avwx.drizzle.js";
-import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
+import { HOUR } from "../lib/constants.js";
 
 import { avwxDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
 import * as turf from "@turf/turf";
 import { limitResultsByKeys } from "../lib/utils.js";
+import * as fs from "fs/promises";
+import path from "path";
+import "dotenv/config";
 
 // Generic function to convert METAR query results to GeoJSON features
 function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, StationPlotData>[] {
@@ -151,22 +154,30 @@ export const wxmapRouter = router({
   }),
 
   wxmapPublicWarnings: publicProcedure.query(async (): Promise<FeatureCollection<MultiPolygon, WarningProperties>> => {
-    const metaDataSourceUrl = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.en.geojson";
+    console.log("[API] Fetching public warnings for wxmap...");
+    const fileName = "public-alerts.json";
 
-    const response = await fetch(metaDataSourceUrl, { headers: DEFAULT_REMOTE_HEADERS });
-    if (!response.ok) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: `Failed to fetch public warnings: ${response.statusText}`,
+    const fileLocation = process.env.STATIC_DATA_DIR
+      ? path.join(process.env.STATIC_DATA_DIR, fileName)
+      : path.resolve("../../static-data", fileName);
+
+    const data = await fs
+      .readFile(fileLocation)
+      .then(
+        (data) =>
+          JSON.parse(data.toString()) as {
+            type: "FeatureCollection";
+            uuid: string;
+            alerts: WxOPolygonAlert;
+            features: Feature<MultiPolygon, WxOPolygonProperties>[];
+          },
+      )
+      .catch((error) => {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Failed to read public warnings from file: ${error.message}`,
+        });
       });
-    }
-
-    const data = (await response.json()) as {
-      type: "FeatureCollection";
-      uuid: string;
-      alerts: WxOPolygonAlert;
-      features: Feature<MultiPolygon, WxOPolygonProperties>[];
-    };
 
     const alerts = Object.entries(data.alerts).reduce<Record<string, WxOAlert>>((acc, [alertRef, alert]) => {
       acc[alertRef] = alert;

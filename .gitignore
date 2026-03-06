@@ -7,6 +7,9 @@
 #server things
 .htaccess
 tmp/
+images/swo/*
+images/tso/*
+static-data/*
 
 
 # Dist

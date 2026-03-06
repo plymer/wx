@@ -3,7 +3,7 @@ import type { LngLatBoundsLike } from "maplibre-gl";
 export const RASTER_DATA_TYPES = ["satellite", "radar"] as const;
 
 export const GEOMET_GETMAP =
-  "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&LAYERS_REFRESH_RATE=PT1M&TRANSPARENT=true&TILED=true&layers=";
+  "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/webp&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&LAYERS_REFRESH_RATE=PT1M&TRANSPARENT=true&TILED=true&layers=";
 
 export const EUMETSAT_GETMAP =
   "https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&format=image/png&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&layers=";

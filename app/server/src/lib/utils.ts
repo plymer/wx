@@ -426,7 +426,7 @@ export function limitResultsByKeys<T>(
 }
 
 export function outlookHandler(product: string) {
-  const outlookRootDir = process.env.OUTLOOK_DIR;
+  const outlookRootDir = process.env.OUTLOOK_DIR ?? "./images";
 
   if (!outlookRootDir) {
     throw new Error("OUTLOOK_DIR environment variable is not set");
