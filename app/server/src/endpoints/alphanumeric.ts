@@ -247,8 +247,6 @@ export const alphanumericRouter = router({
       const data = response[0];
       // we want to extract and transform only the relevant parts that we want to show the client
 
-      console.log(data.dailyFcst.daily);
-
       const alerts = data.alert.alerts
         ?.map((alert) => {
           if (alert.status === "ended") return undefined;
