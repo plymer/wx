@@ -216,22 +216,22 @@ export default function Public() {
                 <Label className="flex gap-2 justify-center place-items-center font-bold bg-black rounded-t-md p-2">
                   <Calendar /> 7-day Forecast for {pointForecast?.placeName}
                 </Label>
-                <div className="grid grid-cols-1">
-                  {dailyForecasts?.map((period) => {
-                    return (
-                      <div
-                        key={period.id}
-                        className="grid grid-cols-5 gap-2 place-items-center text-left  nth-of-type-[2n]:bg-neutral-900 py-4"
-                      >
-                        <h1 className="text-center w-full ">{period.label}</h1>
-                        <div className="col-span-4 flex place-items-center gap-2 w-full border-black">
-                          <WxIcon code={parseInt(period.iconCode)} />
-                          <div>{period.text}</div>
-                        </div>
+                {/* put a little graph here that shows temperature with normals */}
+                {dailyForecasts?.map((period) => {
+                  return (
+                    <div
+                      key={period.id}
+                      className="grid grid-cols-7 gap-2 place-items-center text-left  nth-of-type-[2n]:bg-neutral-900 py-4"
+                    >
+                      <h1 className="text-center w-full ">{period.label}</h1>
+                      <div className="flex flex-col justify-center items-center gap-1">
+                        <WxIcon code={parseInt(period.iconCode)} />
+                        <span className="text-xs">{period.tt}°C</span>
                       </div>
-                    );
-                  })}
-                </div>
+                      <div className="col-span-5 flex place-items-center gap-2 w-full border-black">{period.text}</div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

@@ -247,6 +247,8 @@ export const alphanumericRouter = router({
       const data = response[0];
       // we want to extract and transform only the relevant parts that we want to show the client
 
+      console.log(data.dailyFcst.daily);
+
       const alerts = data.alert.alerts
         ?.map((alert) => {
           if (alert.status === "ended") return undefined;
@@ -304,6 +306,7 @@ export const alphanumericRouter = router({
           label: period.periodLabel,
           text: period.text,
           iconCode: period.iconCode,
+          tt: period.temperature.metric,
           aqhiVal: 9999,
         };
       });

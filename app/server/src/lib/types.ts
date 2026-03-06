@@ -276,6 +276,7 @@ export type WxOAPIResponse = {
       periodLabel: string;
       iconCode: string;
       text: string;
+      temperature: { metric: string; imperial: string; periodHigh?: number; periodLow?: number };
     }>;
     dailyIssuedTimeEpoch: string;
   };
