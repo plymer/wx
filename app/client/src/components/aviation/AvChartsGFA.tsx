@@ -18,7 +18,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
   const actions = useAviationActions();
 
   // if we don't have any data, or the data is not successful, return early
-  if (!data) return null;
+  if (!data) return;
 
   // get our available domains for our currently selected product
   // we will use this to build the ui to switch between the different domains
@@ -27,14 +27,14 @@ const AvChartsGFA = ({ product, data }: Props) => {
   // select the domain's product details so the user can select the forecast time they want to view
   const currentProduct = domainList.find((p) => p.domain === domain);
 
-  const selectedDomain = currentProduct?.domain ?? domainList[0]?.domain;
-  const selectedProduct = currentProduct ?? domainList[0];
-  const currentProductData = selectedDomain ? data.find((d) => d.domain === selectedDomain) : undefined;
-  const selectedSteps = currentProductData ? currentProductData[subProduct] : undefined;
-  const safeTimeStep = selectedSteps ? Math.min(timeStep, Math.max(selectedSteps.length - 1, 0)) : timeStep;
+  // if our currentProduct is undefined, our current domain is not in the domainList
+  // default it back to the first domain in the domainList
+  if (!currentProduct && domainList[0]) actions.setDomain(domainList[0].domain);
+
+  const currentProductData = data.find((d) => d.domain === domain);
 
   // build the image url
-  const imageUrl = selectedSteps?.[safeTimeStep];
+  const imageUrl = currentProductData && currentProductData[subProduct][timeStep];
 
   return (
     <>
@@ -43,10 +43,10 @@ const AvChartsGFA = ({ product, data }: Props) => {
         {domainList.map((r, i) => (
           <Button
             className={`rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md ${
-              selectedDomain === r.domain ? "active" : ""
+              domain === r.domain ? "active" : ""
             }`}
             key={i}
-            onClick={() => actions.setDomain(r.domain as ProductDomains)}
+            onClick={() => actions.setDomain(("gfacn3" + (i + 1).toString()) as ProductDomains)}
           >
             {r.domain.replace("gfacn", "gfa ").toUpperCase()}
           </Button>
@@ -55,23 +55,23 @@ const AvChartsGFA = ({ product, data }: Props) => {
       <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
         <label className="me-4">Clouds & Weather:</label>
         <div>
-          {selectedProduct &&
+          {currentProduct &&
             data.map(
               (p) =>
-                p.domain === selectedDomain &&
+                p.domain === domain &&
                 p.cldwx.map((u, i) => (
                   <Button
                     className={`rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md ${
-                      subProduct === "cldwx" && safeTimeStep === i ? "active" : ""
+                      subProduct === "cldwx" && timeStep === i ? "active" : ""
                     }`}
                     key={i}
                     value={u}
                     onClick={() => {
-                      actions.setSubProduct("cldwx");
+                      actions.setSubProduct!("cldwx");
                       actions.setTimeStep(i);
                     }}
                   >
-                    T+{i * selectedProduct.timeDelta}
+                    T+{i * currentProduct.timeDelta}
                   </Button>
                 )),
             )}
@@ -80,29 +80,29 @@ const AvChartsGFA = ({ product, data }: Props) => {
       <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
         <label className="me-4">Turbulence & Icing:</label>
         <div>
-          {selectedProduct &&
+          {currentProduct &&
             data.map(
               (p) =>
-                p.domain === selectedDomain &&
+                p.domain === domain &&
                 p.turbc.map((u, i) => (
                   <Button
                     className={`rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md ${
-                      subProduct === "turbc" && safeTimeStep === i ? "active" : ""
+                      subProduct === "turbc" && timeStep === i ? "active" : ""
                     }`}
                     key={i}
                     value={u}
                     onClick={() => {
-                      actions.setSubProduct("turbc");
+                      actions.setSubProduct!("turbc");
                       actions.setTimeStep(i);
                     }}
                   >
-                    T+{i * selectedProduct.timeDelta}
+                    T+{i * currentProduct.timeDelta}
                   </Button>
                 )),
             )}
         </div>
       </nav>
-      {selectedProduct && imageUrl && <AvImageContainer url={imageUrl} />}
+      {currentProduct && data && imageUrl && <AvImageContainer url={imageUrl} />}
     </>
   );
 };

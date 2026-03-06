@@ -16,7 +16,7 @@ const AvChartsOther = ({ product, data }: Props) => {
   const timeStep = useTimeStep();
   const actions = useAviationActions();
 
-  if (!data) return null;
+  if (!data) return;
 
   // get our available domains for our currently selected product
   // we will use this to build the ui to switch between the different domains
@@ -25,15 +25,19 @@ const AvChartsOther = ({ product, data }: Props) => {
   // select the domain's product details so the user can select the forecast time they want to view
   const currentProduct = domainList.find((p) => p.domain === domain);
 
-  const selectedDomain = currentProduct?.domain ?? domainList[0]?.domain;
-  const selectedProduct = currentProduct ?? domainList[0];
-  const currentProductData = selectedDomain ? data.find((d) => d.domain === selectedDomain) : undefined;
-  const safeTimeStep = currentProductData
-    ? Math.min(timeStep, Math.max(currentProductData.images.length - 1, 0))
-    : timeStep;
+  // if our currentProduct is undefined, our current domain is not in the domainList
+  // default it back to the first domain in the domainList
+  if (!currentProduct && domainList[0]) actions.setDomain(domainList[0].domain);
+
+  const currentProductData = data.find((d) => d.domain === domain);
+
+  // if our current timeStep is greater than the number of timeSteps available in our data layer
+  // default it back to the highest available timeStep
+  if (currentProductData && timeStep > currentProductData.images.length - 1)
+    actions.setTimeStep(currentProductData.images.length - 1);
 
   // build the image url
-  const imageUrl = currentProductData?.images[safeTimeStep];
+  const imageUrl = currentProductData?.images[timeStep];
 
   return (
     <>
@@ -42,7 +46,7 @@ const AvChartsOther = ({ product, data }: Props) => {
         {domainList.map((d, i) => (
           <Button
             className={`rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-w-96 ${
-              d.domain === selectedDomain ? "active" : ""
+              d.domain === domain ? "active" : ""
             }`}
             key={i}
             onClick={() => {
@@ -57,14 +61,14 @@ const AvChartsOther = ({ product, data }: Props) => {
       <nav className="px-2 mt-2 flex max-md:justify-around place-items-center">
         <label className="me-4">Forecasts:</label>
         <div>
-          {selectedProduct &&
+          {currentProduct &&
             data.map(
               (p) =>
-                p.domain === selectedProduct.domain &&
+                p.domain === currentProduct.domain &&
                 p.images.map((u, i) => (
                   <Button
                     className={`rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md ${
-                      safeTimeStep === i ? "active" : ""
+                      timeStep === i ? "active" : ""
                     }`}
                     key={i}
                     value={u}
@@ -73,13 +77,13 @@ const AvChartsOther = ({ product, data }: Props) => {
                     }}
                   >
                     T+
-                    {i * selectedProduct.timeDelta}
+                    {i * currentProduct.timeDelta}
                   </Button>
                 )),
             )}
         </div>
       </nav>
-      {selectedProduct && imageUrl && <AvImageContainer url={imageUrl} />}
+      {currentProduct && data && imageUrl && <AvImageContainer url={imageUrl} />}
     </>
   );
 };
