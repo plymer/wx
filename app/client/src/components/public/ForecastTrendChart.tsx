@@ -58,7 +58,10 @@ export const ForecastTrendChart = ({ forecastData }: Props) => {
         {COLOUR_BANDS.map((band, i) => (
           <ColourBand key={i} {...band} yScale={yScale} />
         ))}
-        <line {...normalsLine} y1={0} y2={0} stroke="black" strokeOpacity={1} />
+        <line {...normalsLine} y1={0} y2={0} stroke="black" strokeWidth={3} strokeOpacity={1} />
+        <text x={20} y={0} textAnchor="end" fill="white">
+          0&deg;
+        </text>
         <line {...normalsLine} y1={-normals.high / yScale} y2={-normals.high / yScale} stroke="pink" />
         <text {...lineLabel} y={-normals.high / yScale - 6} fill="pink">
           {normals.high}&deg;C
@@ -67,7 +70,13 @@ export const ForecastTrendChart = ({ forecastData }: Props) => {
         <text {...lineLabel} y={-normals.low / yScale + 16} fill="lightblue">
           {normals.low}&deg;C
         </text>
-        <TemperatureTrends dailyForecasts={dailyForecasts} yScale={yScale} />
+
+        <TemperatureTrendGraph
+          dailyForecasts={dailyForecasts}
+          yScale={yScale}
+          maxBound={maxBound}
+          minBound={minBound}
+        />
       </svg>
     </div>
   );
@@ -83,143 +92,121 @@ interface ColourBandProps {
 const ColourBand = ({ ttStart, ttSpan, color, yScale }: ColourBandProps) => {
   const yValue = ttStart < 0 ? ttStart / -yScale : (-ttStart - 5) / yScale;
   return (
-    <rect
-      id={`tt-start__${ttStart}`}
-      x={0}
-      width={800}
-      y={yValue}
-      height={ttSpan / yScale}
-      fill={color}
-      fillOpacity={1}
-    />
+    <g>
+      <rect
+        id={`tt-start__${ttStart}`}
+        x={0}
+        width={800}
+        y={yValue}
+        height={ttSpan / yScale}
+        fill={color}
+        fillOpacity={1}
+      />
+      <text x={20} y={yValue} textAnchor="end" fill={"white"} fontSize="12px">
+        {ttStart < 0 ? ttStart : ttStart + 5}&deg;
+      </text>
+    </g>
   );
 };
 
 interface TemperatureTrendsProps {
   dailyForecasts: PointForecastData["dailyForecasts"];
   yScale: number;
+  maxBound: number;
+  minBound: number;
 }
 
-const TemperatureTrends = ({ dailyForecasts, yScale }: TemperatureTrendsProps) => {
-  const highFirst =
-    dailyForecasts.findIndex((d) => d.ttType === "high") < dailyForecasts.findIndex((d) => d.ttType === "low");
-
+const TemperatureTrendGraph = ({ dailyForecasts, yScale, maxBound, minBound }: TemperatureTrendsProps) => {
   const xDelta = TARGET_LENGTH / (dailyForecasts.length - 1);
   const startX = 150;
 
-  const lowTempPoints = dailyForecasts
-    .filter((d) => d.ttType === "low")
-    .map((d, i) => {
-      let xOffset;
+  const temperaturePoints = dailyForecasts.map((d, i) => {
+    const xOffset = i * xDelta;
 
-      if (highFirst) {
-        xOffset = xDelta + i * xDelta * 2;
-      } else {
-        if (i === 0) {
-          xOffset = 0;
-        } else {
-          xOffset = i * xDelta * 2 - xDelta / 2;
-        }
-      }
-
-      const x = startX + xOffset;
-      const y = -Number(d.tt) / yScale;
-      return { x, y, tt: d.tt };
-    });
-
-  const highTempPoints = dailyForecasts
-    .filter((d) => d.ttType === "high")
-    .map((d, i) => {
-      let xOffset;
-
-      if (!highFirst) {
-        xOffset = xDelta * 1.5 + i * xDelta * 2;
-      } else {
-        if (i === 0) {
-          xOffset = 0;
-        } else {
-          xOffset = i * xDelta * 2 - xDelta / 2;
-        }
-      }
-
-      const x = startX + xOffset;
-      const y = -Number(d.tt) / yScale;
-      return { x, y, tt: d.tt };
-    });
+    const x = startX + xOffset;
+    const y = -Number(d.tt) / yScale;
+    return { x, y, tt: d.tt, period: d.label, type: d.ttType };
+  });
 
   return (
     <>
-      <TemperatureTrendLine maxTempPoints={highTempPoints} minTempPoints={lowTempPoints} />
-      <TemperaturePoints maxTempPoints={highTempPoints} minTempPoints={lowTempPoints} />
+      <TemperatureTrendLine points={temperaturePoints} />
+      <TemperaturePoints points={temperaturePoints} />
+      <DayLabels points={temperaturePoints} maxBound={maxBound} yScale={yScale} minBound={minBound} />
     </>
   );
 };
 
-interface TemperatureTrendPlotProps {
-  maxTempPoints: { x: number; y: number; tt: string }[];
-  minTempPoints: { x: number; y: number; tt: string }[];
+interface TemperaturePlotProps {
+  points: { x: number; y: number; tt: string; period: string; type: "high" | "low" }[];
 }
 
-export const TemperatureTrendLine = ({ maxTempPoints, minTempPoints }: TemperatureTrendPlotProps) => {
-  // build a line to connect each high to each other, and each low to each other, but don't connect the highs to the lows
+interface DayLabelsProps extends TemperaturePlotProps {
+  maxBound: number;
+  minBound: number;
+  yScale: number;
+}
 
+const TemperatureTrendLine = ({ points }: TemperaturePlotProps) => {
   return (
-    <g>
-      <polyline
-        fill="none"
-        stroke="lightblue"
-        strokeWidth={2}
-        points={minTempPoints.map((d) => `${d.x},${d.y}`).join(" ")}
-      />
-      <polyline
-        fill="none"
-        stroke="pink"
-        strokeWidth={2}
-        points={maxTempPoints.map((d) => `${d.x},${d.y}`).join(" ")}
-      />
-    </g>
+    <polyline
+      fill="none"
+      stroke="white"
+      strokeWidth={2}
+      strokeOpacity={0.65}
+      points={points.map((p) => `${p.x},${p.y}`).join(" ")}
+    />
   );
 };
 
-export const TemperaturePoints = ({ minTempPoints, maxTempPoints }: TemperatureTrendPlotProps) => {
-  return (
+const TemperaturePoints = ({ points }: TemperaturePlotProps) => {
+  return points.map((p) => (
     <g>
-      {minTempPoints.map((point) => (
-        <>
-          <circle cx={point.x} cy={point.y} r={5} fill={"white"} />
-          <text
-            x={point.x}
-            y={point.y + 26}
-            textAnchor="middle"
-            fill="white"
-            fontSize="20px"
-            fontFamily="monospace"
-            stroke="black"
-            fontWeight="bold"
-            strokeWidth={1}
-          >
-            {point.tt}°C
-          </text>
-        </>
-      ))}
-      {maxTempPoints.map((point) => (
-        <>
-          <circle cx={point.x} cy={point.y} r={5} fill={"white"} />
-          <text
-            x={point.x}
-            y={point.y - 10}
-            textAnchor="middle"
-            fill="white"
-            fontSize="20px"
-            fontFamily="monospace"
-            stroke="black"
-            fontWeight="bold"
-            strokeWidth={1}
-          >
-            {point.tt}°C
-          </text>
-        </>
-      ))}
+      <circle cx={p.x} cy={p.y} r={5} fill={"white"} />
+      <text
+        x={p.x}
+        y={p.type === "high" ? p.y + 24 : p.y - 12}
+        textAnchor="middle"
+        fill={"white"}
+        fontSize="20px"
+        fontFamily="monospace"
+        stroke="black"
+        fontWeight="600"
+        strokeWidth={1}
+        strokeOpacity={1}
+      >
+        {p.tt}°C
+      </text>
     </g>
-  );
+  ));
+};
+
+const DayLabels = ({ points, maxBound, minBound, yScale }: DayLabelsProps) => {
+  return points.map((p, i) => {
+    let yPos: number;
+
+    if (i % 2 === 0) {
+      yPos = -maxBound / yScale - 12;
+    } else {
+      yPos = -minBound / yScale + 24;
+    }
+
+    return (
+      <g>
+        <text x={p.x} y={yPos} textAnchor="middle" fill="white" fontSize="14px">
+          {p.period}
+        </text>
+        <line
+          x1={p.x}
+          x2={p.x}
+          y1={-BASE_HEIGHT}
+          y2={BASE_HEIGHT}
+          stroke="white"
+          strokeWidth={1}
+          strokeDasharray={"2 2"}
+          strokeOpacity={0.5}
+        />
+      </g>
+    );
+  });
 };
