@@ -203,12 +203,12 @@ export type WxOAlert = {
   status: "ended" | "active";
   type: AlertType;
   colour: AlertColour;
-  issueTime: Date;
+  issueTime: string;
   timezone: string;
   issueTimeText: string;
-  expiryTime: Date;
-  eventOnsetTime: Date;
-  eventEndTime: Date;
+  expiryTime: string;
+  eventOnsetTime: string;
+  eventEndTime: string;
   alertBannerText: string;
   alertNameShort: string;
   text: string;
@@ -361,3 +361,58 @@ export type WarningProperties = Prettify<
     dataType: "publicAlert";
   }
 >;
+
+export type PointForecastData = {
+  placeName: string;
+  currentConditions: {
+    time: string;
+    siteId: string;
+    siteName: string;
+    iconCode: string;
+    weather: {
+      condition: string;
+      tt: string;
+      td: string;
+      vis: string;
+      mslp: string;
+      humidity: string;
+      wSpd: string;
+      wDir: string;
+      wGust: string;
+    };
+    aqhi: {
+      value: number;
+      time: number;
+      text: string | undefined;
+    };
+  };
+  alerts: {
+    type: AlertType;
+    issueTime: string;
+    timezone: string;
+    issueTimeText: string;
+    expiryTime: string;
+    eventOnsetTime: string;
+    eventEndTime: string;
+    alertBannerText: string;
+    text: string;
+  }[];
+  normals: {
+    high: number;
+    low: number;
+  };
+  dailyForecasts: {
+    date: string;
+    id: number;
+    label: string;
+    text: string;
+    iconCode: string;
+    tt: string;
+    ttType: "high" | "low";
+    aqhiVal: number;
+  }[];
+  riseSet: {
+    rise: string;
+    set: string;
+  };
+};

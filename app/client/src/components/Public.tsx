@@ -15,6 +15,8 @@ import { AlertsModal } from "./public/AlertsModal";
 import { NormalsContainer } from "./public/NormalsContainer";
 import { WxIcon } from "./public/WxIcon";
 import { CurrentConditions } from "./public/CurrentConditions";
+import { ForecastTrendChart } from "./public/ForecastTrendChart";
+import type { PointForecastData } from "@shared/lib/types";
 
 export default function Public() {
   const office = useOffice();
@@ -217,6 +219,7 @@ export default function Public() {
                   <Calendar /> 7-day Forecast for {pointForecast?.placeName}
                 </Label>
                 {/* put a little graph here that shows temperature with normals */}
+                <ForecastTrendChart forecastData={pointForecast as PointForecastData} />
                 {dailyForecasts?.map((period) => {
                   return (
                     <div

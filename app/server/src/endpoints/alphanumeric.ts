@@ -18,7 +18,7 @@ import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 
 import { avwxDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
-import type { HubData, WxOAPIResponse, XmetGeoJSON } from "../lib/types.js";
+import type { HubData, PointForecastData, WxOAPIResponse, XmetGeoJSON } from "../lib/types.js";
 
 const HubSites: Record<string, string> = {
   CYYZ: "Toronto Pearson Int'l Airport",
@@ -227,13 +227,15 @@ export const alphanumericRouter = router({
     }
   }),
 
-  pointForecast: publicProcedure.input(publicPointSchema).query(async ({ input }) => {
+  pointForecast: publicProcedure.input(publicPointSchema).query(async ({ input }): Promise<PointForecastData> => {
     const { lat, lon } = input;
 
     console.log("[API] Requesting point forecast for:", lat.toFixed(3), lon.toFixed(3));
 
     // https://weather.gc.ca/api/app/v3/en/Location/53.536,-113.494?type=city
     const apiUrl = `https://weather.gc.ca/api/app/v3/en/Location/${lat.toFixed(3)},${lon.toFixed(3)}?type=city`;
+
+    console.log("[API] Fetching from URL:", apiUrl);
 
     try {
       const response = (await fetch(apiUrl, { headers: DEFAULT_REMOTE_HEADERS }).then((res) =>
@@ -304,6 +306,7 @@ export const alphanumericRouter = router({
           label: period.periodLabel,
           text: period.text,
           iconCode: period.iconCode,
+          ttType: period.temperature.periodHigh ? ("high" as const) : ("low" as const),
           tt: period.temperature.metric,
           aqhiVal: 9999,
         };
