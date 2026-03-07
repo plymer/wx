@@ -4,10 +4,9 @@ interface Props {
   forecastData: PointForecastData;
 }
 
-const lineLabel = { textAnchor: "middle" as const, fontSize: "16px", x: 50 };
-const normalsLine = { x1: 0, x2: 800, strokeOpacity: 0.5 };
-const BASE_HEIGHT = 150;
+const BASE_HEIGHT = 200;
 const TARGET_LENGTH = 600;
+const LABEL_X_START = 25;
 
 export const ForecastTrendChart = ({ forecastData }: Props) => {
   const { normals, dailyForecasts } = forecastData;
@@ -48,37 +47,21 @@ export const ForecastTrendChart = ({ forecastData }: Props) => {
   // so for temperatures, positive temperatures are negative, and negaitve temperatures are positive, and we also need to add some padding to the top and bottom so the points don't get cut off
 
   return (
-    <div>
-      <svg
-        viewBox={`0 ${-maxBound / yScale} ${TARGET_LENGTH + 200} ${BASE_HEIGHT}`}
-        width={TARGET_LENGTH + 200}
-        height={BASE_HEIGHT}
-        className="w-full bg-neutral-800"
-      >
-        {COLOUR_BANDS.map((band, i) => (
-          <ColourBand key={i} {...band} yScale={yScale} />
-        ))}
-        <line {...normalsLine} y1={0} y2={0} stroke="black" strokeWidth={3} strokeOpacity={1} />
-        <text x={20} y={0} textAnchor="end" fill="white">
-          0&deg;
-        </text>
-        <line {...normalsLine} y1={-normals.high / yScale} y2={-normals.high / yScale} stroke="pink" />
-        <text {...lineLabel} y={-normals.high / yScale - 6} fill="pink">
-          {normals.high}&deg;C
-        </text>
-        <line {...normalsLine} y1={-normals.low / yScale} y2={-normals.low / yScale} stroke="lightblue" />
-        <text {...lineLabel} y={-normals.low / yScale + 16} fill="lightblue">
-          {normals.low}&deg;C
-        </text>
+    <svg
+      viewBox={`0 ${-maxBound / yScale} ${TARGET_LENGTH + 200} ${BASE_HEIGHT}`}
+      width={TARGET_LENGTH + 200}
+      height={BASE_HEIGHT}
+      className="w-full bg-neutral-800"
+    >
+      {COLOUR_BANDS.map((band, i) => (
+        <ColourBand key={i} {...band} yScale={yScale} />
+      ))}
 
-        <TemperatureTrendGraph
-          dailyForecasts={dailyForecasts}
-          yScale={yScale}
-          maxBound={maxBound}
-          minBound={minBound}
-        />
-      </svg>
-    </div>
+      <ZeroLine />
+      <NormalsLines normals={normals} yScale={yScale} />
+
+      <TemperatureTrendGraph dailyForecasts={dailyForecasts} yScale={yScale} maxBound={maxBound} minBound={minBound} />
+    </svg>
   );
 };
 
@@ -102,7 +85,7 @@ const ColourBand = ({ ttStart, ttSpan, color, yScale }: ColourBandProps) => {
         fill={color}
         fillOpacity={1}
       />
-      <text x={20} y={yValue} textAnchor="end" fill={"white"} fontSize="12px">
+      <text x={LABEL_X_START} y={yValue} textAnchor="end" fill={"white"} fontSize="12px">
         {ttStart < 0 ? ttStart : ttStart + 5}&deg;
       </text>
     </g>
@@ -121,11 +104,12 @@ const TemperatureTrendGraph = ({ dailyForecasts, yScale, maxBound, minBound }: T
   const startX = 150;
 
   const temperaturePoints = dailyForecasts.map((d, i) => {
+    const { tt, label: period, ttType: type } = d;
     const xOffset = i * xDelta;
 
     const x = startX + xOffset;
-    const y = -Number(d.tt) / yScale;
-    return { x, y, tt: d.tt, period: d.label, type: d.ttType };
+    const y = -Number(tt) / yScale;
+    return { x, y, tt, period, type };
   });
 
   return (
@@ -162,12 +146,19 @@ const TemperatureTrendLine = ({ points }: TemperaturePlotProps) => {
 const TemperaturePoints = ({ points }: TemperaturePlotProps) => {
   return points.map((p) => (
     <g>
-      <circle cx={p.x} cy={p.y} r={5} fill={"white"} />
+      <circle
+        cx={p.x}
+        cy={p.y}
+        r={5}
+        fill={p.type === "high" ? "#991717" : "#174099"}
+        stroke="white"
+        strokeWidth={1.5}
+      />
       <text
         x={p.x}
         y={p.type === "high" ? p.y + 24 : p.y - 12}
         textAnchor="middle"
-        fill={"white"}
+        fill="white"
         fontSize="20px"
         fontFamily="monospace"
         stroke="black"
@@ -191,22 +182,116 @@ const DayLabels = ({ points, maxBound, minBound, yScale }: DayLabelsProps) => {
       yPos = -minBound / yScale + 24;
     }
 
+    const charCalc = p.period.length * 8 + 4;
+    const maxLabelWidth = 80;
+    const labelWidth = charCalc < maxLabelWidth ? charCalc : maxLabelWidth;
+    const labelXStart = p.x - labelWidth / 2;
+
     return (
       <g>
-        <text x={p.x} y={yPos} textAnchor="middle" fill="white" fontSize="14px">
-          {p.period}
-        </text>
         <line
           x1={p.x}
           x2={p.x}
-          y1={-BASE_HEIGHT}
-          y2={BASE_HEIGHT}
+          y1={-BASE_HEIGHT * 4}
+          y2={BASE_HEIGHT * 4}
           stroke="white"
           strokeWidth={1}
           strokeDasharray={"2 2"}
           strokeOpacity={0.5}
         />
+        <rect
+          x={labelXStart}
+          y={yPos - 14}
+          width={labelWidth}
+          height={20}
+          fill="black"
+          fillOpacity={0.75}
+          rx={8}
+          ry={8}
+        />
+        <text x={p.x} y={yPos} textAnchor="middle" fill="white" fontSize="12px">
+          {p.period}
+        </text>
       </g>
     );
   });
+};
+
+const NormalsLines = ({ normals, yScale }: { normals: PointForecastData["normals"]; yScale: number }) => {
+  const xBase = 50;
+  const textBoxWidth = 50;
+  const textPosX = textBoxWidth / 2 + xBase;
+
+  const normalsLineXStart = xBase + textBoxWidth - 2;
+
+  const yHigh = -normals.high / yScale;
+  const yLow = -normals.low / yScale;
+
+  const lowColour = "#174099";
+  const highColour = "#991717";
+
+  return (
+    <g>
+      <line
+        x1={xBase + 1}
+        x2={TARGET_LENGTH + 200}
+        y1={yHigh + 0.5}
+        y2={yHigh + 0.5}
+        stroke="black"
+        strokeOpacity={0.75}
+        strokeWidth={7}
+      />
+      <rect
+        x={xBase}
+        y={yHigh - 12}
+        width={textBoxWidth}
+        height={24}
+        fill={highColour}
+        stroke="black"
+        strokeWidth={2}
+        rx={12}
+        ry={12}
+      />
+      <line x1={normalsLineXStart} x2={TARGET_LENGTH + 200} y1={yHigh} y2={yHigh} stroke={highColour} strokeWidth={3} />
+      <text textAnchor="middle" fontSize="14px" fontWeight="bold" x={textPosX} y={yHigh + 6} fill="white">
+        {normals.high}&deg;C
+      </text>
+
+      <line
+        x1={normalsLineXStart}
+        x2={TARGET_LENGTH + 200}
+        y1={yLow - 0.5}
+        y2={yLow - 0.5}
+        stroke="black"
+        strokeOpacity={0.75}
+        strokeWidth={7}
+      />
+      <rect
+        x={xBase}
+        y={yLow - 12}
+        width={textBoxWidth}
+        height={24}
+        fill={lowColour}
+        stroke="black"
+        strokeWidth={2}
+        rx={12}
+        ry={12}
+      />
+      <line x1={normalsLineXStart} x2={TARGET_LENGTH + 200} y1={yLow} y2={yLow} stroke={lowColour} strokeWidth={3} />
+      <text textAnchor="middle" fontSize="14px" fontWeight="bold" x={textPosX} y={yLow + 4} fill="white">
+        {normals.low}&deg;C
+      </text>
+    </g>
+  );
+};
+
+const ZeroLine = () => {
+  return (
+    <>
+      <line x1={0} x2={TARGET_LENGTH + 200} y1={0} y2={0} stroke="black" strokeWidth={3} strokeOpacity={1} />
+      <text x={LABEL_X_START} y={0} textAnchor="end" fill="white">
+        0&deg;
+      </text>
+    </>
+  );
 };
