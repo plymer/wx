@@ -306,7 +306,10 @@ export const alphanumericRouter = router({
           label: period.periodLabel,
           text: period.text,
           iconCode: period.iconCode,
-          ttType: period.temperature.periodHigh ? ("high" as const) : ("low" as const),
+          ttType:
+            period.temperature.periodHigh !== undefined && period.temperature.periodHigh !== null
+              ? ("high" as const)
+              : ("low" as const),
           tt: period.temperature.metric,
           aqhiVal: 9999,
         };
