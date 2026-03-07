@@ -13,8 +13,8 @@ export const ForecastTrendChart = ({ forecastData }: Props) => {
 
   const dailyTemps = dailyForecasts.map((d) => Number(d.tt));
 
-  const maxBound = Math.max(normals.high, ...dailyTemps); // degrees Celsius
-  const minBound = Math.min(normals.low, ...dailyTemps); // degrees Celsius
+  const maxBound = Math.max(normals.high, ...dailyTemps) + 5; // degrees Celsius
+  const minBound = Math.min(normals.low, ...dailyTemps) - 5; // degrees Celsius
 
   const height = Math.abs(maxBound - minBound); // degrees Celsius
 
@@ -50,8 +50,8 @@ export const ForecastTrendChart = ({ forecastData }: Props) => {
     <svg
       viewBox={`0 ${-maxBound / yScale} ${TARGET_LENGTH + 200} ${BASE_HEIGHT}`}
       width={TARGET_LENGTH + 200}
-      height={BASE_HEIGHT}
-      className="w-full bg-neutral-800"
+      preserveAspectRatio="xMidYMid meet"
+      className="w-full h-auto bg-neutral-800"
     >
       {COLOUR_BANDS.map((band, i) => (
         <ColourBand key={i} {...band} yScale={yScale} />
@@ -177,9 +177,9 @@ const DayLabels = ({ points, maxBound, minBound, yScale }: DayLabelsProps) => {
     let yPos: number;
 
     if (i % 2 === 0) {
-      yPos = -maxBound / yScale - 12;
+      yPos = -maxBound / yScale + 16;
     } else {
-      yPos = -minBound / yScale + 24;
+      yPos = -minBound / yScale - 8;
     }
 
     const charCalc = p.period.length * 8 + 4;
