@@ -18,7 +18,7 @@
     "preview:client": "pnpm --filter client preview",
     "preview:server": "pnpm --filter server start",
     "preview": "pnpm run build:server && pm2 restart data.config.cjs && concurrently 'pnpm run preview:client' 'pnpm run preview:server'",
-    "deploy": "sudo systemctl stop mysql && pnpm install && pnpm build && pm2 restart data.config.cjs && pm2 restart beta.config.cjs && pm2 save && sudo systemctl start mysql",
+    "deploy": "pnpm install && pm2 stop data.config.cjs && sudo systemctl stop mysql && pnpm build && sudo systemctl start mysql && pm2 start data.config.cjs && pm2 restart beta.config.cjs && pm2 save",
     "sprites:icons": "spreet --sdf public/sprites/icons public/sprites/icons && spreet --retina --sdf public/sprites/icons public/sprites/icons@2x",
     "db:push": "pnpm run aqdb:push && pnpm run avwxdb:push",
     "db:rebuild": "docker compose down -v && docker compose up -d",
