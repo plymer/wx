@@ -18,7 +18,7 @@
     "preview:client": "pnpm --filter client preview",
     "preview:server": "pnpm --filter server start",
     "preview": "pnpm run build:server && pm2 restart data.config.cjs && concurrently 'pnpm run preview:client' 'pnpm run preview:server'",
-    "deploy": "pm2 stop beta.config.cjs && pnpm install && pnpm build && pm2 start beta.config.cjs && pm2 save",
+    "deploy": "pm2 stop data.config.cjs && pnpm install && pnpm build && pm2 start data.config.cjs && pm2 restart beta.config.cjs && pm2 save",
     "sprites:icons": "spreet --sdf public/sprites/icons public/sprites/icons && spreet --retina --sdf public/sprites/icons public/sprites/icons@2x",
     "db:push": "pnpm run aqdb:push && pnpm run avwxdb:push",
     "db:rebuild": "docker compose down -v && docker compose up -d",
