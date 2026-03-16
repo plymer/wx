@@ -7,7 +7,7 @@ export function createSwrCacheHandler<T>({
   staleMs,
   fetchFn,
   cache,
-  max,
+  max = 1,
 }: {
   cacheKey: string;
   freshMs: number;
@@ -16,7 +16,7 @@ export function createSwrCacheHandler<T>({
   cache?: LRUCache<string, SwrCacheEntry<T>>;
   max?: number;
 }) {
-  const swrCache = cache ?? new LRUCache<string, SwrCacheEntry<T>>({ max: max ?? 1 });
+  const swrCache = cache ?? new LRUCache<string, SwrCacheEntry<T>>({ max });
   let refreshPromise: Promise<T> | null = null;
 
   const refresh = async (): Promise<T> => {
