@@ -13,7 +13,7 @@ import type {
   WxOPolygonProperties,
 } from "../lib/types.js";
 import { metars, tafs } from "../db/tables/avwx.drizzle.js";
-import { HOUR } from "../lib/constants.js";
+import { HOUR, MINUTE } from "../lib/constants.js";
 
 import { avwxDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
@@ -22,6 +22,106 @@ import { limitResultsByKeys } from "../lib/utils.js";
 import * as fs from "fs/promises";
 import path from "path";
 import "dotenv/config";
+import { createSwrCacheHandler } from "../lib/swrCacheHandler.js";
+
+// use stale-while-revalidate caching for the wxmap data
+// data is at most considered stale after 5 minutes
+// data is refreshed in the background every minute, so it should never be more than 1 minute old
+const wxmapMetarsSwr = createSwrCacheHandler<FeatureCollection<Point, StationPlotData>>({
+  cacheKey: "wxmapMetars",
+  freshMs: MINUTE,
+  staleMs: 5 * MINUTE,
+  fetchFn: fetchWxmapMetarsData,
+});
+
+const wxmapPopupSwr = createSwrCacheHandler<FeatureCollection<Point, StationPlotPopupData>>({
+  cacheKey: "wxmapPopupData",
+  freshMs: MINUTE,
+  staleMs: 5 * MINUTE,
+  fetchFn: fetchWxmapPopupData,
+});
+
+async function fetchWxmapMetarsData(): Promise<FeatureCollection<Point, StationPlotData>> {
+  if (!avwxDb) {
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
+  }
+
+  const queryResult = (await avwxDb.query.metars.findMany({
+    where: gt(metars.validTime, new Date(Date.now() - 4 * HOUR)),
+    with: { stations: { columns: { lat: true, lon: true } } },
+  })) as MetarWithStation[];
+
+  return turf.featureCollection(buildMetarFeatures(queryResult));
+}
+
+async function fetchWxmapPopupData(): Promise<FeatureCollection<Point, StationPlotPopupData>> {
+  if (!avwxDb) {
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
+  }
+
+  const metarsQuery = await avwxDb.query.metars
+    .findMany({
+      where: gt(metars.validTime, new Date(Date.now() - 4 * HOUR)),
+      with: { stations: { columns: { lat: true, lon: true, country: true, name: true, state: true } } },
+      orderBy: [asc(metars.validTime)],
+    })
+    .then((results) => limitResultsByKeys(results, 3, "siteId"));
+
+  const metarList: Record<string, string[]> = {};
+  metarsQuery.forEach((m) => {
+    if (!m.rawText) return;
+
+    if (metarList[m.siteId]) {
+      metarList[m.siteId].push(m.rawText);
+    } else {
+      metarList[m.siteId] = [m.rawText];
+    }
+  });
+
+  const tafsQuery = await avwxDb.query.tafs
+    .findMany({
+      where: gt(tafs.validTime, new Date(Date.now() - 8 * HOUR)),
+      orderBy: [asc(tafs.validTime)],
+    })
+    .then((results) => limitResultsByKeys(results, 1, "siteId"));
+
+  const popupData = metarsQuery.reduce<Feature<Point, StationPlotPopupData>[]>((acc, m) => {
+    if (!m.rawText || !m.stations) return acc;
+
+    const siteId = m.siteId;
+
+    const { lat, lon, name: siteName, country: siteCountry, state: siteState } = m.stations;
+
+    const currentTaf = tafsQuery.find((t) => t.siteId === siteId);
+
+    const existingFeature = acc.find((feature) => feature.properties.siteId === siteId);
+
+    if (existingFeature) {
+      return acc;
+    } else {
+      const newFeature: Feature<Point, StationPlotPopupData> = {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [lon, lat],
+        },
+        properties: {
+          siteId,
+          siteName,
+          siteCountry,
+          siteState,
+          metars: metarList[siteId] || [],
+          taf: currentTaf ? currentTaf.rawText : null,
+          dataType: "site",
+        },
+      };
+      acc.push(newFeature);
+      return acc;
+    }
+  }, []);
+
+  return turf.featureCollection(popupData);
+}
 
 // Generic function to convert METAR query results to GeoJSON features
 function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, StationPlotData>[] {
@@ -74,83 +174,15 @@ export const wxmapRouter = router({
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
-    const queryResult = (await avwxDb.query.metars.findMany({
-      where: gt(metars.validTime, new Date(Date.now() - 4 * HOUR)),
-      with: { stations: { columns: { lat: true, lon: true } } },
-    })) as MetarWithStation[];
-
-    const metarFeatures = turf.featureCollection(buildMetarFeatures(queryResult));
-
-    return metarFeatures;
+    return wxmapMetarsSwr.get();
   }),
 
-  wxmapPopupData: publicProcedure.query(async () => {
+  wxmapPopupData: publicProcedure.query(async (): Promise<FeatureCollection<Point, StationPlotPopupData>> => {
     if (!avwxDb) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
-    const metarsQuery = await avwxDb.query.metars
-      .findMany({
-        where: gt(metars.validTime, new Date(Date.now() - 4 * HOUR)),
-        with: { stations: { columns: { lat: true, lon: true, country: true, name: true, state: true } } },
-        orderBy: [asc(metars.validTime)],
-      })
-      .then((results) => limitResultsByKeys(results, 3, "siteId"));
-
-    const metarList: Record<string, string[]> = {};
-    metarsQuery.forEach((m) => {
-      if (!m.rawText) return;
-
-      if (metarList[m.siteId]) {
-        metarList[m.siteId].push(m.rawText);
-      } else {
-        metarList[m.siteId] = [m.rawText];
-      }
-    });
-
-    const tafsQuery = await avwxDb.query.tafs
-      .findMany({
-        where: gt(tafs.validTime, new Date(Date.now() - 8 * HOUR)),
-        orderBy: [asc(tafs.validTime)],
-      })
-      .then((results) => limitResultsByKeys(results, 1, "siteId"));
-
-    const popupData = metarsQuery.reduce<Feature<Point, StationPlotPopupData>[]>((acc, m) => {
-      if (!m.rawText || !m.stations) return acc;
-
-      const siteId = m.siteId;
-
-      const { lat, lon, name: siteName, country: siteCountry, state: siteState } = m.stations;
-
-      const currentTaf = tafsQuery.find((t) => t.siteId === siteId);
-
-      const existingFeature = acc.find((feature) => feature.properties.siteId === siteId);
-
-      if (existingFeature) {
-        return acc;
-      } else {
-        const newFeature: Feature<Point, StationPlotPopupData> = {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [lon, lat],
-          },
-          properties: {
-            siteId,
-            siteName,
-            siteCountry,
-            siteState,
-            metars: metarList[siteId] || [],
-            taf: currentTaf ? currentTaf.rawText : null,
-            dataType: "site",
-          },
-        };
-        acc.push(newFeature);
-        return acc;
-      }
-    }, []);
-
-    return turf.featureCollection(popupData);
+    return wxmapPopupSwr.get();
   }),
 
   wxmapPublicWarnings: publicProcedure.query(async (): Promise<FeatureCollection<MultiPolygon, WarningProperties>> => {
