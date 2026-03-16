@@ -41,6 +41,13 @@ const wxmapPopupSwr = createSwrCacheHandler<FeatureCollection<Point, StationPlot
   fetchFn: fetchWxmapPopupData,
 });
 
+const wxmapPublicWarnings = createSwrCacheHandler<FeatureCollection<MultiPolygon, WarningProperties>>({
+  cacheKey: "wxmapPublicWarnings",
+  freshMs: MINUTE,
+  staleMs: 5 * MINUTE,
+  fetchFn: fetchWxmapPublicWarnings,
+});
+
 async function fetchWxmapMetarsData(): Promise<FeatureCollection<Point, StationPlotData>> {
   if (!avwxDb) {
     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
@@ -123,6 +130,143 @@ async function fetchWxmapPopupData(): Promise<FeatureCollection<Point, StationPl
   return turf.featureCollection(popupData);
 }
 
+async function fetchWxmapPublicWarnings(): Promise<FeatureCollection<MultiPolygon, WarningProperties>> {
+  const fileName = "public-alerts.json";
+
+  const fileLocation = process.env.STATIC_DATA_DIR
+    ? path.join(process.env.STATIC_DATA_DIR, fileName)
+    : path.resolve("../../static-data", fileName);
+
+  const data = await fs
+    .readFile(fileLocation)
+    .then(
+      (data) =>
+        JSON.parse(data.toString()) as {
+          type: "FeatureCollection";
+          uuid: string;
+          alerts: WxOPolygonAlert;
+          features: Feature<MultiPolygon, WxOPolygonProperties>[];
+        },
+    )
+    .catch((error) => {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Failed to read public warnings from file: ${error.message}`,
+      });
+    });
+
+  const alerts = Object.entries(data.alerts).reduce<Record<string, WxOAlert>>((acc, [alertRef, alert]) => {
+    acc[alertRef] = alert;
+    return acc;
+  }, {});
+
+  // create new features based on the alerts that are presently active
+  // each feature may have multiple alerts associated with it, so we need to create multiple features (with the same geometry) for each alert
+
+  const extractedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];
+
+  data.features.forEach((feature) => {
+    const alertArray = feature.properties.alerts;
+
+    alertArray.forEach((alertObject) => {
+      const alertData = alerts[alertObject.alertRef];
+
+      const newFeature: Feature<MultiPolygon, WarningProperties> = {
+        type: "Feature",
+        geometry: feature.geometry,
+        properties: {
+          alertCode: alertData.alertCode,
+          type: alertData.type,
+          issueTime: alertData.issueTime,
+          alertNameShort: alertData.alertNameShort,
+          colour: alertData.colour,
+          impact: alertData.impact,
+          confidence: alertData.confidence,
+          dataType: "publicAlert",
+        },
+      };
+
+      extractedFeatures.push(newFeature);
+    });
+  });
+
+  // now we want to dissolve all feature polygons of the same alert code into single features
+  // group features by alertCode and flatten MultiPolygons to Polygons
+  const groupedByAlertCode = extractedFeatures.reduce<Record<string, Feature<Polygon, WarningProperties>[]>>(
+    (acc, feature) => {
+      const alertCode = feature.properties.alertCode;
+      if (!acc[alertCode]) {
+        acc[alertCode] = [];
+      }
+
+      // flatten MultiPolygon to individual Polygons
+      const flattened = turf.flatten(feature);
+      flattened.features.forEach((f) => {
+        acc[alertCode].push({
+          type: "Feature",
+          geometry: f.geometry as Polygon,
+          properties: feature.properties,
+        });
+      });
+
+      return acc;
+    },
+    {},
+  );
+
+  // dissolve each group
+  const dissolvedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];
+
+  Object.entries(groupedByAlertCode).forEach(([_, features]) => {
+    const properties = features[0].properties;
+
+    if (features.length === 1) {
+      // only one polygon for this alert code, convert back to MultiPolygon
+      dissolvedFeatures.push({
+        type: "Feature",
+        geometry: {
+          type: "MultiPolygon",
+          coordinates: [features[0].geometry.coordinates],
+        },
+        properties,
+      });
+    } else {
+      // combine all polygons with the same alert code
+      const featureCollection = turf.featureCollection(features);
+      const dissolved = turf.dissolve(featureCollection, { propertyName: "alertCode" });
+
+      // convert dissolved Polygons back to MultiPolygons
+      dissolved.features.forEach((dissolvedFeature) => {
+        let geometry: MultiPolygon;
+
+        if (dissolvedFeature.geometry.type === "Polygon") {
+          geometry = {
+            type: "MultiPolygon",
+            coordinates: [dissolvedFeature.geometry.coordinates],
+          };
+        } else {
+          // dissolve can sometimes return MultiPolygon if there are disjoint areas
+          geometry = dissolvedFeature.geometry as unknown as MultiPolygon;
+        }
+
+        dissolvedFeatures.push({
+          type: "Feature",
+          geometry,
+          properties,
+        });
+      });
+    }
+  });
+
+  const dataCollection: FeatureCollection<MultiPolygon, WarningProperties> = {
+    type: "FeatureCollection",
+    features: dissolvedFeatures,
+  };
+
+  // simplify the polygons to reduce complexity, improve client performance, and reduce payload size
+  return turf.simplify(dataCollection, { tolerance: 0.001, highQuality: false, mutate: true });
+}
+
 // Generic function to convert METAR query results to GeoJSON features
 function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, StationPlotData>[] {
   return queryResult.reduce<Feature<Point, StationPlotData>[]>((acc, metar) => {
@@ -174,6 +318,7 @@ export const wxmapRouter = router({
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
+    console.log("[API] Fetching station plot data for wxmap...");
     return wxmapMetarsSwr.get();
   }),
 
@@ -182,144 +327,13 @@ export const wxmapRouter = router({
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
+    console.log("[API] Fetching popup data for wxmap...");
     return wxmapPopupSwr.get();
   }),
 
   wxmapPublicWarnings: publicProcedure.query(async (): Promise<FeatureCollection<MultiPolygon, WarningProperties>> => {
     console.log("[API] Fetching public warnings for wxmap...");
-    const fileName = "public-alerts.json";
 
-    const fileLocation = process.env.STATIC_DATA_DIR
-      ? path.join(process.env.STATIC_DATA_DIR, fileName)
-      : path.resolve("../../static-data", fileName);
-
-    const data = await fs
-      .readFile(fileLocation)
-      .then(
-        (data) =>
-          JSON.parse(data.toString()) as {
-            type: "FeatureCollection";
-            uuid: string;
-            alerts: WxOPolygonAlert;
-            features: Feature<MultiPolygon, WxOPolygonProperties>[];
-          },
-      )
-      .catch((error) => {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: `Failed to read public warnings from file: ${error.message}`,
-        });
-      });
-
-    const alerts = Object.entries(data.alerts).reduce<Record<string, WxOAlert>>((acc, [alertRef, alert]) => {
-      acc[alertRef] = alert;
-      return acc;
-    }, {});
-
-    // create new features based on the alerts that are presently active
-    // each feature may have multiple alerts associated with it, so we need to create multiple features (with the same geometry) for each alert
-
-    const extractedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];
-
-    data.features.forEach((feature) => {
-      const alertArray = feature.properties.alerts;
-
-      alertArray.forEach((alertObject) => {
-        const alertData = alerts[alertObject.alertRef];
-
-        const newFeature: Feature<MultiPolygon, WarningProperties> = {
-          type: "Feature",
-          geometry: feature.geometry,
-          properties: {
-            alertCode: alertData.alertCode,
-            type: alertData.type,
-            issueTime: alertData.issueTime,
-            alertNameShort: alertData.alertNameShort,
-            colour: alertData.colour,
-            impact: alertData.impact,
-            confidence: alertData.confidence,
-            dataType: "publicAlert",
-          },
-        };
-
-        extractedFeatures.push(newFeature);
-      });
-    });
-
-    // now we want to dissolve all feature polygons of the same alert code into single features
-    // group features by alertCode and flatten MultiPolygons to Polygons
-    const groupedByAlertCode = extractedFeatures.reduce<Record<string, Feature<Polygon, WarningProperties>[]>>(
-      (acc, feature) => {
-        const alertCode = feature.properties.alertCode;
-        if (!acc[alertCode]) {
-          acc[alertCode] = [];
-        }
-
-        // flatten MultiPolygon to individual Polygons
-        const flattened = turf.flatten(feature);
-        flattened.features.forEach((f) => {
-          acc[alertCode].push({
-            type: "Feature",
-            geometry: f.geometry as Polygon,
-            properties: feature.properties,
-          });
-        });
-
-        return acc;
-      },
-      {},
-    );
-
-    // dissolve each group
-    const dissolvedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];
-
-    Object.entries(groupedByAlertCode).forEach(([_, features]) => {
-      const properties = features[0].properties;
-
-      if (features.length === 1) {
-        // only one polygon for this alert code, convert back to MultiPolygon
-        dissolvedFeatures.push({
-          type: "Feature",
-          geometry: {
-            type: "MultiPolygon",
-            coordinates: [features[0].geometry.coordinates],
-          },
-          properties,
-        });
-      } else {
-        // combine all polygons with the same alert code
-        const featureCollection = turf.featureCollection(features);
-        const dissolved = turf.dissolve(featureCollection, { propertyName: "alertCode" });
-
-        // convert dissolved Polygons back to MultiPolygons
-        dissolved.features.forEach((dissolvedFeature) => {
-          let geometry: MultiPolygon;
-
-          if (dissolvedFeature.geometry.type === "Polygon") {
-            geometry = {
-              type: "MultiPolygon",
-              coordinates: [dissolvedFeature.geometry.coordinates],
-            };
-          } else {
-            // dissolve can sometimes return MultiPolygon if there are disjoint areas
-            geometry = dissolvedFeature.geometry as unknown as MultiPolygon;
-          }
-
-          dissolvedFeatures.push({
-            type: "Feature",
-            geometry,
-            properties,
-          });
-        });
-      }
-    });
-
-    const dataCollection: FeatureCollection<MultiPolygon, WarningProperties> = {
-      type: "FeatureCollection",
-      features: dissolvedFeatures,
-    };
-
-    // simplify the polygons to reduce complexity, improve client performance, and reduce payload size
-    return turf.simplify(dataCollection, { tolerance: 0.001, highQuality: false, mutate: true });
+    return wxmapPublicWarnings.get();
   }),
 });
