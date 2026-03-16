@@ -28,6 +28,8 @@ export function createSwrCacheHandler<T>({
       .then((data) => {
         const now = Date.now();
 
+        console.log(`[${cacheKey}] Cache refreshed at ${new Date(now).toISOString()}`);
+
         swrCache.set(cacheKey, {
           data,
           freshUntil: now + freshMs,
