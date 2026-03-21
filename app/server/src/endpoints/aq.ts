@@ -6,12 +6,12 @@ import { aqData } from "../db/tables/aq.drizzle.js";
 import { aqSchema } from "../validationSchemas/aq.zod.js";
 import { HOUR } from "../lib/constants.js";
 
-import type { AQData } from "../lib/types.js";
+import type { AirQualityData, AQData } from "../lib/types.js";
 import { aqDb } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
 
 export const aqRouter = router({
-  aq: publicProcedure.input(aqSchema).query(async ({ input }) => {
+  aq: publicProcedure.input(aqSchema).query(async ({ input }): Promise<Array<Feature<Point, AirQualityData>>> => {
     if (!aqDb) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No AQ database connection available" });
     }
@@ -26,13 +26,13 @@ export const aqRouter = router({
         where: gte(aqData.validTime, then),
       });
 
-      const geoData = data.reduce((acc: Array<Feature<Point>>, item: AQData) => {
+      const geoData = data.reduce((acc: Array<Feature<Point, AirQualityData>>, item: AQData) => {
         if (!item.lat || !item.lon) {
           console.warn(`Skipping item with missing coordinates: ${JSON.stringify(item)}`);
           return acc;
         }
 
-        const output: Feature<Point> = {
+        const output: Feature<Point, AirQualityData> = {
           type: "Feature",
           geometry: {
             type: "Point",

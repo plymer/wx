@@ -13,7 +13,7 @@ export const chartsRouter = router({
       const url =
         "https://plan.navcanada.ca/weather/api/alpha/?site=CYEG&site=CYVR&site=CYZF&site=CYFB&site=CYYZ&site=CYHZ&site=CYRB&image=GFA/CLDWX&image=GFA/TURBC";
 
-      console.log("[API] Requesting GFAs from:", url);
+      console.log("[API] Requesting GFAs");
 
       const ncAPIData: NavCanResponse = await fetch(url)
         .then((gfas) => gfas.json())
@@ -56,7 +56,7 @@ export const chartsRouter = router({
     try {
       const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=SIG_WX//MID_LEVEL/*";
 
-      console.log("[API] Requesting SigWx charts from:", url);
+      console.log("[API] Requesting SigWx charts");
 
       const ncAPIData: NavCanResponse = await fetch(url)
         .then((gfas) => gfas.json())
@@ -100,7 +100,7 @@ export const chartsRouter = router({
     try {
       const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=TURBULENCE";
 
-      console.log("[API] Requesting HLT charts from:", url);
+      console.log("[API] Requesting HLT charts");
 
       const ncAPIData: NavCanResponse = await fetch(url)
         .then((gfas) => gfas.json())
@@ -141,7 +141,7 @@ export const chartsRouter = router({
     try {
       const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CZVR&image=LGF";
 
-      console.log("[API] Requesting LGFs from:", url);
+      console.log("[API] Requesting LGFs");
 
       const ncAPIData: NavCanResponse = await fetch(url)
         .then((lgfs) => lgfs.json())

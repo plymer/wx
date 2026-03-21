@@ -11,6 +11,10 @@ export type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
+export type Nullable<T> = {
+  [K in keyof T]: T[K] | null;
+};
+
 export type GFAData = {
   domain: string;
   cldwx: string[];
@@ -139,6 +143,8 @@ export type WmoDirection =
   | "NW"
   | "NNW"
   | "-";
+
+export type AirQualityData = Prettify<Nullable<Omit<AQData, "lat" | "lon" | "validTime"> & { validTime: Date }>>;
 
 export type RawIntlSigmetData = {
   isigmetId: number;

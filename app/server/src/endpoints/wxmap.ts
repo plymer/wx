@@ -318,7 +318,7 @@ export const wxmapRouter = router({
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
-    console.log("[API] Fetching station plot data for wxmap...");
+    console.log("[API] Fetching station plot data for wxmap");
     return wxmapMetarsSwr.get();
   }),
 
@@ -327,12 +327,12 @@ export const wxmapRouter = router({
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
-    console.log("[API] Fetching popup data for wxmap...");
+    console.log("[API] Fetching popup data for wxmap");
     return wxmapPopupSwr.get();
   }),
 
   wxmapPublicWarnings: publicProcedure.query(async (): Promise<FeatureCollection<MultiPolygon, WarningProperties>> => {
-    console.log("[API] Fetching public warnings for wxmap...");
+    console.log("[API] Fetching public warnings for wxmap");
 
     return wxmapPublicWarnings.get();
   }),
