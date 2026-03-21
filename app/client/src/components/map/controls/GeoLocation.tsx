@@ -26,7 +26,7 @@ export const GeoLocation = () => {
         // center once on first fix to avoid constant recentering
         if (!hasCenteredRef.current && map) {
           hasCenteredRef.current = true;
-          map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: map.getZoom() });
+          map.easeTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: map.getZoom() });
         }
       },
       (err) => {
