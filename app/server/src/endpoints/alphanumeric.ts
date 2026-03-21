@@ -235,8 +235,6 @@ export const alphanumericRouter = router({
     // https://weather.gc.ca/api/app/v3/en/Location/53.536,-113.494?type=city
     const apiUrl = `https://weather.gc.ca/api/app/v3/en/Location/${lat.toFixed(3)},${lon.toFixed(3)}?type=city`;
 
-    console.log("[API] Fetching from URL:", apiUrl);
-
     try {
       const response = (await fetch(apiUrl, { headers: DEFAULT_REMOTE_HEADERS }).then((res) =>
         res.json(),

@@ -3,6 +3,7 @@ import type { AppRouter } from "../../../server/src/main.js";
 import type { inferRouterOutputs } from "@trpc/server";
 import { keepPreviousData, QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink, httpLink, splitLink } from "@trpc/client";
+import superjson from "superjson";
 
 export type RouterOutputs = inferRouterOutputs<AppRouter>;
 
@@ -21,9 +22,13 @@ const trpcClient = createTRPCClient<AppRouter>({
         // Define your condition to split links here
         return op.context.skipBatch === true;
       },
-      true: httpLink({ url }),
+      true: httpLink({
+        transformer: superjson,
+        url,
+      }),
 
       false: httpBatchLink({
+        transformer: superjson,
         url,
       }),
     }),
