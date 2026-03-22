@@ -31,6 +31,7 @@ export const metars = mysqlTable(
     windDir: int("windDir"),
     windSpd: int("windSpd"),
     windGst: int("windGst"),
+    mslp: float("mslp"),
     vis: text("vis"),
     wxString: text("wxString"),
     category: varchar("category", { length: 4 }),

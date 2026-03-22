@@ -25,6 +25,8 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
 
+import { interpolateGeoJSON } from "@plymer/fast-barnes-ts";
+
 export const SurfaceDataLayer = () => {
   const zoom = useZoom();
   const enabled = useShowObs();
@@ -118,6 +120,19 @@ export const SurfaceDataLayer = () => {
     type: "FeatureCollection",
     features,
   };
+
+  const interpolatedPlots = useMemo(() => {
+    if (features.length === 0 || zoom > 12) return filteredPlots;
+
+    const interpolated = interpolateGeoJSON(filteredPlots, "mslp", "isolines", {
+      contourOptions: { spacing: 4, smooth: true },
+      resolution: 128,
+      sigma: 2,
+      coordinateMode: "euclidean",
+    });
+
+    return interpolated;
+  }, [filteredPlots]);
 
   return (
     <>
@@ -351,6 +366,37 @@ export const SurfaceDataLayer = () => {
           layout={{
             "text-field": "+",
             "text-allow-overlap": true,
+          }}
+        />
+      </Source>
+      <Source id="sfc-obs-interpolated" type="geojson" data={interpolatedPlots}>
+        <Layer
+          id="layer-sfc-obs-mslp-isolines"
+          type="line"
+          layout={{
+            "line-join": "round",
+            "line-cap": "round",
+          }}
+          paint={{
+            "line-color": "#eee",
+            "line-width": 3,
+          }}
+        />
+        <Layer
+          id="layer-sfc-obs-mslp-isolines-labels"
+          type="symbol"
+          layout={{
+            "symbol-placement": "line",
+            "symbol-spacing": 200,
+            "text-field": ["concat", ["to-string", ["round", ["get", "value"]]], " hPa"],
+            "text-font": ["Consolas-Regular"],
+            "text-size": 16,
+            "text-keep-upright": true,
+          }}
+          paint={{
+            "text-color": "#ffffff",
+            "text-halo-color": "#000000",
+            "text-halo-width": 1.5,
           }}
         />
       </Source>

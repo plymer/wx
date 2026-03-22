@@ -27,6 +27,8 @@ async function main() {
 
   const metarData = (parser.parse(xml) as XMLCacheFile<CacheMetarData, "metar">).response.data.metar;
 
+  console.log(metarData.find((metar) => metar.stationId === "CYEG"));
+
   try {
     const output: MetarData[] = metarData
       .map((metar) => {
@@ -45,6 +47,7 @@ async function main() {
         const {
           stationId: siteId,
           observationTime: validTime,
+          seaLevelPressureMb: mslp,
           rawText,
           flightCategory: category,
           tempC: tt,
@@ -67,6 +70,7 @@ async function main() {
           windGst,
           vis,
           wxString,
+          mslp,
           tt,
           td,
         };
@@ -86,6 +90,7 @@ async function main() {
               category: metar.category,
               tt: metar.tt,
               td: metar.td,
+              mslp: metar.mslp,
               windDir: metar.windDir,
               windSpd: metar.windSpd,
               windGst: metar.windGst,
