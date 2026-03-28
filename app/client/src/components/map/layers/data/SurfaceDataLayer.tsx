@@ -32,6 +32,19 @@ export const SurfaceDataLayer = () => {
   const enabled = useShowObs();
   const viewport = useViewportBounds();
 
+  const interpolationViewport = useMemo(() => {
+    if (!viewport) return undefined;
+
+    const searchOffset = 15;
+
+    return viewport.map((coord, idx) => (idx < 2 ? coord - searchOffset / zoom : coord + searchOffset / zoom)) as [
+      number,
+      number,
+      number,
+      number,
+    ];
+  }, [viewport, zoom]);
+
   const displayTime = useDisplayTime();
 
   const { data: plotData } = useQuery(
@@ -122,17 +135,53 @@ export const SurfaceDataLayer = () => {
   };
 
   const interpolatedPlots = useMemo(() => {
-    if (features.length === 0 || zoom > 12) return filteredPlots;
+    if (features.length === 0 || zoom > 12 || !interpolationViewport) return null;
 
-    const interpolated = interpolateGeoJSON(filteredPlots, "mslp", "isolines", {
+    const dataset = plotData.features.reduce<StationPlotGeoJSON["features"]>((acc, feature) => {
+      const coords = feature.geometry.coordinates;
+
+      // validate the coordinates
+      if (!hasValidCoordinates(coords)) return acc;
+
+      // if we are animating, only show stations that are in the current viewport
+      if (!checkIfInBounds(coords, interpolationViewport)) return acc;
+
+      const metar = feature.properties.metars
+        .sort((a, b) => {
+          const aDiff = displayTime - new Date(a.validTime).getTime();
+          const bDiff = displayTime - new Date(b.validTime).getTime();
+          return aDiff - bDiff;
+        })
+        .find(
+          (m) =>
+            new Date(m.validTime).getTime() <= displayTime && new Date(m.validTime).getTime() >= displayTime - 2 * HOUR,
+        );
+
+      if (metar) {
+        acc.push({
+          type: "Feature",
+          geometry: feature.geometry,
+          properties: {
+            mslp: metar.mslp,
+            tt: metar.tt,
+            validTimeString: new Date(metar.validTime).toISOString().replace("T", " ").slice(11, -8),
+            validTime: new Date(metar.validTime),
+            siteId: feature.properties.siteId,
+          } as StationPlotGeoJSON["features"][0]["properties"],
+        });
+      }
+
+      return acc;
+    }, []);
+
+    const interpolated = interpolateGeoJSON({ type: "FeatureCollection", features: dataset }, "mslp", "isolines", {
       contourOptions: { spacing: 4, smooth: true },
       resolution: 128,
-      sigma: 2,
-      coordinateMode: "euclidean",
+      sigma: 1.8,
     });
 
     return interpolated;
-  }, [filteredPlots]);
+  }, [plotData, displayTime, interpolationViewport]);
 
   return (
     <>
@@ -369,7 +418,11 @@ export const SurfaceDataLayer = () => {
           }}
         />
       </Source>
-      <Source id="sfc-obs-interpolated" type="geojson" data={interpolatedPlots}>
+      <Source
+        id="sfc-obs-interpolated"
+        type="geojson"
+        data={interpolatedPlots ?? { type: "FeatureCollection", features: [] }}
+      >
         <Layer
           id="layer-sfc-obs-mslp-isolines"
           type="line"
