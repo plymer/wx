@@ -78,6 +78,6 @@ async function fetchLightningData(): Promise<Feature<MultiPoint, { validTime: nu
 export const lightningRouter = router({
   lightning: publicProcedure.query(async () => {
     console.log("[API] Fetching lightning data");
-    lightningSwr.get();
+    return lightningSwr.get();
   }),
 });
