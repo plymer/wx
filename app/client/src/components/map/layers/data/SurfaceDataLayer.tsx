@@ -137,11 +137,11 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-id"
           filter={UNCLUSTERED}
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "siteId"],
             "text-offset": [1.5, 1.5],
-            visibility: zoom > ZOOM_THRESHOLDS.reduced ? "visible" : "none",
           }}
         />
 
@@ -150,12 +150,12 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-gust"
           beforeId="layer-sfc-obs-id"
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "windGst"],
             "text-anchor": "center",
             "text-offset": [0, 0],
-            visibility: zoom > ZOOM_THRESHOLDS.reduced ? "visible" : "none",
           }}
         />
 
@@ -164,12 +164,12 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-tt"
           filter={UNCLUSTERED}
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "tt"],
             "text-offset": [-1.5, -1.5],
             "text-size": 10,
-            visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
           }}
         />
 
@@ -178,12 +178,12 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-td"
           filter={UNCLUSTERED}
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "td"],
             "text-offset": [-1.5, 1.5],
             "text-size": 10,
-            visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
           }}
         />
 
@@ -192,12 +192,12 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-valid-time"
           filter={UNCLUSTERED}
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "validTimeString"],
             "text-offset": [0, 3],
             "text-size": 10,
-            visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
           }}
         />
 
@@ -206,12 +206,12 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-wx"
           filter={UNCLUSTERED}
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["concat", ["get", "vis"], " ", ["get", "wxString"]],
             "text-offset": [-1.5, 0],
             "text-anchor": "right",
-            visibility: zoom > ZOOM_THRESHOLDS.reduced ? "visible" : "none",
           }}
         />
       </Source>
@@ -269,6 +269,7 @@ export const SurfaceDataLayer = () => {
           beforeId="layer-sfc-obs-dot"
           id="layer-sfc-obs-windbarb"
           type="symbol"
+          minzoom={ZOOM_THRESHOLDS.mini}
           layout={{
             "icon-allow-overlap": true,
             "icon-image": [
@@ -288,7 +289,6 @@ export const SurfaceDataLayer = () => {
               ICON_SIZES.maximum.windbarb,
             ],
             "icon-rotate": ["get", "windDir"],
-            visibility: zoom > ZOOM_THRESHOLDS.mini ? "visible" : "none",
           }}
           paint={{
             "icon-halo-color": "#000",
