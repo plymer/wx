@@ -16,12 +16,12 @@ import {
 } from "@/config/stationPlots";
 import { AWC_ATTRIBUTION, UNCLUSTERED } from "@/config/vectorData";
 
-import { useViewportBounds, useZoom } from "@/stateStores/map/mapView";
+import { useMapStateActions, useViewportBounds, useZoom } from "@/stateStores/map/mapView";
 import { useShowObs } from "@/stateStores/map/vectorData";
 
 import { HOUR, MINUTE } from "@shared/lib/constants";
 import { checkIfInBounds, filterSpacedPoints, hasValidCoordinates } from "@/lib/utils";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
 
@@ -29,10 +29,11 @@ export const SurfaceDataLayer = () => {
   const zoom = useZoom();
   const enabled = useShowObs();
   const viewport = useViewportBounds();
+  const { setLoadingState } = useMapStateActions();
 
   const displayTime = useDisplayTime();
 
-  const { data: plotData } = useQuery(
+  const { data: plotData, fetchStatus: plotDataFetch } = useQuery(
     api.wxmap.wxmapMetars.queryOptions(undefined, {
       enabled,
       refetchInterval: MINUTE,
@@ -46,6 +47,11 @@ export const SurfaceDataLayer = () => {
       trpc: { context: { skipBatch: true } },
     }),
   );
+
+  useEffect(() => {
+    if (plotDataFetch === "fetching") setLoadingState(true);
+    else setLoadingState(false);
+  }, [plotDataFetch]);
 
   // construct our station priority list for each zoom level
   // this will give us a computed list of stations to show at each zoom level
