@@ -85,7 +85,7 @@ const ColourBand = ({ ttStart, ttSpan, color, yScale }: ColourBandProps) => {
         fill={color}
         fillOpacity={1}
       />
-      <text x={LABEL_X_START} y={yValue} textAnchor="end" fill={"white"} fontSize="12px">
+      <text x={LABEL_X_START} y={yValue + 5} textAnchor="end" fill={"white"} fontSize="12px" fontWeight="bold">
         {ttStart < 0 ? ttStart : ttStart + 5}&deg;
       </text>
     </g>
@@ -278,7 +278,7 @@ const ZeroLine = () => {
   return (
     <>
       <line x1={0} x2={TARGET_LENGTH + 200} y1={0} y2={0} stroke="black" strokeWidth={3} strokeOpacity={1} />
-      <text x={LABEL_X_START} y={0} textAnchor="end" fill="white">
+      <text x={LABEL_X_START} y={5} textAnchor="end" fill="white" fontWeight="bold">
         0&deg;
       </text>
     </>
