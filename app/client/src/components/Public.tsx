@@ -2,7 +2,7 @@ import { useBulletin, useCoords, useMode, useOffice, usePublicActions } from "@/
 
 import { PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { api } from "@/lib/trpc";
-import { Activity, useEffect, useMemo, useState } from "react";
+import { Activity, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 import { useQuery } from "@tanstack/react-query";
 import { MINUTE } from "@shared/lib/constants";
