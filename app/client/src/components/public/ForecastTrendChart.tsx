@@ -13,8 +13,8 @@ export const ForecastTrendChart = ({ forecastData }: Props) => {
 
   const dailyTemps = dailyForecasts.map((d) => Number(d.tt));
 
-  const maxBound = Math.max(normals.high, ...dailyTemps) + 5; // degrees Celsius
-  const minBound = Math.min(normals.low, ...dailyTemps) - 5; // degrees Celsius
+  const maxBound = Math.max(normals.high, ...dailyTemps) + 10; // degrees Celsius
+  const minBound = Math.min(normals.low, ...dailyTemps) - 8; // degrees Celsius
 
   const height = Math.abs(maxBound - minBound); // degrees Celsius
 
@@ -154,18 +154,7 @@ const TemperaturePoints = ({ points }: TemperaturePlotProps) => {
         stroke="white"
         strokeWidth={1.5}
       />
-      <text
-        x={p.x}
-        y={p.type === "high" ? p.y + 24 : p.y - 12}
-        textAnchor="middle"
-        fill="white"
-        fontSize="20px"
-        fontFamily="monospace"
-        stroke="black"
-        fontWeight="600"
-        strokeWidth={1}
-        strokeOpacity={1}
-      >
+      <text x={p.x} y={p.type === "high" ? p.y - 9 : p.y + 21} textAnchor="middle" fill="white" fontSize="16px">
         {p.tt}°C
       </text>
     </g>
