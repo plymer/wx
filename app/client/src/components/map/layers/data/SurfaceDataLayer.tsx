@@ -440,7 +440,7 @@ export const SurfaceDataLayer = () => {
           type="symbol"
           layout={{
             "symbol-placement": "line",
-            "symbol-spacing": 200,
+            "symbol-spacing": 400,
             "text-field": ["concat", ["to-string", ["round", ["get", "value"]]], " hPa"],
             "text-font": ["Consolas-Regular"],
             "text-size": 16,
