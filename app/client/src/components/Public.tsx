@@ -2,7 +2,7 @@ import { useBulletin, useCoords, useMode, useOffice, usePublicActions } from "@/
 
 import { PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { api } from "@/lib/trpc";
-import { Activity, useEffect, useState } from "react";
+import { Activity, useEffect, useMemo, useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 import { useQuery } from "@tanstack/react-query";
 import { MINUTE } from "@shared/lib/constants";
@@ -26,38 +26,30 @@ export default function Public() {
 
   const { setOffice, setBulletin, setMode } = usePublicActions();
 
-  const [searchCoords, setSearchCoords] = useState<Position | null>(null);
-
-  const [productList, setProductList] = useState<Record<string, string>>({});
-  const [issuerCode, setIssuerCode] = useState("");
-  const [productCode, setProductCode] = useState("");
+  const [searchCoords, setSearchCoords] = useState<Position | null>(pointCoords);
 
   const handleTextClick = () => setMode("text");
   const handlePointClick = () => setMode("point");
 
-  // right now, this effect fires whenever we change the office OR the bulletin
-  // but we actually need different logic for each of those cases
-  // when we change bulletin, update the issuer code and product code because each office can cover multiple issuers
+  const productList = PUBLIC_FORECAST_CONFIG[office].products;
+  const issuerCode = bulletin.slice(-4);
+  const productCode = bulletin.slice(0, 6);
+  const productKey = `${productCode}${issuerCode}`;
+  const productName = productList[productKey as keyof typeof productList];
 
-  // BUT
+  const handleChangeOffice = (newOffice: keyof typeof PUBLIC_FORECAST_CONFIG) => {
+    setOffice(newOffice);
+    const newProductList = PUBLIC_FORECAST_CONFIG[newOffice].products;
 
-  // when we change the office, we should try to default the product selected back to the first product in the list, unless the current bulletin is still valid for the new office (i.e. in the case of the FOCN45CWWG product, which is available in multiple offices)
-
-  useEffect(() => {
-    const products = PUBLIC_FORECAST_CONFIG[office].products;
-    const issuer = bulletin.slice(-4);
-    const product = bulletin.slice(0, 6);
-
-    setProductList(products);
-    setIssuerCode(issuer);
-    setProductCode(product);
-
-    return () => {
-      setProductList({});
-      setIssuerCode("");
-      setProductCode("");
-    };
-  }, [office, bulletin]);
+    // check if the current product is still valid for the new office
+    if (newProductList[bulletin as keyof typeof newProductList]) {
+      // if it is, keep the same product and issuer code
+      setBulletin(bulletin);
+    } else {
+      // if it's not, default to the first product in the list
+      setBulletin(Object.keys(newProductList)[0]);
+    }
+  };
 
   const { data: bulletinContent, fetchStatus } = useQuery(
     api.alpha.publicBulletin.queryOptions(
@@ -76,16 +68,6 @@ export default function Public() {
       { enabled: mode === "point" && searchCoords !== null },
     ),
   );
-
-  useEffect(() => {
-    // search when the component mounts if there are coords already saved from last time
-    if (pointCoords) {
-      setSearchCoords(pointCoords);
-    }
-  }, []);
-
-  const productKey = `${productCode}${issuerCode}`;
-  const productName = productList[productKey as keyof typeof productList];
 
   const currentConditions = pointForecast?.currentConditions;
   const conditionsTime = currentConditions?.time ? new Date(currentConditions?.time) : null;
@@ -118,7 +100,7 @@ export default function Public() {
         <div className="h-[calc(100dvh-7.1rem)] md:h-[calc(100dvh-7.6rem)] flex flex-col gap-2 overflow-hidden px-2">
           <div className="flex place-items-center border-b-2 border-white pb-2 gap-2 w-full md:max-w-[600px] mx-auto">
             <Label htmlFor="officeSelect">Office:</Label>
-            <Select value={office} onValueChange={(e) => setOffice(e as keyof typeof PUBLIC_FORECAST_CONFIG)}>
+            <Select value={office} onValueChange={handleChangeOffice}>
               <SelectTrigger id="officeSelect" className=" text-black">
                 <SelectValue placeholder={productName} />
               </SelectTrigger>
@@ -134,14 +116,14 @@ export default function Public() {
           <div className="flex place-items-center border-b-2 border-white pb-2 gap-2 w-full md:max-w-[600px] mx-auto">
             <Label htmlFor="productSelect">Products:</Label>
 
-            <Select defaultValue={productName} onValueChange={(e) => setBulletin(e as string)}>
+            <Select value={productKey} onValueChange={(e) => setBulletin(e)}>
               <SelectTrigger id="productSelect" className="text-black">
-                <SelectValue placeholder={productName} />
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {Object.keys(productList).map((product, index) => (
-                  <SelectItem key={index} value={product}>
-                    {productList[product as keyof typeof productList]}
+                {Object.keys(productList).map((productKey, index) => (
+                  <SelectItem key={index} value={productKey}>
+                    {productList[productKey as keyof typeof productList]}
                   </SelectItem>
                 ))}
               </SelectContent>
