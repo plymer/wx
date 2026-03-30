@@ -8,6 +8,7 @@ const DB_NAME = "avwx";
 
 const PROVINCES = {
   AB: "Alberta",
+  BC: "British_Columbia",
   MB: "Manitoba",
   SK: "Saskatchewan",
   ON: "Ontario",
