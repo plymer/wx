@@ -32,11 +32,6 @@ const AvChartsOther = ({ product, data }: Props) => {
     actions.setTimeStep(0);
   };
 
-  // if our current timeStep is greater than the number of timeSteps available in our data layer
-  // default it back to the highest available timeStep
-  if (currentProductData && timeStep > currentProductData.images.length - 1)
-    actions.setTimeStep(currentProductData.images.length - 1);
-
   // build the image url
   const imageUrl = currentProductData?.images[timeStep];
 

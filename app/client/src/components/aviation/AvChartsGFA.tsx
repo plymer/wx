@@ -27,14 +27,19 @@ const AvChartsGFA = ({ product, data }: Props) => {
   // select the domain's product details so the user can select the forecast time they want to view
   const currentProduct = domainList.find((p) => p.domain === domain);
 
-  // if our currentProduct is undefined, our current domain is not in the domainList
-  // default it back to the first domain in the domainList
-  if (!currentProduct && domainList[0]) actions.setDomain(domainList[0].domain);
-
   const currentProductData = data.find((d) => d.domain === domain);
 
   // build the image url
   const imageUrl = currentProductData && currentProductData[subProduct][timeStep];
+
+  const handleChangeDomain = (i: number) => {
+    actions.setDomain(("gfacn3" + (i + 1).toString()) as ProductDomains);
+  };
+
+  const handleChangeSubProduct = (sp: ReturnType<typeof useAvSubProduct>, timeIndex: number) => {
+    actions.setSubProduct(sp);
+    actions.setTimeStep(timeIndex);
+  };
 
   return (
     <>
@@ -46,7 +51,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
               domain === r.domain ? "active" : ""
             }`}
             key={i}
-            onClick={() => actions.setDomain(("gfacn3" + (i + 1).toString()) as ProductDomains)}
+            onClick={() => handleChangeDomain(i)}
           >
             {r.domain.replace("gfacn", "gfa ").toUpperCase()}
           </Button>
@@ -66,10 +71,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
                     }`}
                     key={i}
                     value={u}
-                    onClick={() => {
-                      actions.setSubProduct!("cldwx");
-                      actions.setTimeStep(i);
-                    }}
+                    onClick={() => handleChangeSubProduct("cldwx", i)}
                   >
                     T+{i * currentProduct.timeDelta}
                   </Button>
@@ -91,10 +93,7 @@ const AvChartsGFA = ({ product, data }: Props) => {
                     }`}
                     key={i}
                     value={u}
-                    onClick={() => {
-                      actions.setSubProduct!("turbc");
-                      actions.setTimeStep(i);
-                    }}
+                    onClick={() => handleChangeSubProduct("turbc", i)}
                   >
                     T+{i * currentProduct.timeDelta}
                   </Button>

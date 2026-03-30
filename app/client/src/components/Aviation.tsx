@@ -1,4 +1,3 @@
-import type { Products } from "@/lib/types";
 import { useAviationActions, useHub, useAvProduct, useTimeStep } from "@/stateStores/aviation";
 import AvChartsGFA from "./aviation/AvChartsGFA";
 import AvChartsOther from "./aviation/AvChartsOther";
@@ -26,16 +25,16 @@ export default function Aviation() {
       return;
     }
 
-    // if we don't have a domain for the new product, we can't switch to it
-    if (!AVIATION_PRODUCTS[p][0]) return;
+    const newProduct = AVIATION_PRODUCTS[p][0];
 
-    // try to stay on the same timestep, otherwise just revert back to t+0
-    const hasCurrentTimeStep = AVIATION_PRODUCTS[p][0].timeSteps > timeStep;
-    if (!hasCurrentTimeStep) actions.setTimeStep(0);
+    // if we don't have a domain for the new product, we can't switch to it
+    if (!newProduct) return;
+
+    const hasCurrentTimeStep = newProduct.timeSteps > timeStep;
 
     actions.setProduct(p);
-    actions.setDomain(AVIATION_PRODUCTS[p][0].domain);
-    actions.setTimeStep(timeStep);
+    actions.setDomain(newProduct.domain);
+    actions.setTimeStep(hasCurrentTimeStep ? timeStep : newProduct.timeSteps - 1);
   };
 
   return (
