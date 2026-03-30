@@ -26,7 +26,7 @@
     "avwxdb:push": "drizzle-kit push --config avwx.drizzle.config.ts"
   },
   "dependencies": {
-    "@plymer/fast-barnes-ts": "^0.1.0",
+    "@plymer/fast-barnes-ts": "^0.2.1",
     "@tanstack/react-query": "^5.89.0",
     "@tanstack/react-query-devtools": "^5.89.0",
     "@trpc/client": "^11.6.0",

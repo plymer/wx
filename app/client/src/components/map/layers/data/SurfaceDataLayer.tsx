@@ -25,7 +25,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
 
-import { interpolateGeoJSON } from "@plymer/fast-barnes-ts";
+import { tupleArrayToGeoJSON, type Tuple2DWithValue } from "@plymer/fast-barnes-ts";
 
 export const SurfaceDataLayer = () => {
   const zoom = useZoom();
@@ -37,12 +37,20 @@ export const SurfaceDataLayer = () => {
 
     const searchOffset = 15;
 
-    return viewport.map((coord, idx) => (idx < 2 ? coord - searchOffset / zoom : coord + searchOffset / zoom)) as [
-      number,
-      number,
-      number,
-      number,
-    ];
+    return viewport.map((coord, idx) => {
+      const isSwCorner = idx < 2;
+      const isLat = idx % 2 === 1;
+
+      if (isSwCorner) {
+        if (isLat)
+          return Math.min(coord - searchOffset / zoom, -90); // clamp to south pole
+        else return coord - searchOffset / zoom;
+      } else {
+        if (isLat)
+          return Math.max(coord + searchOffset / zoom, 90); // clamp to north pole
+        else return coord + searchOffset / zoom;
+      }
+    }) as [number, number, number, number];
   }, [viewport, zoom]);
 
   const displayTime = useDisplayTime();
@@ -137,7 +145,7 @@ export const SurfaceDataLayer = () => {
   const interpolatedPlots = useMemo(() => {
     if (features.length === 0 || zoom > 12 || !interpolationViewport) return null;
 
-    const dataset = plotData.features.reduce<StationPlotGeoJSON["features"]>((acc, feature) => {
+    const dataset = plotData.features.reduce<Tuple2DWithValue[]>((acc, feature) => {
       const coords = feature.geometry.coordinates;
 
       // validate the coordinates
@@ -158,23 +166,15 @@ export const SurfaceDataLayer = () => {
         );
 
       if (metar) {
-        acc.push({
-          type: "Feature",
-          geometry: feature.geometry,
-          properties: {
-            mslp: metar.mslp,
-            tt: metar.tt,
-            validTimeString: new Date(metar.validTime).toISOString().replace("T", " ").slice(11, -8),
-            validTime: new Date(metar.validTime),
-            siteId: feature.properties.siteId,
-          } as StationPlotGeoJSON["features"][0]["properties"],
-        });
+        if (!metar.mslp) return acc;
+
+        acc.push([coords[0], coords[1], metar.mslp]);
       }
 
       return acc;
     }, []);
 
-    const interpolated = interpolateGeoJSON({ type: "FeatureCollection", features: dataset }, "mslp", "isolines", {
+    const interpolated = tupleArrayToGeoJSON(dataset, "isolines", {
       contourOptions: { spacing: 4, smooth: true },
       resolution: 128,
       sigma: 1.8,
