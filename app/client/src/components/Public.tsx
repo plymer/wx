@@ -81,7 +81,7 @@ export default function Public() {
 
   return (
     <div className="py-2 bg-neutral-800 text-white text-sm flex flex-col gap-2">
-      <div className="flex w-full md:max-w-[600px] mx-auto border-b-2 pb-2 border-white">
+      <div className="flex w-full md:max-w-150 mx-auto border-b-2 pb-2 border-white">
         <Button
           className={`w-full rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md ${mode === "text" ? "active" : ""}`}
           onClick={handleTextClick}
@@ -98,7 +98,7 @@ export default function Public() {
 
       <Activity mode={mode === "text" ? "visible" : "hidden"}>
         <div className="h-[calc(100dvh-7.1rem)] md:h-[calc(100dvh-7.6rem)] flex flex-col gap-2 overflow-hidden px-2">
-          <div className="flex place-items-center border-b-2 border-white pb-2 gap-2 w-full md:max-w-[600px] mx-auto">
+          <div className="flex place-items-center border-b-2 border-white pb-2 gap-2 w-full md:max-w-150 mx-auto">
             <Label htmlFor="officeSelect">Office:</Label>
             <Select value={office} onValueChange={handleChangeOffice}>
               <SelectTrigger id="officeSelect" className=" text-black">
@@ -113,7 +113,7 @@ export default function Public() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex place-items-center border-b-2 border-white pb-2 gap-2 w-full md:max-w-[600px] mx-auto">
+          <div className="flex place-items-center border-b-2 border-white pb-2 gap-2 w-full md:max-w-150 mx-auto">
             <Label htmlFor="productSelect">Products:</Label>
 
             <Select value={productKey} onValueChange={(e) => setBulletin(e)}>
@@ -151,7 +151,7 @@ export default function Public() {
       
        */}
       {mode === "point" && (
-        <div className="text-center max-md:h-[calc(100dvh-7.1rem)] md:h-[calc(100dvh-7.6rem)] flex flex-col gap-2 w-full md:max-w-[600px] mx-auto overflow-y-auto px-2">
+        <div className="text-center max-md:h-[calc(100dvh-7.1rem)] md:h-[calc(100dvh-7.6rem)] flex flex-col gap-2 w-full md:max-w-150 mx-auto overflow-y-auto px-2">
           <PointForecastMap
             searchCoords={searchCoords}
             setSearchCoords={setSearchCoords}
