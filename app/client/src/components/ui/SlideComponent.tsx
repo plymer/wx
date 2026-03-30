@@ -25,7 +25,7 @@ export default function SlideComponent({ isVisible, onAnimationComplete, childre
       setTimeout(() => {
         setShouldRender(false);
         onAnimationComplete?.();
-      }, 500); // Match CSS transition duration
+      }, 500);
     }
   }, [isVisible, onAnimationComplete]);
 
