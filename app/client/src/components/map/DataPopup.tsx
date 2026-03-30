@@ -62,7 +62,7 @@ export const DataPopup = () => {
       onClose={() => setPopupData(undefined)}
       closeButton={false}
       closeOnMove={false}
-      className="w-[400px] max-w-3/4 text-white bg-transparent"
+      className="md:w-100 max-md:w-60 max-w-3/4 text-white bg-transparent"
     >
       <div className="flex flex-col gap-2 justify-center items-center">
         <div className="flex flex-col gap-2 max-h-[33dvh] w-full overflow-y-auto">
