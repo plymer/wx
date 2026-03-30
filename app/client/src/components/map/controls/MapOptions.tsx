@@ -180,11 +180,11 @@ export default function MapOptions({ ...props }: ButtonProps) {
           </Button>
         </DrawerTrigger>
         <DrawerContent className="border-black bg-gray-800 text-white">
-          <div className="text-black mx-auto my-4 w-fit p-2 bg-white border-neutral-400 rounded-md border-px">
+          <div className="text-black mx-auto my-4 max-md:w-[calc(100dvw-1rem)] p-2 bg-white border-neutral-400 rounded-md border-px">
             <Tabs
               value={tab}
               onValueChange={UIActions.setLayersTab as (value: string) => void}
-              className="w-full min-h-[25svh]"
+              className="w-full min-h-[25svh] px"
             >
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="other" className="flex justify-center gap-2">
@@ -268,13 +268,15 @@ export default function MapOptions({ ...props }: ButtonProps) {
                 </div>
               </TabsContent>
               <TabsContent value="other">
-                {VECTOR_DATA_OPTIONS.map((item, i) => (
-                  <DataToggle
-                    key={i}
-                    dataOption={item}
-                    className="flex items-center justify-between p-2 rounded-md text-black border border-input"
-                  />
-                ))}
+                <div className="grid grid-cols-2 gap-2">
+                  {VECTOR_DATA_OPTIONS.map((item, i) => (
+                    <DataToggle
+                      key={i}
+                      dataOption={item}
+                      className="flex items-center justify-between p-2 rounded-md text-black border border-input"
+                    />
+                  ))}
+                </div>
               </TabsContent>
               <TabsContent value="projection">
                 <div className="flex items-center">
