@@ -1,3 +1,5 @@
+import type { GFAData } from "@/lib/types";
+
 // this is the full list of all of our products available to us
 export const AVIATION_PRODUCTS = {
   gfa: [
@@ -117,3 +119,15 @@ export const AVIATION_PRODUCTS = {
 } as const;
 
 export const PRODUCTS = Object.keys(AVIATION_PRODUCTS) as Array<keyof typeof AVIATION_PRODUCTS>;
+
+const dummyArray = ["a", "b", "c"];
+
+export const GFA_PLACEHOLDER_DATA: GFAData[] = [
+  { domain: "gfacn31", cldwx: dummyArray, turbc: dummyArray },
+  { domain: "gfacn32", cldwx: dummyArray, turbc: dummyArray },
+  { domain: "gfacn33", cldwx: dummyArray, turbc: dummyArray },
+  { domain: "gfacn34", cldwx: dummyArray, turbc: dummyArray },
+  { domain: "gfacn35", cldwx: dummyArray, turbc: dummyArray },
+  { domain: "gfacn36", cldwx: dummyArray, turbc: dummyArray },
+  { domain: "gfacn37", cldwx: dummyArray, turbc: dummyArray },
+];
