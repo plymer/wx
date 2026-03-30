@@ -62,7 +62,7 @@ export default function Public() {
   const { data: bulletinContent, fetchStatus } = useQuery(
     api.alpha.publicBulletin.queryOptions(
       { office: issuerCode, bulletin: productCode },
-      { refetchInterval: 10 * MINUTE },
+      { refetchInterval: 10 * MINUTE, placeholderData: "Loading..." },
     ),
   );
 

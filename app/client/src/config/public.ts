@@ -3,7 +3,17 @@ export const PUBLIC_FORECAST_CONFIG = {
     longName: "Pacfic Storm Prediction Centre",
     shortName: "PSPC",
     city: "Vancouver",
-    products: {},
+    products: {
+      fpcn11cwvr: "South Coast",
+      fpcn12cwvr: "Central and North Coast",
+      fpcn13cwvr: "Southwest Interior",
+      fpcn14cwvr: "Columbia Districts",
+      fpcn15cwvr: "Kootenay Districts",
+      fpcn16cwvr: "Central Interior",
+      fpcn17cwvr: "SE Yukon & Northern BC",
+      fpcn18cwvr: "Northeast BC",
+      fpcn19cwvr: "N/Central/SW Yukon & NW BC",
+    },
   },
   paspcedm: {
     longName: "Prairie and Arctic Storm Prediction Centre",
@@ -47,19 +57,32 @@ export const PUBLIC_FORECAST_CONFIG = {
     longName: "Quebec Storm Prediction Centre",
     shortName: "QSPC",
     city: "Montreal",
-    products: {},
+    products: {
+      fpcn11cwul: "Western QC",
+      fpcn12cwqb: "Northern QC",
+      fpcn13cwqb: "Central QC",
+      fpcn14cwxk: "Eastern QC",
+    },
   },
   aspc: {
     longName: "Atlantic Storm Prediction Centre",
     shortName: "ASPC",
     city: "Halifax",
-    products: {},
+    products: {
+      fpcn11cwhx: "Nova Scotia",
+      fpcn13chwx: "Iles de la Madeleine",
+      fpcn14cwhx: "New Brunswick",
+      fpcn15cwhx: "Prince Edward Island",
+    },
   },
   nlwo: {
     longName: "Newfoundland and Labrador Weather Office",
     shortName: "NLWO",
     city: "Gander",
-    products: {},
+    products: {
+      fpcn16cwhx: "Newfoundland",
+      fpcn17cwhx: "Labrador",
+    },
   },
 } as const;
 
