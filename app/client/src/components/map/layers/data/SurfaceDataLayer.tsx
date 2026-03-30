@@ -89,14 +89,11 @@ export const SurfaceDataLayer = () => {
 
     const metar = feature.properties.metars
       .sort((a, b) => {
-        const aDiff = displayTime - new Date(a.validTime).getTime();
-        const bDiff = displayTime - new Date(b.validTime).getTime();
+        const aDiff = displayTime - a.validTime.getTime();
+        const bDiff = displayTime - b.validTime.getTime();
         return aDiff - bDiff;
       })
-      .find(
-        (m) =>
-          new Date(m.validTime).getTime() <= displayTime && new Date(m.validTime).getTime() >= displayTime - 2 * HOUR,
-      );
+      .find((m) => m.validTime.getTime() <= displayTime && m.validTime.getTime() >= displayTime - 2 * HOUR);
 
     if (metar) {
       acc.push({
@@ -104,8 +101,6 @@ export const SurfaceDataLayer = () => {
         geometry: feature.geometry,
         properties: {
           ...metar,
-          validTimeString: new Date(metar.validTime).toISOString().replace("T", " ").slice(11, -8),
-          validTime: new Date(metar.validTime),
           siteId: feature.properties.siteId,
         },
       });
@@ -243,6 +238,7 @@ export const SurfaceDataLayer = () => {
               ZOOM_THRESHOLDS.maximum,
               ICON_SIZES.maximum.station,
             ],
+            "symbol-sort-key": ["get", "stationPriority"],
           }}
           paint={{
             "icon-color": [

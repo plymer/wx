@@ -23,6 +23,7 @@ import * as fs from "fs/promises";
 import path from "path";
 import "dotenv/config";
 import { createSwrCacheHandler } from "../lib/swrCacheHandler.js";
+import { SITE_IGNORES } from "../config/alphanumeric.config.js";
 
 // use stale-while-revalidate caching for the wxmap data
 // data is at most considered stale after 5 minutes
@@ -272,7 +273,7 @@ function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, Sta
   return queryResult.reduce<Feature<Point, StationPlotData>[]>((acc, metar) => {
     const { siteId, category, td, tt, vis, validTime, wxString, windDir, windGst, windSpd, stations } = metar;
 
-    if (!stations?.lat || !stations?.lon) {
+    if (!stations?.lat || !stations?.lon || SITE_IGNORES.includes(siteId)) {
       return acc;
     }
 
@@ -285,6 +286,7 @@ function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, Sta
       tt,
       vis,
       validTime,
+      validTimeString: validTime.toISOString().replace("T", " ").slice(11, -8),
       wxString,
       windDir,
       windGst,
@@ -302,6 +304,7 @@ function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, Sta
         },
         properties: {
           siteId,
+          stationPriority: siteId.startsWith("CY") ? 1 : siteId.startsWith("C") ? 2 : 3,
           metars: [metarData],
         },
       };
