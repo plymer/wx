@@ -364,7 +364,19 @@ export type WxOPolygonProperties = {
 };
 
 export type WarningProperties = Prettify<
-  Pick<WxOAlert, "alertCode" | "type" | "issueTime" | "alertNameShort" | "colour" | "impact" | "confidence"> & {
+  Pick<
+    WxOAlert,
+    | "alertCode"
+    | "type"
+    | "issueTime"
+    | "alertNameShort"
+    | "colour"
+    | "impact"
+    | "confidence"
+    | "alertBannerText"
+    | "eventEndTime"
+    | "eventOnsetTime"
+  > & {
     dataType: "publicAlert";
   }
 >;

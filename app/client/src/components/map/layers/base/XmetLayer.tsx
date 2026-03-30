@@ -87,13 +87,6 @@ const applyMotionVector = (displayTime: number, startTime: number, feature: Feat
   return { ...translated, properties: feature.properties };
 };
 
-const getCoM = (feature: Feature<MultiPolygon, XmetAPIData>) => {
-  // calculate the center of mass for the feature to use for the label
-  const center = turf.centerOfMass(feature).geometry.coordinates;
-
-  return turf.feature({ type: "Point", coordinates: center }, feature.properties);
-};
-
 const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
   const displayTime = useDisplayTime();
 
@@ -172,38 +165,31 @@ const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
     })
     .filter((f) => f !== null || f !== undefined);
 
-  // create a feature collection of the centres of mass of each Xmet to pin the label to
-  const featureLabels = validFeatures.map((f) => getCoM(f)).filter((f) => f !== null);
-
   // check which layer style we need to use depending on our dataType
   const fillStyle = dataType === "airmet" ? AIRMET_DISPLAY : SIGMET_DISPLAY;
   const outlineStyle = dataType === "airmet" ? AIRMET_DISPLAY_OUTLINE : SIGMET_DISPLAY_OUTLINE;
 
   return (
-    <>
-      <Source type="geojson" id={`${dataType}-labels`} data={{ type: "FeatureCollection", features: featureLabels }}>
-        <Layer
-          beforeId={belowLayer}
-          key={`layer-${dataType}-text`}
-          id={`layer-${dataType}-text`}
-          type="symbol"
-          layout={{
-            "text-field": ["get", "alphaCode"],
-            "text-allow-overlap": true,
-            "text-font": ["Consolas-Regular"],
-          }}
-          paint={{
-            "text-color": "#fff",
-            "text-halo-color": "#000",
-            "text-halo-width": 1,
-          }}
-        />
-      </Source>
-      <Source type="geojson" id={`${dataType}-data`} data={{ ...processedData, features: validFeatures }}>
-        <Layer {...outlineStyle} key={`layer-${dataType}-outline`} beforeId={`layer-${dataType}-text`} />
-        <Layer {...fillStyle} key={`layer-${dataType}`} beforeId={outlineStyle.id} />
-      </Source>
-    </>
+    <Source type="geojson" id={`${dataType}-data`} data={{ ...processedData, features: validFeatures }}>
+      <Layer {...outlineStyle} key={`layer-${dataType}-outline`} beforeId={belowLayer} />
+      <Layer {...fillStyle} key={`layer-${dataType}`} beforeId={belowLayer} />
+      <Layer
+        beforeId={belowLayer}
+        key={`layer-${dataType}-text`}
+        id={`layer-${dataType}-text`}
+        type="symbol"
+        layout={{
+          "text-field": ["get", "alphaCode"],
+          "text-allow-overlap": true,
+          "text-font": ["Consolas-Regular"],
+        }}
+        paint={{
+          "text-color": "#fff",
+          "text-halo-color": "#000",
+          "text-halo-width": 1,
+        }}
+      />
+    </Source>
   );
 };
 

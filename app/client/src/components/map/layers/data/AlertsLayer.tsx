@@ -31,7 +31,7 @@ export const AlertsLayer = ({ override }: Props) => {
         id="layer-wxo-alerts-labels"
         type="symbol"
         paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
-        layout={{ "text-field": ["get", "alertNameShort"], "text-size": 12, "text-allow-overlap": true }}
+        layout={{ "text-field": ["get", "alertBannerText"], "text-size": 12, "text-allow-overlap": true }}
       />
       <Layer
         id="layer-wxo-alerts-outline"
@@ -40,6 +40,7 @@ export const AlertsLayer = ({ override }: Props) => {
         paint={{
           "line-color": ["match", ["get", "type"], "warning", "#ff0000", "watch", "#ffff00", "#808080"],
           "line-opacity": 0.85,
+          "line-width": 5,
         }}
       />
     </Source>
