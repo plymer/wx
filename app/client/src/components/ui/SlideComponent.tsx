@@ -7,8 +7,8 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export default function SlideComponent({ isVisible, onAnimationComplete, children, ...props }: Props) {
-  const [shouldRender, setShouldRender] = useState(false);
-  const [animationClass, setAnimationClass] = useState("");
+  const [shouldRender, setShouldRender] = useState(isVisible);
+  const [animationClass, setAnimationClass] = useState("slide-enter-active");
 
   useEffect(() => {
     if (isVisible) {
