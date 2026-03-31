@@ -6,13 +6,13 @@ const ENV_VARS = {
   DB_PASSWORD: process.env.DB_PASSWORD,
   OUTLOOK_DIR: process.env.OUTLOOK_DIR,
   STATIC_DATA_DIR: process.env.STATIC_DATA_DIR,
-  PORT: 3000,
+  PORT: 3001,
 };
 
 module.exports = {
   apps: [
     {
-      name: "prairiewx-prod",
+      name: "prairiewx-dev",
       script: path.resolve(__dirname, "dist/server/main.js"),
       instances: 1,
       exec_mode: "cluster",

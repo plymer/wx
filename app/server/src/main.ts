@@ -22,6 +22,8 @@ import { chartsRouter } from "./endpoints/charts.js";
 import z from "zod";
 import { publicProcedure, router } from "./lib/trpc.js";
 
+const PORT = process.env.PORT || 3000;
+
 // database connections
 export const aqDb = await generateDbConnection("aq", aqDbSchema);
 const avwxCombinedSchema = {
@@ -62,6 +64,6 @@ createHTTPServer({
   middleware: cors(),
   router: appRouter,
   basePath: "/api/",
-}).listen(3000);
+}).listen(PORT);
 
-console.log(`tRPC server listening on http://localhost:3000/api/`);
+console.log(`tRPC server listening on http://localhost:${PORT}/api/`);
