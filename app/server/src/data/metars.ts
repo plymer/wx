@@ -27,6 +27,8 @@ async function main() {
 
   const metarData = (parser.parse(xml) as XMLCacheFile<CacheMetarData, "metar">).response.data.metar;
 
+  // const dataKeys = new Set<string>();
+
   try {
     const output: MetarData[] = metarData
       .map((metar) => {
@@ -45,6 +47,7 @@ async function main() {
         const {
           stationId: siteId,
           observationTime: validTime,
+          seaLevelPressureMb: mslp,
           rawText,
           flightCategory: category,
           tempC: tt,
@@ -55,6 +58,9 @@ async function main() {
           wxString,
           visibilityStatuteMi: vis,
         } = parsed.data;
+
+        const hasQnh = /Q\d{4}/.test(rawText);
+        const outputMslp = mslp ? mslp : hasQnh ? parseInt(rawText.match(/Q\d{4}/)?.[0].substring(1) ?? "0") : null;
 
         // return the data, ready to be inserted into the database
         return {
@@ -67,6 +73,7 @@ async function main() {
           windGst,
           vis,
           wxString,
+          mslp: outputMslp === 0 ? null : outputMslp,
           tt,
           td,
         };
@@ -74,6 +81,8 @@ async function main() {
       .filter((entry) => entry !== undefined);
 
     console.log(`[${DB_NAME.toUpperCase()}] Inserting ${output.length} METARs...`);
+
+    // console.log("METAR Data Keys:", Array.from(dataKeys).sort());
 
     // insert the metar data, or update each metar if it already exists (our pk is siteId + validTime)
     await Promise.allSettled(
@@ -86,6 +95,7 @@ async function main() {
               category: metar.category,
               tt: metar.tt,
               td: metar.td,
+              mslp: metar.mslp,
               windDir: metar.windDir,
               windSpd: metar.windSpd,
               windGst: metar.windGst,
