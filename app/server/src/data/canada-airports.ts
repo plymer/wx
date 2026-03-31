@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { XMLParser } from "fast-xml-parser";
+import { load } from "cheerio";
 import type { StationData } from "../lib/types.js";
 import { generateDbConnection } from "../lib/utils.js";
 import { stations } from "../db/tables/avwx.drizzle.js";
@@ -8,6 +8,7 @@ const DB_NAME = "avwx";
 
 const PROVINCES = {
   AB: "Alberta",
+  BC: "British_Columbia",
   MB: "Manitoba",
   SK: "Saskatchewan",
   ON: "Ontario",
@@ -23,119 +24,105 @@ const PROVINCES = {
 
 const baseUrl = "https://en.wikipedia.org/w/api.php?action=parse&page=List_of_airports_in_";
 
-type RawTableData = {
-  td: [
-    { span: string; a: string }, // community name
-    { a: string }, // airport name
-    string | undefined, // icao code
-    string | undefined, // tc code
-    string | undefined, // iata code
-    {
-      span: {
-        link: string;
-        span: {
-          a: {
-            span: [
-              { span: string[] },
-              "/",
-              { span: { span: [string, { span: string; "#text": string }, { span: string; "#text": string }] } } // coords
-            ];
-          };
-        };
-      };
-    }
-  ];
+type WikiParseResponse = {
+  parse?: {
+    text?: {
+      "*"?: string;
+    };
+  };
 };
 
-const parser = new XMLParser({
-  ignoreAttributes: true,
-  unpairedTags: ["hr", "br", "link", "meta", "img"],
-  stopNodes: ["*.pre", "*.script"],
-  processEntities: true,
-  htmlEntities: true,
-});
-
-function extractCoordinates(coordinateCell: any): { lat: number; lon: number } | null {
-  try {
-    // Try to find the coordinate string by traversing the nested structure
-    function findCoordinateString(obj: any): string | null {
-      if (typeof obj === "string") {
-        // Check if this string contains coordinates (format: "lat; lon")
-        if (/^-?\d+\.?\d*;\s*-?\d+\.?\d*$/.test(obj.trim())) {
-          return obj.trim();
-        }
-        return null;
-      }
-
-      if (Array.isArray(obj)) {
-        for (const item of obj) {
-          const result = findCoordinateString(item);
-          if (result) return result;
-        }
-      }
-
-      if (obj && typeof obj === "object") {
-        for (const key of Object.keys(obj)) {
-          const result = findCoordinateString(obj[key]);
-          if (result) return result;
-        }
-      }
-
-      return null;
-    }
-
-    const coordString = findCoordinateString(coordinateCell);
-    if (!coordString) return null;
-
-    const [lat, lon] = coordString.split(";").map((coord) => parseFloat(coord.trim()));
-
-    if (isNaN(lat) || isNaN(lon)) return null;
-
-    return { lat, lon };
-  } catch (error) {
-    console.warn("Failed to extract coordinates:", error);
-    return null;
-  }
+function normalizeCellText(value: string): string {
+  return value
+    .replace(/\[[^\]]+\]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-async function scrapeProvince(code: string, name: string): Promise<StationData[]> {
-  const url = `${baseUrl}${name}&format=json`;
+function normalizeHeader(value: string): string {
+  return normalizeCellText(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
 
-  const json = await fetch(url)
-    .then((res) => res.json())
-    .then((data) => data as any);
+function findHeaderIndex(headers: string[], candidates: string[]): number {
+  const normalizedCandidates = candidates.map((candidate) => candidate.toLowerCase().replace(/[^a-z0-9]/g, ""));
+  return headers.findIndex((header) => normalizedCandidates.includes(header));
+}
 
-  const html = parser.parse(`<html><body>${json.parse.text["*"]}</body></html>`);
+function parseCoordinates(value: string): { lat: number; lon: number } | null {
+  const normalized = value.replace(/[−–—]/g, "-");
+  const directMatch = normalized.match(/(-?\d+(?:\.\d+)?)\s*;\s*(-?\d+(?:\.\d+)?)/);
 
-  // we'll need to do something specific for Ontario *(of course)*
+  if (!directMatch) {
+    return null;
+  }
 
-  const tableBody = html.html.body.div.table[code === "ON" ? 1 : 0].tbody;
-  // remove the header
-  const tableRows = tableBody.tr.slice(1);
+  const lat = Number.parseFloat(directMatch[1]);
+  const lon = Number.parseFloat(directMatch[2]);
 
-  const sites: StationData[] = tableRows.reduce((acc: StationData[], row: RawTableData) => {
-    const siteId = row.td[2] || row.td[3] || row.td[4];
+  if (Number.isNaN(lat) || Number.isNaN(lon)) {
+    return null;
+  }
 
+  return { lat, lon };
+}
+
+function parseAirportTable(
+  code: string,
+  parseHtml: ReturnType<typeof load>,
+  table: Parameters<ReturnType<typeof load>>[0],
+): StationData[] {
+  const rows = parseHtml(table).find("tr");
+  if (rows.length < 2) {
+    return [];
+  }
+
+  const headerCells = parseHtml(rows[0]).find("th");
+  const headers = headerCells.map((_, cell) => normalizeHeader(parseHtml(cell).text())).get();
+
+  const airportIdx = findHeaderIndex(headers, ["airport", "airportname", "name", "aerodrome"]);
+  const icaoIdx = findHeaderIndex(headers, ["icao", "icaoidentifier"]);
+  const tcIdx = findHeaderIndex(headers, ["tc", "transportcanada", "tcidentifier", "tcid"]);
+  const iataIdx = findHeaderIndex(headers, ["iata", "iataidentifier"]);
+  const coordIdx = findHeaderIndex(headers, ["coordinates", "coord"]);
+
+  if (airportIdx === -1 || coordIdx === -1) {
+    return [];
+  }
+
+  const output: StationData[] = [];
+
+  rows.slice(1).each((_, row) => {
+    const cells = parseHtml(row).find("td");
+    if (!cells.length) {
+      return;
+    }
+
+    const airportName = normalizeCellText(parseHtml(cells[airportIdx]).text());
+    if (!airportName) {
+      return;
+    }
+
+    const maybeIds = [icaoIdx, tcIdx, iataIdx]
+      .filter((idx) => idx >= 0)
+      .map((idx) => normalizeCellText(parseHtml(cells[idx]).text()))
+      .filter(Boolean);
+
+    const siteId = maybeIds[0];
     if (!siteId) {
-      console.warn(`No siteId found for entry: ${row.td[1]?.a || "unknown"}`);
-      return acc;
+      return;
     }
 
-    const name = row.td[1]?.a || String(row.td[1]);
-    if (!name) {
-      console.warn(`No name found for siteId: ${siteId}`);
-      return acc;
-    }
-
-    const coordinates = extractCoordinates(row.td[4]) || extractCoordinates(row.td[5]);
+    const coordinateCellText = normalizeCellText(parseHtml(cells[coordIdx]).text());
+    const coordinates = parseCoordinates(coordinateCellText);
 
     if (!coordinates) {
-      console.warn(`No coordinates found for: ${name} (${siteId})`);
-      return acc;
+      return;
     }
 
-    const output: StationData = {
-      name,
+    output.push({
+      name: airportName,
       siteId,
       lat: coordinates.lat,
       lon: coordinates.lon,
@@ -143,14 +130,34 @@ async function scrapeProvince(code: string, name: string): Promise<StationData[]
       elev_m: null,
       country: "CA",
       state: code,
-    };
+    });
+  });
 
-    acc.push(output);
+  return output;
+}
 
-    return acc;
-  }, []);
+async function scrapeProvince(code: string, name: string): Promise<StationData[]> {
+  const url = `${baseUrl}${name}&format=json`;
 
-  return sites;
+  const json = (await fetch(url).then((res) => res.json())) as WikiParseResponse;
+  const pageHtml = String(json?.parse?.text?.["*"] || "");
+  const parseHtml = load(pageHtml);
+
+  const tableResults: StationData[][] = [];
+
+  parseHtml("table.wikitable").each((_, table) => {
+    tableResults.push(parseAirportTable(code, parseHtml, table));
+  });
+
+  const deduped = new Map<string, StationData>();
+
+  for (const list of tableResults) {
+    for (const station of list) {
+      deduped.set(`${station.state}:${station.siteId}`, station);
+    }
+  }
+
+  return Array.from(deduped.values());
 }
 
 export async function scrapeWiki() {
@@ -173,7 +180,7 @@ export async function scrapeWiki() {
         console.error(`Failed to scrape ${name}: ${baseUrl}${name}&format=json\n\n${err}`);
         return [];
       }
-    })
+    }),
   );
 
   // Process results sequentially to ensure all insertions complete
@@ -196,10 +203,12 @@ export async function scrapeWiki() {
                 state: station.state,
               },
             });
-        })
+        }),
       );
     }
   }
 
   console.log(`[${DB_NAME.toUpperCase()}] Done updating stations from WikiPedia.`);
 }
+
+scrapeWiki();

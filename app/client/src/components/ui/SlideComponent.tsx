@@ -7,25 +7,25 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export default function SlideComponent({ isVisible, onAnimationComplete, children, ...props }: Props) {
-  const [shouldRender, setShouldRender] = useState(false);
-  const [animationClass, setAnimationClass] = useState("");
+  const [shouldRender, setShouldRender] = useState(isVisible);
+  const [animationClass, setAnimationClass] = useState("slide-enter-active");
 
   useEffect(() => {
     if (isVisible) {
-      // Mount: Start rendering and trigger enter animation
       setShouldRender(true);
-      // Small delay to ensure DOM is ready
+      // force an update after a small delay (to ensure the DOM is ready)
+      // to trigger the CSS transition
       setTimeout(() => {
         setAnimationClass("slide-enter-active");
       }, 20);
     } else {
-      // Unmount: Trigger exit animation
       setAnimationClass("slide-exit-active");
-      // Wait for animation to complete before removing from DOM
+
+      // wait the duration of the css transition before un-rendering the component
       setTimeout(() => {
         setShouldRender(false);
         onAnimationComplete?.();
-      }, 500); // Match CSS transition duration
+      }, 500);
     }
   }, [isVisible, onAnimationComplete]);
 

@@ -31,7 +31,7 @@ import { PublicRegionsOverlay } from "./map/layers/overlays/PublicRegionsOverlay
 import { MarineRegionsOverlay } from "./map/layers/overlays/MarineRegionsOverlay";
 import { LightningDataLayer } from "./map/layers/data/LightningDataLayer";
 import { SurfaceDataLayer } from "./map/layers/data/SurfaceDataLayer";
-import { SurfaceDataPopup } from "./map/SurfaceDataPopup";
+import { DataPopup } from "./map/DataPopup";
 import { AirQualityLayer } from "./map/layers/data/AirQualityLayer";
 import { SigmetLayer } from "./map/layers/data/SigmetLayer";
 import { TerrainRGB } from "./map/layers/base/TerrainRGB";
@@ -112,7 +112,7 @@ export default function WxMap() {
 
         <LightningDataLayer timeRange={15} />
 
-        <SurfaceDataPopup />
+        <DataPopup />
 
         <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
           <MapOptions />

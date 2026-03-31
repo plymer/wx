@@ -168,9 +168,10 @@ export type RawIntlSigmetData = {
 };
 
 // used in intermediate steps of the api data return for /wxmap/metars
-export type MetarElements = Prettify<Omit<MetarData, "siteId" | "rawText">>;
+export type MetarElements = Prettify<Omit<MetarData, "siteId" | "rawText"> & { validTimeString: string }>;
 export type StationPlotData = {
   siteId: string;
+  stationPriority: number;
   metars: MetarElements[];
 };
 
@@ -363,7 +364,19 @@ export type WxOPolygonProperties = {
 };
 
 export type WarningProperties = Prettify<
-  Pick<WxOAlert, "alertCode" | "type" | "issueTime" | "alertNameShort" | "colour" | "impact" | "confidence"> & {
+  Pick<
+    WxOAlert,
+    | "alertCode"
+    | "type"
+    | "issueTime"
+    | "alertNameShort"
+    | "colour"
+    | "impact"
+    | "confidence"
+    | "alertBannerText"
+    | "eventEndTime"
+    | "eventOnsetTime"
+  > & {
     dataType: "publicAlert";
   }
 >;

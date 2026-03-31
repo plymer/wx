@@ -34,6 +34,7 @@ export default [
       ],
       "no-case-declarations": "off",
       "no-fallthrough": "off",
+      "preserve-caught-error": "off",
     },
   },
 ];

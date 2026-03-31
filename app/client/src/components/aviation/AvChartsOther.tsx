@@ -25,16 +25,12 @@ const AvChartsOther = ({ product, data }: Props) => {
   // select the domain's product details so the user can select the forecast time they want to view
   const currentProduct = domainList.find((p) => p.domain === domain);
 
-  // if our currentProduct is undefined, our current domain is not in the domainList
-  // default it back to the first domain in the domainList
-  if (!currentProduct && domainList[0]) actions.setDomain(domainList[0].domain);
-
   const currentProductData = data.find((d) => d.domain === domain);
 
-  // if our current timeStep is greater than the number of timeSteps available in our data layer
-  // default it back to the highest available timeStep
-  if (currentProductData && timeStep > currentProductData.images.length - 1)
-    actions.setTimeStep(currentProductData.images.length - 1);
+  const handleChangeDomain = (d: ReturnType<typeof useDomain>) => {
+    actions.setDomain(d);
+    actions.setTimeStep(0);
+  };
 
   // build the image url
   const imageUrl = currentProductData?.images[timeStep];
@@ -49,9 +45,7 @@ const AvChartsOther = ({ product, data }: Props) => {
               d.domain === domain ? "active" : ""
             }`}
             key={i}
-            onClick={() => {
-              actions.setDomain(d.domain);
-            }}
+            onClick={() => handleChangeDomain(d.domain)}
           >
             <span className="md:hidden">{d.shortName}</span>
             <span className="max-md:hidden">{d.longName}</span>

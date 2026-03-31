@@ -43,8 +43,7 @@ export type ButtonVariantList = NonNullable<VariantProps<typeof buttonVariants>[
 export type ButtonSizeList = NonNullable<VariantProps<typeof buttonVariants>["size"]>;
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 

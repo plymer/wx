@@ -12,7 +12,7 @@ const ENV_VARS = {
 module.exports = {
   apps: [
     {
-      name: "prairiewx-beta",
+      name: "prairiewx-prod",
       script: path.resolve(__dirname, "dist/server/main.js"),
       instances: 1,
       exec_mode: "cluster",

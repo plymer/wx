@@ -13,8 +13,8 @@ export const ForecastTrendChart = ({ forecastData }: Props) => {
 
   const dailyTemps = dailyForecasts.map((d) => Number(d.tt));
 
-  const maxBound = Math.max(normals.high, ...dailyTemps) + 5; // degrees Celsius
-  const minBound = Math.min(normals.low, ...dailyTemps) - 5; // degrees Celsius
+  const maxBound = Math.max(normals.high, ...dailyTemps) + 10; // degrees Celsius
+  const minBound = Math.min(normals.low, ...dailyTemps) - 8; // degrees Celsius
 
   const height = Math.abs(maxBound - minBound); // degrees Celsius
 
@@ -85,7 +85,7 @@ const ColourBand = ({ ttStart, ttSpan, color, yScale }: ColourBandProps) => {
         fill={color}
         fillOpacity={1}
       />
-      <text x={LABEL_X_START} y={yValue} textAnchor="end" fill={"white"} fontSize="12px">
+      <text x={LABEL_X_START} y={yValue + 5} textAnchor="end" fill={"white"} fontSize="12px" fontWeight="bold">
         {ttStart < 0 ? ttStart : ttStart + 5}&deg;
       </text>
     </g>
@@ -154,18 +154,7 @@ const TemperaturePoints = ({ points }: TemperaturePlotProps) => {
         stroke="white"
         strokeWidth={1.5}
       />
-      <text
-        x={p.x}
-        y={p.type === "high" ? p.y + 24 : p.y - 12}
-        textAnchor="middle"
-        fill="white"
-        fontSize="20px"
-        fontFamily="monospace"
-        stroke="black"
-        fontWeight="600"
-        strokeWidth={1}
-        strokeOpacity={1}
-      >
+      <text x={p.x} y={p.type === "high" ? p.y - 9 : p.y + 21} textAnchor="middle" fill="white" fontSize="16px">
         {p.tt}°C
       </text>
     </g>
@@ -289,7 +278,7 @@ const ZeroLine = () => {
   return (
     <>
       <line x1={0} x2={TARGET_LENGTH + 200} y1={0} y2={0} stroke="black" strokeWidth={3} strokeOpacity={1} />
-      <text x={LABEL_X_START} y={0} textAnchor="end" fill="white">
+      <text x={LABEL_X_START} y={5} textAnchor="end" fill="white" fontWeight="bold">
         0&deg;
       </text>
     </>

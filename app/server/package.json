@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "version": "1.0.0_rc1",
+  "version": "1.0.0",
   "description": "the trpc api",
   "license": "MIT",
   "author": "Ryan Pimiskern",
@@ -12,6 +12,7 @@
     "dev": "tsx watch src/main.ts",
     "dev:data:sigmets": "tsx watch src/data/sigmets.ts",
     "dev:data:metars": "tsx watch src/data/metars.ts",
+    "dev:data:stations": "tsx watch src/data/canada-airports.ts",
     "lint": "eslint .",
     "start": "node ../../dist/server/main.js"
   }

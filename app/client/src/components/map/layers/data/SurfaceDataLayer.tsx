@@ -16,12 +16,12 @@ import {
 } from "@/config/stationPlots";
 import { AWC_ATTRIBUTION, UNCLUSTERED } from "@/config/vectorData";
 
-import { useViewportBounds, useZoom } from "@/stateStores/map/mapView";
+import { useMapStateActions, useViewportBounds, useZoom } from "@/stateStores/map/mapView";
 import { useShowObs } from "@/stateStores/map/vectorData";
 
 import { HOUR, MINUTE } from "@shared/lib/constants";
 import { checkIfInBounds, filterSpacedPoints, hasValidCoordinates } from "@/lib/utils";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
 
@@ -31,6 +31,7 @@ export const SurfaceDataLayer = () => {
   const zoom = useZoom();
   const enabled = useShowObs();
   const viewport = useViewportBounds();
+  const { setLoadingState } = useMapStateActions();
 
   const interpolationViewport = useMemo(() => {
     if (!viewport) return undefined;
@@ -55,7 +56,7 @@ export const SurfaceDataLayer = () => {
 
   const displayTime = useDisplayTime();
 
-  const { data: plotData } = useQuery(
+  const { data: plotData, fetchStatus: plotDataFetch } = useQuery(
     api.wxmap.wxmapMetars.queryOptions(undefined, {
       enabled,
       refetchInterval: MINUTE,
@@ -69,6 +70,11 @@ export const SurfaceDataLayer = () => {
       trpc: { context: { skipBatch: true } },
     }),
   );
+
+  useEffect(() => {
+    if (plotDataFetch === "fetching") setLoadingState(true);
+    else setLoadingState(false);
+  }, [plotDataFetch]);
 
   // construct our station priority list for each zoom level
   // this will give us a computed list of stations to show at each zoom level
@@ -112,14 +118,11 @@ export const SurfaceDataLayer = () => {
 
     const metar = feature.properties.metars
       .sort((a, b) => {
-        const aDiff = displayTime - new Date(a.validTime).getTime();
-        const bDiff = displayTime - new Date(b.validTime).getTime();
+        const aDiff = displayTime - a.validTime.getTime();
+        const bDiff = displayTime - b.validTime.getTime();
         return aDiff - bDiff;
       })
-      .find(
-        (m) =>
-          new Date(m.validTime).getTime() <= displayTime && new Date(m.validTime).getTime() >= displayTime - 2 * HOUR,
-      );
+      .find((m) => m.validTime.getTime() <= displayTime && m.validTime.getTime() >= displayTime - 2 * HOUR);
 
     if (metar) {
       acc.push({
@@ -127,8 +130,6 @@ export const SurfaceDataLayer = () => {
         geometry: feature.geometry,
         properties: {
           ...metar,
-          validTimeString: new Date(metar.validTime).toISOString().replace("T", " ").slice(11, -8),
-          validTime: new Date(metar.validTime),
           siteId: feature.properties.siteId,
         },
       });
@@ -201,11 +202,11 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-id"
           filter={UNCLUSTERED}
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "siteId"],
             "text-offset": [1.5, 1.5],
-            visibility: zoom > ZOOM_THRESHOLDS.reduced ? "visible" : "none",
           }}
         />
 
@@ -214,12 +215,12 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-gust"
           beforeId="layer-sfc-obs-id"
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "windGst"],
             "text-anchor": "center",
             "text-offset": [0, 0],
-            visibility: zoom > ZOOM_THRESHOLDS.reduced ? "visible" : "none",
           }}
         />
 
@@ -228,12 +229,12 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-tt"
           filter={UNCLUSTERED}
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "tt"],
             "text-offset": [-1.5, -1.5],
             "text-size": 10,
-            visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
           }}
         />
 
@@ -242,12 +243,12 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-td"
           filter={UNCLUSTERED}
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "td"],
             "text-offset": [-1.5, 1.5],
             "text-size": 10,
-            visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
           }}
         />
 
@@ -256,12 +257,12 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-valid-time"
           filter={UNCLUSTERED}
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "validTimeString"],
             "text-offset": [0, 3],
             "text-size": 10,
-            visibility: zoom > ZOOM_THRESHOLDS.maximum ? "visible" : "none",
           }}
         />
 
@@ -270,12 +271,12 @@ export const SurfaceDataLayer = () => {
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-wx"
           filter={UNCLUSTERED}
+          minzoom={ZOOM_THRESHOLDS.reduced}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["concat", ["get", "vis"], " ", ["get", "wxString"]],
             "text-offset": [-1.5, 0],
             "text-anchor": "right",
-            visibility: zoom > ZOOM_THRESHOLDS.reduced ? "visible" : "none",
           }}
         />
       </Source>
@@ -307,6 +308,7 @@ export const SurfaceDataLayer = () => {
               ZOOM_THRESHOLDS.maximum,
               ICON_SIZES.maximum.station,
             ],
+            "symbol-sort-key": ["get", "stationPriority"],
           }}
           paint={{
             "icon-color": [
@@ -333,6 +335,7 @@ export const SurfaceDataLayer = () => {
           beforeId="layer-sfc-obs-dot"
           id="layer-sfc-obs-windbarb"
           type="symbol"
+          minzoom={ZOOM_THRESHOLDS.mini}
           layout={{
             "icon-allow-overlap": true,
             "icon-image": [
@@ -352,7 +355,6 @@ export const SurfaceDataLayer = () => {
               ICON_SIZES.maximum.windbarb,
             ],
             "icon-rotate": ["get", "windDir"],
-            visibility: zoom > ZOOM_THRESHOLDS.mini ? "visible" : "none",
           }}
           paint={{
             "icon-halo-color": "#000",
