@@ -71,6 +71,10 @@ export const metarSchema = z.object({
   observationTime: z.coerce.date(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
+  seaLevelPressureMb: z
+    .number()
+    .optional()
+    .transform((val) => (val === undefined ? null : val)),
   tempC: z
     .number()
     .optional()
