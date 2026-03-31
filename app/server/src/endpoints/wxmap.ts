@@ -274,7 +274,7 @@ async function fetchWxmapPublicWarnings(): Promise<FeatureCollection<MultiPolygo
 // Generic function to convert METAR query results to GeoJSON features
 function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, StationPlotData>[] {
   return queryResult.reduce<Feature<Point, StationPlotData>[]>((acc, metar) => {
-    const { siteId, category, td, tt, vis, validTime, wxString, windDir, windGst, windSpd, stations } = metar;
+    const { siteId, category, td, tt, vis, validTime, wxString, windDir, windGst, windSpd, stations, mslp } = metar;
 
     if (!stations?.lat || !stations?.lon || SITE_IGNORES.includes(siteId)) {
       return acc;
@@ -288,6 +288,7 @@ function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, Sta
       td,
       tt,
       vis,
+      mslp,
       validTime,
       validTimeString: validTime.toISOString().replace("T", " ").slice(11, -8),
       wxString,
