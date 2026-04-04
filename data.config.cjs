@@ -72,7 +72,7 @@ module.exports = {
       merge_logs: true,
       env: { ...ENV_VARS },
       autorestart: false, // don't restart this script automatically
-      cron_restart: "* * * * *",
+      cron_restart: "*/10 * * * *", // AWC only updates cache every 10 min
     },
     {
       name: "sigmets-processing",
