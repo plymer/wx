@@ -30,7 +30,7 @@ export const db = await generateDbConnection(
     ...schemas,
     ...relations,
   },
-  "server",
+  "api",
 );
 
 const greetRouter = router({
