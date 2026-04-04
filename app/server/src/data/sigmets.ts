@@ -1,19 +1,19 @@
 import "dotenv/config";
-import { gt, lt } from "drizzle-orm";
+import { gt, lt, Relations } from "drizzle-orm";
 import { sigmets } from "../db/tables/data.drizzle.js";
 import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, HOUR } from "../lib/constants.js";
 import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../lib/types.js";
 import { cardinalToDegrees, generateDbConnection, readGzipFile, xmlParser } from "../lib/utils.js";
 import { airSigmetsSchema } from "../lib/validation.js";
+import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
-async function main() {
-  const db = await generateDbConnection({ sigmets }, "sigmet");
-
+export async function getSigmets<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
+  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
+) {
   if (!db) {
-    console.error(`[SIGMET] Database connection failed.`);
-    process.exit(1);
+    throw new Error("[SIGMET] Database connection failed.");
   }
 
   const xml = await readGzipFile(RESOURCE_URL, "sigmet");
@@ -301,10 +301,7 @@ async function main() {
   try {
     await db.delete(sigmets).where(lt(sigmets.endTime, new Date(Date.now() - 12 * HOUR)));
     console.log(`[SIGMET] Old data cleanup complete.`);
-    process.exit(0);
   } catch (error) {
     throw new Error(`[SIGMET] Could not clean up old SIGMETs in the database: ${(error as Error).message}`);
   }
 }
-
-await main();

@@ -1,23 +1,20 @@
-// this script will download and parse the metars 'cache' files from aviationweather.gov
-// metar cache updates minutely
-
 import "dotenv/config";
-import { lt } from "drizzle-orm";
+import { lt, Relations } from "drizzle-orm";
 import { generateDbConnection, readGzipFile } from "../lib/utils.js";
 import { xmlParser } from "../lib/utils.js";
 import { metars } from "../db/tables/data.drizzle.js";
 import type { CacheMetarData, MetarData, XMLCacheFile } from "../lib/types.js";
 import { metarSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
+import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/metars.cache.xml.gz";
 
-async function main() {
-  const db = await generateDbConnection({ metars }, "metar");
-
+export async function getMetars<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
+  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
+) {
   if (!db) {
-    console.error(`[METAR] Database connection failed.`);
-    process.exit(1);
+    throw new Error("[METAR] Database connection failed.");
   }
 
   const xml = await readGzipFile(RESOURCE_URL, "metar");
@@ -114,11 +111,7 @@ async function main() {
     console.log(`[METAR] Cleanup complete.`);
 
     console.log(`[METAR] Cache file processing complete.`);
-    process.exit(0);
   } catch (error) {
-    console.error(`[METAR] Error processing cache file: ${error as Error}`);
-    process.exit(1);
+    throw new Error(`[METAR] Error processing cache file: ${(error as Error).message}`);
   }
 }
-
-await main();

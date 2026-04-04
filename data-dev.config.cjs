@@ -10,17 +10,30 @@ const ENV_VARS = {
 module.exports = {
   apps: [
     {
-      name: "dev-metars-processing",
-      script: path.resolve(__dirname, "dist/server/data/metars.js"),
+      name: "dev-data-processing",
+      script: path.resolve(__dirname, "dist/server/data/index.js"),
       instances: 1,
       exec_mode: "fork", // use fork for single-instance cron scripts
       log_date_format: "YYYY-MM-DD HH:mm Z",
-      error_file: "./logs/data/metars-error.log",
-      out_file: "./logs/data/metars-out.log",
+      error_file: "./logs/data-error.log",
+      out_file: "./logs/data-out.log",
       merge_logs: true,
       env: { ...ENV_VARS },
       autorestart: false, // don't restart this script automatically
       cron_restart: "* * * * *",
+    },
+    {
+      name: "dev-build-station-catalog",
+      script: path.resolve(__dirname, "dist/server/data/stations.js"),
+      instances: 1,
+      exec_mode: "fork", // use fork for single-instance cron scripts
+      log_date_format: "YYYY-MM-DD HH:mm Z",
+      error_file: "./logs/stations-error.log",
+      out_file: "./logs/stations-out.log",
+      merge_logs: true,
+      env: { ...ENV_VARS },
+      autorestart: false, // don't restart this script automatically
+      cron_restart: "0 0 * * *", // run once a day at midnight
     },
   ],
 };

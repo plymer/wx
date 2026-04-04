@@ -1,25 +1,22 @@
-// this script will download and parse the pirep 'cache' files from aviationweather.gov
-// pirep cache updates minutely
-
 import "dotenv/config";
-import { lt } from "drizzle-orm";
+import { lt, Relations } from "drizzle-orm";
 import { generateDbConnection, readGzipFile } from "../lib/utils.js";
 import { xmlParser } from "../lib/utils.js";
 import { pireps } from "../db/tables/data.drizzle.js";
 import type { CachePirepData, PirepData, XMLCacheFile } from "../lib/types.js";
 import { pirepSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
+import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 
 const CACHEFILE_URL = "https://aviationweather.gov/data/cache/aircraftreports.cache.xml.gz";
 // const NAVCAN_URL =
 //   "https://plan.navcanada.ca/weather/api/alpha/?site=CZEG&site=CZVR&site=CZWG&site=CZYZ&site=CZUL&site=CZQM&site=CZQX&alpha=pirep";
 
-async function main() {
-  const db = await generateDbConnection({ pireps }, "pirep");
-
+export async function getPireps<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
+  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
+) {
   if (!db) {
-    console.error(`[PIREP] Database connection failed.`);
-    process.exit(1);
+    throw new Error("[PIREP] Database connection failed.");
   }
 
   const xml = await readGzipFile(CACHEFILE_URL, "pirep");
@@ -102,10 +99,6 @@ async function main() {
 
     console.log(`[PIREP] Cache file processing complete.`);
   } catch (error) {
-    console.error(`[PIREP] Error processing cache file: ${(error as Error).message}`);
-    process.exit(1);
+    throw new Error(`[PIREP] Error processing cache file: ${(error as Error).message}`);
   }
-  process.exit(0);
 }
-
-await main();

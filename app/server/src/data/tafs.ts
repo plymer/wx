@@ -1,23 +1,20 @@
-// this script will download and parse the taf 'cache' files from aviationweather.gov
-// taf cache updates minutely
-
 import "dotenv/config";
-import { lt } from "drizzle-orm";
+import { lt, Relations } from "drizzle-orm";
 import { generateDbConnection, readGzipFile } from "../lib/utils.js";
 import { xmlParser } from "../lib/utils.js";
 import { tafs } from "../db/tables/data.drizzle.js";
 import type { CacheTafData, TafData, XMLCacheFile } from "../lib/types.js";
 import { tafSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
+import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/tafs.cache.xml.gz";
 
-async function main() {
-  const db = await generateDbConnection({ tafs }, "station");
-
+export async function getTafs<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
+  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
+) {
   if (!db) {
-    console.error(`[TAF] Database connection failed.`);
-    process.exit(1);
+    throw new Error("[TAF] Database connection failed.");
   }
 
   const xml = await readGzipFile(RESOURCE_URL, "taf");
@@ -74,11 +71,7 @@ async function main() {
     console.log(`[TAF] TAF cleanup complete.`);
 
     console.log(`[TAF] TAF cache file processing complete.`);
-    process.exit(0);
   } catch (error) {
-    console.error(`[TAF] Error processing TAF cache file: ${(error as Error).message}`);
-    process.exit(1);
+    throw new Error(`[TAF] Error processing TAF cache file: ${(error as Error).message}`);
   }
 }
-
-await main();

@@ -34,5 +34,3 @@ export async function getPublicAlerts() {
     return;
   }
 }
-
-await getPublicAlerts();
