@@ -10,17 +10,17 @@ const ENV_VARS = {
 module.exports = {
   apps: [
     {
-      name: "aq-data-processing",
-      script: path.resolve(__dirname, "dist/server/data/aq-data.js"),
+      name: "data-processing",
+      script: path.resolve(__dirname, "dist/server/data/index.js"),
       instances: 1,
       exec_mode: "fork", // use fork for single-instance cron scripts
       log_date_format: "YYYY-MM-DD HH:mm Z",
-      error_file: "./logs/data/aq-error.log",
-      out_file: "./logs/data/aq-out.log",
+      error_file: "./logs/data-error.log",
+      out_file: "./logs/data-out.log",
       merge_logs: true,
       env: { ...ENV_VARS },
       autorestart: false, // don't restart this script automatically
-      cron_restart: "*/10 * * * *",
+      cron_restart: "* * * * *",
     },
     {
       name: "build-station-catalog",
@@ -28,64 +28,12 @@ module.exports = {
       instances: 1,
       exec_mode: "fork", // use fork for single-instance cron scripts
       log_date_format: "YYYY-MM-DD HH:mm Z",
-      error_file: "./logs/data/stations-error.log",
-      out_file: "./logs/data/stations-out.log",
+      error_file: "./logs/stations-error.log",
+      out_file: "./logs/stations-out.log",
       merge_logs: true,
       env: { ...ENV_VARS },
       autorestart: false, // don't restart this script automatically
       cron_restart: "0 0 * * *", // run once a day at midnight
-    },
-    {
-      name: "public-alerts-fetch",
-      script: path.resolve(__dirname, "dist/server/data/public-alerts.js"),
-      instances: 1,
-      exec_mode: "fork",
-      log_date_format: "YYYY-MM-DD HH:mm Z",
-      error_file: "./logs/data/alerts-error.log",
-      out_file: "./logs/data/alerts-out.log",
-      merge_logs: true,
-      env: { ...ENV_VARS },
-      autorestart: false, // don't restart this script automatically
-      cron_restart: "* * * * *",
-    },
-    {
-      name: "metars-processing",
-      script: path.resolve(__dirname, "dist/server/data/metars.js"),
-      instances: 1,
-      exec_mode: "fork", // use fork for single-instance cron scripts
-      log_date_format: "YYYY-MM-DD HH:mm Z",
-      error_file: "./logs/data/metars-error.log",
-      out_file: "./logs/data/metars-out.log",
-      merge_logs: true,
-      env: { ...ENV_VARS },
-      autorestart: false, // don't restart this script automatically
-      cron_restart: "* * * * *",
-    },
-    {
-      name: "tafs-processing",
-      script: path.resolve(__dirname, "dist/server/data/tafs.js"),
-      instances: 1,
-      exec_mode: "fork", // use fork for single-instance cron scripts
-      log_date_format: "YYYY-MM-DD HH:mm Z",
-      error_file: "./logs/data/tafs-error.log",
-      out_file: "./logs/data/tafs-out.log",
-      merge_logs: true,
-      env: { ...ENV_VARS },
-      autorestart: false, // don't restart this script automatically
-      cron_restart: "*/10 * * * *", // AWC only updates cache every 10 min
-    },
-    {
-      name: "sigmets-processing",
-      script: path.resolve(__dirname, "dist/server/data/sigmets.js"),
-      instances: 1,
-      exec_mode: "fork", // use fork for single-instance cron scripts
-      log_date_format: "YYYY-MM-DD HH:mm Z",
-      error_file: "./logs/data/sigmets-error.log",
-      out_file: "./logs/data/sigmets-out.log",
-      merge_logs: true,
-      env: { ...ENV_VARS },
-      autorestart: false, // don't restart this script automatically
-      cron_restart: "* * * * *",
     },
   ],
 };
