@@ -5,23 +5,22 @@ import "dotenv/config";
 import { lt } from "drizzle-orm";
 import { generateDbConnection, readGzipFile } from "../lib/utils.js";
 import { xmlParser } from "../lib/utils.js";
-import { metars } from "../db/tables/avwx.drizzle.js";
+import { metars } from "../db/tables/data.drizzle.js";
 import type { CacheMetarData, MetarData, XMLCacheFile } from "../lib/types.js";
 import { metarSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/metars.cache.xml.gz";
-const DB_NAME = "avwx";
 
 async function main() {
-  const db = await generateDbConnection(DB_NAME, { metars });
+  const db = await generateDbConnection({ metars }, "metar");
 
   if (!db) {
-    console.error(`[${DB_NAME.toUpperCase()}] (METARs) Database connection failed.`);
+    console.error(`[METAR] Database connection failed.`);
     process.exit(1);
   }
 
-  const xml = await readGzipFile(RESOURCE_URL, DB_NAME);
+  const xml = await readGzipFile(RESOURCE_URL, "metar");
 
   const { parser } = xmlParser();
 
@@ -80,7 +79,7 @@ async function main() {
       })
       .filter((entry) => entry !== undefined);
 
-    console.log(`[${DB_NAME.toUpperCase()}] Inserting ${output.length} METARs...`);
+    console.log(`[METAR] Inserting ${output.length} METARs...`);
 
     // console.log("METAR Data Keys:", Array.from(dataKeys).sort());
 
@@ -90,7 +89,8 @@ async function main() {
         await db
           .insert(metars)
           .values(metar)
-          .onDuplicateKeyUpdate({
+          .onConflictDoUpdate({
+            target: [metars.siteId, metars.validTime],
             set: {
               category: metar.category,
               tt: metar.tt,
@@ -107,16 +107,16 @@ async function main() {
       }),
     );
 
-    console.log(`[${DB_NAME.toUpperCase()}] Cleaning up old METARs...`);
+    console.log(`[METAR] Cleaning up old data...`);
     // now clean up the database and remove any metars older than 96 hours
     await db.delete(metars).where(lt(metars.validTime, new Date(Date.now() - 96 * HOUR)));
 
-    console.log(`[${DB_NAME.toUpperCase()}] METAR cleanup complete.`);
+    console.log(`[METAR] Cleanup complete.`);
 
-    console.log(`[${DB_NAME.toUpperCase()}] METAR cache file processing complete.`);
+    console.log(`[METAR] Cache file processing complete.`);
     process.exit(0);
   } catch (error) {
-    console.error(`[${DB_NAME.toUpperCase()}] Error processing METAR cache file: ${error as Error}`);
+    console.error(`[METAR] Error processing cache file: ${error as Error}`);
     process.exit(1);
   }
 }

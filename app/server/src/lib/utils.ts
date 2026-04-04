@@ -1,15 +1,15 @@
-import { existsSync, readdirSync, statSync } from "fs";
+import { existsSync, mkdirSync, readdirSync, statSync } from "fs";
 import path from "path";
 import suncalc, { type GetTimesResult } from "suncalc";
 import { createGunzip } from "zlib";
 import * as turf from "@turf/turf";
 import { XMLParser } from "fast-xml-parser";
 import type { Position } from "geojson";
-import { drizzle, MySql2Database } from "drizzle-orm/mysql2";
-import { createPool, type Pool } from "mysql2/promise";
+import { drizzle, type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import Database from "better-sqlite3";
+import type BetterSqlite3 from "better-sqlite3";
 import { Relations } from "drizzle-orm";
-import { sql } from "drizzle-orm/sql";
-import type { MySqlTableWithColumns } from "drizzle-orm/mysql-core";
+import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 import "dotenv/config";
 
 import type { LatLon, SunTimes } from "./common.types.js";
@@ -248,62 +248,52 @@ export function isConvectiveSigmet(header: string): boolean {
 }
 
 export async function generateDbConnection<
-  TSchema extends Record<string, MySqlTableWithColumns<any> | Relations<any, any>>,
->(dbName: string, dbSchema: TSchema) {
-  const connectionPool = getDbConnectionPool(dbName);
+  TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>,
+>(dbSchema: TSchema, consumer: string) {
+  const connection = getDbConnection(consumer);
 
-  if (!connectionPool) {
-    console.error(`[${dbName.toUpperCase()}] Database credentials are not set.`);
-    return undefined;
-  }
+  const db = drizzle(connection, { schema: dbSchema });
 
-  const db = drizzle(connectionPool, { mode: "default", schema: dbSchema });
-
-  const isConnected = await testDbConnection(db, dbName);
+  const isConnected = await testDbConnection(db, consumer);
 
   if (isConnected) return db;
   else return undefined;
 }
 
-export function getDbConnectionPool(dbName: string) {
-  const userName = process.env.AM_I_A_SERVER ? `${dbName}user` : "root";
-  const password = process.env.DB_PASSWORD;
-  if (!password) {
-    console.error("DB_PASSWORD environment variable is not set");
-    return undefined;
+export function getDbConnection(consumer: string) {
+  if (!process.env.SQLITE_PATH) {
+    console.warn(
+      `[${consumer.toUpperCase()}] SQLITE_PATH environment variable is not set. Using default path './sqlite-db/wx.sqlite'.`,
+    );
   }
 
-  const connection = createPool({
-    host: "localhost",
-    port: 3306,
-    user: userName,
-    password: password,
-    database: dbName,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-  });
+  const dbPath = process.env.SQLITE_PATH ? path.resolve(process.env.SQLITE_PATH) : "./sqlite-db/wx.sqlite";
+
+  mkdirSync(path.dirname(dbPath), { recursive: true });
+
+  const connection = new Database(dbPath);
+  connection.pragma("journal_mode = WAL");
 
   return connection;
 }
 
 export async function testDbConnection<TSchema extends Record<string, unknown>>(
-  db: MySql2Database<TSchema> & {
-    $client: Pool;
+  db: BetterSQLite3Database<TSchema> & {
+    $client: BetterSqlite3.Database;
   },
-  dbName: string,
+  consumer: string,
 ) {
   try {
-    await db.execute(sql`SELECT 1`);
-    console.log(`[${dbName.toUpperCase()}] Database connection is valid.`);
+    db.$client.prepare("SELECT 1").get();
+    console.log(`[${consumer.toUpperCase()}] Database connection is valid.`);
     return true;
   } catch (err) {
-    console.error(`[${dbName.toUpperCase()}] Database connection failed:`, err);
+    console.error(`[${consumer.toUpperCase()}] Database connection failed:`, err);
     return false;
   }
 }
 
-export async function readGzipFile(url: string, dbName: string) {
+export async function readGzipFile(url: string, dataType: string) {
   try {
     // fetch the compressed data
     const arrayBuffer = await fetch(url, { headers: DEFAULT_REMOTE_HEADERS }).then((res) => {
@@ -328,12 +318,12 @@ export async function readGzipFile(url: string, dbName: string) {
     });
 
     if (typeof decompressedData !== "string") {
-      throw new Error(`[${dbName.toUpperCase()}] Decompressed data is not a string`);
+      throw new Error(`[${dataType.toUpperCase()}] Decompressed data is not a string`);
     }
 
     return decompressedData;
   } catch (error) {
-    console.error(`[${dbName.toUpperCase()}] Error reading gzip file:`, error);
+    console.error(`[${dataType.toUpperCase()}] Error reading gzip file:`, error);
     throw error;
   }
 }

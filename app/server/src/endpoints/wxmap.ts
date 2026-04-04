@@ -12,10 +12,10 @@ import type {
   WxOPolygonAlert,
   WxOPolygonProperties,
 } from "../lib/types.js";
-import { metars, tafs } from "../db/tables/avwx.drizzle.js";
+import { metars, tafs } from "../db/tables/data.drizzle.js";
 import { HOUR, MINUTE } from "../lib/constants.js";
 
-import { avwxDb } from "../main.js";
+import { db } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
 import * as turf from "@turf/turf";
 import { limitResultsByKeys } from "../lib/utils.js";
@@ -50,11 +50,11 @@ const wxmapPublicWarnings = createSwrCacheHandler<FeatureCollection<MultiPolygon
 });
 
 async function fetchWxmapMetarsData(): Promise<FeatureCollection<Point, StationPlotData>> {
-  if (!avwxDb) {
+  if (!db) {
     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
   }
 
-  const queryResult = (await avwxDb.query.metars.findMany({
+  const queryResult = (await db.query.metars.findMany({
     where: gt(metars.validTime, new Date(Date.now() - 4 * HOUR)),
     with: { stations: { columns: { lat: true, lon: true } } },
   })) as MetarWithStation[];
@@ -63,11 +63,11 @@ async function fetchWxmapMetarsData(): Promise<FeatureCollection<Point, StationP
 }
 
 async function fetchWxmapPopupData(): Promise<FeatureCollection<Point, StationPlotPopupData>> {
-  if (!avwxDb) {
+  if (!db) {
     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
   }
 
-  const metarsQuery = await avwxDb.query.metars
+  const metarsQuery = await db.query.metars
     .findMany({
       where: gt(metars.validTime, new Date(Date.now() - 4 * HOUR)),
       with: { stations: { columns: { lat: true, lon: true, country: true, name: true, state: true } } },
@@ -86,7 +86,7 @@ async function fetchWxmapPopupData(): Promise<FeatureCollection<Point, StationPl
     }
   });
 
-  const tafsQuery = await avwxDb.query.tafs
+  const tafsQuery = await db.query.tafs
     .findMany({
       where: gt(tafs.validTime, new Date(Date.now() - 8 * HOUR)),
       orderBy: [asc(tafs.validTime)],
@@ -321,7 +321,7 @@ function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, Sta
 
 export const wxmapRouter = router({
   wxmapMetars: publicProcedure.query(async (): Promise<FeatureCollection<Point, StationPlotData>> => {
-    if (!avwxDb) {
+    if (!db) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
@@ -330,7 +330,7 @@ export const wxmapRouter = router({
   }),
 
   wxmapPopupData: publicProcedure.query(async (): Promise<FeatureCollection<Point, StationPlotPopupData>> => {
-    if (!avwxDb) {
+    if (!db) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 

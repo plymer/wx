@@ -2,8 +2,7 @@ const path = require("path");
 
 const ENV_VARS = {
   NODE_ENV: "production",
-  AM_I_A_SERVER: process.env.AM_I_A_SERVER,
-  DB_PASSWORD: process.env.DB_PASSWORD,
+  SQLITE_PATH: process.env.SQLITE_PATH,
   OUTLOOK_DIR: process.env.OUTLOOK_DIR,
   STATIC_DATA_DIR: process.env.STATIC_DATA_DIR,
 };

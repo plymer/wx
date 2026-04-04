@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { gt, lt, sql } from "drizzle-orm";
-import { sigmets } from "../db/tables/avwx.drizzle.js";
+import { gt, lt } from "drizzle-orm";
+import { sigmets } from "../db/tables/data.drizzle.js";
 import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, HOUR } from "../lib/constants.js";
 import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../lib/types.js";
 import { cardinalToDegrees, generateDbConnection, readGzipFile, xmlParser } from "../lib/utils.js";
@@ -9,16 +9,14 @@ import { airSigmetsSchema } from "../lib/validation.js";
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
 async function main() {
-  const DB_NAME = "avwx";
-
-  const db = await generateDbConnection(DB_NAME, { sigmets });
+  const db = await generateDbConnection({ sigmets }, "sigmet");
 
   if (!db) {
-    console.error(`[${DB_NAME.toUpperCase()}] (SIGMETs) Database connection failed.`);
+    console.error(`[SIGMET] Database connection failed.`);
     process.exit(1);
   }
 
-  const xml = await readGzipFile(RESOURCE_URL, DB_NAME);
+  const xml = await readGzipFile(RESOURCE_URL, "sigmet");
 
   const { parser } = xmlParser();
 
@@ -70,7 +68,7 @@ async function main() {
           sigmetIdentifier && sigmetIdentifier.match(/\d+/g) ? parseInt(sigmetIdentifier.match(/\d+/g)![0]) : null;
 
         if (!charCode || !numberCode) {
-          console.error(`[${DB_NAME.toUpperCase()}] Could not parse SIGMET identifier from raw text: ${rawText}`);
+          console.error(`[SIGMET] Could not parse SIGMET identifier from raw text: ${rawText}`);
           return;
         }
 
@@ -101,7 +99,7 @@ async function main() {
 
     conusOutput.push(...output);
   } catch (error) {
-    throw new Error(`[${DB_NAME.toUpperCase()}] Could not parse SIGMETs from the AWC XML: ${(error as Error).message}`);
+    throw new Error(`[SIGMET] Could not parse SIGMETs from the AWC XML: ${(error as Error).message}`);
   }
 
   const avwxApi = "https://aviationweather.gov/api/data/";
@@ -121,9 +119,7 @@ async function main() {
     .then((response) => {
       if (!response.ok) {
         throw new Error(
-          `[${DB_NAME.toUpperCase()}] Failed to fetch international SIGMET data\n${response.status} ${
-            response.statusText
-          }`,
+          `[SIGMET] Failed to fetch international SIGMET data\n${response.status} ${response.statusText}`,
         );
       }
       return response.json();
@@ -269,7 +265,7 @@ async function main() {
 
   toCancel.forEach((sigmet) => {
     console.warn(
-      `[${DB_NAME.toUpperCase()}] SIGMET ${sigmet.domain} ${sigmet.charCode} ${
+      `[SIGMET] SIGMET ${sigmet.domain} ${sigmet.charCode} ${
         sigmet.numberCode
       } is active in the database but missing from the AWC API, creating a cancellation...`,
     );
@@ -292,31 +288,22 @@ async function main() {
   try {
     await Promise.allSettled(
       data.map(async (sigmet) => {
-        await db
-          .insert(sigmets)
-          .values(sigmet)
-          .onDuplicateKeyUpdate({
-            set: { header: sql`header` },
-          });
+        await db.insert(sigmets).values(sigmet).onConflictDoNothing();
       }),
     );
-    console.log(`[${DB_NAME.toUpperCase()}] Inserted/updated ${data.length} SIGMETs.`);
+    console.log(`[SIGMET] Inserted/updated ${data.length} SIGMETs.`);
   } catch (error) {
-    throw new Error(
-      `[${DB_NAME.toUpperCase()}] Could not insert SIGMETs into the database: ${(error as Error).message}`,
-    );
+    throw new Error(`[SIGMET] Could not insert SIGMETs into the database: ${(error as Error).message}`);
   }
 
-  console.log(`[${DB_NAME.toUpperCase()}] Cleaning up old SIGMETs...`);
+  console.log(`[SIGMET] Cleaning up old data...`);
 
   try {
     await db.delete(sigmets).where(lt(sigmets.endTime, new Date(Date.now() - 12 * HOUR)));
-    console.log(`[${DB_NAME.toUpperCase()}] Old SIGMET cleanup complete.`);
+    console.log(`[SIGMET] Old data cleanup complete.`);
     process.exit(0);
   } catch (error) {
-    throw new Error(
-      `[${DB_NAME.toUpperCase()}] Could not clean up old SIGMETs in the database: ${(error as Error).message}`,
-    );
+    throw new Error(`[SIGMET] Could not clean up old SIGMETs in the database: ${(error as Error).message}`);
   }
 }
 

@@ -1,16 +1,16 @@
 import "dotenv/config";
 import { lt } from "drizzle-orm";
-import { aqData } from "../db/tables/aq.drizzle.js";
+import { aqData } from "../db/tables/data.drizzle.js";
 import type { AQData } from "../lib/types.js";
 import { aqSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
 import { generateDbConnection } from "../lib/utils.js";
 
 async function main() {
-  const db = await generateDbConnection("aq", { aqData });
+  const db = await generateDbConnection({ aqData }, "aq-data");
 
   if (!db) {
-    console.error("[AQ Data] Failed to connect to the database.");
+    console.error("[AQ-DATA] Failed to connect to the database.");
     process.exit(1);
   }
 
@@ -83,7 +83,8 @@ async function main() {
         await db
           .insert(aqData)
           .values(data)
-          .onDuplicateKeyUpdate({
+          .onConflictDoUpdate({
+            target: [aqData.name, aqData.validTime],
             set: {
               pm25: data.pm25,
             },
