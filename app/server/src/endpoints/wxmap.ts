@@ -44,6 +44,15 @@ const wxmapPopupSwr = createSwrCacheHandler<FeatureCollection<Point, StationPlot
   fetchFn: fetchWxmapPopupData,
 });
 
+const wxmapIsobarsSwr = createSwrCacheHandler<
+  FeatureCollection<Point | LineString, { value: number } | { kind: "max" | "min"; value: number }>[]
+>({
+  cacheKey: "wxmapIsobars",
+  freshMs: MINUTE,
+  staleMs: 5 * MINUTE,
+  fetchFn: fetchWxmapIsobarsData,
+});
+
 const wxmapPublicWarnings = createSwrCacheHandler<FeatureCollection<MultiPolygon, WarningProperties>>({
   cacheKey: "wxmapPublicWarnings",
   freshMs: MINUTE,
