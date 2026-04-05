@@ -1,5 +1,5 @@
 import { asc, gt } from "drizzle-orm";
-import type { Feature, FeatureCollection, MultiPolygon, Point, Polygon } from "geojson";
+import type { Feature, FeatureCollection, LineString, MultiPolygon, Point, Polygon } from "geojson";
 import { TRPCError } from "@trpc/server";
 
 import type {
@@ -24,6 +24,8 @@ import path from "path";
 import "dotenv/config";
 import { createSwrCacheHandler } from "../lib/swrCacheHandler.js";
 import { SITE_IGNORES } from "../config/alphanumeric.config.js";
+
+import { tupleArrayToGeoJSON, type Tuple2DWithValue } from "@plymer/fast-barnes-ts";
 
 // use stale-while-revalidate caching for the wxmap data
 // data is at most considered stale after 5 minutes
@@ -129,6 +131,114 @@ async function fetchWxmapPopupData(): Promise<FeatureCollection<Point, StationPl
   }, []);
 
   return turf.featureCollection(popupData);
+}
+
+async function fetchWxmapIsobarsData(): Promise<
+  FeatureCollection<Point | LineString, { value: number } | { kind: "max" | "min"; value: number }>[]
+> {
+  // for now, we'll just return the same data as the metars endpoint, since the isobars are generated on the client from the same data
+  if (!db) {
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
+  }
+
+  const now = new Date().getTime();
+
+  const queryResult = (await db.query.metars.findMany({
+    where: gt(metars.validTime, new Date(now - 4 * HOUR)),
+    with: { stations: { columns: { lat: true, lon: true } } },
+  })) as MetarWithStation[];
+
+  const fcArray: FeatureCollection<Point | LineString, { value: number } | { kind: "max" | "min"; value: number }>[] =
+    [];
+
+  const collatedData: Record<string, { lat: number; lon: number; values: { mslp: number; validTime: Date }[] }> = {};
+
+  const BLACKLISTED_SITES = ["PACX", "PFTO"];
+
+  queryResult.forEach((metar) => {
+    const { mslp, validTime, stations, siteId } = metar;
+
+    if (!stations?.lat || !stations?.lon || !mslp || BLACKLISTED_SITES.includes(siteId)) {
+      return;
+    }
+
+    const { lat, lon } = stations;
+
+    if (collatedData[metar.siteId]) {
+      collatedData[metar.siteId].values.push({ mslp, validTime });
+    } else {
+      collatedData[metar.siteId] = { lat, lon, values: [{ mslp, validTime }] };
+    }
+  });
+
+  for (let i = 0; i < 19; i++) {
+    const tupleData = Object.values(collatedData).reduce<Tuple2DWithValue[]>((acc, data) => {
+      const { lat, lon, values } = data;
+      const computedTime = now - (19 - i) * 10 * MINUTE;
+
+      if (!lat || !lon || !values.length) {
+        return acc;
+      }
+
+      const dataForTime = values
+        .sort((a, b) => {
+          const aDiff = computedTime - new Date(a.validTime).getTime();
+          const bDiff = computedTime - new Date(b.validTime).getTime();
+          return aDiff - bDiff;
+        })
+        .find(
+          (m) =>
+            new Date(m.validTime).getTime() <= computedTime &&
+            new Date(m.validTime).getTime() >= computedTime - 4 * HOUR,
+        );
+
+      if (dataForTime) {
+        if (!dataForTime.mslp) return acc;
+
+        acc.push([lon, lat, dataForTime.mslp]);
+      }
+
+      return acc;
+    }, []);
+
+    // convert the tuple data to GeoJSON features with the mslp value as a property
+
+    const fc = tupleArrayToGeoJSON(tupleData, "isolines", {
+      contourOptions: { spacing: 4, smooth: true },
+      resolution: 1024,
+      sigma: 1.4,
+      extrema: { radius: 2, minSeparation: 6, minProminence: 0.001, maxCountPerKind: undefined },
+    })
+      .features.filter((feature) => {
+        if ("kind" in feature.properties) {
+          if (feature.properties.kind !== "max" && feature.properties.kind !== "min") {
+            return false;
+          } else {
+            return true;
+          }
+        } else if ("value" in feature.properties && !("kind" in feature.properties)) {
+          return true;
+        }
+      })
+      .map((feature) => {
+        if ("kind" in feature.properties) {
+          return {
+            ...feature,
+            properties: {
+              ...feature.properties,
+              value:
+                feature.properties.kind === "max"
+                  ? Math.ceil(feature.properties.value)
+                  : Math.floor(feature.properties.value),
+            },
+          };
+        } else return feature;
+      });
+
+    fcArray.push({ type: "FeatureCollection", features: fc });
+  }
+
+  return fcArray;
 }
 
 async function fetchWxmapPublicWarnings(): Promise<FeatureCollection<MultiPolygon, WarningProperties>> {
