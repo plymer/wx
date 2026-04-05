@@ -18,6 +18,7 @@ import { wmsRouter } from "./endpoints/wms.js";
 import { wxmapRouter } from "./endpoints/wxmap.js";
 import { alphanumericRouter } from "./endpoints/alphanumeric.js";
 import { chartsRouter } from "./endpoints/charts.js";
+import { globalMessageRouter } from "./endpoints/globalMessage.js";
 import z from "zod";
 import { publicProcedure, router } from "./lib/trpc.js";
 
@@ -49,6 +50,7 @@ const greetRouter = router({
 
 const appRouter = router({
   base: greetRouter,
+  messages: globalMessageRouter,
   alpha: alphanumericRouter,
   charts: chartsRouter,
   lightning: lightningRouter,
