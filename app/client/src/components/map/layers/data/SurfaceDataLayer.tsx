@@ -163,6 +163,7 @@ export const SurfaceDataLayer = () => {
             "text-font": ["Consolas-Regular"],
             "text-size": 16,
             "text-keep-upright": true,
+            "text-allow-overlap": true,
           }}
           paint={{
             "text-color": "#000",
