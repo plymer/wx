@@ -3,6 +3,8 @@ import { useNavigate } from "react-router";
 
 // ui components
 import Button from "@/components/ui/Button";
+import { GlobalMessage } from "./components/ui/GlobalMessage";
+import { Toaster } from "@/components/ui/Sonner";
 
 // app mode components
 import Observations from "@/components/Observations";
@@ -18,7 +20,10 @@ import useHashPath from "@/hooks/useHashPath";
 import { APP_MODES_LIST } from "@/config/modes";
 import { useAppMode, useSetAppMode } from "@/stateStores/app";
 import type { AppMode } from "@/lib/types";
-import { Toaster } from "@/components/ui/Sonner";
+import { api } from "./lib/trpc";
+import { useQuery } from "@tanstack/react-query";
+import { MINUTE } from "@shared/lib/constants";
+import { useState } from "react";
 
 const appModesList: AppMode[] = Object.keys(APP_MODES_LIST).map((k) => k as AppMode);
 
@@ -26,6 +31,10 @@ export const App = () => {
   const appMode = useAppMode();
   const setAppMode = useSetAppMode();
   const navigate = useNavigate();
+
+  const [showGlobalMessage, setShowGlobalMessage] = useState(true);
+
+  const { data: globalMessages } = useQuery(api.messages.get.queryOptions(undefined, { refetchInterval: MINUTE }));
 
   // we're using this custom hook to handle the app mode based on the URL hash path
   // so we can create a sharable URL without breaking the iOS SPA PWA experience
@@ -39,8 +48,10 @@ export const App = () => {
     }
   };
 
+  const handleMessageClose = () => setShowGlobalMessage(false);
+
   return (
-    <main className="w-full max-w-(--breakpoint-2xl) mx-auto">
+    <main className="relative w-full max-w-(--breakpoint-2xl) mx-auto">
       {/* large-screen nav bar */}
       <nav className="flex justify-between px-4 mt-2 place-items-center max-md:hidden">
         <img src="/site-icon.svg" className="size-10 inline me-2" />
@@ -77,6 +88,15 @@ export const App = () => {
       {appMode === "obs" && <Observations />}
       {appMode === "map" && <WxMap />}
       {appMode === "otlk" && <Outlooks />}
+
+      {showGlobalMessage && globalMessages && (
+        <GlobalMessage
+          message={globalMessages.message}
+          timestamp={globalMessages.timestamp}
+          title={globalMessages.title}
+          onClick={handleMessageClose}
+        />
+      )}
 
       <Toaster toastOptions={{ className: "bg-neutral-800 text-white" }} />
     </main>
