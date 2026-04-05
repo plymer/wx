@@ -14,7 +14,8 @@ static-data/*
 
 # Dist
 node_modules
-dist/
+dist
+sqlite-db
 .vinxi
 .output
 .vercel

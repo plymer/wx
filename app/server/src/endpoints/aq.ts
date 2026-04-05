@@ -2,17 +2,17 @@ import { gte } from "drizzle-orm";
 import type { Feature, Point } from "geojson";
 import { TRPCError } from "@trpc/server";
 
-import { aqData } from "../db/tables/aq.drizzle.js";
+import { aqData } from "../db/tables/data.drizzle.js";
 import { aqSchema } from "../validationSchemas/aq.zod.js";
 import { HOUR } from "../lib/constants.js";
 
 import type { AirQualityData, AQData } from "../lib/types.js";
-import { aqDb } from "../main.js";
+import { db } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
 
 export const aqRouter = router({
   aq: publicProcedure.input(aqSchema).query(async ({ input }): Promise<Array<Feature<Point, AirQualityData>>> => {
-    if (!aqDb) {
+    if (!db) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No AQ database connection available" });
     }
 
@@ -22,7 +22,7 @@ export const aqRouter = router({
     const then = new Date(new Date().getTime() - hours * HOUR);
 
     try {
-      const data = await aqDb.query.aqData.findMany({
+      const data = await db.query.aqData.findMany({
         where: gte(aqData.validTime, then),
       });
 

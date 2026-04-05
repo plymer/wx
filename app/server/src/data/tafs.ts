@@ -1,27 +1,23 @@
-// this script will download and parse the taf 'cache' files from aviationweather.gov
-// taf cache updates minutely
-
 import "dotenv/config";
-import { lt } from "drizzle-orm";
+import { lt, Relations } from "drizzle-orm";
 import { generateDbConnection, readGzipFile } from "../lib/utils.js";
 import { xmlParser } from "../lib/utils.js";
-import { tafs } from "../db/tables/avwx.drizzle.js";
+import { tafs } from "../db/tables/data.drizzle.js";
 import type { CacheTafData, TafData, XMLCacheFile } from "../lib/types.js";
 import { tafSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
+import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/tafs.cache.xml.gz";
-const DB_NAME = "avwx";
 
-async function main() {
-  const db = await generateDbConnection(DB_NAME, { tafs });
-
+export async function getTafs<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
+  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
+) {
   if (!db) {
-    console.error(`[${DB_NAME.toUpperCase()}] (TAFs) Database connection failed.`);
-    process.exit(1);
+    throw new Error("[TAF] Database connection failed.");
   }
 
-  const xml = await readGzipFile(RESOURCE_URL, DB_NAME);
+  const xml = await readGzipFile(RESOURCE_URL, "taf");
 
   const { parser } = xmlParser();
 
@@ -53,7 +49,7 @@ async function main() {
       })
       .filter((entry) => entry !== undefined);
 
-    console.log(`[${DB_NAME.toUpperCase()}] Inserting ${output.length} TAFs...`);
+    console.log(`[TAF] Inserting ${output.length} TAFs...`);
 
     // insert the metar data, or update each metar if it already exists (our pk is siteId + validTime)
     await Promise.allSettled(
@@ -61,24 +57,21 @@ async function main() {
         await db
           .insert(tafs)
           .values(taf)
-          .onDuplicateKeyUpdate({
+          .onConflictDoUpdate({
+            target: [tafs.siteId, tafs.validTime],
             set: { rawText: taf.rawText },
           });
       }),
     );
 
-    console.log(`[${DB_NAME.toUpperCase()}] Cleaning up old TAFs...`);
+    console.log(`[TAF] Cleaning up old TAFs...`);
     // now clean up the database and remove any tafs older than 24 hours
     await db.delete(tafs).where(lt(tafs.validTime, new Date(Date.now() - 24 * HOUR)));
 
-    console.log(`[${DB_NAME.toUpperCase()}] TAF cleanup complete.`);
+    console.log(`[TAF] TAF cleanup complete.`);
 
-    console.log(`[${DB_NAME.toUpperCase()}] TAF cache file processing complete.`);
-    process.exit(0);
+    console.log(`[TAF] TAF cache file processing complete.`);
   } catch (error) {
-    console.error(`[${DB_NAME.toUpperCase()}] Error processing TAF cache file: ${(error as Error).message}`);
-    process.exit(1);
+    throw new Error(`[TAF] Error processing TAF cache file: ${(error as Error).message}`);
   }
 }
-
-await main();

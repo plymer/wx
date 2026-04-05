@@ -13,10 +13,10 @@ import {
 import type { HubDiscussion, XmetEventData } from "../lib/alphanumeric.types.js";
 import { isConvectiveSigmet, leadZero, processCoordinates } from "../lib/utils.js";
 
-import { metars, sigmets, stations, tafs } from "../db/tables/avwx.drizzle.js";
+import { metars, sigmets, stations, tafs } from "../db/tables/data.drizzle.js";
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 
-import { avwxDb } from "../main.js";
+import { db } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
 import type { HubData, PointForecastData, WxOAPIResponse, XmetGeoJSON } from "../lib/types.js";
 
@@ -31,7 +31,7 @@ const HubSites: Record<string, string> = {
 
 export const alphanumericRouter = router({
   metars: publicProcedure.input(metarSchema).query(async ({ input }) => {
-    if (!avwxDb) {
+    if (!db) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
@@ -41,7 +41,7 @@ export const alphanumericRouter = router({
     console.log("[API] Requesting METARs for:", searchSite, "for the last", hrs, "hours");
 
     try {
-      const metarData = await avwxDb.query.metars.findMany({
+      const metarData = await db.query.metars.findMany({
         columns: { rawText: true },
         where: and(eq(metars.siteId, searchSite), gte(metars.validTime, new Date(Date.now() - hrs * HOUR))),
         orderBy: asc(metars.validTime),
@@ -61,7 +61,7 @@ export const alphanumericRouter = router({
   }),
 
   sitedata: publicProcedure.input(singleSiteSchema).query(async ({ input }) => {
-    if (!avwxDb) {
+    if (!db) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
@@ -71,7 +71,7 @@ export const alphanumericRouter = router({
     console.log("[API] Requesting site data for:", searchSite);
 
     try {
-      const stationData = await avwxDb.query.stations.findFirst({
+      const stationData = await db.query.stations.findFirst({
         where: eq(stations.siteId, searchSite),
       });
 
@@ -119,7 +119,7 @@ export const alphanumericRouter = router({
   }),
 
   taf: publicProcedure.input(singleSiteSchema).query(async ({ input }) => {
-    if (!avwxDb) {
+    if (!db) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
@@ -129,7 +129,7 @@ export const alphanumericRouter = router({
     console.log("[API] Requesting TAF for:", searchSite);
 
     try {
-      const tafData = await avwxDb.query.tafs.findMany({
+      const tafData = await db.query.tafs.findMany({
         columns: { rawText: true },
         where: eq(tafs.siteId, searchSite),
         orderBy: desc(tafs.validTime),
@@ -331,13 +331,13 @@ export const alphanumericRouter = router({
   }),
 
   sigmets: publicProcedure.input(xmetSchema).query(async ({ input }) => {
-    if (!avwxDb) {
+    if (!db) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
     try {
       const { hours } = input;
-      const queryResult = await avwxDb.query.sigmets.findMany({
+      const queryResult = await db.query.sigmets.findMany({
         where: gt(sigmets.endTime, new Date(Date.now() - hours * HOUR)),
         orderBy: [desc(sigmets.endTime)],
       });

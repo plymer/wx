@@ -2,9 +2,7 @@ import "dotenv/config";
 import { load } from "cheerio";
 import type { StationData } from "../lib/types.js";
 import { generateDbConnection } from "../lib/utils.js";
-import { stations } from "../db/tables/avwx.drizzle.js";
-
-const DB_NAME = "avwx";
+import { stations } from "../db/tables/data.drizzle.js";
 
 const PROVINCES = {
   AB: "Alberta",
@@ -161,10 +159,10 @@ async function scrapeProvince(code: string, name: string): Promise<StationData[]
 }
 
 export async function scrapeWiki() {
-  const db = await generateDbConnection(DB_NAME, { stations });
+  const db = await generateDbConnection({ stations }, "wiki-station");
 
   if (!db) {
-    console.error(`[${DB_NAME.toUpperCase()}] (Stations) Database connection failed.`);
+    console.error(`[STATIONS] Database connection failed.`);
     process.exit(1);
   }
 
@@ -187,7 +185,7 @@ export async function scrapeWiki() {
   for (const provinceList of results) {
     if (provinceList.status === "fulfilled") {
       const values = provinceList.value;
-      console.log(`[${DB_NAME.toUpperCase()}] Inserting ${values.length} stations...`);
+      console.log(`[STATIONS] Inserting ${values.length} stations...`);
 
       // insert the station data, or update each station if it already exists
       await Promise.allSettled(
@@ -195,7 +193,8 @@ export async function scrapeWiki() {
           await db
             .insert(stations)
             .values(station)
-            .onDuplicateKeyUpdate({
+            .onConflictDoUpdate({
+              target: stations.siteId,
               set: {
                 lat: station.lat,
                 lon: station.lon,
@@ -208,7 +207,7 @@ export async function scrapeWiki() {
     }
   }
 
-  console.log(`[${DB_NAME.toUpperCase()}] Done updating stations from WikiPedia.`);
+  console.log(`[STATIONS] Done updating stations from WikiPedia.`);
 }
 
 scrapeWiki();

@@ -5,9 +5,8 @@ import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import cors from "cors";
 
 // database schemas
-import * as aqDbSchema from "./db/tables/aq.drizzle.js";
-import * as avwxSchemas from "./db/tables/avwx.drizzle.js";
-import * as avwxRelations from "./db/relations/avwx.relations.drizzle.js";
+import * as schemas from "./db/tables/data.drizzle.js";
+import * as relations from "./db/relations/data.relations.drizzle.js";
 
 // utilities
 import { generateDbConnection } from "./lib/utils.js";
@@ -25,12 +24,14 @@ import { publicProcedure, router } from "./lib/trpc.js";
 const PORT = process.env.PORT || 3000;
 
 // database connections
-export const aqDb = await generateDbConnection("aq", aqDbSchema);
-const avwxCombinedSchema = {
-  ...avwxSchemas,
-  ...avwxRelations,
-};
-export const avwxDb = await generateDbConnection("avwx", avwxCombinedSchema);
+
+export const db = await generateDbConnection(
+  {
+    ...schemas,
+    ...relations,
+  },
+  "api",
+);
 
 const greetRouter = router({
   greeting: publicProcedure

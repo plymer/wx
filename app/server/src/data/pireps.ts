@@ -1,37 +1,31 @@
-// this script will download and parse the pirep 'cache' files from aviationweather.gov
-// pirep cache updates minutely
-
 import "dotenv/config";
-import { lt } from "drizzle-orm";
+import { lt, Relations } from "drizzle-orm";
 import { generateDbConnection, readGzipFile } from "../lib/utils.js";
 import { xmlParser } from "../lib/utils.js";
-import { pireps } from "../db/tables/avwx.drizzle.js";
+import { pireps } from "../db/tables/data.drizzle.js";
 import type { CachePirepData, PirepData, XMLCacheFile } from "../lib/types.js";
 import { pirepSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
+import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 
 const CACHEFILE_URL = "https://aviationweather.gov/data/cache/aircraftreports.cache.xml.gz";
 // const NAVCAN_URL =
 //   "https://plan.navcanada.ca/weather/api/alpha/?site=CZEG&site=CZVR&site=CZWG&site=CZYZ&site=CZUL&site=CZQM&site=CZQX&alpha=pirep";
-const DB_NAME = "avwx";
 
-async function main() {
-  const db = await generateDbConnection(DB_NAME, { pireps });
-
+export async function getPireps<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
+  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
+) {
   if (!db) {
-    console.error(`[${DB_NAME.toUpperCase()}] (PIREPs) Database connection failed.`);
-    process.exit(1);
+    throw new Error("[PIREP] Database connection failed.");
   }
 
-  const xml = await readGzipFile(CACHEFILE_URL, DB_NAME);
+  const xml = await readGzipFile(CACHEFILE_URL, "pirep");
 
   const { parser } = xmlParser();
 
   const pirepData = (
     parser.parse(xml) as XMLCacheFile<CachePirepData, "aircraftreport">
   ).response.data.aircraftreport.filter((report) => report.reportType === "PIREP");
-
-  console.log(pirepData);
 
   try {
     const output: PirepData[] = pirepData
@@ -76,7 +70,7 @@ async function main() {
       })
       .filter((entry) => entry !== undefined);
 
-    console.log(`[${DB_NAME.toUpperCase()}] Inserting ${output.length} PIREPs...`);
+    console.log(`[PIREP] Inserting ${output.length} PIREPs...`);
 
     // insert the pirep data, or update each pirep if it already exists (our pk is lat + lon + validTime)
     await Promise.allSettled(
@@ -84,7 +78,8 @@ async function main() {
         await db
           .insert(pireps)
           .values(pirep)
-          .onDuplicateKeyUpdate({
+          .onConflictDoUpdate({
+            target: [pireps.lat, pireps.lon, pireps.validTime],
             set: {
               flightLevel: pirep.flightLevel,
               aircraftType: pirep.aircraftType,
@@ -96,18 +91,14 @@ async function main() {
       }),
     );
 
-    console.log(`[${DB_NAME.toUpperCase()}] Cleaning up old PIREPs...`);
+    console.log(`[PIREP] Cleaning up old data...`);
     // now clean up the database and remove any pireps older than 4 hours
     await db.delete(pireps).where(lt(pireps.validTime, new Date(Date.now() - 4 * HOUR)));
 
-    console.log(`[${DB_NAME.toUpperCase()}] PIREP cleanup complete.`);
+    console.log(`[PIREP] Cleanup complete.`);
 
-    console.log(`[${DB_NAME.toUpperCase()}] PIREP cache file processing complete.`);
+    console.log(`[PIREP] Cache file processing complete.`);
   } catch (error) {
-    console.error(`[${DB_NAME.toUpperCase()}] Error processing PIREP cache file: ${(error as Error).message}`);
-    process.exit(1);
+    throw new Error(`[PIREP] Error processing cache file: ${(error as Error).message}`);
   }
-  process.exit(0);
 }
-
-await main();

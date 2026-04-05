@@ -2,7 +2,7 @@ const path = require("path");
 
 const ENV_VARS = {
   NODE_ENV: "production",
-  SQLITE_PATH: process.env.SQLITE_PATH,
+  SQLITE_PATH: process.env.SQLITE_DEV_PATH,
   OUTLOOK_DIR: process.env.OUTLOOK_DIR,
   STATIC_DATA_DIR: process.env.STATIC_DATA_DIR,
 };
@@ -10,7 +10,7 @@ const ENV_VARS = {
 module.exports = {
   apps: [
     {
-      name: "data-processing",
+      name: "dev-data-processing",
       script: path.resolve(__dirname, "dist/server/data/index.js"),
       instances: 1,
       exec_mode: "fork", // use fork for single-instance cron scripts
@@ -23,7 +23,7 @@ module.exports = {
       cron_restart: "* * * * *",
     },
     {
-      name: "build-station-catalog",
+      name: "dev-build-station-catalog",
       script: path.resolve(__dirname, "dist/server/data/stations.js"),
       instances: 1,
       exec_mode: "fork", // use fork for single-instance cron scripts

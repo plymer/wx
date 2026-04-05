@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { metars, stations, tafs } from "../tables/avwx.drizzle.js";
+import { metars, stations, tafs } from "../tables/data.drizzle.js";
 
 // one station has many metars
 // one metar belongs to one station
