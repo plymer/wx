@@ -1,5 +1,5 @@
 // third-party libraries
-import { type ReactElement, useEffect, useState } from "react";
+import { type ReactElement, useState } from "react";
 import Map, { type ViewState, type ViewStateChangeEvent } from "react-map-gl/maplibre";
 import type { MapLayerMouseEvent, MapLibreEvent, StyleSpecification } from "maplibre-gl";
 import { Loader2 } from "lucide-react";
@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 // helpers
 
 // global state stores
-import { useLayersLoading, useMapStateActions } from "@/stateStores/map/mapView";
+import { useMapStateActions } from "@/stateStores/map/mapView";
 import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
 import type { MapProjections } from "@/lib/types";
 import useMapClock from "@/hooks/useClock";
@@ -25,7 +25,6 @@ interface Props {
 const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLayers }: Props) => {
   // subscribe to our global state stores
   const mapState = useMapStateActions();
-  const layersLoading = useLayersLoading();
   const { updateFromMapEvent } = useUpdateMapViewstate();
   const { setPopupData } = useUIActions();
 
@@ -34,10 +33,6 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
 
   useMapLoadingState("satellite", isSatelliteLoading);
   useMapLoadingState("radar", isRadarLoading);
-
-  useEffect(() => {
-    console.log("Layers currently loading:", layersLoading);
-  }, [layersLoading]);
 
   // set up our map clock so that our map animation is keeping up to date
   useMapClock();

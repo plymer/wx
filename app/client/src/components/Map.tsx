@@ -39,9 +39,7 @@ import { AlertsLayer } from "./map/layers/data/AlertsLayer";
 
 export default function WxMap() {
   // global state store subscriptions
-  const loadingState = useLayersLoading().length;
-
-  console.log("Number of layers loading:", loadingState);
+  const loadingState = useLayersLoading().length > 0;
   const projection = useProjection();
   const animation = useAnimationActions();
 
@@ -120,7 +118,7 @@ export default function WxMap() {
           <MapOptions />
           <GeoLocation />
         </div>
-        <MapLoadingIndicator show={loadingState > 0} />
+        <MapLoadingIndicator show={loadingState} />
       </WeatherMap>
       <AnimationControls className="w-full flex justify-center border-t-2 border-black bg-neutral-800 px-2 text-white max-md:pb-8" />
     </div>
