@@ -136,6 +136,66 @@ export const SurfaceDataLayer = () => {
 
   return (
     <>
+      <Source
+        id="sfc-obs-interpolated"
+        type="geojson"
+        data={interpolatedData ?? { type: "FeatureCollection", features: [] }}
+      >
+        <Layer
+          id="layer-sfc-obs-mslp-isolines"
+          type="line"
+          layout={{
+            "line-join": "round",
+            "line-cap": "round",
+          }}
+          paint={{
+            "line-color": "#111",
+            "line-width": 3,
+          }}
+        />
+        <Layer
+          id="layer-sfc-obs-mslp-isolines-labels"
+          type="symbol"
+          layout={{
+            "symbol-placement": "line",
+            "symbol-spacing": 400,
+            "text-field": ["concat", ["to-string", ["round", ["get", "value"]]], " hPa"],
+            "text-font": ["Consolas-Regular"],
+            "text-size": 16,
+            "text-keep-upright": true,
+            "text-allow-overlap": true,
+          }}
+          paint={{
+            "text-color": "#000",
+            "text-halo-color": "#fff",
+            "text-halo-width": 1.5,
+          }}
+        />
+        <Layer
+          id="layer-sfc-obs-mslp-extrema-value"
+          type="symbol"
+          filter={["has", "kind"]}
+          layout={{
+            "text-field": ["get", "value"],
+            "text-allow-overlap": true,
+            "text-anchor": "center",
+          }}
+          paint={{ "text-color": "#000", "text-halo-color": "#fff", "text-halo-width": 2 }}
+        />
+        <Layer
+          id="layer-sfc-obs-mslp-extrema-marker"
+          type="symbol"
+          filter={["has", "kind"]}
+          layout={{
+            "text-field": ["match", ["get", "kind"], "max", "H", "min", "L", ""],
+            "text-allow-overlap": true,
+            "text-anchor": "bottom",
+            "text-size": 48,
+            "text-font": ["Open-Sans-Italic"],
+          }}
+          paint={{ "text-color": "#000", "text-halo-color": "#fff", "text-halo-width": 2 }}
+        />
+      </Source>
       {/* Clustered source for text that can be culled when too dense */}
       <Source
         attribution={AWC_ATTRIBUTION}
@@ -368,65 +428,6 @@ export const SurfaceDataLayer = () => {
             "text-field": "+",
             "text-allow-overlap": true,
           }}
-        />
-      </Source>
-      <Source
-        id="sfc-obs-interpolated"
-        type="geojson"
-        data={interpolatedData ?? { type: "FeatureCollection", features: [] }}
-      >
-        <Layer
-          id="layer-sfc-obs-mslp-isolines"
-          type="line"
-          layout={{
-            "line-join": "round",
-            "line-cap": "round",
-          }}
-          paint={{
-            "line-color": "#eee",
-            "line-width": 3,
-          }}
-        />
-        <Layer
-          id="layer-sfc-obs-mslp-isolines-labels"
-          type="symbol"
-          layout={{
-            "symbol-placement": "line",
-            "symbol-spacing": 400,
-            "text-field": ["concat", ["to-string", ["round", ["get", "value"]]], " hPa"],
-            "text-font": ["Consolas-Regular"],
-            "text-size": 16,
-            "text-keep-upright": true,
-          }}
-          paint={{
-            "text-color": "#ffffff",
-            "text-halo-color": "#000000",
-            "text-halo-width": 1.5,
-          }}
-        />
-        <Layer
-          id="layer-sfc-obs-mslp-extrema-value"
-          type="symbol"
-          filter={["has", "kind"]}
-          layout={{
-            "text-field": ["get", "value"],
-            "text-allow-overlap": true,
-            "text-anchor": "center",
-          }}
-          paint={{ "text-color": "#fff", "text-halo-color": "#000", "text-halo-width": 2 }}
-        />
-        <Layer
-          id="layer-sfc-obs-mslp-extrema-marker"
-          type="symbol"
-          filter={["has", "kind"]}
-          layout={{
-            "text-field": ["match", ["get", "kind"], "max", "H", "min", "L", ""],
-            "text-allow-overlap": true,
-            "text-anchor": "bottom",
-            "text-size": 48,
-            "text-font": ["Open-Sans-Italic"],
-          }}
-          paint={{ "text-color": "#fff", "text-halo-color": "#000", "text-halo-width": 2 }}
         />
       </Source>
     </>

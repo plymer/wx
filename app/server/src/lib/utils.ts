@@ -422,8 +422,10 @@ export function outlookHandler(product: string) {
     throw new Error("OUTLOOK_DIR environment variable is not set");
   }
 
+  console.log(`[API] Loading outlooks`);
+
   const dirPath = path.join(outlookRootDir, product, "today");
-  console.log("[API] Loading", product, "charts");
+
   if (!existsSync(dirPath)) {
     console.warn(`[API] ${product} directory does not exist at path: ${dirPath}`);
     return null;
@@ -456,10 +458,6 @@ export function outlookHandler(product: string) {
       console.warn(`[API] Skipping file with undefined office or region: ${entry.name}`);
       continue;
     }
-
-    console.log(
-      `[API] Processing file: ${entry.name} (Office: ${officeKey}, Region: ${regionKey}, Valid: ${validPeriod})`,
-    );
 
     if (office && region && validPeriod) {
       const stats = statSync(path.join(entry.parentPath, entry.name));

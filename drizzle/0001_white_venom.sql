@@ -1,1 +1,0 @@
-ALTER TABLE `metars` ADD `mslp` float;

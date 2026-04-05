@@ -19,6 +19,7 @@ export const AlertsLayer = ({ override }: Props) => {
   return (
     <Source id="wxo-alerts-source" type="geojson" data={data ?? { type: "FeatureCollection", features: [] }}>
       <Layer
+        key="layer-wxo-alerts"
         id="layer-wxo-alerts"
         beforeId="tunnel_motorway_casing"
         type="fill"
@@ -28,20 +29,25 @@ export const AlertsLayer = ({ override }: Props) => {
         }}
       />
       <Layer
-        id="layer-wxo-alerts-labels"
-        type="symbol"
-        paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
-        layout={{ "text-field": ["get", "alertBannerText"], "text-size": 12, "text-allow-overlap": true }}
-      />
-      <Layer
+        key="layer-wxo-alerts-outline"
         id="layer-wxo-alerts-outline"
-        beforeId="layer-wxo-alerts-labels"
+        beforeId="place_state"
         type="line"
+        minzoom={4}
         paint={{
           "line-color": ["match", ["get", "type"], "warning", "#ff0000", "watch", "#ffff00", "#808080"],
           "line-opacity": 0.85,
           "line-width": 5,
         }}
+      />
+      <Layer
+        key="layer-wxo-alerts-labels"
+        id="layer-wxo-alerts-labels"
+        beforeId="place_state"
+        type="symbol"
+        minzoom={4.75}
+        paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
+        layout={{ "text-field": ["get", "alertBannerText"], "text-size": 12, "text-allow-overlap": true }}
       />
     </Source>
   );
