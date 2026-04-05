@@ -10,11 +10,7 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   plugins: [
     tailwindcss(),
-    react({
-      babel: {
-        plugins: [["babel-plugin-react-compiler", { target: "19" }]],
-      },
-    }),
+    react(),
     VitePWA({
       registerType: "autoUpdate",
       manifest: false,
@@ -35,7 +31,8 @@ export default defineConfig({
     outDir: path.resolve(__dirname, "../../dist"),
     rolldownOptions: {
       output: {
-        advancedChunks: {
+        codeSplitting: {
+          minSize: 200_000,
           groups: [
             { test: /maplibre-gl/, name: "maplibre-gl", priority: 999 },
             { test: /overlays/, name: "overlays", priority: 999 },
