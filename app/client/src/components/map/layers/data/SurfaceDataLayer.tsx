@@ -160,7 +160,7 @@ export const SurfaceDataLayer = () => {
             "symbol-spacing": 400,
             "text-field": ["concat", ["to-string", ["round", ["get", "value"]]], " hPa"],
             "text-font": ["Consolas-Regular"],
-            "text-size": 16,
+            "text-size": 12,
             "text-keep-upright": true,
             "text-allow-overlap": true,
           }}
@@ -178,6 +178,8 @@ export const SurfaceDataLayer = () => {
             "text-field": ["get", "value"],
             "text-allow-overlap": true,
             "text-anchor": "center",
+            "text-offset": [0, 0.25],
+            "text-font": ["Metropolis-Regular"],
           }}
           paint={{ "text-color": "#000", "text-halo-color": "#fff", "text-halo-width": 2 }}
         />
@@ -426,6 +428,7 @@ export const SurfaceDataLayer = () => {
           layout={{
             "text-field": "+",
             "text-allow-overlap": true,
+            "text-font": ["Metropolis-Regular"],
           }}
         />
       </Source>

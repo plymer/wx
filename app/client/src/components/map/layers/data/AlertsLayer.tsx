@@ -50,7 +50,12 @@ export const AlertsLayer = ({ override }: Props) => {
         type="symbol"
         minzoom={4.75}
         paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
-        layout={{ "text-field": ["get", "alertBannerText"], "text-size": 12, "text-allow-overlap": true }}
+        layout={{
+          "text-field": ["get", "alertBannerText"],
+          "text-size": 12,
+          "text-allow-overlap": true,
+          "text-font": ["Open-Sans-Italic"],
+        }}
       />
     </Source>
   );
