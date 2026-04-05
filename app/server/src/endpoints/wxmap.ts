@@ -457,6 +457,20 @@ export const wxmapRouter = router({
     return wxmapPopupSwr.get();
   }),
 
+  wxmapIsobars: publicProcedure.query(
+    async (): Promise<
+      FeatureCollection<Point | LineString, { value: number } | { kind: "max" | "min"; value: number }>[]
+    > => {
+      // for now, we'll just return the same data as the metars endpoint, since the isobars are generated on the client from the same data
+      if (!db) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
+      }
+
+      console.log("[API] Fetching isobar data for wxmap");
+      return wxmapIsobarsSwr.get();
+    },
+  ),
+
   wxmapPublicWarnings: publicProcedure.query(async (): Promise<FeatureCollection<MultiPolygon, WarningProperties>> => {
     console.log("[API] Fetching public warnings for wxmap");
 
