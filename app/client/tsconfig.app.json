@@ -19,7 +19,6 @@
     "noFallthroughCasesInSwitch": false,
     "noEmit": true,
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@shared/*": ["../server/src/*"]
