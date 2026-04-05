@@ -13,8 +13,8 @@ importers:
   .:
     dependencies:
       '@plymer/fast-barnes-ts':
-        specifier: ^0.3.1
-        version: 0.3.1(@types/geojson@7946.0.16)
+        specifier: ^0.3.2
+        version: 0.3.2(@types/geojson@7946.0.16)
       '@tanstack/react-query':
         specifier: ^5.95.2
         version: 5.95.2(react@19.2.4)
@@ -1179,8 +1179,8 @@ packages:
   '@oxc-project/types@0.101.0':
     resolution: {integrity: sha512-nuFhqlUzJX+gVIPPfuE6xurd4lST3mdcWOhyK/rZO0B9XWMKm79SuszIQEnSMmmDhq1DC8WWVYGVd+6F93o1gQ==}
 
-  '@plymer/fast-barnes-ts@0.3.1':
-    resolution: {integrity: sha512-GyWtWMBDmNJAT+QnPHWoGJ4fpaohXcBkR73078OTne7oaLRaAJq2x9shoKJo5a6yM/ZV+VcnyyU/jgnba/2cuQ==}
+  '@plymer/fast-barnes-ts@0.3.2':
+    resolution: {integrity: sha512-AjVeX5VRf5O0Bm9dezP6SehHmq47gAz9Mj2mHVl7ScnHUWDzcPPKoi4YJaGNZpUSAHVMyN412B9r/jAoqYceRQ==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/geojson': '>=7946.0.16'
@@ -5895,7 +5895,7 @@ snapshots:
 
   '@oxc-project/types@0.101.0': {}
 
-  '@plymer/fast-barnes-ts@0.3.1(@types/geojson@7946.0.16)':
+  '@plymer/fast-barnes-ts@0.3.2(@types/geojson@7946.0.16)':
     dependencies:
       '@types/geojson': 7946.0.16
       d3-contour: 4.0.2
