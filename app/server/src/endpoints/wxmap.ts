@@ -32,15 +32,15 @@ import { tupleArrayToGeoJSON, type Tuple2DWithValue } from "@plymer/fast-barnes-
 // data is refreshed in the background every minute, so it should never be more than 1 minute old
 const wxmapMetarsSwr = createSwrCacheHandler<FeatureCollection<Point, StationPlotData>>({
   cacheKey: "wxmapMetars",
-  freshMs: MINUTE,
-  staleMs: 5 * MINUTE,
+  freshMs: 2 * MINUTE,
+  staleMs: 15 * MINUTE,
   fetchFn: fetchWxmapMetarsData,
 });
 
 const wxmapPopupSwr = createSwrCacheHandler<FeatureCollection<Point, StationPlotPopupData>>({
   cacheKey: "wxmapPopupData",
-  freshMs: MINUTE,
-  staleMs: 5 * MINUTE,
+  freshMs: 2 * MINUTE,
+  staleMs: 15 * MINUTE,
   fetchFn: fetchWxmapPopupData,
 });
 
@@ -48,15 +48,15 @@ const wxmapIsobarsSwr = createSwrCacheHandler<
   FeatureCollection<Point | LineString, { value: number } | { kind: "max" | "min"; value: number }>[]
 >({
   cacheKey: "wxmapIsobars",
-  freshMs: MINUTE,
-  staleMs: 5 * MINUTE,
+  freshMs: 5 * MINUTE,
+  staleMs: 15 * MINUTE,
   fetchFn: fetchWxmapIsobarsData,
 });
 
 const wxmapPublicWarnings = createSwrCacheHandler<FeatureCollection<MultiPolygon, WarningProperties>>({
   cacheKey: "wxmapPublicWarnings",
-  freshMs: MINUTE,
-  staleMs: 5 * MINUTE,
+  freshMs: 5 * MINUTE,
+  staleMs: 15 * MINUTE,
   fetchFn: fetchWxmapPublicWarnings,
 });
 
