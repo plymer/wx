@@ -8,6 +8,7 @@ import { useShowLightning } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
 import { api } from "@/lib/trpc";
 import { useQuery } from "@tanstack/react-query";
+import { useMapLoadingState } from "@/hooks/useMapLoadingState";
 
 interface Props {
   belowLayer?: string;
@@ -19,13 +20,15 @@ export const LightningDataLayer = ({ belowLayer, timeRange = 15 }: Props) => {
 
   const displayTime = useDisplayTime();
 
-  const { data } = useQuery(
+  const { data, isFetching } = useQuery(
     api.lightning.lightning.queryOptions(undefined, {
       enabled,
       refetchInterval: MINUTE,
       trpc: { context: { skipBatch: true } },
     }),
   );
+
+  useMapLoadingState("lightning", isFetching);
 
   if (!enabled || !data) return;
 

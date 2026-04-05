@@ -1,5 +1,6 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
+import { useMapLoadingState } from "@/hooks/useMapLoadingState";
 
 import type { StationPlotGeoJSON } from "@shared/lib/types";
 
@@ -16,12 +17,12 @@ import {
 } from "@/config/stationPlots";
 import { AWC_ATTRIBUTION, UNCLUSTERED } from "@/config/vectorData";
 
-import { useMapStateActions, useViewportBounds, useZoom } from "@/stateStores/map/mapView";
+import { useViewportBounds, useZoom } from "@/stateStores/map/mapView";
 import { useShowObs } from "@/stateStores/map/vectorData";
 
 import { HOUR, MINUTE } from "@shared/lib/constants";
 import { checkIfInBounds, filterSpacedPoints, hasValidCoordinates } from "@/lib/utils";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
 
@@ -32,11 +33,10 @@ export const SurfaceDataLayer = () => {
   const enabled = useShowObs();
   const viewport = useViewportBounds();
   const currentFrame = useFrame();
-  const { setLoadingState } = useMapStateActions();
 
   const displayTime = useDisplayTime();
 
-  const { data: plotData, fetchStatus: plotDataFetch } = useQuery(
+  const { data: plotData, isFetching: plotFetching } = useQuery(
     api.wxmap.wxmapMetars.queryOptions(undefined, {
       enabled,
       refetchInterval: MINUTE,
@@ -44,14 +44,14 @@ export const SurfaceDataLayer = () => {
     }),
   );
 
-  const { data: popupData } = useQuery(
+  const { data: popupData, isFetching: popupFetching } = useQuery(
     api.wxmap.wxmapPopupData.queryOptions(undefined, {
       enabled,
       trpc: { context: { skipBatch: true } },
     }),
   );
 
-  const { data: isobarData } = useQuery(
+  const { data: isobarData, isFetching: isobarFetching } = useQuery(
     api.wxmap.wxmapIsobars.queryOptions(undefined, {
       enabled,
       refetchInterval: 5 * MINUTE,
@@ -59,10 +59,9 @@ export const SurfaceDataLayer = () => {
     }),
   );
 
-  useEffect(() => {
-    if (plotDataFetch === "fetching") setLoadingState(true);
-    else setLoadingState(false);
-  }, [plotDataFetch]);
+  useMapLoadingState("sfc-plots", plotFetching);
+  useMapLoadingState("sfc-popup", popupFetching);
+  useMapLoadingState("sfc-isobars", isobarFetching);
 
   // construct our station priority list for each zoom level
   // this will give us a computed list of stations to show at each zoom level

@@ -9,13 +9,13 @@ import { AttributionControl, ScaleControl, type ViewState } from "react-map-gl/m
 import MapLoadingIndicator from "./ui/MapLoadingIndicator";
 import { GeoLocation } from "./map/controls/GeoLocation";
 import {
-  useLoadingState,
   useProjection,
   useLatitude,
   useLongitude,
   useZoom,
   useBearing,
   usePitch,
+  useLayersLoading,
 } from "@/stateStores/map/mapView";
 import { useAnimationActions } from "@/stateStores/map/animation";
 
@@ -39,7 +39,7 @@ import { AlertsLayer } from "./map/layers/data/AlertsLayer";
 
 export default function WxMap() {
   // global state store subscriptions
-  const loadingState = useLoadingState();
+  const loadingState = useLayersLoading().length > 0;
   const projection = useProjection();
   const animation = useAnimationActions();
 

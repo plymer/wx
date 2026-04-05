@@ -12,6 +12,7 @@ import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
 import type { MapProjections } from "@/lib/types";
 import useMapClock from "@/hooks/useClock";
 import { useUIActions } from "@/stateStores/map/ui";
+import { useMapLoadingState } from "@/hooks/useMapLoadingState";
 
 interface Props {
   viewState: Partial<ViewState>;
@@ -26,6 +27,12 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
   const mapState = useMapStateActions();
   const { updateFromMapEvent } = useUpdateMapViewstate();
   const { setPopupData } = useUIActions();
+
+  const [isSatelliteLoading, setIsSatelliteLoading] = useState(false);
+  const [isRadarLoading, setIsRadarLoading] = useState(false);
+
+  useMapLoadingState("satellite", isSatelliteLoading);
+  useMapLoadingState("radar", isRadarLoading);
 
   // set up our map clock so that our map animation is keeping up to date
   useMapClock();
@@ -91,12 +98,11 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
       onMouseLeave={() => setCursor("grab")}
       onLoad={onMapLoad}
       onSourceData={(e) => {
-        if (e.sourceId.includes("satellite") || e.sourceId.includes("radar")) {
-          mapState.setLoadingState(true);
-        }
-      }}
-      onIdle={() => {
-        mapState.setLoadingState(false);
+        const isSatelliteLoading = e.sourceId.includes("satellite");
+        const isRadarLoading = e.sourceId.includes("radar");
+
+        setIsSatelliteLoading(isSatelliteLoading && e.isSourceLoaded === false);
+        setIsRadarLoading(isRadarLoading && e.isSourceLoaded === false);
       }}
       onMove={onMove}
     >

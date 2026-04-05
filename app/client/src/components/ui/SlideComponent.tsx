@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   isVisible: boolean;
@@ -7,29 +7,86 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export default function SlideComponent({ isVisible, onAnimationComplete, children, ...props }: Props) {
+  const ENTER_ANIMATION_DELAY_MS = 20;
+  const EXIT_ANIMATION_DURATION_MS = 500;
+
   const [shouldRender, setShouldRender] = useState(isVisible);
-  const [animationClass, setAnimationClass] = useState("slide-enter-active");
+  const [animationState, setAnimationState] = useState<"enter" | "exit">(isVisible ? "enter" : "exit");
+  const enterTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const exitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isVisibleRef = useRef(isVisible);
+  const onAnimationCompleteRef = useRef(onAnimationComplete);
 
   useEffect(() => {
+    onAnimationCompleteRef.current = onAnimationComplete;
+  }, [onAnimationComplete]);
+
+  useEffect(() => {
+    isVisibleRef.current = isVisible;
+
+    if (enterTimeoutRef.current) {
+      clearTimeout(enterTimeoutRef.current);
+      enterTimeoutRef.current = null;
+    }
+
+    if (exitTimeoutRef.current) {
+      clearTimeout(exitTimeoutRef.current);
+      exitTimeoutRef.current = null;
+    }
+
     if (isVisible) {
       setShouldRender(true);
+      setAnimationState("exit");
       // force an update after a small delay (to ensure the DOM is ready)
       // to trigger the CSS transition
-      setTimeout(() => {
-        setAnimationClass("slide-enter-active");
-      }, 20);
+      enterTimeoutRef.current = setTimeout(() => {
+        if (!isVisibleRef.current) {
+          return;
+        }
+        setAnimationState("enter");
+        enterTimeoutRef.current = null;
+      }, ENTER_ANIMATION_DELAY_MS);
     } else {
-      setAnimationClass("slide-exit-active");
+      setAnimationState("exit");
 
       // wait the duration of the css transition before un-rendering the component
-      setTimeout(() => {
+      exitTimeoutRef.current = setTimeout(() => {
+        if (isVisibleRef.current) {
+          return;
+        }
         setShouldRender(false);
-        onAnimationComplete?.();
-      }, 500);
+        onAnimationCompleteRef.current?.();
+        exitTimeoutRef.current = null;
+      }, EXIT_ANIMATION_DURATION_MS);
     }
-  }, [isVisible, onAnimationComplete]);
+
+    return () => {
+      if (enterTimeoutRef.current) {
+        clearTimeout(enterTimeoutRef.current);
+        enterTimeoutRef.current = null;
+      }
+
+      if (exitTimeoutRef.current) {
+        clearTimeout(exitTimeoutRef.current);
+        exitTimeoutRef.current = null;
+      }
+    };
+  }, [isVisible]);
 
   if (!shouldRender) return null;
 
-  return <div className={`slide-panel ${animationClass} ${props.className}`}>{children}</div>;
+  const isEntering = animationState === "enter";
+  const transitionTiming = isEntering ? "ease-out" : "ease-in";
+  const slideStyle: React.CSSProperties = {
+    transform: isEntering ? "translateX(0)" : "translateX(-100%)",
+    opacity: isEntering ? 1 : 0,
+    transition: `transform ${EXIT_ANIMATION_DURATION_MS}ms ${transitionTiming}, opacity ${EXIT_ANIMATION_DURATION_MS}ms ${transitionTiming}`,
+    ...props.style,
+  };
+
+  return (
+    <div {...props} className={props.className} style={slideStyle}>
+      {children}
+    </div>
+  );
 }
