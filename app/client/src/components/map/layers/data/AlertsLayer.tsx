@@ -1,3 +1,4 @@
+import { useMapLoadingState } from "@/hooks/useMapLoadingState";
 import { api } from "@/lib/trpc";
 import { useShowPublicAlerts } from "@/stateStores/map/vectorData";
 import { useQuery } from "@tanstack/react-query";
@@ -10,9 +11,11 @@ interface Props {
 export const AlertsLayer = ({ override }: Props) => {
   const enabled = useShowPublicAlerts();
 
-  const { data } = useQuery(
+  const { data, isFetching } = useQuery(
     api.wxmap.wxmapPublicWarnings.queryOptions(undefined, { trpc: { context: { skipBatch: true } } }),
   );
+
+  useMapLoadingState("alerts", isFetching);
 
   if (!override && !enabled) return null;
 

@@ -15,10 +15,11 @@ interface MapStateStore extends ViewState {
   padding: PaddingOptions;
   projection: MapProjections;
   viewportBounds?: [number, number, number, number];
-  loadingState: boolean;
+  layersLoading: string[];
   actions: {
     setMapRef: (ref: Map | null) => void;
-    setLoadingState: (loading: boolean) => void;
+    addLayerLoading: (layerName: string) => void;
+    removeLayerLoading: (layerName: string) => void;
     setLatitude: (lat: number) => void;
     setLongitude: (lon: number) => void;
     setZoom: (zoom: number) => void;
@@ -40,10 +41,19 @@ const useMapViewState = create<MapStateStore>()(
       padding: { top: 0, left: 0, right: 0, bottom: 0 },
       projection: "mercator",
       viewportBounds: undefined,
-      loadingState: false,
+      layersLoading: [],
       actions: {
         setMapRef: (newRef) => set(() => ({ mapRef: newRef })),
-        setLoadingState: (newState) => set(() => ({ loadingState: newState })),
+        addLayerLoading: (layerName: string) =>
+          set((state) => ({
+            layersLoading: state.layersLoading.includes(layerName)
+              ? state.layersLoading
+              : [...state.layersLoading, layerName],
+          })),
+        removeLayerLoading: (layerName: string) =>
+          set((state) => ({
+            layersLoading: state.layersLoading.filter((name) => name !== layerName),
+          })),
         setLatitude: (newLatitude) => set(() => ({ latitude: newLatitude })),
         setLongitude: (newLongitude) => set(() => ({ longitude: newLongitude })),
         setZoom: (newZoom) => set(() => ({ zoom: newZoom })),
@@ -80,5 +90,5 @@ export const usePitch = () => useMapViewState((state) => state.pitch);
 export const usePadding = () => useMapViewState((state) => state.padding);
 export const useProjection = () => useMapViewState((state) => state.projection);
 export const useViewportBounds = () => useMapViewState((state) => state.viewportBounds);
-export const useLoadingState = () => useMapViewState((state) => state.loadingState);
+export const useLayersLoading = () => useMapViewState((state) => state.layersLoading);
 export const useMapStateActions = () => useMapViewState((state) => state.actions);

@@ -1,5 +1,5 @@
 // third-party libraries
-import { type ReactElement, useState } from "react";
+import { type ReactElement, useEffect, useState } from "react";
 import Map, { type ViewState, type ViewStateChangeEvent } from "react-map-gl/maplibre";
 import type { MapLayerMouseEvent, MapLibreEvent, StyleSpecification } from "maplibre-gl";
 import { Loader2 } from "lucide-react";
@@ -7,11 +7,12 @@ import { Loader2 } from "lucide-react";
 // helpers
 
 // global state stores
-import { useMapStateActions } from "@/stateStores/map/mapView";
+import { useLayersLoading, useMapStateActions } from "@/stateStores/map/mapView";
 import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
 import type { MapProjections } from "@/lib/types";
 import useMapClock from "@/hooks/useClock";
 import { useUIActions } from "@/stateStores/map/ui";
+import { useMapLoadingState } from "@/hooks/useMapLoadingState";
 
 interface Props {
   viewState: Partial<ViewState>;
@@ -24,8 +25,19 @@ interface Props {
 const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLayers }: Props) => {
   // subscribe to our global state stores
   const mapState = useMapStateActions();
+  const layersLoading = useLayersLoading();
   const { updateFromMapEvent } = useUpdateMapViewstate();
   const { setPopupData } = useUIActions();
+
+  const [isSatelliteLoading, setIsSatelliteLoading] = useState(false);
+  const [isRadarLoading, setIsRadarLoading] = useState(false);
+
+  useMapLoadingState("satellite", isSatelliteLoading);
+  useMapLoadingState("radar", isRadarLoading);
+
+  useEffect(() => {
+    console.log("Layers currently loading:", layersLoading);
+  }, [layersLoading]);
 
   // set up our map clock so that our map animation is keeping up to date
   useMapClock();
@@ -91,12 +103,11 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
       onMouseLeave={() => setCursor("grab")}
       onLoad={onMapLoad}
       onSourceData={(e) => {
-        if (e.sourceId.includes("satellite") || e.sourceId.includes("radar")) {
-          mapState.setLoadingState(true);
-        }
-      }}
-      onIdle={() => {
-        mapState.setLoadingState(false);
+        const isSatelliteLoading = e.sourceId.includes("satellite");
+        const isRadarLoading = e.sourceId.includes("radar");
+
+        setIsSatelliteLoading(isSatelliteLoading && e.isSourceLoaded === false);
+        setIsRadarLoading(isRadarLoading && e.isSourceLoaded === false);
       }}
       onMove={onMove}
     >

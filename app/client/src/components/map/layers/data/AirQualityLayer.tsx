@@ -8,6 +8,7 @@ import { useShowAQ } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
 import { api } from "@/lib/trpc";
 import { useQuery } from "@tanstack/react-query";
+import { useMapLoadingState } from "@/hooks/useMapLoadingState";
 
 interface Props {
   belowLayer?: string;
@@ -20,12 +21,14 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
   const lastFrame = useFrameCount() - 1;
   const displayTime = useDisplayTime();
 
-  const { data } = useQuery(
+  const { data, isFetching } = useQuery(
     api.aq.aq.queryOptions(
       { hours: 4 },
       { enabled, refetchInterval: 10 * MINUTE, trpc: { context: { skipBatch: true } } },
     ),
   );
+
+  useMapLoadingState("aqData", isFetching);
 
   if (!enabled || !data) return;
 

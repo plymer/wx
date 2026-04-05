@@ -3,6 +3,7 @@ import XmetLayer from "../base/XmetLayer";
 import { useShowSIGMETs } from "@/stateStores/map/vectorData";
 import { useQuery } from "@tanstack/react-query";
 import { MINUTE } from "@shared/lib/constants";
+import { useMapLoadingState } from "@/hooks/useMapLoadingState";
 
 /**
  * Opinionated SIGMET layer that automatically fetches and displays SIGMET data
@@ -11,9 +12,10 @@ import { MINUTE } from "@shared/lib/constants";
 export function SigmetLayer() {
   // Get SIGMET visibility from state store
   const enabled = useShowSIGMETs();
+
   const {
     data: sigmetData,
-    isLoading,
+    isFetching,
     error,
   } = useQuery(
     api.alpha.sigmets.queryOptions(
@@ -22,19 +24,17 @@ export function SigmetLayer() {
     ),
   );
 
+  useMapLoadingState("sigmet", isFetching);
+
   // Don't render if SIGMETs are disabled in state
   if (!enabled) return null;
-
-  if (isLoading) return null;
 
   if (error) {
     console.error("[SigmetLayer] Failed to load SIGMET data:", error);
     return null;
   }
 
-  if (!sigmetData) {
-    return null;
-  }
+  if (!sigmetData) return null;
 
   return <XmetLayer dataType="sigmet" jsonData={sigmetData} belowLayer={"place_state"} />;
 }
