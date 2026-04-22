@@ -7,6 +7,9 @@ interface OutlookCardProps {
 }
 
 const OutlookCard = ({ panel, onClick }: OutlookCardProps) => {
+  const [rawType, period] = panel.validPeriod.split("_");
+  const type = `${rawType.charAt(0).toUpperCase()}${rawType.slice(1)}`;
+
   return (
     <>
       <Card
@@ -15,7 +18,7 @@ const OutlookCard = ({ panel, onClick }: OutlookCardProps) => {
       >
         <CardHeader>
           <CardTitle className="flex gap-4 items-center justify-center">
-            <div className="font-bold text-xl">{`Day ${panel.validPeriod.split("_")[1]}`}</div>
+            <div className="font-bold text-xl">{`${type} ${period}`}</div>
             <div className="italic text-xs">
               (Panel created:{" "}
               {new Date(panel.date).toLocaleString("en-CA", {
