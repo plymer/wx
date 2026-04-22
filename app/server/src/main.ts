@@ -1,8 +1,8 @@
 // third-party dependencies
 import "dotenv/config";
-
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
 import cors from "cors";
+import z from "zod";
 
 // database schemas
 import * as schemas from "./db/tables/data.drizzle.js";
@@ -10,6 +10,8 @@ import * as relations from "./db/relations/data.relations.drizzle.js";
 
 // utilities
 import { generateDbConnection } from "./lib/utils.js";
+import { redisClient } from "./lib/redis.js";
+import { publicProcedure, router } from "./lib/trpc.js";
 
 // endpoint routers
 import { aqRouter } from "./endpoints/aq.js";
@@ -19,12 +21,8 @@ import { wxmapRouter } from "./endpoints/wxmap.js";
 import { alphanumericRouter } from "./endpoints/alphanumeric.js";
 import { chartsRouter } from "./endpoints/charts.js";
 import { globalMessageRouter } from "./endpoints/globalMessage.js";
-import z from "zod";
-import { publicProcedure, router } from "./lib/trpc.js";
 
 const PORT = process.env.PORT || 3000;
-
-// database connections
 
 export const db = await generateDbConnection(
   {
@@ -33,6 +31,8 @@ export const db = await generateDbConnection(
   },
   "api",
 );
+
+export const cacheClient = await redisClient();
 
 const greetRouter = router({
   greeting: publicProcedure
@@ -69,4 +69,4 @@ createHTTPServer({
   basePath: "/api/",
 }).listen(PORT);
 
-console.log(`tRPC server listening on http://localhost:${PORT}/api/`);
+console.log(`[API] tRPC server listening on http://localhost:${PORT}/api/`);
