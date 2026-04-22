@@ -458,7 +458,7 @@ export const wxmapRouter = router({
 
     // simplify the polygons to reduce complexity, improve client performance, and reduce payload size
     const output = turf.simplify(dataCollection, { tolerance: 0.001, highQuality: false, mutate: true });
-    await cacheClient.setEx("wxmap:publicWarnings", 5, JSON.stringify(output));
+    await cacheClient.setEx("wxmap:publicWarnings", 60 * 10, JSON.stringify(output));
 
     return output;
   }),
