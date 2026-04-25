@@ -14,7 +14,7 @@ import type { FeatureCollection, MultiPoint, MultiPolygon } from "geojson";
 import type { InferSelectModel } from "drizzle-orm";
 
 import { LngLat, type MapGeoJSONFeature } from "maplibre-gl";
-import { aqData } from "@shared/db/tables/aq.drizzle";
+import type { aqData } from "@shared/db/tables/data.drizzle";
 
 export type AppMode = keyof typeof APP_MODES_LIST;
 export type AnimationState = (typeof ANIMATION_STATES)[number];

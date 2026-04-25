@@ -42,6 +42,9 @@ const OutlookContainer = ({ data }: Props) => {
 
   const officeData = data && selectedOffice !== null ? data[selectedOffice] : null;
 
+  console.log("regionsInOffice", regionsInOffice);
+  console.log("officeData", officeData);
+
   if (data === null) {
     return (
       <p className="w-fit mx-auto text-sm italic text-center px-4 py-2 border-white rounded-lg border-2 my-8">
