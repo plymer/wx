@@ -15,14 +15,12 @@ const OutlookGrid = ({ officeData }: OutlookGridProps) => {
   const region = useOutlookRegion();
   const actions = useOutlookActions();
 
-  console.log("OutlookGrid officeData", Object.entries(officeData));
-
   return (
     <div className="p-2">
       {Object.entries(officeData).map(
         ([regionKey, regionData]) =>
           (region === regionKey || !region) && (
-            <div className="flex flex-col gap-2" key={regionData.name}>
+            <div className="flex flex-col gap-2" key={`${regionKey}-${regionData.name}`}>
               <h2 className="text-xl font-bold ">{regionData.name}</h2>
               <div className={`grid gap-2 ${columnHelper(regionData)} max-lg:grid-cols-1`}>
                 {regionData.panels.map((panel) => (
