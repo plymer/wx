@@ -259,7 +259,7 @@ export const alphanumericRouter = router({
             expiryTime: alert.expiryTime,
             eventOnsetTime: alert.eventOnsetTime,
             eventEndTime: alert.eventEndTime,
-            alertBannerText: alert.alertBannerText,
+            bannerText: alert.bannerText,
             text: alert.text,
           };
         })

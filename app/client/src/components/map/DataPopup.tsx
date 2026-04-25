@@ -186,7 +186,7 @@ export const DataPopup = () => {
                         {alertProps.type === "warning" && <OctagonX />}
                       </div>
                       <div className=" col-span-6 flex gap-1 items-center font-bold justify-left">
-                        {alertProps.alertBannerText}
+                        {alertProps.bannerText}
                       </div>
                     </div>
                   );

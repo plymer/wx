@@ -216,7 +216,7 @@ export type WxOAlert = {
   expiryTime: string;
   eventOnsetTime: string;
   eventEndTime: string;
-  alertBannerText: string;
+  bannerText: string;
   alertNameShort: string;
   text: string;
   impact: string;
@@ -373,7 +373,7 @@ export type WarningProperties = Prettify<
     | "colour"
     | "impact"
     | "confidence"
-    | "alertBannerText"
+    | "bannerText"
     | "eventEndTime"
     | "eventOnsetTime"
   > & {
@@ -413,7 +413,7 @@ export type PointForecastData = {
     expiryTime: string;
     eventOnsetTime: string;
     eventEndTime: string;
-    alertBannerText: string;
+    bannerText: string;
     text: string;
   }[];
   normals: {

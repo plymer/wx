@@ -369,7 +369,7 @@ export const wxmapRouter = router({
             type: alertData.type,
             issueTime: alertData.issueTime,
             alertNameShort: alertData.alertNameShort,
-            alertBannerText: alertData.alertBannerText,
+            bannerText: alertData.bannerText,
             eventEndTime: alertData.eventEndTime,
             eventOnsetTime: alertData.eventOnsetTime,
             colour: alertData.colour,
