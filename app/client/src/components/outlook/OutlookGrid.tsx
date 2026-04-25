@@ -15,6 +15,8 @@ const OutlookGrid = ({ officeData }: OutlookGridProps) => {
   const region = useOutlookRegion();
   const actions = useOutlookActions();
 
+  console.log("OutlookGrid officeData", Object.entries(officeData));
+
   return (
     <div className="p-2">
       {Object.entries(officeData).map(
