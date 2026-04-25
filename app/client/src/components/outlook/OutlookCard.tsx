@@ -35,7 +35,7 @@ const OutlookCard = ({ panel, onClick }: OutlookCardProps) => {
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex justify-center items-center">
           <img src={panel.url} />
         </CardContent>
       </Card>
