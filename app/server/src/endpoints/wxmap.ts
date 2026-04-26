@@ -4,7 +4,6 @@ import { TRPCError } from "@trpc/server";
 import * as fs from "fs/promises";
 import path from "path";
 import "dotenv/config";
-import { tupleArrayToGeoJSON, type Tuple2DWithValue } from "@plymer/fast-barnes-ts";
 import * as turf from "@turf/turf";
 
 import type {
@@ -18,7 +17,7 @@ import type {
   WxOPolygonProperties,
 } from "../lib/types.js";
 import { metars, tafs } from "../db/tables/data.drizzle.js";
-import { HOUR, MINUTE } from "../lib/constants.js";
+import { HOUR } from "../lib/constants.js";
 
 import { cacheClient, db } from "../main.js";
 import { publicProcedure, router } from "../lib/trpc.js";
@@ -26,6 +25,7 @@ import { publicProcedure, router } from "../lib/trpc.js";
 import { limitResultsByKeys } from "../lib/utils.js";
 
 import { SITE_IGNORES } from "../config/alphanumeric.config.js";
+import { wxmapIsolinesSchema } from "../validationSchemas/wxmap.zod.js";
 
 // Generic function to convert METAR query results to GeoJSON features
 function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, StationPlotData>[] {
@@ -184,142 +184,40 @@ export const wxmapRouter = router({
     return output;
   }),
 
-  wxmapIsobars: publicProcedure.query(
-    async (): Promise<
-      FeatureCollection<Point | LineString, { value: number } | { kind: "max" | "min"; value: number }>[]
-    > => {
-      // for now, we'll just return the same data as the metars endpoint, since the isobars are generated on the client from the same data
-      if (!db) {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
-      }
+  wxmapIsolines: publicProcedure
+    .input(wxmapIsolinesSchema)
+    .query(
+      async ({
+        input,
+      }): Promise<
+        FeatureCollection<Point | LineString, { value: number } | { kind: "max" | "min"; value: number }>[]
+      > => {
+        const { type } = input;
 
-      const cachedData = await cacheClient.get("wxmap:isobars");
+        const cachedData = await cacheClient.lRange(`wxmap:isolines:${type}`, 0, -1);
 
-      if (cachedData) {
-        console.log("[API] Cache HIT for wxmap isobars");
-        return JSON.parse(cachedData) as FeatureCollection<
-          Point | LineString,
-          { value: number } | { kind: "max" | "min"; value: number }
-        >[];
-      }
+        if (cachedData.length > 0) {
+          console.log(`[API] Cache HIT for WxMap Isolines - ${type} (${cachedData.length} items)`);
 
-      console.log("[API] Cache MISS for wxmap isobars. Fetching from source...");
-
-      const now = new Date().getTime();
-
-      const queryResult = (await db.query.metars.findMany({
-        where: gt(metars.validTime, new Date(now - 4 * HOUR)),
-        with: { stations: { columns: { lat: true, lon: true } } },
-      })) as MetarWithStation[];
-
-      const fcArray: FeatureCollection<
-        Point | LineString,
-        { value: number } | { kind: "max" | "min"; value: number }
-      >[] = [];
-
-      const collatedData: Record<string, { lat: number; lon: number; values: { mslp: number; validTime: Date }[] }> =
-        {};
-
-      const BLACKLISTED_SITES = ["PACX", "PFTO"];
-
-      queryResult.forEach((metar) => {
-        const { mslp, validTime, stations, siteId } = metar;
-
-        if (!stations?.lat || !stations?.lon || !mslp || BLACKLISTED_SITES.includes(siteId)) {
-          return;
-        }
-
-        const { lat, lon } = stations;
-
-        if (collatedData[metar.siteId]) {
-          collatedData[metar.siteId].values.push({ mslp, validTime });
+          return cachedData.flatMap((item) => JSON.parse(item)) as FeatureCollection<
+            Point | LineString,
+            { value: number } | { kind: "max" | "min"; value: number }
+          >[];
         } else {
-          collatedData[metar.siteId] = { lat, lon, values: [{ mslp, validTime }] };
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No cache client available for isolines" });
         }
-      });
-
-      for (let i = 0; i < 19; i++) {
-        const tupleData = Object.values(collatedData).reduce<Tuple2DWithValue[]>((acc, data) => {
-          const { lat, lon, values } = data;
-          const computedTime = now - (19 - i) * 10 * MINUTE;
-
-          if (!lat || !lon || !values.length) {
-            return acc;
-          }
-
-          const dataForTime = values
-            .sort((a, b) => {
-              const aDiff = computedTime - new Date(a.validTime).getTime();
-              const bDiff = computedTime - new Date(b.validTime).getTime();
-              return aDiff - bDiff;
-            })
-            .find(
-              (m) =>
-                new Date(m.validTime).getTime() <= computedTime &&
-                new Date(m.validTime).getTime() >= computedTime - 4 * HOUR,
-            );
-
-          if (dataForTime) {
-            if (!dataForTime.mslp) return acc;
-
-            acc.push([lon, lat, dataForTime.mslp]);
-          }
-
-          return acc;
-        }, []);
-
-        // convert the tuple data to GeoJSON features with the mslp value as a property
-
-        const fc = tupleArrayToGeoJSON(tupleData, "isolines", {
-          contourOptions: { spacing: 4, smooth: true },
-          resolution: 1024,
-          sigma: 1.4,
-          extrema: { radius: 2, minSeparation: 6, minProminence: 0.001, maxCountPerKind: undefined },
-        })
-          .features.filter((feature) => {
-            if ("kind" in feature.properties) {
-              if (feature.properties.kind !== "max" && feature.properties.kind !== "min") {
-                return false;
-              } else {
-                return true;
-              }
-            } else if ("value" in feature.properties && !("kind" in feature.properties)) {
-              return true;
-            }
-          })
-          .map((feature) => {
-            if ("kind" in feature.properties) {
-              return {
-                ...feature,
-                properties: {
-                  ...feature.properties,
-                  value:
-                    feature.properties.kind === "max"
-                      ? Math.ceil(feature.properties.value)
-                      : Math.floor(feature.properties.value),
-                },
-              };
-            } else return feature;
-          });
-
-        fcArray.push({ type: "FeatureCollection", features: fc });
-      }
-
-      await cacheClient.setEx("wxmap:isobars", 60 * 10, JSON.stringify(fcArray));
-
-      return fcArray;
-    },
-  ),
+      },
+    ),
 
   wxmapPublicWarnings: publicProcedure.query(async (): Promise<FeatureCollection<MultiPolygon, WarningProperties>> => {
     const cachedData = await cacheClient.get("wxmap:publicWarnings");
 
     if (cachedData) {
-      console.log("[API] Cache HIT for wxmap public warnings");
+      console.log("[API] Cache HIT for WxMap Public Warnings");
       return JSON.parse(cachedData) as FeatureCollection<MultiPolygon, WarningProperties>;
     }
 
-    console.log("[API] Cache MISS for wxmap public warnings. Fetching from source...");
+    console.log("[API] Cache MISS for WxMap Public Warnings. Fetching from source...");
 
     const fileName = "public-alerts.json";
 
@@ -341,7 +239,7 @@ export const wxmapRouter = router({
       .catch((error) => {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: `Failed to read public warnings from file: ${error.message}`,
+          message: `Failed to read Public Warnings from file: ${error.message}`,
         });
       });
 

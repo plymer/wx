@@ -1,5 +1,7 @@
 // third-party libraries
+import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 
 // ui components
 import Button from "@/components/ui/Button";
@@ -21,9 +23,7 @@ import { APP_MODES_LIST } from "@/config/modes";
 import { useAppMode, useSetAppMode } from "@/stateStores/app";
 import type { AppMode } from "@/lib/types";
 import { api } from "./lib/trpc";
-import { useQuery } from "@tanstack/react-query";
 import { MINUTE } from "@shared/lib/constants";
-import { useState } from "react";
 
 const appModesList: AppMode[] = Object.keys(APP_MODES_LIST).map((k) => k as AppMode);
 

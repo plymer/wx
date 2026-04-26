@@ -5,6 +5,9 @@ interface VectorStateStore {
   showAQ: boolean;
   showLightning: boolean;
   showObs: boolean;
+  showIsobars: boolean;
+  showIsotherms: boolean;
+  showIsodrosotherms: boolean;
   showPIREPs: boolean;
   showSIGMETs: boolean;
   showAIRMETs: boolean;
@@ -13,6 +16,9 @@ interface VectorStateStore {
     toggleAQ: () => void;
     toggleLightning: () => void;
     toggleObs: () => void;
+    toggleIsobars: () => void;
+    toggleIsotherms: () => void;
+    toggleIsodrosotherms: () => void;
     togglePIREPs: () => void;
     toggleSIGMETs: () => void;
     toggleAIRMETs: () => void;
@@ -27,6 +33,9 @@ const useVectorData = create<VectorStateStore>()(
       showAQ: true,
       showLightning: true,
       showObs: true,
+      showIsobars: true,
+      showIsotherms: false,
+      showIsodrosotherms: false,
       showPIREPs: true,
       showSIGMETs: true,
       showAIRMETs: true,
@@ -35,6 +44,9 @@ const useVectorData = create<VectorStateStore>()(
         toggleAQ: () => set((state) => ({ showAQ: !state.showAQ })),
         toggleLightning: () => set((state) => ({ showLightning: !state.showLightning })),
         toggleObs: () => set((state) => ({ showObs: !state.showObs })),
+        toggleIsobars: () => set((state) => ({ showIsobars: !state.showIsobars })),
+        toggleIsotherms: () => set((state) => ({ showIsotherms: !state.showIsotherms })),
+        toggleIsodrosotherms: () => set((state) => ({ showIsodrosotherms: !state.showIsodrosotherms })),
         togglePIREPs: () => set((state) => ({ showPIREPs: !state.showPIREPs })),
         toggleSIGMETs: () => set((state) => ({ showSIGMETs: !state.showSIGMETs })),
         toggleAIRMETs: () => set((state) => ({ showAIRMETs: !state.showAIRMETs })),
@@ -47,6 +59,9 @@ const useVectorData = create<VectorStateStore>()(
           showAQ: state.showAQ,
           showLightning: state.showLightning,
           showObs: state.showObs,
+          showIsobars: state.showIsobars,
+          showIsotherms: state.showIsotherms,
+          showIsodrosotherms: state.showIsodrosotherms,
           showPIREPs: state.showPIREPs,
           showAIRMETs: state.showAIRMETs,
           showSIGMETs: state.showSIGMETs,
@@ -62,6 +77,9 @@ const useVectorData = create<VectorStateStore>()(
 export const useShowAQ = () => useVectorData((state) => state.showAQ);
 export const useShowLightning = () => useVectorData((state) => state.showLightning);
 export const useShowObs = () => useVectorData((state) => state.showObs);
+export const useShowIsobars = () => useVectorData((state) => state.showIsobars);
+export const useShowIsotherms = () => useVectorData((state) => state.showIsotherms);
+export const useShowIsodrosotherms = () => useVectorData((state) => state.showIsodrosotherms);
 export const useShowPIREPs = () => useVectorData((state) => state.showPIREPs);
 export const useShowSIGMETs = () => useVectorData((state) => state.showSIGMETs);
 export const useShowAIRMETs = () => useVectorData((state) => state.showAIRMETs);

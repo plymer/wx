@@ -82,11 +82,11 @@ export function runFromCron(cron: string, currentMinute: number, currentHour: nu
     const interval = parseInt(min.substring(2));
     if (isNaN(interval) || interval <= 0) throw new Error(`Invalid minute interval in cron schedule: ${cron}`);
     return currentMinute % interval === 0; // every N minutes
-  } else if (min === "0" && hour.startsWith("*/")) {
+  } else if (Number(min) === 0 && hour.startsWith("*/")) {
     const interval = parseInt(hour.substring(2));
     if (isNaN(interval) || interval <= 0) throw new Error(`Invalid minute interval in cron schedule: ${cron}`);
     return currentHour % interval === 0; // every N hours
-  } else if (min === "0" && hour === "0") {
+  } else if (Number(min) === 0 && Number(hour) === 0) {
     return currentHour === 0 && currentMinute === 0; // every day at midnight
   } else {
     throw new Error(`Unsupported cron schedule: ${cron}`);

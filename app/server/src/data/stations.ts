@@ -11,7 +11,7 @@ import { scrapeWiki } from "./canada-airports.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/stations.cache.json.gz";
 
-async function main() {
+export async function buildStationCatalog() {
   const db = await generateDbConnection({ stations }, "station");
 
   if (!db) {
@@ -89,5 +89,3 @@ async function main() {
   }
   process.exit(0);
 }
-
-await main();

@@ -74,6 +74,7 @@ export default function WxMap() {
       >
         <ScaleControl
           position="bottom-right"
+          unit="nautical"
           style={{
             backgroundColor: "rgba(0,0,0,0.25)",
             color: "white",

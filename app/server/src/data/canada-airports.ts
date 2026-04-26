@@ -209,5 +209,3 @@ export async function scrapeWiki() {
 
   console.log(`[STATIONS] Done updating stations from WikiPedia.`);
 }
-
-scrapeWiki();

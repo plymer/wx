@@ -32,7 +32,7 @@ export const db = await generateDbConnection(
   "api",
 );
 
-export const cacheClient = await redisClient();
+export const cacheClient = await redisClient("api");
 
 const greetRouter = router({
   greeting: publicProcedure

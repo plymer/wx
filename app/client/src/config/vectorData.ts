@@ -15,6 +15,9 @@ export const AWC_ATTRIBUTION = "<a href='https://www.aviationweather.gov/'>NOAA 
 
 export const VECTOR_DATA_TYPES = [
   "surfaceObs",
+  "isobars",
+  "isotherms",
+  "isodrosotherms",
   "lightning",
   "pirep",
   "airmet",
