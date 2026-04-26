@@ -1,7 +1,7 @@
 // tailwindcss boilerplate things
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { ParsedTAF, XmetAPIData } from "./types";
+import type { ParsedTAF, Units, XmetAPIData } from "./types";
 import { SIGWX_REGEX } from "./regex";
 import type { Feature, FeatureCollection, MultiPolygon, Point, Position } from "geojson";
 import * as turf from "@turf/turf";
@@ -53,6 +53,34 @@ export function findNearestTimeStep(data: WMSLayer, currentTime: number) {
   });
 
   return closestTimeStep;
+}
+
+export function convertMetarWinds(metarString: string, units: Units) {
+  if (units === "aviation") return metarString;
+
+  // Regular expression to match the wind component in the METAR string
+  const windRegex = /(\d{3}|VRB)(\d{2,3})(G\d{2,3})?KT/;
+  const match = metarString.match(windRegex);
+
+  if (match) {
+    const direction = match[1];
+    const speed = parseInt(match[2], 10);
+    const gust = match[3] ? parseInt(match[3].substring(1), 10) : null;
+
+    // Convert speed from knots to km/h
+    const speedKmh = Math.round(speed * 1.852);
+    const gustKmh = gust ? Math.round(gust * 1.852) : null;
+
+    // Replace the original wind component with the converted one
+    let convertedWind = `${direction}${speedKmh}`;
+    if (gustKmh) {
+      convertedWind += `G${gustKmh}`;
+    }
+    return metarString.replace(windRegex, `${convertedWind}KMH`);
+  }
+
+  // If no wind component is found, return the original string
+  return metarString;
 }
 
 /**

@@ -1,16 +1,17 @@
 // third-party libraries
 import { useEffect, useRef } from "react";
-import { Loader2, RefreshCw, Search } from "lucide-react";
+import { Plane, RefreshCw, User } from "lucide-react";
 import { toast } from "sonner";
-import { useHours, useObsActions, useSite } from "@/stateStores/observations";
-import type { METAR, SiteData, TAFData } from "@/lib/types";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+
+import { useHours, useObsActions, useSite, useUnits } from "@/stateStores/observations";
+
 import { Input } from "./ui/Input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
 import METARs from "./observations/METARs";
 import SiteMetadata from "./observations/SiteMetadata";
 import TAF from "./observations/TAF";
 import Button from "./ui/Button";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
 import { MINUTE } from "@shared/lib/constants";
 
@@ -22,6 +23,7 @@ export default function Observations() {
   const actions = useObsActions();
   const site = useSite();
   const hours = useHours();
+  const units = useUnits();
 
   // when we mount the component, we want to set the siteId to the current site
   useEffect(() => {
@@ -51,7 +53,7 @@ export default function Observations() {
     api.alpha.taf.queryOptions({ site: site }, { placeholderData: keepPreviousData, refetchInterval: MINUTE }),
   );
 
-  const isLoading = metarFetchStatus !== "idle" || tafFetchStatus !== "idle" || metaFetchStatus !== "idle";
+  const isLoading = metarFetchStatus === "fetching" || tafFetchStatus === "fetching" || metaFetchStatus === "fetching";
 
   // validate the input and mutate the search string, passing it to the context and then it will propagate to the child components
   //   to show the user the data they have requested
@@ -84,9 +86,9 @@ export default function Observations() {
     siteId.current = e.currentTarget.value;
   };
 
-  const handleOnClick = () => {
-    handleInputText(siteId.current);
-  };
+  const handleOnClick = () => handleInputText(siteId.current);
+
+  const handleUnitClick = () => actions.toggleUnits();
 
   const handleOnKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -100,19 +102,15 @@ export default function Observations() {
 
   return (
     <>
-      <div className="flex justify-around bg-neutral-800 text-white p-2 text-sm">
-        <div className="flex place-items-center">
-          <label htmlFor="site" className="text-white flex place-items-center">
-            {isLoading ? <Loader2 className="size-4 me-2 animate-spin" /> : <Search className="size-4 me-2" />}
-            <span>Site:</span>
-          </label>
+      <div className="flex justify-center gap-2 bg-neutral-800 text-white p-2 text-sm">
+        <div className="flex items-center">
           <Input
             id="site"
             type="text"
             minLength={2}
             maxLength={4}
             // text-base is required so that the mobile experience doesn't zoom to the input
-            className="ms-2 w-24 text-black text-center text-base uppercase rounded-e-none font-mono"
+            className="w-24 text-black text-center text-base uppercase rounded-e-none font-mono"
             autoComplete="off"
             autoCorrect="false"
             spellCheck="false"
@@ -122,32 +120,36 @@ export default function Observations() {
             onClick={(e) => (e.currentTarget.value = "")}
           />
           <Button
-            className="me-2 rounded-e-md rounded-s-none flex place-items-center"
+            className="rounded-e-md rounded-s-none flex items-center gap-2"
             onClick={() => handleOnClick()}
             variant="alternate"
           >
-            <RefreshCw className="w-4 h-4 me-2 inline" />
+            <RefreshCw className={`size-4 ${isLoading ? "animate-spin" : ""}`} />
             Load
           </Button>
-          <Select onValueChange={(e) => actions.setHours(parseInt(e))} defaultValue={hours.toString()}>
-            <SelectTrigger className="text-black">
-              <SelectValue placeholder={hours + " hrs"} />
-            </SelectTrigger>
-            <SelectContent>
-              {HOURS.map((h, i) => (
-                <SelectItem key={i} value={h.toString()}>
-                  {h} hrs
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
+
+        <Select onValueChange={(e) => actions.setHours(parseInt(e))} defaultValue={hours.toString()}>
+          <SelectTrigger className="text-black max-w-48">
+            <SelectValue placeholder={hours + " hrs"} />
+          </SelectTrigger>
+          <SelectContent>
+            {HOURS.map((h, i) => (
+              <SelectItem key={i} value={h.toString()}>
+                {h} hrs
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button variant="alternate" onClick={handleUnitClick}>
+          {units === "aviation" ? <Plane /> : <User />}
+        </Button>
       </div>
 
       <div className="overflow-y-scroll text-sm" style={{ height: "calc(100svh - 6.5rem)" }}>
-        <METARs data={metarData as METAR} />
-        <SiteMetadata response={metaData as SiteData} />
-        <TAF data={tafData as TAFData} />
+        <METARs data={metarData} />
+        <SiteMetadata response={metaData} />
+        <TAF data={tafData} />
       </div>
     </>
   );
