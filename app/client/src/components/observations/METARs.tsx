@@ -20,16 +20,14 @@ const METARs = ({ data }: Props) => {
   // if we have no data object, return nothing
   if (!data) return;
 
-  const parsedMetars = data
-    ? (data.map((m) => formatSigWx(convertMetarWinds(m, units), "metar")) as string[])
-    : undefined;
+  const parsedMetars = data ? (data.map((m) => formatSigWx(m, "metar")) as string[]) : undefined;
 
   if (parsedMetars) {
     return (
       <div>
         {parsedMetars.map((m: string, i: number) => (
           <div className="font-mono px-6 odd:bg-muted even:bg-muted-foreground ps-10 -indent-8" key={i}>
-            {highlightSigWx(m)}
+            {highlightSigWx(convertMetarWinds(m, units))}
           </div>
         ))}
         <div ref={scrollTargetRef}></div>
