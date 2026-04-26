@@ -25,6 +25,8 @@ export type AnimationControlsList = (typeof ANIM_CONTROLS)[number];
 export type Nullable<T> = T | null;
 export type HexColor = `#${string}`;
 
+export type Units = "metric" | "aviation";
+
 /**
  * Prettify is a utility type that makes an object type more readable by removing excess nesting.
  */
@@ -97,9 +99,6 @@ export type LightningData = FeatureCollection<MultiPoint, { validTime: number }>
 export type AqDbData = Omit<InferSelectModel<typeof aqData>, "id">;
 export type AqData = FeatureCollection<MultiPoint, AqDbData>;
 
-export type METAR = string[];
-export type TAFData = string;
-
 export type ParsedTAF = {
   main: string | undefined;
   partPeriods: string[] | undefined;
@@ -116,17 +115,6 @@ export type OtherChartData = {
   domain: string;
   images: string[];
 };
-
-// export type OutlookData = {
-//   [office: string]: {
-//     [region: string]: {
-//       office: string;
-//       id: string;
-//       name: string;
-//       panels: Panel[];
-//     }[];
-//   }[];
-// };
 
 export type OutlookData = Record<OutlookOffice, Record<string, Region>>;
 

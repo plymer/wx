@@ -1,3 +1,4 @@
+import type { Units } from "@/lib/types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -5,9 +6,11 @@ import { createJSONStorage, persist } from "zustand/middleware";
 type ObservationsState = {
   site: string;
   hours: number;
+  units: Units;
   actions: {
     setSite: (site: string) => void;
     setHours: (hours: number) => void;
+    toggleUnits: () => void;
   };
 };
 
@@ -17,13 +20,19 @@ const useObservations = create<ObservationsState>()(
     (set) => ({
       site: "cyeg",
       hours: 12,
+      units: "aviation",
       actions: {
         setSite: (newSite: string) => set({ site: newSite }),
         setHours: (newHours: number) => set({ hours: newHours }),
+        toggleUnits: () =>
+          set((state) => ({
+            units: state.units === "aviation" ? "metric" : "aviation",
+          })),
       },
     }),
     {
-      partialize: (state) => ({ site: state.site, hours: state.hours }) as Partial<ObservationsState>,
+      partialize: (state) =>
+        ({ site: state.site, hours: state.hours, units: state.units }) as Partial<ObservationsState>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as ObservationsState) }),
       name: "observationOptions",
       storage: createJSONStorage(() => localStorage),
@@ -34,4 +43,5 @@ const useObservations = create<ObservationsState>()(
 // export the stateStore data accessors
 export const useSite = () => useObservations((state) => state.site);
 export const useHours = () => useObservations((state) => state.hours);
+export const useUnits = () => useObservations((state) => state.units);
 export const useObsActions = () => useObservations((state) => state.actions);

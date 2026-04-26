@@ -1,16 +1,17 @@
 import { useEffect, useRef } from "react";
 import { useHighlightSigWx } from "@/hooks/useHighlightSigWx";
-import type { METAR } from "@/lib/types";
-import { formatSigWx } from "@/lib/utils";
+import { convertMetarWinds, formatSigWx } from "@/lib/utils";
 import { AlertOctagon } from "lucide-react";
+import { useUnits } from "@/stateStores/observations";
 
 interface Props {
-  data: METAR | undefined;
+  data: string[] | undefined;
 }
 
 const METARs = ({ data }: Props) => {
   const scrollTargetRef = useRef<null | HTMLDivElement>(null);
-  const highlightSigWx = useHighlightSigWx().highlightSigWx;
+  const units = useUnits();
+  const { highlightSigWx } = useHighlightSigWx();
 
   useEffect(() => {
     scrollTargetRef.current?.scrollIntoView({ behavior: "instant" });
@@ -19,7 +20,9 @@ const METARs = ({ data }: Props) => {
   // if we have no data object, return nothing
   if (!data) return;
 
-  const parsedMetars = data ? (data.map((m) => formatSigWx(m, "metar")) as string[]) : undefined;
+  const parsedMetars = data
+    ? (data.map((m) => formatSigWx(convertMetarWinds(m, units), "metar")) as string[])
+    : undefined;
 
   if (parsedMetars) {
     return (

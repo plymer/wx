@@ -1,10 +1,10 @@
-import type { ParsedTAF, TAFData } from "@/lib/types";
+import type { ParsedTAF } from "@/lib/types";
 import { useHighlightSigWx } from "@/hooks/useHighlightSigWx";
 import { formatSigWx } from "@/lib/utils";
 import { AlertOctagon } from "lucide-react";
 
 interface Props {
-  data: TAFData | undefined;
+  data: string | undefined;
 }
 
 const TAF = ({ data }: Props) => {
