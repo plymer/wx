@@ -92,10 +92,10 @@ export async function createIsolines<TSchema extends Record<string, SQLiteTableW
 
   for (const type of DATA_TYPES) {
     // for the time being, we are going to skip generating isolines for tt/td because the performance isn't super great on the client and I might want to adjust how we handle it there
-    // if (type === "tt" || type === "td") {
-    //   console.info("[ISOLINES] Skipping isoline generation for temperature and dew point for now.");
-    //   continue;
-    // }
+    if (type === "tt" || type === "td") {
+      console.info(`[ISOLINES] Skipping isoline generation for '${type}'.`);
+      continue;
+    }
 
     const fcArray: FeatureCollection<
       Point | LineString | MultiPolygon,
