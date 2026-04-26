@@ -1,6 +1,21 @@
 import { useState } from "react";
 
-import { CloudLightning, Globe, Layers, Radar, Satellite, ScanEye, Map, List } from "lucide-react";
+import {
+  CloudLightning,
+  Globe,
+  Layers,
+  Radar,
+  Satellite,
+  ScanEye,
+  Map,
+  List,
+  FlameKindling,
+  LineSquiggle,
+  Thermometer,
+  TriangleAlert,
+  Droplet,
+  Snowflake,
+} from "lucide-react";
 
 import { SATELLITE_CHANNELS } from "@/config/rasterData";
 
@@ -20,6 +35,9 @@ import {
   useVectorActions,
   useShowAQ,
   useShowPublicAlerts,
+  useShowIsobars,
+  useShowIsotherms,
+  useShowIsodrosotherms,
 } from "@/stateStores/map/vectorData";
 import type { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
@@ -49,6 +67,9 @@ export default function MapOptions({ ...props }: ButtonProps) {
     useShowAQ: useShowAQ(),
     showLightning: useShowLightning(),
     showObs: useShowObs(),
+    showIsobars: useShowIsobars(),
+    showIsotherms: useShowIsotherms(),
+    showIsodrosotherms: useShowIsodrosotherms(),
     showPIREPs: useShowPIREPs(),
     showSIGMETs: useShowSIGMETs(),
     showAIRMETs: useShowAIRMETs(),
@@ -84,18 +105,47 @@ export default function MapOptions({ ...props }: ButtonProps) {
 
   // vector options config
   const VECTOR_DATA_OPTIONS: ToggleDataOption[] = [
-    { type: "aq", name: "PM 2.5μm", state: vector.useShowAQ, toggle: vectorActions.toggleAQ },
     {
+      icon: <FlameKindling className="shrink-0" />,
+      type: "aq",
+      name: "PM 2.5μm",
+      state: vector.useShowAQ,
+      toggle: vectorActions.toggleAQ,
+    },
+    {
+      icon: <CloudLightning className="shrink-0" />,
       type: "lightning",
       name: "Lightning",
       state: vector.showLightning,
       toggle: vectorActions.toggleLightning,
     },
     {
+      icon: <Thermometer className="shrink-0" />,
       type: "surfaceObs",
-      name: "Surface Observations",
+      name: "Observations",
       state: vector.showObs,
       toggle: vectorActions.toggleObs,
+    },
+    {
+      icon: <LineSquiggle className="shrink-0" />,
+      type: "isobars",
+      name: "Isobars",
+      state: vector.showIsobars,
+      toggle: vectorActions.toggleIsobars,
+    },
+    {
+      icon: <LineSquiggle className="shrink-0" />,
+      type: "isotherms",
+      name: "Temperature (Experimental)",
+      state: vector.showIsotherms,
+      toggle: vectorActions.toggleIsotherms,
+    },
+    {
+      icon: <LineSquiggle className="shrink-0" />,
+      type: "isodrosotherms",
+      name: "Dewpoint (Experimental)",
+      state: vector.showIsodrosotherms,
+      toggle: vectorActions.toggleIsodrosotherms,
     },
     // {
     //   type: "pirep",
@@ -104,12 +154,14 @@ export default function MapOptions({ ...props }: ButtonProps) {
     //   toggle: vectorActions.togglePIREPs,
     // },
     {
+      icon: <TriangleAlert className="shrink-0" />,
       type: "publicAlerts",
       name: "Public Alerts",
       state: vector.showPublicAlerts,
       toggle: vectorActions.togglePublicAlerts,
     },
     {
+      icon: <TriangleAlert className="shrink-0" />,
       type: "sigmet",
       name: "SIGMETs",
       state: vector.showSIGMETs,
@@ -254,6 +306,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
                     disabled={!raster.showRadar}
                     className={`${raster.radarProduct === "RADAR_1KM_RRAI" && "active"}`}
                   >
+                    <Droplet />
                     Rain Rate
                   </Button>
                   <Button
@@ -263,6 +316,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
                     disabled={!raster.showRadar}
                     className={`${raster.radarProduct === "RADAR_1KM_RSNO" && "active"}`}
                   >
+                    <Snowflake />
                     Snow Rate
                   </Button>
                 </div>

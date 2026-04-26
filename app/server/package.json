@@ -13,6 +13,7 @@
     "dev:data:sigmets": "tsx watch src/data/sigmets.ts",
     "dev:data:metars": "tsx watch src/data/metars.ts",
     "dev:data:stations": "tsx watch src/data/canada-airports.ts",
+    "dev:data:isolines": "tsx watch src/data/isolines.ts",
     "lint": "eslint .",
     "start": "node ../../dist/server/main.js"
   }

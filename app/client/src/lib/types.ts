@@ -15,6 +15,7 @@ import type { InferSelectModel } from "drizzle-orm";
 
 import { LngLat, type MapGeoJSONFeature } from "maplibre-gl";
 import type { aqData } from "@shared/db/tables/data.drizzle";
+import type React from "react";
 
 export type AppMode = keyof typeof APP_MODES_LIST;
 export type AnimationState = (typeof ANIMATION_STATES)[number];
@@ -158,6 +159,7 @@ export type HubData = {
 
 // used to define the vector data (TODO: rename)
 export type ToggleDataOption = {
+  icon?: React.ReactNode;
   type: VectorDataTypes | MapLines | RasterDataTypes;
   name: string;
   state: boolean;
