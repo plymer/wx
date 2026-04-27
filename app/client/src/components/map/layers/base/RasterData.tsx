@@ -18,6 +18,7 @@ import {
   EUMETSAT_BOUNDS,
   EUMETSAT_ATTRIBUTION,
   GEOMET_ATTRIBUTION,
+  IODC_BOUNDS,
 } from "@/config/rasterData";
 import type { WMSDomains, WMSLayer } from "@shared/lib/types";
 import type { TransitionSpecification } from "maplibre-gl";
@@ -28,7 +29,7 @@ interface Props {
 }
 
 const makeTileRequestString = (domain: WMSDomains, layerName: string, validTime: number) => {
-  const baseUrl = domain === "europe" ? EUMETSAT_GETMAP : GEOMET_GETMAP;
+  const baseUrl = domain === "europe" || domain === "indianOcean" ? EUMETSAT_GETMAP : GEOMET_GETMAP;
 
   return `${baseUrl}${layerName}&time=${makeISOTimeStamp(validTime, "data")}`;
 };
@@ -55,16 +56,19 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
   const layerId = "layer-" + apiData.type + "-" + apiData.domain;
 
   const source: RasterSourceSpecification = {
-    attribution: apiData.domain === "europe" ? EUMETSAT_ATTRIBUTION : GEOMET_ATTRIBUTION,
+    attribution:
+      apiData.domain === "europe" || apiData.domain === "indianOcean" ? EUMETSAT_ATTRIBUTION : GEOMET_ATTRIBUTION,
     type: "raster",
     tileSize: 256,
     bounds:
       apiData.type === "satellite"
         ? apiData.domain === "europe"
           ? EUMETSAT_BOUNDS
-          : apiData.domain === "west"
-            ? GOES_WEST_BOUNDS
-            : GOES_EAST_BOUNDS
+          : apiData.domain === "indianOcean"
+            ? IODC_BOUNDS
+            : apiData.domain === "west"
+              ? GOES_WEST_BOUNDS
+              : GOES_EAST_BOUNDS
         : MAP_BOUNDS,
   };
 

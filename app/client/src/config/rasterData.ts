@@ -54,12 +54,13 @@ export const RADAR_PRODUCTS = {
 } as const;
 
 // map object constants
-const MAX_WEST: number = -180;
-const MAX_SOUTH: number = -85;
-const MAX_EAST: number = 45;
-const MAX_NORTH: number = 85;
-const EAST_WEST_SPLIT: number = -90;
-const GOES_METEOSAT_SPLIT: number = -30;
+const MAX_WEST = -180;
+const MAX_SOUTH = -85;
+const MAX_EAST = 180;
+const MAX_NORTH = 85;
+const EAST_WEST_SPLIT = -90;
+const GOES_METEOSAT_SPLIT = -30;
+const METEOSAT_INDIAN_OCEAN_SPLIT = 50;
 export const MAP_BOUNDS: LngLatBoundsLike & [number, number, number, number] = [
   MAX_WEST,
   MAX_SOUTH,
@@ -74,4 +75,10 @@ export const GOES_EAST_BOUNDS: [number, number, number, number] = [
 ];
 export const GOES_WEST_BOUNDS: [number, number, number, number] = [MAX_WEST, MAX_SOUTH, EAST_WEST_SPLIT, MAX_NORTH];
 export const RADAR_BOUNDS: [number, number, number, number] = [MAX_WEST, MAX_SOUTH, MAX_EAST, 60];
-export const EUMETSAT_BOUNDS: [number, number, number, number] = [GOES_METEOSAT_SPLIT, MAX_SOUTH, MAX_EAST, MAX_NORTH];
+export const EUMETSAT_BOUNDS: [number, number, number, number] = [
+  GOES_METEOSAT_SPLIT,
+  MAX_SOUTH,
+  METEOSAT_INDIAN_OCEAN_SPLIT,
+  MAX_NORTH,
+];
+export const IODC_BOUNDS: [number, number, number, number] = [METEOSAT_INDIAN_OCEAN_SPLIT, MAX_SOUTH, 180, MAX_NORTH];
