@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import type { WMSLayer } from "../lib/types.js";
 import { processDimensionString } from "../lib/utils.js";
 import { DATA_CUTOFF, EUMETSAT_GETCAPABILITIES, GEOMET_GETCAPABILITIES } from "../config/wms.config.js";
-import { goesProductSchema, radarProductSchema, realtimeLayersSchema } from "../validationSchemas/wms.zod.js";
+import { eumetsatProductSchema, goesProductSchema, radarProductSchema } from "../validationSchemas/wms.zod.js";
 import { WMSXMLParser } from "../lib/xml-parser.js";
 import { publicProcedure, router } from "../lib/trpc.js";
 import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
@@ -95,18 +95,18 @@ export const wmsRouter = router({
     }
   }),
 
-  eumetsat: publicProcedure.input(realtimeLayersSchema).query(async ({ input }) => {
-    const { layer } = input;
+  eumetsat: publicProcedure.input(eumetsatProductSchema).query(async ({ input }) => {
+    const { domain, product } = input;
 
     try {
-      const cachedData = await cacheClient.get(`wms:eumetsat:${layer}`);
+      const cachedData = await cacheClient.get(`wms:eumetsat:${domain}:${product}`);
 
       if (cachedData) {
-        console.log(`[API] Cache HIT for WMS EUMETSAT layer: ${layer}`);
+        console.log(`[API] Cache HIT for WMS EUMETSAT WMS EUMETSAT ${domain} product: ${product}.`);
         return JSON.parse(cachedData) as WMSLayer;
       }
 
-      console.log(`[API] Cache MISS for WMS EUMETSAT layer: ${layer}. Fetching from source...`);
+      console.log(`[API] Cache MISS for WMS EUMETSAT ${domain} product: ${product}. Fetching from source...`);
 
       const { parser } = new WMSXMLParser();
 
@@ -115,25 +115,25 @@ export const wmsRouter = router({
       );
 
       const allLayers: WMSLayer[] = xml.wmsCapabilities.capability.layer.layer
-        .filter((layer: any) => layer.title.includes("- 0 degree"))
+        .filter((layer: any) => layer.title.includes("- 0 degree") || layer.title.includes("- Indian Ocean"))
         .map((layer: any) => {
           return {
             name: layer.name,
             title: layer.title,
             dimension: layer.dimension.value,
-            domain: "europe",
+            domain: domain,
             type: "satellite",
           } as WMSLayer;
         });
 
       const dataCutoff = Date.now() - DATA_CUTOFF;
 
-      const foundLayer = allLayers.find((l) => l.name === layer);
+      const foundLayer = allLayers.find((l) => l.name === product);
 
       if (!foundLayer) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `Layer ${layer} not found`,
+          message: `Product ${product} not found`,
         });
       }
 
@@ -142,7 +142,7 @@ export const wmsRouter = router({
         timeSteps: processDimensionString(foundLayer.dimension).filter((time) => time.validTime >= dataCutoff),
       };
 
-      await cacheClient.setEx(`wms:eumetsat:${layer}`, 60 * 10, JSON.stringify(output));
+      await cacheClient.setEx(`wms:eumetsat:${domain}:${product}`, 60 * 10, JSON.stringify(output));
 
       return output;
     } catch (error) {

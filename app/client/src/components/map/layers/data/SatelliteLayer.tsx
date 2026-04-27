@@ -21,15 +21,24 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
   // daytime visible product:
   // mtg_fd:rgb_cloudphase
   // night time low cloud/fog product:
-  // msg_fes:rgb_fog
+  // mtg_fd:rgb_fog
 
   const { data: euData } = useQuery(
     api.wms.eumetsat.queryOptions(
-      { layer: "msg_fes:rgb_fog" },
+      { domain: "europe", product: "mtg_fd:rgb_fog" },
       {
         enabled: showSatellite && domain === "europe",
         refetchInterval: MINUTE,
-        trpc: { context: { skipBatch: true } },
+      },
+    ),
+  );
+
+  const { data: iOData } = useQuery(
+    api.wms.eumetsat.queryOptions(
+      { domain: "indianOcean", product: "msg_iodc:rgb_fog" },
+      {
+        enabled: showSatellite && domain === "indianOcean",
+        refetchInterval: MINUTE,
       },
     ),
   );
@@ -38,14 +47,13 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
     api.wms.goes.queryOptions(
       { domain: domain as "east" | "west", product: satelliteProduct },
       {
-        enabled: showSatellite && domain !== "europe",
+        enabled: showSatellite && domain !== "europe" && domain !== "indianOcean",
         refetchInterval: MINUTE,
-        trpc: { context: { skipBatch: true } },
       },
     ),
   );
 
-  const data = domain === "europe" ? euData : goesData;
+  const data = domain === "europe" ? euData : domain === "indianOcean" ? iOData : goesData;
 
   if (!showSatellite || !data) return;
 
