@@ -12,6 +12,7 @@ import type {
   StationPlotData,
   StationPlotPopupData,
   WarningProperties,
+  WxmapIsolineSlotMetadata,
   WxOAlert,
   WxOPolygonAlert,
   WxOPolygonProperties,
@@ -208,6 +209,48 @@ export const wxmapRouter = router({
         }
       },
     ),
+
+  wxmapIsolineSlots: publicProcedure.query(async (): Promise<WxmapIsolineSlotMetadata[]> => {
+    const tilesRootDir = process.env.TILES_DIR
+      ? path.resolve(process.env.TILES_DIR)
+      : path.resolve(process.cwd(), "tiles", "isolines");
+
+    const entries = await fs.readdir(tilesRootDir, { withFileTypes: true }).catch(() => []);
+
+    const slotDirs = entries
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => {
+        const slot = Number.parseInt(entry.name, 10);
+        if (Number.isNaN(slot) || slot < 0) {
+          return null;
+        }
+
+        return { slot, name: entry.name };
+      })
+      .filter((entry): entry is { slot: number; name: string } => entry !== null)
+      .sort((a, b) => a.slot - b.slot);
+
+    const metadataResults = await Promise.all(
+      slotDirs.map(async (slotDir) => {
+        const metadataPath = path.join(tilesRootDir, slotDir.name, "metadata.json");
+        const metadata = await fs
+          .readFile(metadataPath, "utf-8")
+          .then((data) => JSON.parse(data) as Omit<WxmapIsolineSlotMetadata, "slot">)
+          .catch(() => null);
+
+        if (!metadata) {
+          return null;
+        }
+
+        return {
+          slot: slotDir.slot,
+          ...metadata,
+        };
+      }),
+    );
+
+    return metadataResults.filter((item): item is WxmapIsolineSlotMetadata => item !== null);
+  }),
 
   wxmapPublicWarnings: publicProcedure.query(async (): Promise<FeatureCollection<MultiPolygon, WarningProperties>> => {
     const cachedData = await cacheClient.get("wxmap:publicWarnings");

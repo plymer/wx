@@ -5,6 +5,7 @@ const ENV_VARS = {
   SQLITE_PATH: process.env.SQLITE_DEV_PATH,
   OUTLOOK_DIR: process.env.OUTLOOK_DIR,
   STATIC_DATA_DIR: process.env.STATIC_DATA_DIR,
+  TILES_DIR: process.env.TILES_DIR,
 };
 
 module.exports = {

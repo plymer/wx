@@ -19,7 +19,7 @@ export const SurfaceDataLayer = () => {
     <>
       <Isodrosotherms currentFrame={currentFrame} />
       <Isotherms currentFrame={currentFrame} />
-      <Isobars currentFrame={currentFrame} />
+      <Isobars currentFrame={currentFrame} displayTime={displayTime} />
       <Plots viewport={viewport} displayTime={displayTime} zoom={zoom} />
       <Popups zoom={zoom} />
     </>
