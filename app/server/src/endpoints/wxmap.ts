@@ -212,7 +212,7 @@ export const wxmapRouter = router({
 
   wxmapIsolineSlots: publicProcedure.query(async (): Promise<WxmapIsolineSlotMetadata[]> => {
     const tilesRootDir = process.env.TILES_DIR
-      ? path.resolve(process.env.TILES_DIR)
+      ? path.resolve(process.env.TILES_DIR, "isolines")
       : path.resolve(process.cwd(), "tiles", "isolines");
 
     const entries = await fs.readdir(tilesRootDir, { withFileTypes: true }).catch(() => []);

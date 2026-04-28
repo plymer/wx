@@ -106,7 +106,7 @@ export async function createIsolines<TSchema extends Record<string, SQLiteTableW
 
   const now = new Date().getTime();
   const tilesRootDir = process.env.TILES_DIR
-    ? path.resolve(process.env.TILES_DIR)
+    ? path.resolve(process.env.TILES_DIR, "isolines")
     : path.resolve(process.cwd(), "tiles", "isolines");
   const outputDir = path.join(tilesRootDir, TILESET_STAGING_DIR);
 
