@@ -123,6 +123,12 @@ export async function createIsolines<TSchema extends Record<string, SQLiteTableW
       td: metars.td,
       lat: stations.lat,
       lon: stations.lon,
+      windDir: metars.windDir,
+      windSpd: metars.windSpd,
+      windGst: metars.windGst,
+      vis: metars.vis,
+      wxString: metars.wxString,
+      category: metars.category,
     })
     .from(metars)
     .leftJoin(stations, eq(stations.siteId, metars.siteId))
@@ -139,23 +145,34 @@ export async function createIsolines<TSchema extends Record<string, SQLiteTableW
     {
       lat: number;
       lon: number;
-      values: { mslp: number | null; tt: number | null; td: number | null; validTime: Date }[];
+      values: {
+        mslp: number | null;
+        tt: number | null;
+        td: number | null;
+        validTime: Date;
+        windDir: number | null;
+        windSpd: number | null;
+        windGst: number | null;
+        vis: string | null;
+        wxString: string | null;
+        category: string | null;
+      }[];
     }
   > = {};
 
   const BLACKLISTED_SITES = ["PACX", "PFTO"];
 
   queryResult.forEach((metar) => {
-    const { mslp, tt, td, validTime, lat, lon, siteId } = metar;
+    const { siteId, lat, lon, ...metarData } = metar;
 
     if (!lat || !lon || BLACKLISTED_SITES.includes(siteId)) {
       return;
     }
 
     if (collatedData[metar.siteId]) {
-      collatedData[metar.siteId].values.push({ mslp, tt, td, validTime });
+      collatedData[metar.siteId].values.push(metarData);
     } else {
-      collatedData[metar.siteId] = { lat, lon, values: [{ mslp, tt, td, validTime }] };
+      collatedData[metar.siteId] = { lat, lon, values: [metarData] };
     }
   });
 
