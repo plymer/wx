@@ -270,5 +270,5 @@ export const outlookRegionSchema = z
   })
   .transform((val) => {
     const regionEntry = Object.keys(OFFICE_REGION_MAP).find(([, region]) => region.toLowerCase() === val);
-    return regionEntry ? regionEntry[0] : val;
+    return regionEntry ?? val;
   });
