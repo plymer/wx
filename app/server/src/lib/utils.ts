@@ -16,7 +16,7 @@ import type { LatLon, SunTimes } from "./common.types.js";
 import type { XmetShapes } from "./alphanumeric.types.js";
 import { DEFAULT_REMOTE_HEADERS, MINUTE } from "./constants.js";
 
-import type { OutlookData, Panel, WmoDirection } from "./types.js";
+import type { OutlookData, Panel, RegionData, WmoDirection } from "./types.js";
 import { OFFICE_REGION_MAP } from "../config/charts.config.js";
 import { outlookOfficeSchema, outlookRegionSchema } from "./validation.js";
 
@@ -433,8 +433,9 @@ export function outlookHandler(product: string) {
 
   const officeDir = readdirSync(dirPath, { withFileTypes: true, recursive: true });
 
-  const output = officeDir.reduce<OutlookData>((acc, entry) => {
-    if (!entry.isFile()) return acc;
+  const result: OutlookData = {} as OutlookData;
+  for (const entry of officeDir) {
+    if (!entry.isFile()) continue;
 
     const [, office, region, validPeriod] =
       entry.name.match(/([a-zA-Z]+)(?:-)([0-9a-zA-z_-]+)(?:-)([0-9a-zA-z_]+)/) || [];
@@ -444,19 +445,19 @@ export function outlookHandler(product: string) {
 
     if (!officeParsed) {
       console.warn(`[API] Skipping file with invalid office: ${entry.name}`);
-      return acc;
+      continue;
     }
 
     const { data: regionKey, success: regionParsed } = outlookRegionSchema.safeParse(region);
 
     if (!regionParsed) {
       console.warn(`[API] Skipping file with invalid region: ${region}`);
-      return acc;
+      continue;
     }
 
     if (regionKey === undefined || officeKey === undefined) {
       console.warn(`[API] Skipping file with undefined office or region: ${entry.name}`);
-      return acc;
+      continue;
     }
 
     if (office && region && validPeriod) {
@@ -474,95 +475,32 @@ export function outlookHandler(product: string) {
         url: `/images/${product}/today/${officeKey}/${entry.name}`,
       };
 
-      // initialize office if it doesn't exist
-      if (!acc[officeKey]) acc[officeKey] = {};
+      // Initialize office if it doesn't exist
+      if (!result[officeKey]) result[officeKey] = {};
 
-      acc[officeKey][region] = acc[officeKey][region] || {
-        office: officeKey,
-        id: region,
-        name: OFFICE_REGION_MAP[regionKey as keyof typeof OFFICE_REGION_MAP],
-        panels: [],
-      };
+      // Add or update region data
+      const existingRegionData = result[officeKey][region];
 
-      acc[officeKey][region].panels.push(panel);
-      // the panels need to be sorted by the number in the valid period to ensure that
-      // ay 1 -> night 1 -> day 2... is followed rather than day 1 -> day 2 -> night 1
-      acc[officeKey][region].panels.sort((a, b) =>
-        a.validPeriod.split(" ")[1]?.localeCompare(b.validPeriod.split(" ")[1]),
-      );
+      if (existingRegionData) {
+        existingRegionData.panels.push(panel);
+        // the panels need to be sorted by the number in the valid period to ensure that
+        // ay 1 -> night 1 -> day 2... is followed rather than day 1 -> day 2 -> night 1
+        existingRegionData.panels.sort((a, b) =>
+          a.validPeriod.split("_")[1]?.localeCompare(b.validPeriod.split("_")[1]),
+        );
+      } else {
+        const regionData: RegionData = {
+          office: officeKey,
+          id: region,
+          name: OFFICE_REGION_MAP[regionKey as keyof typeof OFFICE_REGION_MAP],
+          panels: [panel],
+        };
+
+        result[officeKey][region] = regionData;
+      }
     }
-
-    return acc;
-  }, {} as OutlookData);
-
-  // const result: OutlookData = {} as OutlookData;
-  // for (const entry of officeDir) {
-  //   if (!entry.isFile()) continue;
-
-  //   const [, office, region, validPeriod] =
-  //     entry.name.match(/([a-zA-Z]+)(?:-)([0-9a-zA-z_-]+)(?:-)([0-9a-zA-z_]+)/) || [];
-
-  //   // use zod to validate our office and region values, and to transform them into the correct format if necessary (lowercasing them and comparing them against the lookups in our config)
-  //   const { data: officeKey, success: officeParsed } = outlookOfficeSchema.safeParse(office);
-
-  //   if (!officeParsed) {
-  //     console.warn(`[API] Skipping file with invalid office: ${entry.name}`);
-  //     continue;
-  //   }
-
-  //   const { data: regionKey, success: regionParsed } = outlookRegionSchema.safeParse(region);
-
-  //   if (!regionParsed) {
-  //     console.warn(`[API] Skipping file with invalid region: ${region}`);
-  //     continue;
-  //   }
-
-  //   if (regionKey === undefined || officeKey === undefined) {
-  //     console.warn(`[API] Skipping file with undefined office or region: ${entry.name}`);
-  //     continue;
-  //   }
-
-  //   if (office && region && validPeriod) {
-  //     const stats = statSync(path.join(entry.parentPath, entry.name));
-
-  //     // Create the panel object
-  //     const panel: Panel = {
-  //       id: entry.name,
-  //       name: OFFICE_REGION_MAP[regionKey as keyof typeof OFFICE_REGION_MAP],
-  //       date: stats.mtime.toUTCString(),
-  //       product,
-  //       office: officeKey,
-  //       region: regionKey,
-  //       validPeriod,
-  //       url: `/images/${product}/today/${officeKey}/${entry.name}`,
-  //     };
-
-  //     // Initialize office if it doesn't exist
-  //     if (!result[officeKey]) result[officeKey] = {};
-
-  //     // Add or update region data
-  //     const existingRegionData = result[officeKey][region];
-
-  //     if (existingRegionData) {
-  //       existingRegionData.panels.push(panel);
-  //       // the panels need to be sorted by the number in the valid period to ensure that
-  //       // ay 1 -> night 1 -> day 2... is followed rather than day 1 -> day 2 -> night 1
-  //       existingRegionData.panels.sort((a, b) =>
-  //         a.validPeriod.split(" ")[1]?.localeCompare(b.validPeriod.split(" ")[1]),
-  //       );
-  //     } else {
-  //       const regionData: RegionData = {
-  //         office: officeKey,
-  //         id: region,
-  //         name: OFFICE_REGION_MAP[regionKey as keyof typeof OFFICE_REGION_MAP],
-  //         panels: [panel],
-  //       };
-
-  //       result[officeKey][region] = regionData;
-  //     }
-  //   }
-  // }
+  }
 
   // add an explicit check to see if we have valid date, otherwise return explicitly undefined
-  return Object.keys(output).length > 0 ? output : null;
+  return Object.keys(result).length > 0 ? result : null;
 }
