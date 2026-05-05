@@ -110,6 +110,8 @@ export async function createIsolines<TSchema extends Record<string, SQLiteTableW
     : path.resolve(process.cwd(), "tiles", "isolines");
   const outputDir = path.join(tilesRootDir, TILESET_STAGING_DIR);
 
+  const [west, south, east, north] = bbox;
+
   await fs.mkdir(tilesRootDir, { recursive: true });
   await fs.rm(outputDir, { recursive: true, force: true });
   await fs.mkdir(outputDir, { recursive: true });
@@ -135,8 +137,8 @@ export async function createIsolines<TSchema extends Record<string, SQLiteTableW
     .where(
       and(
         gt(metars.validTime, new Date(now - 4 * HOUR)),
-        between(stations.lon, bbox[0], bbox[2]),
-        between(stations.lat, bbox[1], bbox[3]),
+        between(stations.lon, west, east),
+        between(stations.lat, south, north),
       ),
     );
 
@@ -212,29 +214,20 @@ export async function createIsolines<TSchema extends Record<string, SQLiteTableW
       continue;
     }
 
-    const fcArray: FeatureCollection<
-      Point | LineString | MultiPolygon,
-      { value: number } | { kind: "max" | "min"; value: number }
-    >[] = [];
     console.log(
       `[ISOLINES] Processing isolines for type '${type}' with ${Object.keys(collatedData).length} data points.`,
     );
 
     const tupleData = Object.values(collatedData).reduce<Tuple2DWithValue[]>((acc, data) => {
       const { lat, lon, values } = data;
-      const computedTime = now - 10 * MINUTE;
 
       const dataForTime = values
         .sort((a, b) => {
-          const aDiff = computedTime - new Date(a.validTime).getTime();
-          const bDiff = computedTime - new Date(b.validTime).getTime();
+          const aDiff = now - new Date(a.validTime).getTime();
+          const bDiff = now - new Date(b.validTime).getTime();
           return aDiff - bDiff;
         })
-        .find(
-          (m) =>
-            new Date(m.validTime).getTime() <= computedTime &&
-            new Date(m.validTime).getTime() >= computedTime - 4 * HOUR,
-        );
+        .find((m) => new Date(m.validTime).getTime() <= now && new Date(m.validTime).getTime() >= now - 4 * HOUR);
 
       if (dataForTime) {
         if (!dataForTime[type]) return acc;
@@ -279,11 +272,7 @@ export async function createIsolines<TSchema extends Record<string, SQLiteTableW
         } else return f;
       });
 
-    fcArray.push({ type: "FeatureCollection", features });
-
-    if (fcArray[0]?.features.length) {
-      featureCollectionsByType[type] = fcArray[0];
-    }
+    featureCollectionsByType[type] = { type: "FeatureCollection", features };
 
     console.log(`[ISOLINES] Completed isoline processing for type '${type}'.`);
   }
