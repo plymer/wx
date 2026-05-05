@@ -482,6 +482,11 @@ export function outlookHandler(product: string) {
 
       if (existingRegionData) {
         existingRegionData.panels.push(panel);
+        // the panels need to be sorted by the number in the valid period to ensure that
+        // ay 1 -> night 1 -> day 2... is followed rather than day 1 -> day 2 -> night 1
+        existingRegionData.panels.sort((a, b) =>
+          a.validPeriod.split(" ")[1]?.localeCompare(b.validPeriod.split(" ")[1]),
+        );
       } else {
         const regionData: RegionData = {
           office: officeKey,
@@ -491,14 +496,6 @@ export function outlookHandler(product: string) {
         };
 
         result[officeKey][region] = regionData;
-      }
-
-      // the panels need to be sorted by the number in the valid period to ensure that
-      // ay 1 -> night 1 -> day 2... is followed rather than day 1 -> day 2 -> night 1
-      if (existingRegionData?.panels.length > 1) {
-        existingRegionData.panels.sort((a, b) =>
-          a.validPeriod.split(" ")[1]?.localeCompare(b.validPeriod.split(" ")[1]),
-        );
       }
     }
   }
