@@ -19,7 +19,10 @@ function filterSpacedPoints(
   minDistance: number,
   seedIds: string[],
 ): string[] {
-  if (!input) return seedIds;
+  if (!input) {
+    console.warn("No input data for filterSpacedPoints, returning seedIds only.");
+    return seedIds;
+  }
   const retained: FeatureCollection<Point> = turf.featureCollection([]);
   const selected: string[] = [];
   const excludedIds = new Set(seedIds);
@@ -81,7 +84,11 @@ export async function updateStationList() {
     max: Array.from(new Set(stationList.max)),
   };
 
-  await updateStationCache(stationSetByZoom, lastUpdatedTime);
+  console.log(
+    `Station counts by zoom: min=${stationSetByZoom.min.length} med=${stationSetByZoom.med.length} max=${stationSetByZoom.max.length}`,
+  );
+
+  await updateStationCache({ data: stationSetByZoom, lastUpdatedTime });
   console.log("Station list cache updated.");
 }
 

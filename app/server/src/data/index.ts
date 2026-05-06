@@ -32,7 +32,7 @@ async function main() {
     { name: "SIGMETs", run: () => getSigmets(db), schedule: "* * * * *" },
     { name: "Public-Alerts", run: () => getPublicAlerts(), schedule: "* * * * *" },
     { name: "AQ-Data", run: () => getAqData(db), schedule: "*/10 * * * *" },
-    { name: "Isolines", run: () => generateVectorTiles(db), schedule: "*/10 * * * *" },
+    { name: "Vector-Tiles", run: () => generateVectorTiles(db), schedule: "* * * * *" },
     { name: "Station-Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
 

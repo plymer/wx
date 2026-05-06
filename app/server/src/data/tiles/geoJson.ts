@@ -1,4 +1,4 @@
-import type { Categories, Cloud, PlotData, TiledSurfacePlotData, Wind, WxMapPopupMetar } from "./types.js";
+import type { Categories, PlotData, TiledSurfacePlotData, Wind } from "./types.js";
 
 import type { fetchSurfaceData } from "../vector-tiles.js";
 
@@ -190,63 +190,6 @@ export function isConvectiveSigmet(header: string): boolean {
 //   if (LIGHT_AIRCRAFT_TYPES.includes(type)) return "L";
 //   return "UNKN";
 // }
-
-export function getStationType(metars: Partial<WxMapPopupMetar>[]) {
-  if (metars.some((m) => m.stationType === "LIGHTHOUSE")) return "lighthouse";
-  if (metars.some((m) => m.stationType === "SHIP")) return "ship";
-  if (metars.some((m) => m.stationType === "MOORED_BUOY" || m.stationType === "DRIFTING_BUOY")) return "buoy";
-  if (metars.some((m) => m.stationType === "LAND_MANNED")) return "hwos";
-  if (metars.some((m) => m.stationType === "LAND_AUTO")) return "awos";
-  return "auto";
-}
-
-export function getObType(rawText: string | null) {
-  if (!rawText) return "UNKNOWN"; // THis will basically never happen
-  const obTypeRaw = rawText.split(" ")[0];
-  if (["SPECI", "METSP"].includes(obTypeRaw)) return "SPECI";
-  return "HOURLY";
-}
-
-export function getCloudParts(cloudStr: string) {
-  if (cloudStr.startsWith("VV")) {
-    // When the cloud is a vertical visibility "cloud" its opacity code has only 2 characters
-    return {
-      opacityStr: cloudStr.slice(0, 2),
-      heightStr: cloudStr.slice(2, 5),
-      convectiveStr: cloudStr.slice(5),
-    };
-  } else {
-    // All other opacity codes have three characters
-    return {
-      opacityStr: cloudStr.slice(0, 3),
-      heightStr: cloudStr.slice(3, 6),
-      convectiveStr: cloudStr.slice(6),
-    };
-  }
-}
-
-export function formatClouds(cloudsRawStr: string | null) {
-  if (!cloudsRawStr) return []; // If this is null or empty string, return an empty array
-  const cloudsRawArr = cloudsRawStr.split(" "); // split by spaces
-  const clouds: Cloud[] = cloudsRawArr.map((cloudRaw) => {
-    const { opacityStr, heightStr, convectiveStr } = getCloudParts(cloudRaw);
-    let height: number | null = null;
-    if (heightStr.length > 0 && heightStr !== "///") {
-      height = Number(heightStr) * 100; // Convert to number and multipley by 100 to convert to feet
-    }
-    return {
-      raw: cloudRaw,
-      opacity: opacityStr,
-      height,
-      convective: convectiveStr.length > 0 ? convectiveStr : null,
-    };
-  });
-  const cloudsFiltered = clouds.filter(
-    (cloud) =>
-      (cloud.opacity.length === 2 || cloud.opacity.length === 3) && (cloud.height === null || !isNaN(cloud.height)),
-  ); // Make sure cloud opacity is 3 letters and height is either null or a valid number
-  return cloudsFiltered;
-}
 
 /**
  * limits query results to a specific number of the most recent entries per unique key value

@@ -271,7 +271,7 @@ export async function generateVectorTiles<
 
   try {
     const startTime = performance.now();
-    console.log("\x1b[0m%s\x1b[0m", "ℹ️ Info: Fetching data from NSWOB...");
+    console.log("\x1b[0m%s\x1b[0m", "ℹ️ Info: Fetching data from the database...");
     surfaceData = await fetchSurfaceData({
       db,
       order: "asc",
@@ -282,11 +282,11 @@ export async function generateVectorTiles<
     const duration = ((endTime - startTime) / 1000).toFixed(2);
 
     if (surfaceData.length === 0) {
-      console.info("ℹ️ No new data fetched from NSWOB, skipping payload generation");
+      console.info("ℹ️ No new data fetched from the database, skipping payload generation");
     }
     console.log(
       "\x1b[32m%s\x1b[0m",
-      `✅ Success: Fetched ${surfaceData.length} records from NSWOB in ${duration} seconds`,
+      `✅ Success: Fetched ${surfaceData.length} records from the database in ${duration} seconds`,
     );
   } catch (error) {
     console.error("\x1b[31m%s\x1b[0m", "❌ Error: Failed while creating payload files:\n\n", (error as Error).stack);
@@ -343,7 +343,7 @@ export async function generateVectorTiles<
             .then((results) => limitResultsByKeys(results, 1, "siteId"));
 
           const popupData = surfaceData.reduce<Feature<Point, StationPlotPopupData>[]>((acc, m) => {
-            if (!m.rawText || !m.lat || !m.lon) return acc;
+            if (!m.lat || !m.lon) return acc;
 
             const siteId = m.siteId;
 

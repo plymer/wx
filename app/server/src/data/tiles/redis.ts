@@ -763,11 +763,11 @@ export const getStationCache = async () => {
   }
 };
 
-export const updateStationCache = async (data: StationList["data"], lastUpdatedTime: number) => {
+export const updateStationCache = async (cacheData: StationList) => {
   try {
     await redis.json.set(`${CACHE_PREFIX}:stationList`, "$", {
-      data,
-      lastUpdatedTime,
+      data: cacheData.data,
+      lastUpdatedTime: cacheData.lastUpdatedTime,
     } as unknown as RedisJSON);
   } catch (err) {
     console.error(`[Redis Overwrite Cache Failed] stationList: ${err instanceof Error ? err.message : String(err)}`);

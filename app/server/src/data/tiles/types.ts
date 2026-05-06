@@ -18,7 +18,7 @@ export type PayloadCache = { lastUpdatedTime: number; data: FeatureCollection };
 export type PirepSeverity = (typeof SEVERITIES)[number];
 
 export type StationList = {
-  lastUpdatedId: number;
+  lastUpdatedTime: number;
   data: {
     min: string[];
     med: string[];

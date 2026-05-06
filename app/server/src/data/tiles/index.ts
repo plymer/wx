@@ -464,14 +464,13 @@ export async function generateTiles(
 
           if (!tile || !tile.features?.length) return acc;
 
-          if (layer === "plot" || layer === "popup") {
+          if (layer === "plot") {
             if (!hasStationFilterData) {
               acc[layer] = tile;
               return acc;
             }
 
-            const zoomLevel: ZoomLevel =
-              z < (layer === "popup" ? 3 : 5.5) ? "min" : z < (layer === "popup" ? 4 : 6.5) ? "med" : "max";
+            const zoomLevel: ZoomLevel = z < 5.5 ? "min" : z < 6.5 ? "med" : "max";
             const allowedLandSites = stationSetByZoom[zoomLevel];
 
             const filteredFeatures = (tile.features as geojsonvt.Feature[]).filter((feature) => {

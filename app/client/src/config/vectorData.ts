@@ -36,7 +36,7 @@ export const LIGHTNING_DISPLAY: SymbolLayerSpecification = {
     "text-field": "X",
     "text-overlap": "always",
     "symbol-sort-key": ["get", "validTime"],
-    "text-size": 14,
+    "text-size": 18,
     "text-font": ["Metropolis-Regular"],
   },
   paint: { "text-color": "rgb(255,0,155)", "text-halo-color": "rgb(255,255,255)", "text-halo-width": 1 },
