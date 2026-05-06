@@ -284,7 +284,7 @@ async function finalizeTileLocation(outDir: string, rootDir: string) {
 }
 
 function getTileDirs(tileSetName?: string) {
-  const baseDir = process.env.DATA ? process.env.DATA : process.cwd();
+  const baseDir = process.env.TILES_DIR ? process.env.TILES_DIR : process.cwd();
 
   const rootDir =
     tileSetName !== undefined ? path.resolve(baseDir, "tiles", tileSetName) : path.resolve(baseDir, "tiles");

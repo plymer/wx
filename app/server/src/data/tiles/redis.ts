@@ -64,7 +64,7 @@ const mergeTiledPlotFeatures = (
     const time = new Date(feature.properties.validTime);
     if (time < dataCutoffTime) continue;
 
-    const key = feature.properties.uniqueSiteId;
+    const key = feature.properties.siteId;
 
     if (!bySite.has(key)) {
       bySite.set(key, []);
@@ -75,7 +75,7 @@ const mergeTiledPlotFeatures = (
 
   // add new obs to the data
   for (const feature of newData) {
-    const key = feature.properties.uniqueSiteId;
+    const key = feature.properties.siteId;
 
     if (!bySite.has(key)) {
       bySite.set(key, []);
@@ -535,7 +535,7 @@ export const updateCache = async (
       const groupedBySite = new Map<string, TiledSurfacePlotData[]>();
 
       for (const feature of incomingFeatures) {
-        const siteId = feature.properties.uniqueSiteId;
+        const siteId = feature.properties.siteId;
         if (!groupedBySite.has(siteId)) {
           groupedBySite.set(siteId, []);
         }

@@ -1,17 +1,11 @@
 #!/usr/bin/node
-import { FeatureCollection, Point } from "geojson";
+import type { FeatureCollection, Point } from "geojson";
 import * as turf from "@turf/turf";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { STATION_PRIORITY_MED, STATION_PRIORITY_MIN } from "./config/stationPlots.js";
 
 import { getCache, updateStationCache } from "./redis.js";
-import { Logger } from "@msc-cmac-apps/cmac-helpers/node";
-
-export const logger = new Logger({
-  projectName: "payload-generator",
-  fileName: "vector",
-});
+import { STATION_PRIORITY_MED, STATION_PRIORITY_MIN } from "../../config/tiles/stationPlots.js";
 
 /**
  * Filters out points that are too close to each other
@@ -61,9 +55,9 @@ function filterSpacedPoints(
 }
 
 export async function updateStationList() {
-  logger.log("Updating station list cache...");
+  console.log("Updating station list cache...");
 
-  const { lastUpdatedId, data } = await getCache("popup");
+  const { lastUpdatedTime, data } = await getCache("popup");
 
   const dataset = data as FeatureCollection<Point> | undefined;
 
@@ -87,8 +81,8 @@ export async function updateStationList() {
     max: Array.from(new Set(stationList.max)),
   };
 
-  await updateStationCache(stationSetByZoom, lastUpdatedId);
-  logger.log("Station list cache updated.");
+  await updateStationCache(stationSetByZoom, lastUpdatedTime);
+  console.log("Station list cache updated.");
 }
 
 const isDirectExecution = (() => {
