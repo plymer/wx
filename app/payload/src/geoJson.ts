@@ -1,0 +1,360 @@
+import { InferSelectModel } from "drizzle-orm";
+import {
+  HEAVY_AIRCRAFT_TYPES,
+  LIGHT_AIRCRAFT_TYPES,
+  MEDIUM_AIRCRAFT_TYPES,
+  SUPER_AIRCRAFT_TYPES,
+} from "./config/pireps.js";
+import {
+  Categories,
+  Cloud,
+  PirepSeverity,
+  PlotData,
+  Prettify,
+  TiledSurfacePlotData,
+  WakeTurbClass,
+  Wind,
+  WxMapPopupMetar,
+} from "./types.js";
+import { nswob, pireps } from "./schemas/dms-aviation.js";
+import { HOUR, MINUTE } from "@msc-cmac-apps/cmac-helpers/node";
+import { Feature, Point } from "geojson";
+import { PRIORITY_STATIONS } from "./config/stationPlots.js";
+import { calculateSeverity } from "./helpers/vector.js";
+
+export function generatePirepGeoJson(data: Prettify<InferSelectModel<typeof pireps>>[]): Feature[] {
+  const output = data.map((pirep) => {
+    const { lon, lat, issueTime, validTime, aircraftType, flightLevel, turbulence, icing, ws, ...pirepProps } = pirep;
+    const validTimeObject = validTime ? new Date(validTime) : null;
+
+    const iTime = issueTime ? new Date(issueTime).getTime() : null;
+    const vTime = validTimeObject ? validTimeObject.getTime() : null;
+    const startTime = vTime !== null ? Math.floor(vTime / (10 * MINUTE)) * 10 * MINUTE : null;
+    const expiryTime = vTime !== null ? vTime + 1.5 * HOUR : null;
+    const wakeTurbClass = getWakeTurbulenceClass(aircraftType);
+
+    const severity = calculateSeverity(
+      turbulence as Uppercase<PirepSeverity> | null,
+      icing as Uppercase<PirepSeverity> | null,
+      ws ?? false,
+    );
+    const SEVERITY_RANK: Record<PirepSeverity, number> = {
+      none: 0,
+      lgt: 1,
+      mod: 2,
+      sev: 3,
+    };
+
+    return {
+      type: "Feature",
+      geometry: {
+        coordinates: [lon, lat],
+        type: "Point",
+      },
+      properties: {
+        ...pirepProps,
+        flightLevel: flightLevel !== null ? flightLevel.toString().padStart(3, "0") : "999",
+        issueTime: iTime,
+        validTime: vTime,
+        startTime,
+        timeString: validTimeObject
+          ? `${validTimeObject.getUTCHours().toString().padStart(2, "0")}:${validTimeObject.getUTCMinutes().toString().padStart(2, "0")}`
+          : null,
+        expiryTime,
+        wakeTurbClass,
+        severity,
+        severityRank: SEVERITY_RANK[severity] ?? 0,
+        dataType: "pirep",
+      },
+    } as Feature<Point>;
+  });
+
+  return output;
+}
+
+export function generateTimeseriesGeoJson(
+  data: Prettify<
+    InferSelectModel<typeof nswob> & {
+      stations?: { lat: number; lon: number; siteName: string } | null;
+    }
+  >[],
+): TiledSurfacePlotData[] {
+  const output = data.map((ob) => {
+    const stationType = ob.stationType;
+    const dataSource = ob.dataSource; // This will be pre-pended to siteId in uniqueSiteId for THIRD_PARTY stations
+    const uniqueSiteId = stationType === "THIRD_PARTY" ? `${dataSource}: ${ob.stationId}` : ob.stationId; // This is to prevent sites with conflicting names from different third party sources from getting their data mixed
+
+    const stationPriority = PRIORITY_STATIONS.includes(ob.stationId) ? 1 : stationType !== "THIRD_PARTY" ? 2 : 3;
+
+    const obType = getObType(ob.rawText);
+    const clouds = formatClouds(ob.clouds);
+    let ceiling = ob.ceiling !== null ? ob.ceiling * 100 : null;
+    if (
+      ceiling === null &&
+      clouds.some(
+        (cloud) =>
+          cloud.opacity === "SKC" || cloud.opacity === "CLR" || cloud.opacity === "FEW" || cloud.opacity === "SCT",
+      )
+    ) {
+      ceiling = 99999;
+    }
+    const cat = calculateFlightCategory(ob.visibility, ceiling);
+    const wind: Wind = formatWind(ob.windDir, ob.windDirAvg10, ob.windSpd, ob.windSpdAvg10, ob.windSpdMax10);
+
+    const timeString = `${new Date(ob.validTime).getUTCHours().toString().padStart(2, "0")}:${new Date(ob.validTime).getUTCMinutes().toString().padStart(2, "0")}`;
+
+    // Marine only fields
+    const marineOnly = {
+      ts: ob.ts,
+      waveHeight: ob.waveHeight,
+      wavePeriod: ob.wavePeriod,
+      moveDir: ob.shipDir,
+      moveSpd: ob.shipSpd,
+    };
+
+    // Lighthouses only fields
+    const lighthousesOnly = {
+      waveHeight: ob.waveHeight,
+    };
+
+    // wind speed = 0 then set to zero
+    // wind speed > 0 and <= 5 then set to 5
+    // wind speed > 5 then round to nearest 5
+
+    const binnedWindSpd =
+      wind.speed !== null ? (wind.speed === 0 ? 0 : wind.speed <= 5 ? 5 : Math.round(wind.speed / 5) * 5) : null;
+    const binnedWindDir =
+      wind.dir !== null
+        ? binnedWindSpd !== null && binnedWindSpd !== 0
+          ? Math.round(wind.dir / 10) * 10
+          : binnedWindSpd === 0
+            ? 0
+            : null
+        : null;
+
+    const parsedMetar: PlotData = {
+      stationPriority,
+      windDir: wind.dir,
+      binnedWindDir: binnedWindDir === 360 ? 0 : binnedWindDir,
+      windSpd: wind.speed,
+      binnedWindSpd,
+      windGst: wind.gust,
+      stationType,
+      obType,
+      ceiling,
+      cat,
+      vis: ob.visibility,
+      wx: ob.wx ?? "",
+      tt: ob.tt,
+      td: ob.td,
+      mslp: ob.mslp,
+      timeString,
+      validTime: new Date(ob.validTime).getTime(),
+      ...marineOnly,
+      ...lighthousesOnly,
+    };
+
+    const hasStationData = ob.stations ? !!(ob.stations.lon && ob.stations.lat) : false;
+
+    const [lat, lon] = hasStationData ? [ob.stations!.lat, ob.stations!.lon] : [ob.lat, ob.lon];
+
+    const newFeature: TiledSurfacePlotData = {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [lon, lat],
+      },
+      properties: {
+        siteId: ob.stationId,
+        uniqueSiteId,
+        ...parsedMetar,
+      },
+    };
+
+    return newFeature;
+  });
+
+  return output;
+}
+
+export function calculateFlightCategory(vis: number | undefined | null, cig: number | undefined | null): Categories {
+  const ceiling = cig !== null && cig !== undefined ? cig : null;
+  const visibility = vis !== null && vis !== undefined ? vis : null;
+
+  const thresholds = { lifr: { vis: 0.5, cig: 400 }, ifr: { vis: 3, cig: 1000 }, mvfr: { vis: 6, cig: 2500 } };
+
+  if (visibility === null && ceiling !== null) {
+    if (ceiling < thresholds.lifr.cig) return "lifr";
+    else if (ceiling < thresholds.ifr.cig) return "ifr";
+    else if (ceiling < thresholds.mvfr.cig) return "mvfr";
+    else return "vfr";
+  } else if (ceiling === null && visibility !== null) {
+    if (visibility < thresholds.lifr.vis) return "lifr";
+    else if (visibility < thresholds.ifr.vis) return "ifr";
+    else if (visibility < thresholds.mvfr.vis) return "mvfr";
+    else return "vfr";
+  } else if (visibility !== null && ceiling !== null) {
+    if (visibility < thresholds.lifr.vis || ceiling < thresholds.lifr.cig) return "lifr";
+    else if (visibility < thresholds.ifr.vis || ceiling < thresholds.ifr.cig) return "ifr";
+    else if (visibility < thresholds.mvfr.vis || ceiling < thresholds.mvfr.cig) return "mvfr";
+    else return "vfr";
+  } else {
+    return "none";
+  }
+}
+
+export function formatWind(
+  windDir: number | null,
+  windDirAvg10: number | null,
+  windSpd: number | null,
+  windSpdAvg10: number | null,
+  windSpdMax10: number | null,
+): Wind {
+  const nullWind: Wind = {
+    raw: null,
+    dir: null,
+    speed: null,
+    gust: null,
+  };
+  const output: Wind = { ...nullWind };
+
+  const dir = windDir ?? windDirAvg10;
+  const spd = windSpd ?? windSpdAvg10;
+
+  Object.assign(output, { dir: dir === 0 && spd !== 0 ? 360 : dir });
+  Object.assign(output, { speed: spd });
+
+  // Make sure at least one of dir or speed is not null
+  if (output.dir === null && output.speed === null) return nullWind;
+
+  Object.assign(output, { gust: windSpdMax10 });
+
+  let speedStr: string | null = null;
+  let gustStr: string | null = null;
+
+  // Format speed and gust
+  if (output.speed !== null)
+    speedStr = output.speed > 99 ? output.speed.toString() : output.speed.toString().padStart(2, "0"); // Special 3 digit format if > 99kts otherwise 2 digit
+  if (output.gust !== null)
+    gustStr = output.gust > 99 ? output.gust.toString() : output.gust.toString().padStart(2, "0");
+
+  const raw = `${output.dir === null ? "///" : output.dir === 999 ? "VRB" : output.dir.toString().padStart(3, "0")}${speedStr === null ? "//" : speedStr}${gustStr === null ? "KT" : `G${gustStr}KT`}`;
+
+  Object.assign(output, { raw });
+
+  return output;
+}
+
+export function isConvectiveSigmet(header: string): boolean {
+  return header.includes("WSUS3");
+}
+
+export function getWakeTurbulenceClass(aircraftType: string | null | undefined): WakeTurbClass | "UNKN" {
+  if (!aircraftType) return "UNKN";
+
+  const type = aircraftType.toLowerCase().trim();
+
+  if (SUPER_AIRCRAFT_TYPES.includes(type)) return "J";
+  if (HEAVY_AIRCRAFT_TYPES.includes(type)) return "H";
+  if (MEDIUM_AIRCRAFT_TYPES.includes(type)) return "M";
+  if (LIGHT_AIRCRAFT_TYPES.includes(type)) return "L";
+  return "UNKN";
+}
+
+export function getStationType(metars: Partial<WxMapPopupMetar>[]) {
+  if (metars.some((m) => m.stationType === "LIGHTHOUSE")) return "lighthouse";
+  if (metars.some((m) => m.stationType === "SHIP")) return "ship";
+  if (metars.some((m) => m.stationType === "MOORED_BUOY" || m.stationType === "DRIFTING_BUOY")) return "buoy";
+  if (metars.some((m) => m.stationType === "LAND_MANNED")) return "hwos";
+  if (metars.some((m) => m.stationType === "LAND_AUTO")) return "awos";
+  return "auto";
+}
+
+export function getObType(rawText: string | null) {
+  if (!rawText) return "UNKNOWN"; // THis will basically never happen
+  const obTypeRaw = rawText.split(" ")[0];
+  if (["SPECI", "METSP"].includes(obTypeRaw)) return "SPECI";
+  return "HOURLY";
+}
+
+export function getCloudParts(cloudStr: string) {
+  if (cloudStr.startsWith("VV")) {
+    // When the cloud is a vertical visibility "cloud" its opacity code has only 2 characters
+    return {
+      opacityStr: cloudStr.slice(0, 2),
+      heightStr: cloudStr.slice(2, 5),
+      convectiveStr: cloudStr.slice(5),
+    };
+  } else {
+    // All other opacity codes have three characters
+    return {
+      opacityStr: cloudStr.slice(0, 3),
+      heightStr: cloudStr.slice(3, 6),
+      convectiveStr: cloudStr.slice(6),
+    };
+  }
+}
+
+export function formatClouds(cloudsRawStr: string | null) {
+  if (!cloudsRawStr) return []; // If this is null or empty string, return an empty array
+  const cloudsRawArr = cloudsRawStr.split(" "); // split by spaces
+  const clouds: Cloud[] = cloudsRawArr.map((cloudRaw) => {
+    const { opacityStr, heightStr, convectiveStr } = getCloudParts(cloudRaw);
+    let height: number | null = null;
+    if (heightStr.length > 0 && heightStr !== "///") {
+      height = Number(heightStr) * 100; // Convert to number and multipley by 100 to convert to feet
+    }
+    return {
+      raw: cloudRaw,
+      opacity: opacityStr,
+      height,
+      convective: convectiveStr.length > 0 ? convectiveStr : null,
+    };
+  });
+  const cloudsFiltered = clouds.filter(
+    (cloud) =>
+      (cloud.opacity.length === 2 || cloud.opacity.length === 3) && (cloud.height === null || !isNaN(cloud.height)),
+  ); // Make sure cloud opacity is 3 letters and height is either null or a valid number
+  return cloudsFiltered;
+}
+
+/**
+ * limits query results to a specific number of the most recent entries per unique key value
+ *
+ * @param queryResult - the array of results to be limited
+ * @param limit - the maximum number of entries to keep per unique key value
+ * @param uniqueKey - a function that extracts the unique identifier from each item or a key name; the key name must be a string
+ * @returns a new array with limited results
+ */
+export function limitResultsByKeys<T>(
+  queryResult: T[],
+  limit: number,
+  uniqueKey: ((item: T) => string) | keyof T | (keyof T)[],
+): T[] {
+  // ff limit is zero or negative, return the original results
+  if (limit <= 0) {
+    return queryResult;
+  }
+
+  // create a function to extract the key, whether uniqueKey is a function or a property name
+  const getKey =
+    typeof uniqueKey === "function"
+      ? uniqueKey
+      : Array.isArray(uniqueKey)
+        ? (item: T) => uniqueKey.map((key) => String(item[key])).join("|") // Combine multiple keys into a composite key
+        : (item: T) => String(item[uniqueKey]);
+
+  // get the unique keys
+  const uniqueKeys = [...new Set(queryResult.map(getKey))];
+
+  // initialize result array
+  let limitedResult: T[] = [];
+
+  // for each unique key, get the latest 'limit' number of entries
+  uniqueKeys.forEach((key) => {
+    const filteredItems = queryResult.filter((item) => getKey(item) === key);
+    limitedResult = [...limitedResult, ...filteredItems.slice(-limit)];
+  });
+
+  return limitedResult;
+}
