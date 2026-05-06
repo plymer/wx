@@ -169,8 +169,6 @@ export async function generateIsolines({
       }
     });
 
-    console.log(skippedStations.size, "stations were skipped due to missing data or blacklisting.");
-
     const dataToInterpolate: Tuple2DWithValue[] = Object.values(collatedData).reduce<Tuple2DWithValue[]>(
       (acc, data) => {
         const { lat, lon, values } = data;
