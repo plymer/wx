@@ -16,7 +16,7 @@ static-data/*
 node_modules
 dist
 sqlite-db
-tiles
+/tiles/*
 .vinxi
 .output
 .vercel

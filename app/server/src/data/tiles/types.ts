@@ -1,20 +1,19 @@
-import { Feature, FeatureCollection, Point } from "geojson";
-import { PAYLOAD_TYPE } from "./config/index.js";
-import { InferSelectModel } from "drizzle-orm";
-import { nswob } from "./schemas/dms-aviation.js";
-import { SEVERITIES, WAKE_TURBULENCE_CATEGORIES } from "./config/pireps.js";
-import { CATEGORIES, OBS_TYPES } from "./config/stationPlots.js";
+import type { Feature, FeatureCollection, Point } from "geojson";
+import { PAYLOAD_TYPE } from "../../config/tiles/index.js";
+
+import type { CATEGORIES, OBS_TYPES } from "../../config/tiles/stationPlots.js";
+import type { SEVERITIES, WAKE_TURBULENCE_CATEGORIES } from "../../config/tiles/pireps.js";
 
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 export type Nullable<T> = { [K in keyof T]: T[K] | null };
 
-export type StationTypes = InferSelectModel<typeof nswob>["stationType"];
 export type ObsTypes = (typeof OBS_TYPES)[number];
 export type Categories = (typeof CATEGORIES)[number];
 export type WakeTurbClass = (typeof WAKE_TURBULENCE_CATEGORIES)[number];
+export type StationTypes = "auto" | "manned";
 
 export type PayloadType = (typeof PAYLOAD_TYPE)[number];
-export type PayloadCache = { lastUpdatedId: number; data: FeatureCollection };
+export type PayloadCache = { lastUpdatedTime: number; data: FeatureCollection };
 
 export type PirepSeverity = (typeof SEVERITIES)[number];
 
@@ -95,7 +94,6 @@ export type TiledSurfacePlotData = Feature<
   Prettify<
     {
       siteId: string;
-      uniqueSiteId: string;
       startTime?: number;
       expiryTime?: number;
     } & PlotData
@@ -103,11 +101,8 @@ export type TiledSurfacePlotData = Feature<
 >;
 
 export type PlotData = {
-  stationPriority: 1 | 2 | 3;
   validTime: number;
   timeString: string;
-  stationType: StationTypes;
-  obType: ObsTypes;
   tt: number | null;
   td: number | null;
   ts?: number | null | undefined;
@@ -122,8 +117,7 @@ export type PlotData = {
   moveDir?: number | null | undefined;
   moveSpd?: number | null | undefined;
   wx: string | null;
-  vis: number | null;
-  ceiling: number | null;
+  vis: string | null;
   cat: Categories | null;
 };
 

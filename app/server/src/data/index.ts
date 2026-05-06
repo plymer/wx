@@ -5,12 +5,12 @@ import { getMetars } from "./metars.js";
 import { getPublicAlerts } from "./public-alerts.js";
 import { getSigmets } from "./sigmets.js";
 import { getTafs } from "./tafs.js";
-import { createIsolines } from "./tiles/isolines.js";
 
 import * as schemas from "../db/tables/data.drizzle.js";
 import * as relations from "../db/relations/data.relations.drizzle.js";
 import { runFromCron, TaskQueue, type DataTask } from "../lib/queue.js";
 import { buildStationCatalog } from "./stations.js";
+import { generateVectorTiles } from "./vector-tiles.js";
 
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
@@ -32,7 +32,7 @@ async function main() {
     { name: "SIGMETs", run: () => getSigmets(db), schedule: "* * * * *" },
     { name: "Public-Alerts", run: () => getPublicAlerts(), schedule: "* * * * *" },
     { name: "AQ-Data", run: () => getAqData(db), schedule: "*/10 * * * *" },
-    { name: "Isolines", run: () => createIsolines(db), schedule: "*/10 * * * *" },
+    { name: "Isolines", run: () => generateVectorTiles(db), schedule: "*/10 * * * *" },
     { name: "Station-Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
 

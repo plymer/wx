@@ -1,29 +1,17 @@
-import * as os from "os";
-import * as fs from "fs";
 import { createHash } from "crypto";
 
 import "dotenv/config";
-import { createClient, RedisJSON } from "redis";
-import { Feature, FeatureCollection } from "geojson";
-import { PayloadCache, PayloadType, Popup, StationList, TiledSurfacePlotData } from "./types.js";
-import { HOUR, Logger, MINUTE } from "@msc-cmac-apps/cmac-helpers/node";
+import type { RedisJSON } from "redis";
+import type { Feature, FeatureCollection } from "geojson";
+import type { PayloadCache, PayloadType, Popup, StationList, TiledSurfacePlotData } from "./types.js";
+import { HOUR, MINUTE } from "../../lib/constants.js";
+import { redisClient } from "../../lib/redis.js";
 
-const logger = new Logger({
-  projectName: "payload-generator",
-  fileName: "redis",
-});
+const redis = await redisClient("vector-tiles");
 
-const IS_REMOTE = os.homedir() === "/home/sa-cmacw";
-const password = IS_REMOTE ? readPassword(process.env.REDIS_PW) : process.env.REDIS_PW; // if not set then we assume no pw needed
-const host = process.env.REDIS_HOST || "127.0.0.1";
-const port = Number(process.env.REDIS_PORT) || 6379;
-// URL encode the password to safely handle characters like /, +, =
-const encodedPassword = password ? encodeURIComponent(password) : "";
-const auth = encodedPassword ? `:${encodedPassword}@` : "";
 const CACHE_PREFIX = "tiles:realtime";
 
-type SurfacePayloadType = "land" | "marine" | "lighthouse";
-type ClusteredPointPayloadType = "pirep" | "lightning";
+type ClusteredPointPayloadType = "lightning";
 type SurfaceSiteDoc = {
   features: TiledSurfacePlotData[];
 };
@@ -36,92 +24,29 @@ type TimeSliceDoc = {
 const ISOLINE_RETENTION_TIME = 3 * HOUR + 10 * MINUTE;
 const TIMESTEP_BUCKET = 10 * MINUTE;
 const CLUSTERED_POINT_RETENTION: Record<ClusteredPointPayloadType, number> = {
-  pirep: 4.5 * HOUR,
+  // pirep: 4.5 * HOUR,
   lightning: 4 * HOUR,
 };
 
-function readPassword(fileName: string | undefined): string | undefined {
-  if (fileName) {
-    if (!fs.existsSync(fileName)) {
-      logger.error("\x1b[31m%s\x1b[0m", `❌ api error: password file '${fileName}' does not exist`);
-      return undefined;
-    }
-    return fs.readFileSync(fileName, "utf-8").trim();
-  } else return undefined;
-}
-
-export const redis = createClient({
-  // Format: redis[s]://[[username][:password]@][host][:port][/db-number]
-  url: `redis://${auth}${host}:${port}`,
-
-  socket: {
-    // Replacement for retryStrategy
-    reconnectStrategy: (retries) => {
-      if (IS_REMOTE) {
-        return Math.min(retries * 50, 2000);
-      } else {
-        // Return an Error or 'false' to stop retrying (Fails fast on WSL)
-        return false;
-      }
-    },
-  },
-  // Replacement for enableOfflineQueue: false
-  // If false, commands will immediately throw an error if the client is not connected
-  commandsQueueMaxLength: 0,
-});
-
-// 📡 Triggered when the socket starts connecting
-redis.on("connect", () => {
-  logger.log("📡 Redis: Initializing connection...");
-});
-
-// 🚀 Triggered when the connection is established AND ready to use
-// This is the same as ioredis
-redis.on("ready", () => {
-  logger.log("🚀 Redis: Connection successful and ready.");
-});
-
-// ❌ Standard error handling
-redis.on("error", (err) => {
-  logger.error("❌ Redis: Connection error:", err.message);
-});
-
-// ⚠️ Triggered when the connection is closed
-// In node-redis, 'end' is the standard event for this
-redis.on("end", () => {
-  logger.warn("⚠️ Redis: Connection ended. Caching is now disabled for this session.");
-});
-
-// Extra: 'reconnecting' is also available if you want to log retry attempts
-redis.on("reconnecting", () => {
-  logger.log("🔄 Redis: Attempting to reconnect...");
-});
-
-// IMPORTANT: node-redis requires an explicit .connect() call
-await redis.connect();
-
 const emptyPayloadCache = (): PayloadCache => ({
   data: { type: "FeatureCollection", features: [] },
-  lastUpdatedId: 0,
+  lastUpdatedTime: 0,
 });
 
-const isSurfacePayload = (cacheType: PayloadType): cacheType is SurfacePayloadType =>
-  cacheType === "land" || cacheType === "marine" || cacheType === "lighthouse";
-
 const isClusteredPointPayload = (cacheType: PayloadType): cacheType is ClusteredPointPayloadType =>
-  cacheType === "pirep" || cacheType === "lightning";
+  cacheType === "lightning";
 
 async function getJsonRoot<T>(key: string): Promise<T | null> {
   const raw = (await redis.json.get(key, { path: "$" })) as T[] | null;
   return raw?.[0] ?? null;
 }
 
-async function setLastUpdatedId(cacheType: PayloadType, lastUpdatedId: number) {
-  await redis.json.set(`${CACHE_PREFIX}:${cacheType}:meta`, "$", { lastUpdatedId } as unknown as RedisJSON);
+async function setlastUpdatedTime(cacheType: PayloadType, lastUpdatedTime: number) {
+  await redis.json.set(`${CACHE_PREFIX}:${cacheType}:meta`, "$", { lastUpdatedTime } as unknown as RedisJSON);
 }
 
-async function getLastUpdatedId(cacheType: PayloadType) {
-  const raw = (await redis.json.get(`${CACHE_PREFIX}:${cacheType}:meta`, { path: "$.lastUpdatedId" })) as
+async function getlastUpdatedTime(cacheType: PayloadType) {
+  const raw = (await redis.json.get(`${CACHE_PREFIX}:${cacheType}:meta`, { path: "$.lastUpdatedTime" })) as
     | number[]
     | null;
   return raw?.[0] ?? 0;
@@ -313,13 +238,13 @@ const cleanOldTimedFeatureData = (features: Feature[], dataCutoffTime: Date) =>
 const getClusteredPointFeatureKey = (cacheType: ClusteredPointPayloadType, feature: Feature) => {
   const properties = feature.properties ?? {};
 
-  if (cacheType === "pirep") {
-    const id = (properties as { id?: unknown }).id;
+  // if (cacheType === "pirep") {
+  //   const id = (properties as { id?: unknown }).id;
 
-    if (typeof id === "number" || typeof id === "string") {
-      return `id:${id}`;
-    }
-  }
+  //   if (typeof id === "number" || typeof id === "string") {
+  //     return `id:${id}`;
+  //   }
+  // }
 
   const validTime = (properties as { validTime?: unknown }).validTime;
   const geometryJson = JSON.stringify(feature.geometry ?? null);
@@ -449,10 +374,10 @@ async function getTimedSliceCache(
 
     return {
       data: { type: "FeatureCollection", features },
-      lastUpdatedId: await getLastUpdatedId(cacheType),
+      lastUpdatedTime: await getlastUpdatedTime(cacheType),
     };
   } catch (err) {
-    logger.error(`[Redis Get Cache Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
+    console.error(`[Redis Get Cache Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
     return emptyPayloadCache();
   }
 }
@@ -504,23 +429,23 @@ async function getPopupCache(): Promise<PayloadCache> {
 
     return {
       data: { type: "FeatureCollection", features },
-      lastUpdatedId: await getLastUpdatedId("popup"),
+      lastUpdatedTime: await getlastUpdatedTime("popup"),
     };
   } catch (err) {
-    logger.error(`[Redis Get Cache Failed] popup: ${err instanceof Error ? err.message : String(err)}`);
+    console.error(`[Redis Get Cache Failed] popup: ${err instanceof Error ? err.message : String(err)}`);
     return emptyPayloadCache();
   }
 }
 
-async function getSurfacePlotCache(cacheType: SurfacePayloadType): Promise<PayloadCache> {
+async function getSurfacePlotCache(): Promise<PayloadCache> {
   try {
-    const siteIds = await redis.sMembers(`${CACHE_PREFIX}:${cacheType}:sites`);
+    const siteIds = await redis.sMembers(`${CACHE_PREFIX}:plot:sites`);
     const cutoffTime = new Date(Date.now() - 6 * HOUR);
     const features: TiledSurfacePlotData[] = [];
     const staleSiteIds: string[] = [];
 
     for (const siteId of siteIds) {
-      const key = `${CACHE_PREFIX}:${cacheType}:site:${encodeURIComponent(siteId)}`;
+      const key = `${CACHE_PREFIX}:plot:site:${encodeURIComponent(siteId)}`;
       const siteDoc = await getJsonRoot<SurfaceSiteDoc>(key);
 
       if (!siteDoc) {
@@ -544,28 +469,28 @@ async function getSurfacePlotCache(cacheType: SurfacePayloadType): Promise<Paylo
     }
 
     if (staleSiteIds.length) {
-      await redis.sRem(`${CACHE_PREFIX}:${cacheType}:sites`, staleSiteIds);
+      await redis.sRem(`${CACHE_PREFIX}:plot:sites`, staleSiteIds);
     }
 
     return {
       data: { type: "FeatureCollection", features },
-      lastUpdatedId: await getLastUpdatedId(cacheType),
+      lastUpdatedTime: await getlastUpdatedTime("plot"),
     };
   } catch (err) {
-    logger.error(`[Redis Get Cache Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
+    console.error(`[Redis Get Cache Failed] plot: ${err instanceof Error ? err.message : String(err)}`);
     return emptyPayloadCache();
   }
 }
 
 export const updateCache = async (
   incomingData: FeatureCollection,
-  lastUpdatedId: number,
+  lastUpdatedTime: number,
   cacheType: PayloadType,
   dataCutoffTime: Date,
 ): Promise<PayloadCache> => {
   if (!redis.isReady) {
     return {
-      lastUpdatedId,
+      lastUpdatedTime,
       data: incomingData,
     };
   }
@@ -593,18 +518,18 @@ export const updateCache = async (
         }),
       );
 
-      await setLastUpdatedId("popup", lastUpdatedId);
+      await setlastUpdatedTime("popup", lastUpdatedTime);
 
       const output = await getPopupCache();
-      logger.log(`✅ Cache for '${cacheType}' updated successfully.`);
+      console.log(`✅ Cache for '${cacheType}' updated successfully.`);
       return output;
     } catch (err) {
-      logger.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
       return emptyPayloadCache();
     }
   }
 
-  if (isSurfacePayload(cacheType)) {
+  if (cacheType === "plot") {
     try {
       const incomingFeatures = incomingData.features as TiledSurfacePlotData[];
       const groupedBySite = new Map<string, TiledSurfacePlotData[]>();
@@ -636,13 +561,13 @@ export const updateCache = async (
         }),
       );
 
-      await setLastUpdatedId(cacheType, lastUpdatedId);
+      await setlastUpdatedTime(cacheType, lastUpdatedTime);
 
-      const output = await getSurfacePlotCache(cacheType);
-      logger.log(`✅ Cache for '${cacheType}' updated successfully.`);
+      const output = await getSurfacePlotCache();
+      console.log(`✅ Cache for '${cacheType}' updated successfully.`);
       return output;
     } catch (err) {
-      logger.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
       return emptyPayloadCache();
     }
   }
@@ -699,13 +624,13 @@ export const updateCache = async (
         }),
       );
 
-      await setLastUpdatedId(cacheType, lastUpdatedId);
+      await setlastUpdatedTime(cacheType, lastUpdatedTime);
 
       const output = await getClusteredPointCache(cacheType);
-      logger.log(`✅ Cache for '${cacheType}' updated successfully.`);
+      console.log(`✅ Cache for '${cacheType}' updated successfully.`);
       return output;
     } catch (err) {
-      logger.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
       return emptyPayloadCache();
     }
   }
@@ -755,19 +680,19 @@ export const updateCache = async (
         }),
       );
 
-      await setLastUpdatedId(cacheType, lastUpdatedId);
+      await setlastUpdatedTime(cacheType, lastUpdatedTime);
 
       const output = await getIsolineCache(cacheType);
-      logger.log(`✅ Cache for '${cacheType}' updated successfully.`);
+      console.log(`✅ Cache for '${cacheType}' updated successfully.`);
       return output;
     } catch (err) {
-      logger.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
       return emptyPayloadCache();
     }
   }
 
-  let output: PayloadCache = {
-    lastUpdatedId,
+  const output: PayloadCache = {
+    lastUpdatedTime,
     data: incomingData,
   };
 
@@ -778,17 +703,17 @@ export const updateCache = async (
 
     const savePromise = redis.json.set(`${CACHE_PREFIX}:${cacheType}:flat`, "$", {
       data: output.data,
-      lastUpdatedId,
+      lastUpdatedTime,
     } as unknown as RedisJSON);
 
     const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), timeout));
 
     await Promise.race([savePromise, timeoutPromise]);
   } catch (err) {
-    logger.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
+    console.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
   }
 
-  logger.log(`✅ Cache for '${cacheType}' updated successfully.`);
+  console.log(`✅ Cache for '${cacheType}' updated successfully.`);
   return output;
 };
 
@@ -796,16 +721,16 @@ export const getCache = async (cacheType: PayloadType): Promise<PayloadCache> =>
   switch (cacheType) {
     case "popup":
       return getPopupCache();
-    case "pirep":
+    // case "pirep":
     case "lightning":
       return getClusteredPointCache(cacheType);
     case "isobar":
     case "isotherm":
       return getIsolineCache(cacheType);
-    case "land":
-    case "marine":
-    case "lighthouse":
-      return getSurfacePlotCache(cacheType);
+    case "plot":
+      // case "marine":
+      // case "lighthouse":
+      return getSurfacePlotCache();
     default:
       try {
         const cache = (await redis.json.get(`${CACHE_PREFIX}:${cacheType}:flat`, { path: "$" })) as
@@ -813,12 +738,12 @@ export const getCache = async (cacheType: PayloadType): Promise<PayloadCache> =>
           | null;
 
         if (cache?.[0]) {
-          return { data: cache[0].data, lastUpdatedId: cache[0].lastUpdatedId };
+          return { data: cache[0].data, lastUpdatedTime: cache[0].lastUpdatedTime };
         } else {
           return emptyPayloadCache();
         }
       } catch (err) {
-        logger.error(`[Redis Get Cache Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
+        console.error(`[Redis Get Cache Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
         return emptyPayloadCache();
       }
   }
@@ -828,23 +753,23 @@ export const getStationCache = async () => {
   try {
     const cache = (await redis.json.get(`${CACHE_PREFIX}:stationList`, { path: "$" })) as StationList[] | null;
 
-    return cache?.[0] ?? { data: { min: [], med: [], max: [] }, lastUpdatedId: 0 };
+    return cache?.[0] ?? { data: { min: [], med: [], max: [] }, lastUpdatedTime: 0 };
   } catch (err) {
-    logger.error(`[Redis Get Cache Failed] stationList: ${err instanceof Error ? err.message : String(err)}`);
+    console.error(`[Redis Get Cache Failed] stationList: ${err instanceof Error ? err.message : String(err)}`);
     return {
       data: { min: [], med: [], max: [] },
-      lastUpdatedId: 0,
+      lastUpdatedTime: 0,
     };
   }
 };
 
-export const updateStationCache = async (data: StationList["data"], lastUpdatedId: number) => {
+export const updateStationCache = async (data: StationList["data"], lastUpdatedTime: number) => {
   try {
     await redis.json.set(`${CACHE_PREFIX}:stationList`, "$", {
       data,
-      lastUpdatedId,
+      lastUpdatedTime,
     } as unknown as RedisJSON);
   } catch (err) {
-    logger.error(`[Redis Overwrite Cache Failed] stationList: ${err instanceof Error ? err.message : String(err)}`);
+    console.error(`[Redis Overwrite Cache Failed] stationList: ${err instanceof Error ? err.message : String(err)}`);
   }
 };

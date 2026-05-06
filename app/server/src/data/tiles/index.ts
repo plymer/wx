@@ -1,13 +1,20 @@
-import { Feature, FeatureCollection, GeoJsonProperties, LineString, MultiPoint, Point } from "geojson";
-import { PayloadType } from "./types.js";
+// generate tiles with the following data:
+// - isobars
+// - station plots
+// - popups for station plots
+// - public alerts
+// - lightning strikes
+
+import type { Feature, FeatureCollection, GeoJsonProperties, LineString, MultiPoint, Point } from "geojson";
 
 import geojsonvt from "geojson-vt";
 import { fromGeojsonVt as vtToPbf } from "vt-pbf";
 import Supercluster from "supercluster";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { HOUR, MINUTE } from "@msc-cmac-apps/cmac-helpers/node";
-import { logger } from "./vector.js";
+
+import { MINUTE } from "../../lib/constants.js";
+import type { PayloadType } from "./types.js";
 import { getStationCache } from "./redis.js";
 
 const MIN_ZOOM = 2;
@@ -94,9 +101,9 @@ function buildClusteredFc<TData extends GeoJsonProperties>(
     minPoints: 2,
     map: (props) => ({
       ...props,
-      ...(layerName === "pirep"
-        ? { groupIds: props.id, groupSeverity: props.severityRank, groupLatestTimeString: props.timeString }
-        : {}),
+      // ...(layerName === "pirep"
+      //   ? { groupIds: props.id, groupSeverity: props.severityRank, groupLatestTimeString: props.timeString }
+      //   : {}),
     }),
     reduce: (acc, props) => {
       const accValidTime = acc.validTime ?? Number.NEGATIVE_INFINITY;
@@ -105,17 +112,17 @@ function buildClusteredFc<TData extends GeoJsonProperties>(
 
       // Keep latest-member properties on the cluster so decoded fields remain available.
       if (hasNewerValidTime) {
-        const existingGroupIds = acc.groupIds;
-        const existingGroupSeverity = acc.groupSeverity;
-        const existingGroupLatestTimeString = acc.groupLatestTimeString;
+        // const existingGroupIds = acc.groupIds;
+        // const existingGroupSeverity = acc.groupSeverity;
+        // const existingGroupLatestTimeString = acc.groupLatestTimeString;
 
         Object.assign(acc, props);
 
-        if (layerName === "pirep") {
-          acc.groupIds = existingGroupIds;
-          acc.groupSeverity = existingGroupSeverity;
-          acc.groupLatestTimeString = existingGroupLatestTimeString;
-        }
+        // if (layerName === "pirep") {
+        //   acc.groupIds = existingGroupIds;
+        //   acc.groupSeverity = existingGroupSeverity;
+        //   acc.groupLatestTimeString = existingGroupLatestTimeString;
+        // }
       }
 
       if (props.startTime !== undefined) {
@@ -130,21 +137,22 @@ function buildClusteredFc<TData extends GeoJsonProperties>(
         acc.validTime = propsValidTime;
       }
 
-      if (layerName === "pirep") {
-        if (props.id !== undefined) {
-          acc.groupIds = acc.groupIds ? `${acc.groupIds}|${props.id}` : String(props.id);
-        }
+      //   if (layerName === "pirep") {
+      //     if (props.id !== undefined) {
+      //       acc.groupIds = acc.groupIds ? `${acc.groupIds}|${props.id}` : String(props.id);
+      //     }
 
-        acc.groupSeverity = Math.max(acc.groupSeverity ?? 0, props.severityRank ?? 0);
+      //     acc.groupSeverity = Math.max(acc.groupSeverity ?? 0, props.severityRank ?? 0);
 
-        if (hasNewerValidTime && props.timeString !== undefined) {
-          acc.groupLatestTimeString = String(props.timeString);
-        }
+      //     if (hasNewerValidTime && props.timeString !== undefined) {
+      //       acc.groupLatestTimeString = String(props.timeString);
+      //     }
 
-        if (!acc.groupLatestTimeString && props.timeString !== undefined) {
-          acc.groupLatestTimeString = String(props.timeString);
-        }
-      }
+      //     if (!acc.groupLatestTimeString && props.timeString !== undefined) {
+      //       acc.groupLatestTimeString = String(props.timeString);
+      //     }
+      //   }
+      // },
     },
   });
 
@@ -292,7 +300,7 @@ export async function generateTiles(
 ) {
   type ZoomLevel = "min" | "med" | "max";
 
-  logger.info("\x1b[37m%s\x1b[0m", `ℹ️ Starting tile generation for layers: ${Object.keys(data).join(", ")}`);
+  console.info("\x1b[37m%s\x1b[0m", `ℹ️ Starting tile generation for layers: ${Object.keys(data).join(", ")}`);
 
   const now = new Date().getTime();
 
@@ -320,11 +328,11 @@ export async function generateTiles(
       data: data.lightning as FeatureCollection<Point | MultiPoint> | undefined,
     },
 
-    pirep: {
-      maxZoom: MAX_ZOOM,
-      clusterRadius: 256,
-      data: data.pirep as FeatureCollection<Point | MultiPoint> | undefined,
-    },
+    // pirep: {
+    //   maxZoom: MAX_ZOOM,
+    //   clusterRadius: 256,
+    //   data: data.pirep as FeatureCollection<Point | MultiPoint> | undefined,
+    // },
   };
 
   const stationList = (await getStationCache())?.data;
@@ -338,7 +346,7 @@ export async function generateTiles(
     stationSetByZoom.min.size > 0 || stationSetByZoom.med.size > 0 || stationSetByZoom.max.size > 0;
 
   if (!hasStationFilterData) {
-    logger.warn(
+    console.warn(
       "[PAYLOADS] Station list cache is empty; land/popup tiles will be generated without station filtering.",
     );
   }
@@ -387,7 +395,7 @@ export async function generateTiles(
 
       const layer = layerName as PayloadType;
 
-      logger.log(
+      console.log(
         "\x1b[34m%s\x1b[0m",
         `Clustering layer '${layer}' with ${featureCollection.features.length} features...`,
       );
@@ -405,6 +413,7 @@ export async function generateTiles(
   ] as PayloadType[];
 
   let emittedTiles = 0;
+  let zoomTileCount = 0;
 
   // loop over our zoom levels, building out x-y tile grid
   // for each grid segment we need to verify if we're a) evaluating a clustered dataset and b) within a clustered threshold
@@ -413,8 +422,6 @@ export async function generateTiles(
   for (let z = MIN_ZOOM; z <= MAX_ZOOM; z++) {
     const tileDimension = 1 << z;
     const pendingWrites: Promise<void>[] = [];
-
-    let zoomTileCount = 0;
 
     for (let x = 0; x < tileDimension; x++) {
       const xDir = path.join(outDir, z.toString(), x.toString());
@@ -457,7 +464,7 @@ export async function generateTiles(
 
           if (!tile || !tile.features?.length) return acc;
 
-          if (layer === "land" || layer === "popup") {
+          if (layer === "plot" || layer === "popup") {
             if (!hasStationFilterData) {
               acc[layer] = tile;
               return acc;
@@ -508,7 +515,7 @@ export async function generateTiles(
     generatedAt: now,
     generatedAtIso: new Date(now).toISOString(),
     layers: layerNames,
-    emittedTiles,
+    emittedTiles: emittedTiles + zoomTileCount,
     minZoom: MIN_ZOOM,
     maxZoom: MAX_ZOOM,
   };
@@ -519,7 +526,7 @@ export async function generateTiles(
   const endTime = performance.now();
   const duration = ((endTime - startTime) / 1000).toFixed(2);
 
-  logger.log(
+  console.log(
     "\x1b[32m%s\x1b[0m",
     `🏁 Wrote ${emittedTiles} vector tiles (z${MIN_ZOOM}-z${MAX_ZOOM}) to '${rootDir}' in ${duration} seconds.`,
   );
