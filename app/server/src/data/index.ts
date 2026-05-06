@@ -5,7 +5,7 @@ import { getMetars } from "./metars.js";
 import { getPublicAlerts } from "./public-alerts.js";
 import { getSigmets } from "./sigmets.js";
 import { getTafs } from "./tafs.js";
-import { createIsolines } from "./isolines.js";
+import { createIsolines } from "./tiles/isolines.js";
 
 import * as schemas from "../db/tables/data.drizzle.js";
 import * as relations from "../db/relations/data.relations.drizzle.js";
