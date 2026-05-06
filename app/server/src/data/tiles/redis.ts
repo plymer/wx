@@ -2,10 +2,11 @@ import { createHash } from "crypto";
 
 import "dotenv/config";
 import type { RedisJSON } from "redis";
-import type { Feature, FeatureCollection } from "geojson";
-import type { PayloadCache, PayloadType, Popup, StationList, TiledSurfacePlotData } from "./types.js";
+import type { Feature, FeatureCollection, Point } from "geojson";
+import type { PayloadCache, PayloadType, StationList, TiledSurfacePlotData } from "./types.js";
 import { HOUR, MINUTE } from "../../lib/constants.js";
 import { redisClient } from "../../lib/redis.js";
+import type { StationPlotPopupData } from "../../lib/types.js";
 
 const redis = await redisClient("vector-tiles");
 
@@ -111,7 +112,11 @@ const mergeTiledPlotFeatures = (
   return Array.from(bySite.values()).flat();
 };
 
-const mergePopupFeatures = (currentData: Popup | null, newData: Popup, dataCutoffTime: Date): Popup | null => {
+const mergePopupFeatures = (
+  currentData: Feature<Point, StationPlotPopupData> | null,
+  newData: Feature<Point, StationPlotPopupData>,
+  dataCutoffTime: Date,
+): Feature<Point, StationPlotPopupData> | null => {
   const currentMetars = currentData
     ? currentData.properties.metars.filter((metar) =>
         metar.validTime !== null && metar.validTime !== undefined ? new Date(metar.validTime) >= dataCutoffTime : false,
@@ -135,7 +140,7 @@ const mergePopupFeatures = (currentData: Popup | null, newData: Popup, dataCutof
   };
 };
 
-const cleanOldPopupData = (feature: Popup, dataCutoffTime: Date) => {
+const cleanOldPopupData = (feature: Feature<Point, StationPlotPopupData>, dataCutoffTime: Date) => {
   const retainedMetars = [...feature.properties.metars]
     .filter((metar) =>
       metar.validTime !== null && metar.validTime !== undefined ? new Date(metar.validTime) >= dataCutoffTime : false,
@@ -396,12 +401,12 @@ async function getPopupCache(): Promise<PayloadCache> {
   try {
     const siteIds = await redis.sMembers(`${CACHE_PREFIX}:popup:sites`);
     const cutoffTime = new Date(Date.now() - 6 * HOUR);
-    const features: Popup[] = [];
+    const features: Feature<Point, StationPlotPopupData>[] = [];
     const staleSiteIds: string[] = [];
 
     for (const siteId of siteIds) {
       const key = `${CACHE_PREFIX}:popup:site:${encodeURIComponent(siteId)}`;
-      const feature = await getJsonRoot<Popup>(key);
+      const feature = await getJsonRoot<Feature<Point, StationPlotPopupData>>(key);
 
       if (!feature) {
         staleSiteIds.push(siteId);
@@ -497,13 +502,13 @@ export const updateCache = async (
 
   if (cacheType === "popup") {
     try {
-      const incomingFeatures = incomingData.features as Popup[];
+      const incomingFeatures = incomingData.features as Feature<Point, StationPlotPopupData>[];
 
       await Promise.all(
         incomingFeatures.map(async (feature) => {
           const siteId = feature.properties.siteId;
           const siteKey = `${CACHE_PREFIX}:popup:site:${encodeURIComponent(siteId)}`;
-          const existing = await getJsonRoot<Popup>(siteKey);
+          const existing = await getJsonRoot<Feature<Point, StationPlotPopupData>>(siteKey);
 
           const merged = mergePopupFeatures(existing ?? null, feature, dataCutoffTime);
 

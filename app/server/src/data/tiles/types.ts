@@ -26,43 +26,6 @@ export type StationList = {
   };
 };
 
-export type ParsedMetarContents = {
-  wind: Nullable<{
-    raw: string;
-    dir: number;
-    speed: number;
-    gust: number;
-  }> | null;
-  vis: number | null;
-  wx: string | null;
-  wind_shear: any;
-  clouds:
-    | Nullable<{
-        raw: string;
-        opacity: string;
-        height: number;
-        convective: any;
-      }>[]
-    | null;
-  tt?: number | null;
-  td?: number | null;
-  altimeter: number | null;
-  mslp: number | null;
-  rawText: string | null;
-};
-
-export type WxMapPopupMetar = Prettify<
-  Omit<ParsedMetarContents, "wind_shear"> & {
-    validTime: number;
-    windShear: any;
-    rmk: string | null;
-    stationType: string | null;
-    obType: string | null;
-    rvr: string | null;
-    correctionLevel: string | null;
-  }
->;
-
 export type Wind = {
   raw: string | null;
   dir: number | null;
@@ -70,23 +33,6 @@ export type Wind = {
   gust: number | null;
 };
 
-export type Cloud = {
-  raw: string;
-  opacity: string;
-  height: number | null;
-  convective: any;
-};
-
-export type OutputPopupData = Record<
-  string,
-  {
-    lng: number;
-    lat: number;
-    siteName?: string | null;
-    taf?: string | null;
-    metars: Partial<ParsedMetarContents>[];
-  }
->;
 export type SurfacePlotData = Feature<Point, { siteId: string; uniqueSiteId: string; plotData: PlotData[] }>;
 
 export type TiledSurfacePlotData = Feature<
@@ -120,15 +66,3 @@ export type PlotData = {
   vis: string | null;
   cat: Categories | null;
 };
-
-export type Popup = Feature<
-  Point,
-  {
-    siteId: string;
-    siteName?: string | null;
-    taf: string | null;
-    stationType: "lighthouse" | "ship" | "buoy" | "hwos" | "awos" | "auto";
-    metars: Partial<WxMapPopupMetar>[];
-    dataType: "site";
-  }
->;

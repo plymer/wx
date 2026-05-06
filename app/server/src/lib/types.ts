@@ -189,7 +189,7 @@ export type StationPlotPopupData = {
   siteName: string | null;
   siteCountry: string | null;
   siteState: string | null;
-  metars: string[];
+  metars: { validTime: number; rawText: string; mslp?: number; tt?: number; td?: number }[];
   taf: string | null;
   dataType: "site";
 };

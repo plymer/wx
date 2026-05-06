@@ -175,10 +175,6 @@ export function formatWind(windDir: number | null, windSpd: number | null, windG
   return output;
 }
 
-export function isConvectiveSigmet(header: string): boolean {
-  return header.includes("WSUS3");
-}
-
 // export function getWakeTurbulenceClass(aircraftType: string | null | undefined): WakeTurbClass | "UNKN" {
 //   if (!aircraftType) return "UNKN";
 

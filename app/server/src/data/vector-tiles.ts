@@ -1,7 +1,7 @@
 #!/usr/bin/node
 import { asc, desc, gt, eq, Relations, gte } from "drizzle-orm";
 import { generateTimeseriesGeoJson, limitResultsByKeys } from "./tiles/geoJson.js";
-import type { PayloadType, Popup } from "./tiles/types.js";
+import type { PayloadType } from "./tiles/types.js";
 import type { Feature, FeatureCollection, LineString, MultiPoint, Point } from "geojson";
 import { getCache, getStationCache, updateCache } from "./tiles/redis.js";
 import { updateStationList } from "./tiles/stationList.js";
@@ -18,7 +18,7 @@ import { generateTiles } from "./tiles/index.js";
 type IsolineInputDataPoint = {
   lat: number;
   lon: number;
-  stationId: string;
+  siteId: string;
   validTime: Date;
   mslp: number | null;
   tt: number | null;
@@ -27,7 +27,9 @@ type IsolineInputDataPoint = {
 
 const toFiniteNumber = (value: unknown) => (typeof value === "number" && Number.isFinite(value) ? value : null);
 
-const getIsolineInputFromPopupFeatures = (popupFeatures: Popup[]): IsolineInputDataPoint[] => {
+const getIsolineInputFromPopupFeatures = (
+  popupFeatures: Feature<Point, StationPlotPopupData>[],
+): IsolineInputDataPoint[] => {
   return popupFeatures.reduce<IsolineInputDataPoint[]>((acc, feature) => {
     if (!feature.geometry || feature.geometry.type !== "Point") {
       return acc;
@@ -39,9 +41,9 @@ const getIsolineInputFromPopupFeatures = (popupFeatures: Popup[]): IsolineInputD
       return acc;
     }
 
-    const stationId = feature.properties?.siteId;
+    const siteId = feature.properties?.siteId;
 
-    if (!stationId) {
+    if (!siteId) {
       return acc;
     }
 
@@ -55,7 +57,7 @@ const getIsolineInputFromPopupFeatures = (popupFeatures: Popup[]): IsolineInputD
       acc.push({
         lat,
         lon,
-        stationId,
+        siteId,
         validTime: new Date(validTimeMs),
         mslp: toFiniteNumber(metar.mslp),
         tt: toFiniteNumber(metar.tt),
@@ -158,23 +160,30 @@ export async function generateIsolines({
 
   const BLACKLISTED_SITES = ["PACX", "PFTO"];
 
+  const skippedStations = new Set<string>();
+
   try {
     const collatedData: Record<string, { lat: number; lon: number; values: { val: number; validTime: Date }[] }> = {};
     const outputFeatures: Feature[] = [];
     data.forEach((ob) => {
-      const { lat, lon, stationId, validTime } = ob;
+      const { lat, lon, siteId, validTime } = ob;
       const val = ob[field];
-      if (!lat || !lon || !val || BLACKLISTED_SITES.includes(stationId)) return;
-      if (collatedData[stationId]) {
-        collatedData[stationId].values.push({ val, validTime });
+      if (!lat || !lon || !val || BLACKLISTED_SITES.includes(siteId)) {
+        skippedStations.add(siteId);
+        return;
+      }
+      if (collatedData[siteId]) {
+        collatedData[siteId].values.push({ val, validTime });
       } else {
-        collatedData[stationId] = {
+        collatedData[siteId] = {
           lat,
           lon,
           values: [{ val, validTime }],
         };
       }
     });
+
+    console.log(skippedStations.size, "stations were skipped due to missing data or blacklisting.");
 
     const dataToInterpolate: Tuple2DWithValue[] = Object.values(collatedData).reduce<Tuple2DWithValue[]>(
       (acc, data) => {
@@ -324,14 +333,14 @@ export async function generateVectorTiles<
             surfaceDataUpdatedId,
           );
 
-          const metarList: Record<string, string[]> = {};
+          const metarList: Record<string, { validTime: number; rawText: string }[]> = {};
           surfaceData.forEach((m) => {
             if (!m.rawText) return;
 
             if (metarList[m.siteId]) {
-              metarList[m.siteId].push(m.rawText);
+              metarList[m.siteId].push({ validTime: m.validTime.getTime(), rawText: m.rawText });
             } else {
-              metarList[m.siteId] = [m.rawText];
+              metarList[m.siteId] = [{ validTime: m.validTime.getTime(), rawText: m.rawText }];
             }
           });
 
@@ -477,7 +486,7 @@ export async function generateVectorTiles<
         case "isobar": {
           try {
             const { data: popupCacheData, lastUpdatedTime: popupCachelastUpdatedTime } = await getCache("popup");
-            const popupFeatures = popupCacheData.features as Popup[];
+            const popupFeatures = popupCacheData.features as Feature<Point, StationPlotPopupData>[];
             const isolineInputData = getIsolineInputFromPopupFeatures(popupFeatures);
 
             const features = await generateIsolines({
@@ -514,7 +523,7 @@ export async function generateVectorTiles<
         case "isotherm": {
           try {
             const { data: popupCacheData, lastUpdatedTime: popupCachelastUpdatedTime } = await getCache("popup");
-            const popupFeatures = popupCacheData.features as Popup[];
+            const popupFeatures = popupCacheData.features as Feature<Point, StationPlotPopupData>[];
             const isolineInputData = getIsolineInputFromPopupFeatures(popupFeatures);
 
             const features = await generateIsolines({

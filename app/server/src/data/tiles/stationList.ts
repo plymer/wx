@@ -62,20 +62,23 @@ export async function updateStationList() {
 
   const { lastUpdatedTime, data } = await getCache("popup");
 
-  const dataset = data as FeatureCollection<Point> | undefined;
+  const dataSet = data as FeatureCollection<Point, { siteId: string }>;
 
-  const stationFilterRadius = { min: 200, med: 100, max: 0 };
+  const stationFilterRadius = { min: 100, med: 50, max: 0 };
 
-  const minStations = STATION_PRIORITY_MIN;
+  const minStations = [
+    ...STATION_PRIORITY_MIN,
+    ...filterSpacedPoints(dataSet, stationFilterRadius.min, STATION_PRIORITY_MIN),
+  ];
   const medStations = [
     ...STATION_PRIORITY_MED,
-    ...filterSpacedPoints(dataset, stationFilterRadius.med, STATION_PRIORITY_MED),
+    ...filterSpacedPoints(dataSet, stationFilterRadius.med, STATION_PRIORITY_MED),
   ];
 
   const stationList = {
     min: minStations,
     med: medStations,
-    max: [...medStations, ...filterSpacedPoints(dataset, stationFilterRadius.max, medStations)],
+    max: [...medStations, ...filterSpacedPoints(dataSet, stationFilterRadius.max, medStations)],
   };
 
   const stationSetByZoom = {
@@ -83,10 +86,6 @@ export async function updateStationList() {
     med: Array.from(new Set(stationList.med)),
     max: Array.from(new Set(stationList.max)),
   };
-
-  console.log(
-    `Station counts by zoom: min=${stationSetByZoom.min.length} med=${stationSetByZoom.med.length} max=${stationSetByZoom.max.length}`,
-  );
 
   await updateStationCache({ data: stationSetByZoom, lastUpdatedTime });
   console.log("Station list cache updated.");
