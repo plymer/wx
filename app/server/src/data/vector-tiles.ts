@@ -25,21 +25,11 @@ type IsolineInputDataPoint = {
   td: number | null;
 };
 
-const toFiniteNumber = (value: unknown) => (typeof value === "number" && Number.isFinite(value) ? value : null);
-
 const getIsolineInputFromPopupFeatures = (
   popupFeatures: Feature<Point, StationPlotPopupData>[],
 ): IsolineInputDataPoint[] => {
-  return popupFeatures.reduce<IsolineInputDataPoint[]>((acc, feature) => {
-    if (!feature.geometry || feature.geometry.type !== "Point") {
-      return acc;
-    }
-
+  const data = popupFeatures.reduce<IsolineInputDataPoint[]>((acc, feature) => {
     const [lon, lat] = feature.geometry.coordinates;
-
-    if (!Number.isFinite(lon) || !Number.isFinite(lat)) {
-      return acc;
-    }
 
     const siteId = feature.properties?.siteId;
 
@@ -48,25 +38,21 @@ const getIsolineInputFromPopupFeatures = (
     }
 
     feature.properties.metars.forEach((metar) => {
-      const validTimeMs = metar.validTime;
-
-      if (typeof validTimeMs !== "number" || !Number.isFinite(validTimeMs)) {
-        return;
-      }
-
       acc.push({
         lat,
         lon,
         siteId,
-        validTime: new Date(validTimeMs),
-        mslp: toFiniteNumber(metar.mslp),
-        tt: toFiniteNumber(metar.tt),
-        td: toFiniteNumber(metar.td),
+        validTime: new Date(metar.validTime),
+        mslp: metar.mslp ?? null,
+        tt: metar.tt ?? null,
+        td: metar.td ?? null,
       });
     });
 
     return acc;
   }, []);
+
+  return data;
 };
 
 const hasStationListData = (stationList: { min: string[]; med: string[]; max: string[] }) =>
@@ -333,14 +319,25 @@ export async function generateVectorTiles<
             surfaceDataUpdatedId,
           );
 
-          const metarList: Record<string, { validTime: number; rawText: string }[]> = {};
+          const metarList: Record<
+            string,
+            { validTime: number; rawText: string; mslp?: number; tt?: number; td?: number }[]
+          > = {};
           surfaceData.forEach((m) => {
             if (!m.rawText) return;
 
+            const dataPackage = {
+              validTime: m.validTime.getTime(),
+              rawText: m.rawText,
+              mslp: m.mslp ?? undefined,
+              tt: m.tt ?? undefined,
+              td: m.td ?? undefined,
+            };
+
             if (metarList[m.siteId]) {
-              metarList[m.siteId].push({ validTime: m.validTime.getTime(), rawText: m.rawText });
+              metarList[m.siteId].push(dataPackage);
             } else {
-              metarList[m.siteId] = [{ validTime: m.validTime.getTime(), rawText: m.rawText }];
+              metarList[m.siteId] = [dataPackage];
             }
           });
 
