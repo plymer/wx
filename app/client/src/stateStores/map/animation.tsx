@@ -49,8 +49,14 @@ const useAnimation = create<AnimationStateStore>()(
       actions: {
         setFrameCount: (newCount: number) => set(() => ({ frameCount: newCount })),
         setFrame: (newFrame: number) => set(() => ({ frame: newFrame })),
-        nextFrame: () => set((state) => ({ frame: state.frame + 1 <= state.frameCount - 1 ? state.frame + 1 : 0 })),
-        previousFrame: () => set((state) => ({ frame: state.frame - 1 >= 0 ? state.frame - 1 : state.frameCount - 1 })),
+        nextFrame: () =>
+          set((state) => ({
+            frame: state.frame + 1 <= state.frameCount - 1 ? state.frame + 1 : 0,
+          })),
+        previousFrame: () =>
+          set((state) => ({
+            frame: state.frame - 1 >= 0 ? state.frame - 1 : state.frameCount - 1,
+          })),
         firstFrame: () => set((state) => ({ frame: state.frameCount - 1 })),
         lastFrame: () => set(() => ({ frame: 0 })),
         pause: () => set(() => ({ state: "paused" })),
@@ -66,7 +72,10 @@ const useAnimation = create<AnimationStateStore>()(
     {
       // persist only frameRate
       partialize: (state) => ({ frameRate: state.frameRate }) as Partial<AnimationStateStore>,
-      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as AnimationStateStore) }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as AnimationStateStore),
+      }),
       name: "animationOptions",
       storage: createJSONStorage(() => localStorage),
     },

@@ -67,7 +67,10 @@ const useVectorData = create<VectorStateStore>()(
           showSIGMETs: state.showSIGMETs,
           showPublicAlerts: state.showPublicAlerts,
         }) as Partial<VectorStateStore>,
-      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as VectorStateStore) }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as VectorStateStore),
+      }),
       name: "vectorDataOptions",
       storage: createJSONStorage(() => localStorage),
     },

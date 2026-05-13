@@ -40,7 +40,10 @@ const usePublicState = create<PublicState>()(
           mode: state.mode,
           coords: state.coords,
         }) as Partial<PublicState>,
-      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as PublicState) }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as PublicState),
+      }),
       name: "publicOptions",
       storage: createJSONStorage(() => localStorage),
     },

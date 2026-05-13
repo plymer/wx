@@ -96,7 +96,12 @@ export const API_CONFIG = {
       description: "returns lightning data for the last 3 hours",
       params: null,
     },
-    { data: "aq", url: "/aq", description: "returns air quality data for the last 4 hours", params: ["hours"] },
+    {
+      data: "aq",
+      url: "/aq",
+      description: "returns air quality data for the last 4 hours",
+      params: ["hours"],
+    },
     {
       data: "wxmap metars",
       url: "/wxmap/metars",

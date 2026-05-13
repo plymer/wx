@@ -22,4 +22,11 @@ const tsPattern =
 
 export const siteIdPattern = /(C[YWZ][A-Z]{2})\b/g;
 
-export const SIGWX_REGEX = { tsPattern, cloudPattern, fzPrecipitation, windPattern, ifrWxPattern, siteIdPattern };
+export const SIGWX_REGEX = {
+  tsPattern,
+  cloudPattern,
+  fzPrecipitation,
+  windPattern,
+  ifrWxPattern,
+  siteIdPattern,
+};

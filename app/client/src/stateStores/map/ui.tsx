@@ -27,7 +27,10 @@ const useUI = create<UIStateStore>()(
         ({
           layersTab: state.layersTab,
         }) as Partial<UIStateStore>,
-      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as UIStateStore) }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as UIStateStore),
+      }),
       name: "uiOptions",
       storage: createJSONStorage(() => localStorage),
     },

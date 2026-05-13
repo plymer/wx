@@ -20,7 +20,10 @@ const useAppState = create<AppState>()(
         ({
           appMode: state.appMode,
         }) as Partial<AppState>,
-      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as AppState) }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as AppState),
+      }),
       name: "appOptions",
       storage: createJSONStorage(() => localStorage),
     },

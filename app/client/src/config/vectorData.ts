@@ -39,7 +39,11 @@ export const LIGHTNING_DISPLAY: SymbolLayerSpecification = {
     "text-size": 18,
     "text-font": ["Metropolis-Regular"],
   },
-  paint: { "text-color": "rgb(255,0,155)", "text-halo-color": "rgb(255,255,255)", "text-halo-width": 1 },
+  paint: {
+    "text-color": "rgb(255,0,155)",
+    "text-halo-color": "rgb(255,255,255)",
+    "text-halo-width": 1,
+  },
 };
 
 const SIGMET_COLOUR = "rgb(184,6,6)";

@@ -50,7 +50,10 @@ const useMapOverlays = create<OverlaysStore>()(
         publicRegions: state.publicRegions,
         marineRegions: state.marineRegions,
       }),
-      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as OverlaysStore) }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as OverlaysStore),
+      }),
       name: "vectorOverlays",
       storage: createJSONStorage(() => localStorage),
     },

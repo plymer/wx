@@ -39,7 +39,10 @@ const useRasterData = create<RasterStateStore>()(
           showSatellite: state.showSatellite,
           showRadar: state.showRadar,
         }) as Partial<RasterStateStore>,
-      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as RasterStateStore) }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as RasterStateStore),
+      }),
       name: "rasterDataOptions",
       storage: createJSONStorage(() => localStorage),
     },

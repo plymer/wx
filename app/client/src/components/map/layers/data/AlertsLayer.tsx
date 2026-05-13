@@ -12,7 +12,9 @@ export const AlertsLayer = ({ override }: Props) => {
   const enabled = useShowPublicAlerts();
 
   const { data, isFetching } = useQuery(
-    api.wxmap.wxmapPublicWarnings.queryOptions(undefined, { trpc: { context: { skipBatch: true } } }),
+    api.wxmap.wxmapPublicWarnings.queryOptions(undefined, {
+      trpc: { context: { skipBatch: true } },
+    }),
   );
 
   useMapLoadingState("alerts", isFetching);

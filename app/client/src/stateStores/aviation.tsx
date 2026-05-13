@@ -44,7 +44,10 @@ const useAviation = create<AviationState>()(
           timeStep: state.timeStep,
           hub: state.hub,
         }) as Partial<AviationState>,
-      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as AviationState) }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as AviationState),
+      }),
       name: "aviationOptions",
       storage: createJSONStorage(() => localStorage),
     },

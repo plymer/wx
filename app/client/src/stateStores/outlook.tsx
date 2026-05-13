@@ -39,7 +39,10 @@ const useOutlookState = create<OutlookState>()(
           product: state.product,
           valid: state.validPeriod,
         }) as Partial<OutlookState>,
-      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as OutlookState) }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as OutlookState),
+      }),
       name: "outlookOptions",
       storage: createJSONStorage(() => localStorage),
     },

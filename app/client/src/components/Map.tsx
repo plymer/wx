@@ -85,7 +85,11 @@ export default function WxMap() {
         <AttributionControl
           compact
           position="bottom-right"
-          style={{ backgroundColor: "var(--accent)", color: "var(--secondary)", border: "1px solid var(--primary)" }}
+          style={{
+            backgroundColor: "var(--accent)",
+            color: "var(--secondary)",
+            border: "1px solid var(--primary)",
+          }}
         />
 
         <TerrainRGB />

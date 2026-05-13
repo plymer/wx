@@ -7,14 +7,15 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "check": "tsc --noEmit && eslint .",
+    "check": "tsc --noEmit && oxfmt && oxlint --fix",
+    "format": "oxfmt",
     "build": "tsc",
     "dev": "tsx watch src/main.ts",
     "dev:data:sigmets": "tsx watch src/data/sigmets.ts",
     "dev:data:metars": "tsx watch src/data/metars.ts",
     "dev:data:stations": "tsx watch src/data/canada-airports.ts",
     "dev:data:isolines": "tsx watch src/data/isolines.ts",
-    "lint": "eslint .",
+    "lint": "oxlint --fix",
     "start": "node ../../dist/server/main.js"
   }
 }

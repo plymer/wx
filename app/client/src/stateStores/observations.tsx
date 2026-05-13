@@ -32,8 +32,15 @@ const useObservations = create<ObservationsState>()(
     }),
     {
       partialize: (state) =>
-        ({ site: state.site, hours: state.hours, units: state.units }) as Partial<ObservationsState>,
-      merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as ObservationsState) }),
+        ({
+          site: state.site,
+          hours: state.hours,
+          units: state.units,
+        }) as Partial<ObservationsState>,
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as ObservationsState),
+      }),
       name: "observationOptions",
       storage: createJSONStorage(() => localStorage),
     },

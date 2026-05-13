@@ -73,7 +73,11 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
   };
 
   const currentLocationGeoJSON = turf.featureCollection([
-    { type: "Feature", geometry: { type: "Point", coordinates: searchCoords || [0, 0] }, properties: {} },
+    {
+      type: "Feature",
+      geometry: { type: "Point", coordinates: searchCoords || [0, 0] },
+      properties: {},
+    },
   ] as Feature[]);
 
   return (
