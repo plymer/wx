@@ -1,10 +1,10 @@
 import type { FeatureCollection } from "geojson";
 
+// the WxOffice API has some non-standard datashape for its lightning GeoJSON where it has top-level properties defined which violates my understanding of known conventions in GeoJSON spec :shrug-emoji:
+
 export interface LightningFC extends FeatureCollection {
   timeStamp: string;
   dateFrom: string;
   dateTo: string;
   totalBeforeCluster: number;
 }
-
-// TODO this type isn't correctly defined but it somehow works -- will need to revist this during convective season to properly create a type like FeatureCollection<Geometry, LightningProperties> or something like that

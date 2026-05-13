@@ -11,6 +11,7 @@ import * as relations from "../db/relations/data.relations.drizzle.js";
 import { runFromCron, TaskQueue, type DataTask } from "../lib/queue.js";
 import { buildStationCatalog } from "./stations.js";
 import { generateVectorTiles } from "./vector-tiles.js";
+import { getLightning } from "./lightning.js";
 
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
@@ -28,6 +29,7 @@ async function main() {
   const tasks: DataTask[] = [
     { name: "TAFs", run: () => getTafs(db), schedule: "*/5 * * * *" },
     { name: "METARs", run: () => getMetars(db), schedule: "* * * * *" },
+    { name: "Lightning", run: () => getLightning(db), schedule: "* * * * *" },
     // { name: "PIREPs", run: () => getPireps(db), schedule: "* * * * *" },
     { name: "SIGMETs", run: () => getSigmets(db), schedule: "* * * * *" },
     { name: "Public-Alerts", run: () => getPublicAlerts(), schedule: "* * * * *" },

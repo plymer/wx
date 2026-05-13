@@ -8,4 +8,4 @@ export const DEFAULT_NUMBER_ID = 0;
 
 export const DEFAULT_REMOTE_HEADERS = {
   "User-Agent": "PrairieWxApi/1.0",
-};
+} as const;
