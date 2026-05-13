@@ -264,7 +264,7 @@ export async function getSigmets<TSchema extends Record<string, SQLiteTableWithC
   const toCancel = activeInDb.filter(shouldCancelSigmet);
 
   toCancel.forEach((sigmet) => {
-    console.warn(
+    console.info(
       `[SIGMET] SIGMET ${sigmet.domain} ${sigmet.charCode} ${
         sigmet.numberCode
       } is active in the database but missing from the AWC API, creating a cancellation...`,
