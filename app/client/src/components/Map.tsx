@@ -61,7 +61,6 @@ export default function WxMap() {
   // import the map style - this may need to change to allow different map styles in the future
   const mapStyle = positronWxMap;
 
-  // const interactiveLayers = ["layer-pirep", "layer-sigmet", "layer-airmet", "layer-sfc-obs-target"]
   const interactiveLayers = ["layer-sfc-obs-target", "layer-sigmet", "layer-wxo-alerts"];
 
   return (

@@ -18,7 +18,7 @@ export const Popups = ({ zoom }: Props) => {
   if (!enabled) return null;
 
   return (
-    <Source id="sfc-obs-interactive-target" type="vector" tiles={[tileUrl]}>
+    <Source id="sfc-obs-interactive-target" type="vector" tiles={[tileUrl]} maxzoom={8} minzoom={2}>
       {/* Interactive target (invisible circles for click detection) */}
       <Layer
         id="layer-sfc-obs-target"
