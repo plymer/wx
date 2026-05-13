@@ -2,12 +2,12 @@
 import { asc, desc, gt, eq, Relations, gte } from "drizzle-orm";
 import { generateTimeseriesGeoJson, limitResultsByKeys } from "./tiles/geoJson.js";
 import type { PayloadType } from "./tiles/types.js";
-import type { Feature, FeatureCollection, LineString, MultiPoint, Point } from "geojson";
+import type { Feature, FeatureCollection, LineString, MultiPoint, Point, Position } from "geojson";
 import { getCache, getStationCache, updateCache } from "./tiles/redis.js";
 import { updateStationList } from "./tiles/stationList.js";
 
 import { type Tuple2DWithValue, tupleArrayToGeoJSON } from "@plymer/fast-barnes-ts";
-import { metars, stations, tafs } from "../db/tables/data.drizzle.js";
+import { lightningData, metars, stations, tafs } from "../db/tables/data.drizzle.js";
 import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 import type { generateDbConnection } from "../lib/utils.js";
 import { HOUR, MINUTE } from "../lib/constants.js";
@@ -418,66 +418,69 @@ export async function generateVectorTiles<
 
         //   break;
         // }
-        // case "lightning": {
-        //   // we're going to do a full dump of the data since
-        //   // a) the query is relatively fast (1 record per minute of time)
-        //   // b) the latest timestep can get updated after the fact due to how the data feed works
-        //   // we can rework this later to do some back-tracking but I'm taking this shortcut now
-        //   // (you're welcome, future me)
+        case "lightning": {
+          // we're going to do a full dump of the data since
+          // a) the query is relatively fast (1 record per 6 minutes of time)
+          // b) the 2 most-recent timesteps can get updated after the fact due to how the data feed works
+          // we can rework this later to do some back-tracking but I'm taking this shortcut now
+          // (you're welcome, future me)
 
-        //   try {
-        //     const lightningData = await lightningDb.query.lightning.findMany({
-        //       where: gt(lgSchema.lightning.validTime, new Date(Date.now() - 4 * HOUR)),
-        //     });
+          try {
+            const strikeData = await db
+              .select()
+              .from(lightningData)
+              .where(gt(lightningData.dateFrom, new Date(Date.now() - 4 * HOUR)));
 
-        //     const data: FeatureCollection = {
-        //       type: "FeatureCollection",
-        //       features: lightningData.map((evt) => {
-        //         const COORD_DELIMITER = " ";
-        //         const validTime = evt.validTime.getTime();
-        //         const startTime = Math.floor(validTime / (10 * MINUTE)) * 10 * MINUTE;
-        //         const expiryTime = startTime + 10 * MINUTE;
+            const data: FeatureCollection = {
+              type: "FeatureCollection",
+              features: strikeData.map((evt) => {
+                if (evt.dateFrom === null) throw new Error("Null value for 'dateFrom' in lightning data");
 
-        //         const coords = evt.coords
-        //           ?.split(COORD_DELIMITER)
-        //           .map((coord) => {
-        //             const [lat, lon] = coord.split(",");
-        //             return [Number(lon), Number(lat)] as Position;
-        //           })
-        //           .filter(([lon, lat]) => {
-        //             // Filter out NaN or invalid
-        //             return !isNaN(lon) && !isNaN(lat);
-        //           });
+                const COORD_DELIMITER = " ";
+                const validTime = evt.dateFrom.getTime();
+                const startTime = Math.floor(validTime / (10 * MINUTE)) * 10 * MINUTE;
+                const expiryTime = startTime + 10 * MINUTE;
 
-        //         const feature: Feature = {
-        //           type: "Feature",
-        //           properties: {
-        //             validTime,
-        //             startTime,
-        //             expiryTime,
-        //           },
-        //           geometry: {
-        //             type: "MultiPoint",
-        //             coordinates: coords ?? [],
-        //           },
-        //         };
+                const coords = evt.strikes
+                  ?.split(COORD_DELIMITER)
+                  .map((coord) => {
+                    const [lat, lon] = coord.split(",");
+                    return [Number(lon), Number(lat)] as Position;
+                  })
+                  .filter(([lon, lat]) => {
+                    // Filter out NaN or invalid
+                    return !isNaN(lon) && !isNaN(lat);
+                  });
 
-        //         return feature;
-        //       }),
-        //     };
+                const feature: Feature = {
+                  type: "Feature",
+                  properties: {
+                    validTime,
+                    startTime,
+                    expiryTime,
+                  },
+                  geometry: {
+                    type: "MultiPoint",
+                    coordinates: coords ?? [],
+                  },
+                };
 
-        //     const updatedCache = await updateCache(data, Date.now(), payloadType, new Date(Date.now() - 4 * HOUR));
-        //     featureCollectionsByType[payloadType] = updatedCache.data as FeatureCollection<MultiPoint>;
-        //   } catch (error) {
-        //     console.error(
-        //       "\x1b[31m%s\x1b[0m",
-        //       `❌ Error: Failed to generate ${payloadType.toUpperCase()} payload:\n\n`,
-        //       (error as Error).stack,
-        //     );
-        //   }
+                return feature;
+              }),
+            };
 
-        //   break;
-        // }
+            const updatedCache = await updateCache(data, Date.now(), payloadType, new Date(Date.now() - 4 * HOUR));
+            featureCollectionsByType[payloadType] = updatedCache.data as FeatureCollection<MultiPoint>;
+          } catch (error) {
+            console.error(
+              "\x1b[31m%s\x1b[0m",
+              `❌ Error: Failed to generate ${payloadType.toUpperCase()} payload:\n\n`,
+              (error as Error).stack,
+            );
+          }
+
+          break;
+        }
         case "isobar": {
           try {
             const { data: popupCacheData, lastUpdatedTime: popupCachelastUpdatedTime } = await getCache("popup");
