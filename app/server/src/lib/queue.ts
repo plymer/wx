@@ -2,12 +2,14 @@ export type DataTask = {
   name: string;
   run: () => Promise<void>;
   schedule: string;
+  dependsOn?: string[];
 };
 
 type QueuedTask = {
   id: number;
   name: string;
   run: () => Promise<void>;
+  dependsOn?: string[];
 };
 
 export class TaskQueue {
@@ -15,6 +17,8 @@ export class TaskQueue {
   private queue: QueuedTask[];
   private activeCount: number;
   private nextTaskId: number;
+  private blockers: Map<string, string[]> | undefined;
+  private running = new Set<string>();
 
   constructor(concurrency: number = 1) {
     this.concurrency = concurrency;
@@ -23,13 +27,18 @@ export class TaskQueue {
     this.nextTaskId = 1;
   }
 
-  push(name: string, task: () => Promise<void>) {
+  push(name: string, task: () => Promise<void>, dependsOn?: string[]) {
     return new Promise<void>((resolve, reject) => {
       const taskId = this.nextTaskId++;
+      if (dependsOn) {
+        if (!this.blockers) this.blockers = new Map<string, string[]>();
+        this.blockers.set(name, dependsOn);
+      }
 
       this.queue.push({
         id: taskId,
         name,
+        dependsOn,
         run: async () => {
           const startedAt = Date.now();
 
@@ -49,23 +58,47 @@ export class TaskQueue {
   }
 
   private async next() {
-    if (this.activeCount >= this.concurrency || this.queue.length === 0) {
-      return;
-    }
+    while (this.activeCount < this.concurrency && this.queue.length > 0) {
+      let runnableIndex = -1;
 
-    const task = this.queue.shift();
-    if (!task) {
-      return;
-    }
+      for (let i = 0; i < this.queue.length; i++) {
+        const candidate = this.queue[i];
+        const blockers = new Set(this.blockers?.get(candidate.name) ?? []);
+        const blocked = [...blockers].some(
+          (name) => this.running.has(name) || this.queue.some((t, idx) => idx !== i && t.name === name),
+        );
 
-    this.activeCount++;
-    try {
-      await task.run();
-    } catch {
-      // task-specific errors are logged in task.run; continue draining queue
-    } finally {
-      this.activeCount--;
-      this.next();
+        if (!blocked) {
+          runnableIndex = i;
+          break;
+        }
+
+        // Only log for the head item to avoid noisy repeated logs while scanning.
+        if (i === 0) {
+          console.log(`[QUEUE] Delaying #${candidate.id} ${candidate.name} (blocked by ${[...blockers].join(", ")})`);
+        }
+      }
+
+      if (runnableIndex === -1) {
+        return;
+      }
+
+      const [task] = this.queue.splice(runnableIndex, 1);
+      if (!task) return;
+
+      this.activeCount++;
+      this.running.add(task.name);
+
+      void task
+        .run()
+        .catch(() => {
+          // task-specific errors are logged in task.run; continue draining queue
+        })
+        .finally(() => {
+          this.activeCount--;
+          this.running.delete(task.name);
+          void this.next();
+        });
     }
   }
 }

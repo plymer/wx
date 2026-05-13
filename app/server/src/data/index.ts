@@ -30,20 +30,26 @@ async function main() {
     { name: "TAFs", run: () => getTafs(db), schedule: "*/5 * * * *" },
     { name: "METARs", run: () => getMetars(db), schedule: "* * * * *" },
     { name: "Lightning", run: () => getLightning(db), schedule: "* * * * *" },
+    {
+      name: "Vector Tiles",
+      run: () => generateVectorTiles(db),
+      schedule: "* * * * *",
+      dependsOn: ["TAFs", "METARs", "Lightning"],
+    },
     // { name: "PIREPs", run: () => getPireps(db), schedule: "* * * * *" },
     { name: "SIGMETs", run: () => getSigmets(db), schedule: "* * * * *" },
     { name: "Public Alerts", run: () => getPublicAlerts(), schedule: "* * * * *" },
     { name: "AQ Data", run: () => getAqData(db), schedule: "*/10 * * * *" },
-    { name: "Vector Tiles", run: () => generateVectorTiles(db), schedule: "* * * * *" },
+
     { name: "Station Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
 
   console.log(
-    `[DATA] Starting data refresh (max concurrent ${MAX_CONCURRENCY}) - ${tasks.map((t) => t.name).join(", ")}`,
+    `[DATA] Starting data refresh (tasks: ${tasks.length} / max concurrent ${MAX_CONCURRENCY}) - ${tasks.map((t) => t.name).join(", ")}`,
   );
   const startedAt = performance.now();
 
-  const results = await Promise.allSettled(tasks.map((task) => queue.push(task.name, task.run)));
+  const results = await Promise.allSettled(tasks.map((task) => queue.push(task.name, task.run, task.dependsOn)));
   const failures = results.filter((result) => result.status === "rejected");
   const elapsedMs = Math.round(performance.now() - startedAt);
 
