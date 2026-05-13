@@ -84,10 +84,18 @@ export const DataPopup = () => {
                   const { siteId, siteCountry, siteState, siteName, metars, taf } =
                     feature.properties as StationPlotPopupData;
 
-                  const metarArray = JSON.parse(metars as unknown as string) as string[];
+                  const metarArray = JSON.parse(metars as unknown as string) as {
+                    validTime: number;
+                    rawText: string;
+                    mslp: number;
+                    tt: number;
+                    td: number;
+                  }[];
 
                   const parsedMetar =
-                    metarArray.length > 0 ? (formatSigWx(metarArray[metarArray.length - 1], "metar") as string) : null;
+                    metarArray.length > 0
+                      ? (formatSigWx(metarArray[metarArray.length - 1].rawText, "metar") as string)
+                      : null;
 
                   const parsedTaf = taf ? (formatSigWx(taf, "taf") as ParsedTAF) : null;
 

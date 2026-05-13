@@ -1,8 +1,8 @@
 import { ZOOM_THRESHOLDS } from "@/config/map";
-import { useMapLoadingState } from "@/hooks/useMapLoadingState";
-import { api } from "@/lib/trpc";
+
+import { useRealtimeTilesUrl } from "@/hooks/useRealtimeTilesUrl";
+
 import { useShowObs } from "@/stateStores/map/vectorData";
-import { useQuery } from "@tanstack/react-query";
 
 import { Layer, Source } from "react-map-gl/maplibre";
 
@@ -12,26 +12,18 @@ interface Props {
 
 export const Popups = ({ zoom }: Props) => {
   const enabled = useShowObs();
-  const { data: popupData, isFetching: popupFetching } = useQuery(
-    api.wxmap.wxmapPopupData.queryOptions(undefined, {
-      enabled,
-      trpc: { context: { skipBatch: true } },
-    }),
-  );
-  useMapLoadingState("sfc-popup", popupFetching);
+
+  const tileUrl = useRealtimeTilesUrl();
 
   if (!enabled) return null;
 
   return (
-    <Source
-      id="sfc-obs-interactive-target"
-      type="geojson"
-      data={popupData || { type: "FeatureCollection", features: [] }}
-    >
+    <Source id="sfc-obs-interactive-target" type="vector" tiles={[tileUrl]}>
       {/* Interactive target (invisible circles for click detection) */}
       <Layer
         id="layer-sfc-obs-target"
         type="circle"
+        source-layer="popup"
         paint={{
           "circle-radius": [
             "interpolate",
@@ -50,6 +42,7 @@ export const Popups = ({ zoom }: Props) => {
       <Layer
         id="layer-sfc-obs-target-cross"
         beforeId="layer-sfc-obs-windbarb"
+        source-layer="popup"
         type="symbol"
         paint={{
           "text-opacity": [
