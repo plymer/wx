@@ -149,7 +149,7 @@ const tafForecastSchema = z.object({
     .string()
     .optional()
     .transform((val) => (val === undefined ? null : val)),
-  skyCondition: z.union([z.undefined(), skyObjectSchema, z.array(skyObjectSchema)]),
+  skyCondition: z.union([z.undefined(), skyObjectSchema.optional(), z.array(skyObjectSchema).optional()]),
 });
 
 export const tafSchema = z.object({

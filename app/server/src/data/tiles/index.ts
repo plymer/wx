@@ -325,7 +325,7 @@ export async function generateTiles(
     lightning: {
       maxZoom: 6,
       clusterRadius: 24,
-      data: data.lightning as FeatureCollection<Point | MultiPoint> | undefined,
+      data: data.lightning as FeatureCollection<MultiPoint> | undefined,
     },
 
     // pirep: {

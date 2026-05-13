@@ -1,77 +1,49 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 
-import type { FeatureCollection, Point } from "geojson";
-import { CLUSTERED, LIGHTNING_DISPLAY, UNCLUSTERED } from "@/config/vectorData";
-import { MINUTE } from "@shared/lib/constants";
+import { LIGHTNING_DISPLAY } from "@/config/vectorData";
+
 import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
 import { useShowLightning } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
-import { api } from "@/lib/trpc";
-import { useQuery } from "@tanstack/react-query";
-import { useMapLoadingState } from "@/hooks/useMapLoadingState";
+
+import { useRealtimeTilesUrl } from "@/hooks/useRealtimeTilesUrl";
+import type { FilterSpecification } from "maplibre-gl";
 
 interface Props {
   belowLayer?: string;
-  timeRange?: number;
 }
 
-export const LightningDataLayer = ({ belowLayer, timeRange = 15 }: Props) => {
+export const LightningDataLayer = ({ belowLayer }: Props) => {
   const enabled = useShowLightning();
+  const frameTime = useDisplayTime();
 
-  const displayTime = useDisplayTime();
+  const tileUrl = useRealtimeTilesUrl();
 
-  const { data, isFetching } = useQuery(
-    api.lightning.lightning.queryOptions(undefined, {
-      enabled,
-      refetchInterval: MINUTE,
-      trpc: { context: { skipBatch: true } },
-    }),
-  );
+  const filter: FilterSpecification = [
+    "all",
+    ["<", ["get", "startTime"], ["to-number", frameTime]],
+    [">=", ["get", "expiryTime"], ["to-number", frameTime]],
+  ];
 
-  useMapLoadingState("lightning", isFetching);
-
-  if (!enabled || !data) return;
-
-  const filteredData: FeatureCollection = {
-    type: "FeatureCollection",
-    features: data.reduce((acc: FeatureCollection<Point, { validTime: number }>["features"], feature) => {
-      if (
-        feature.properties.validTime >= displayTime - timeRange * MINUTE &&
-        feature.properties.validTime <= displayTime
-      ) {
-        // convert MultiPoint to array of Point features to enable clustering
-        if (feature.geometry.type === "MultiPoint") {
-          feature.geometry.coordinates.forEach((coord) => {
-            acc.push({
-              ...feature,
-              geometry: { type: "Point", coordinates: coord },
-            });
-          });
-        }
-      }
-      return acc;
-    }, []),
-  };
+  if (!enabled) return;
 
   return (
     <>
       <Source
-        type="geojson"
+        type="vector"
         attribution={GEOMET_ATTRIBUTION}
         key="lightning-data-source"
-        data={filteredData}
+        tiles={[tileUrl]}
         id="lightning-data"
-        cluster={true}
-        clusterMaxZoom={12}
-        clusterRadius={4}
+        maxzoom={8}
+        minzoom={2}
       >
-        <Layer {...LIGHTNING_DISPLAY} key="lightning-data" filter={UNCLUSTERED} beforeId={belowLayer} />
         <Layer
+          source-layer="lightning"
           {...LIGHTNING_DISPLAY}
-          key="lightning-data-cluster"
-          id="lightning-data-cluster"
-          filter={CLUSTERED}
-          beforeId="lightning-data"
+          key="lightning-data"
+          filter={filter}
+          beforeId={belowLayer}
         />
       </Source>
     </>
