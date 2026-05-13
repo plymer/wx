@@ -262,7 +262,7 @@ export async function generateDbConnection<
 
 export function getDbConnection(consumer: string) {
   if (!process.env.SQLITE_PATH) {
-    console.warn(
+    console.info(
       `[${consumer.toUpperCase()}] SQLITE_PATH environment variable is not set. Using default path './sqlite-db/wx.sqlite'.`,
     );
   }
