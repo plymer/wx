@@ -53,10 +53,12 @@ import type { fetchSurfaceData } from "../vector-tiles.js";
 // }
 
 export function generateTimeseriesGeoJson(data: Awaited<ReturnType<typeof fetchSurfaceData>>): TiledSurfacePlotData[] {
+  let skippedSitesCount = 0;
+
   const output = data
     .map((ob) => {
       if (!ob.siteId || ob.lat === null || ob.lon === null) {
-        console.warn(`Skipping observation with missing siteId or coordinates: ${JSON.stringify(ob)}`);
+        skippedSitesCount++;
         return null; // Skip this observation
       }
 
@@ -112,6 +114,10 @@ export function generateTimeseriesGeoJson(data: Awaited<ReturnType<typeof fetchS
       return newFeature;
     })
     .filter((feature): feature is TiledSurfacePlotData => feature !== null);
+
+  if (skippedSitesCount !== 0) {
+    console.warn(`[PLOTS] Skipped ${skippedSitesCount} sites (un-plottable)`);
+  }
 
   return output;
 }

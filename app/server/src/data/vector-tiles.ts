@@ -586,10 +586,7 @@ export async function generateVectorTiles<
     });
 
     console.log("\x1b[35m%s\x1b[0m", "🚀 Complete: All payload files generated successfully!");
-
-    process.exit(0);
   } catch (error) {
-    console.error("\x1b[31m%s\x1b[0m", "❌ Error: Failed while creating payload files:\n\n", (error as Error).stack);
-    process.exit(1);
+    throw new Error(`\x1b[31m%s\x1b[0m❌ Error: Failed while creating payload files:\n\n ${(error as Error).stack}`);
   }
 }

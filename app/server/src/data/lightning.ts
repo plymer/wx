@@ -1,7 +1,7 @@
-import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
+import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { LightningFC } from "../lib/lightning.types.js";
 import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
-import type { Relations } from "drizzle-orm";
+import { lt, type Relations } from "drizzle-orm";
 import type { generateDbConnection } from "../lib/utils.js";
 import { lightningData } from "../db/tables/data.drizzle.js";
 
@@ -84,6 +84,12 @@ export async function getLightning<TSchema extends Record<string, SQLiteTableWit
           });
       }),
     );
+
+    const { changes } = await db
+      .delete(lightningData)
+      .where(lt(lightningData.dateFrom, new Date(new Date().getTime() - 4 * HOUR)));
+
+    console.log(`[LIGHTNING] Cleaned up ${changes} old lightning entries`);
 
     console.log(`[LIGHTNING] Latest strikes updated for ${previousBin.toISOString()} - ${currentBin.toISOString()}`);
   } catch (error) {
