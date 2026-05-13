@@ -20,7 +20,7 @@ export const Isotherms = ({ frameTime }: Props) => {
   if (!enabled) return null;
 
   return (
-    <Source id="sfc-obs-isotherms" type="vector" tiles={[tileUrl]} maxzoom={8} minzoom={2}>
+    <Source id="sfc-obs-isotherms" type="vector" tiles={[tileUrl]} maxzoom={9} minzoom={2}>
       <Layer
         id="layer-sfc-obs-isotherms"
         type="line"

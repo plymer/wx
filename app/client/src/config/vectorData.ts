@@ -28,24 +28,6 @@ export const VECTOR_DATA_TYPES = [
 
 export const XMET_TYPES = ["airmet", "sigmet"] as const;
 
-export const LIGHTNING_DISPLAY: SymbolLayerSpecification = {
-  type: "symbol",
-  id: "lightning-data",
-  source: "lightning-data",
-  layout: {
-    "text-field": "X",
-    "text-overlap": "always",
-    "symbol-sort-key": ["get", "validTime"],
-    "text-size": 18,
-    "text-font": ["Metropolis-Regular"],
-  },
-  paint: {
-    "text-color": "rgb(255,0,155)",
-    "text-halo-color": "rgb(255,255,255)",
-    "text-halo-width": 1,
-  },
-};
-
 const SIGMET_COLOUR = "rgb(184,6,6)";
 
 export const SIGMET_DISPLAY: FillLayerSpecification = {
@@ -135,7 +117,6 @@ export const AQ_VALUE_DISPLAY: SymbolLayerSpecification = {
 };
 
 export const VECTOR_DISPLAY_CONFIGS = {
-  lightning: LIGHTNING_DISPLAY,
   sigmet: SIGMET_DISPLAY,
   airmet: AIRMET_DISPLAY,
   pirep: PIREP_DISPLAY,

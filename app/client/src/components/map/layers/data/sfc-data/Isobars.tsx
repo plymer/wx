@@ -24,7 +24,7 @@ export const Isobars = ({ frameTime }: { frameTime: number }) => {
 
   return (
     <>
-      <Source key={`sfc-obs-isobars`} id={`sfc-obs-isobars`} type="vector" tiles={[tileUrl]} maxzoom={8} minzoom={2}>
+      <Source key={`sfc-obs-isobars`} id={`sfc-obs-isobars`} type="vector" tiles={[tileUrl]} maxzoom={9} minzoom={2}>
         <Layer
           id={`layer-sfc-obs-isobars`}
           source-layer="isobar"

@@ -1,7 +1,5 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 
-import { LIGHTNING_DISPLAY } from "@/config/vectorData";
-
 import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
 import { useShowLightning } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
@@ -35,15 +33,29 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
         key="lightning-data-source"
         tiles={[tileUrl]}
         id="lightning-data"
-        maxzoom={8}
+        maxzoom={9}
         minzoom={2}
       >
         <Layer
           source-layer="lightning"
-          {...LIGHTNING_DISPLAY}
           key="lightning-data"
           filter={filter}
           beforeId={belowLayer}
+          type="symbol"
+          id="lightning-data"
+          source="lightning-data"
+          layout={{
+            "text-field": "X",
+            "text-overlap": "always",
+            "symbol-sort-key": ["get", "validTime"],
+            "text-size": 18,
+            "text-font": ["Metropolis-Regular"],
+          }}
+          paint={{
+            "text-color": "rgb(255,0,155)",
+            "text-halo-color": "#fff",
+            "text-halo-width": 1,
+          }}
         />
       </Source>
     </>

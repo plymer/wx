@@ -439,17 +439,17 @@ export async function generateVectorTiles<
                 const COORD_DELIMITER = " ";
                 const validTime = evt.dateFrom.getTime();
                 const startTime = Math.floor(validTime / (10 * MINUTE)) * 10 * MINUTE;
-                const expiryTime = startTime + 10 * MINUTE;
+                const expiryTime = startTime + 20 * MINUTE;
 
                 const coords = evt.strikes
                   ?.split(COORD_DELIMITER)
                   .map((coord) => {
-                    const [lat, lon] = coord.split(",");
+                    const [lon, lat] = coord.split(",");
                     return [Number(lon), Number(lat)] as Position;
                   })
                   .filter(([lon, lat]) => {
-                    // Filter out NaN or invalid
-                    return !isNaN(lon) && !isNaN(lat);
+                    // Filter out NaN and out-of-range coordinates.
+                    return !isNaN(lon) && !isNaN(lat) && lon >= -180 && lon <= 180 && lat >= -90 && lat <= 90;
                   });
 
                 const feature: Feature = {
