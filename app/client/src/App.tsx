@@ -22,7 +22,7 @@ import useHashPath from "@/hooks/useHashPath";
 import { APP_MODES_LIST } from "@/config/modes";
 import { useAppMode, useSetAppMode } from "@/stateStores/app";
 import type { AppMode } from "@/lib/types";
-import { api } from "./lib/trpc";
+import { api } from "@/lib/trpc";
 import { MINUTE } from "@shared/lib/constants";
 
 const appModesList: AppMode[] = Object.keys(APP_MODES_LIST).map((k) => k as AppMode);
@@ -51,33 +51,18 @@ export const App = () => {
   const handleMessageClose = () => setShowGlobalMessage(false);
 
   return (
-    <main className="relative w-full max-w-(--breakpoint-2xl) mx-auto">
-      {/* large-screen nav bar */}
-      <nav className="flex justify-between px-4 mt-2 place-items-center max-md:hidden">
-        <img src="/site-icon.svg" className="size-10 inline me-2" />
-        {appModesList.map((l, i) => (
+    <main className="w-full max-w-384 mx-auto">
+      <nav className="flex gap-1 justify-between px-4 mt-2 items-center">
+        <img src="/site-icon.svg" className="max-md:size-6 md:size-10" />
+        {appModesList.map((m, i) => (
           <Button
             key={i}
             variant={"menuTab"}
-            className={appMode === l ? "active " : ""}
-            onClick={() => handleSetAppMode(l)}
+            className={appMode === m ? "active " : ""}
+            onClick={() => handleSetAppMode(m)}
           >
-            {APP_MODES_LIST[l].longName}
-          </Button>
-        ))}
-      </nav>
-
-      {/* small-screen nav bar */}
-      <nav className="flex justify-between px-2 place-items-center md:hidden ">
-        <img src="/site-icon.svg" className="w-6 h-6 inline" />
-        {appModesList.map((l, i) => (
-          <Button
-            key={i}
-            variant={"menuTab"}
-            className={appMode === l ? "active " : ""}
-            onClick={() => handleSetAppMode(l)}
-          >
-            {APP_MODES_LIST[l].shortName}
+            <span className="max-md:hidden">{APP_MODES_LIST[m].longName}</span>
+            <span className="md:hidden">{APP_MODES_LIST[m].shortName}</span>
           </Button>
         ))}
       </nav>

@@ -98,7 +98,7 @@ export const metarSchema = z.object({
     .number()
     .optional()
     .transform((val) => (val === undefined ? null : val)),
-  skyCondition: z.union([z.undefined(), skyObjectSchema, z.array(skyObjectSchema)]),
+  skyCondition: z.union([z.undefined(), skyObjectSchema.optional(), z.array(skyObjectSchema).optional()]),
   flightCategory: z
     .enum(["VFR", "IFR", "MVFR", "LIFR", ""])
     .optional()
