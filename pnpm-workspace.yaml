@@ -1,3 +1,5 @@
 packages:
   - "app/client"
   - "app/server"
+
+minimumReleaseAge: 2880 # minimum package age is 2 days
