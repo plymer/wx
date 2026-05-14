@@ -3,6 +3,7 @@ import { load } from "cheerio";
 import type { StationData } from "../lib/types.js";
 import { generateDbConnection } from "../lib/utils.js";
 import { stations } from "../db/tables/data.drizzle.js";
+import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
 
 const PROVINCES = {
   AB: "Alberta",
@@ -137,7 +138,7 @@ function parseAirportTable(
 async function scrapeProvince(code: string, name: string): Promise<StationData[]> {
   const url = `${baseUrl}${name}&format=json`;
 
-  const json = (await fetch(url).then((res) => res.json())) as WikiParseResponse;
+  const json = (await fetch(url, { headers: DEFAULT_REMOTE_HEADERS }).then((res) => res.json())) as WikiParseResponse;
   const pageHtml = String(json?.parse?.text?.["*"] || "");
   const parseHtml = load(pageHtml);
 

@@ -311,6 +311,8 @@ export async function generateVectorTiles<
         }
         case "popup": {
           const tafLookback = new Date(Date.now() - 12 * HOUR);
+          const { data: existingPopupCacheData } = await getCache("popup");
+          const existingPopupFeatures = existingPopupCacheData.features as Feature<Point, StationPlotPopupData>[];
 
           const maxTime = surfaceData.reduce(
             (max, obs) => (new Date(obs.validTime).getTime() > max ? new Date(obs.validTime).getTime() : max),
@@ -339,47 +341,88 @@ export async function generateVectorTiles<
             }
           });
 
-          const tafsQuery = await db
-            .select()
+          const tafRows = await db
+            .select({ siteId: tafs.siteId, rawText: tafs.rawText })
             .from(tafs)
             .where(gt(tafs.validTime, tafLookback))
-            .orderBy(asc(tafs.validTime))
-            .then((results) => limitResultsByKeys(results, 1, "siteId"));
+            .orderBy(desc(tafs.validTime));
 
-          const popupData = surfaceData.reduce<Feature<Point, StationPlotPopupData>[]>((acc, m) => {
-            if (!m.lat || !m.lon) return acc;
-
-            const siteId = m.siteId;
-
-            const { lat, lon, siteName, siteCountry, siteState } = m;
-
-            const currentTaf = tafsQuery.find((t) => t.siteId === siteId);
-
-            const existingFeature = acc.find((feature) => feature.properties.siteId === siteId);
-
-            if (existingFeature) {
-              return acc;
-            } else {
-              const newFeature: Feature<Point, StationPlotPopupData> = {
-                type: "Feature",
-                geometry: {
-                  type: "Point",
-                  coordinates: [lon, lat],
-                },
-                properties: {
-                  siteId,
-                  siteName,
-                  siteCountry,
-                  siteState,
-                  metars: metarList[siteId] || [],
-                  taf: currentTaf ? currentTaf.rawText : null,
-                  dataType: "site",
-                },
-              };
-              acc.push(newFeature);
-              return acc;
+          const latestTafBySite = new Map<string, string | null>();
+          tafRows.forEach((taf) => {
+            if (!latestTafBySite.has(taf.siteId)) {
+              latestTafBySite.set(taf.siteId, taf.rawText ?? null);
             }
-          }, []);
+          });
+
+          const surfaceSiteMeta = new Map<
+            string,
+            { lat: number; lon: number; siteName: string | null; siteCountry: string | null; siteState: string | null }
+          >();
+
+          surfaceData.forEach((m) => {
+            if (!m.lat || !m.lon || surfaceSiteMeta.has(m.siteId)) return;
+
+            surfaceSiteMeta.set(m.siteId, {
+              lat: m.lat,
+              lon: m.lon,
+              siteName: m.siteName,
+              siteCountry: m.siteCountry,
+              siteState: m.siteState,
+            });
+          });
+
+          const existingSiteMeta = new Map<
+            string,
+            { lat: number; lon: number; siteName: string | null; siteCountry: string | null; siteState: string | null }
+          >();
+
+          existingPopupFeatures.forEach((feature) => {
+            const [lon, lat] = feature.geometry.coordinates;
+            const { siteId, siteName, siteCountry, siteState } = feature.properties;
+
+            existingSiteMeta.set(siteId, {
+              lat,
+              lon,
+              siteName,
+              siteCountry,
+              siteState,
+            });
+          });
+
+          const siteIds = new Set<string>([
+            ...surfaceData.map((m) => m.siteId),
+            ...existingPopupFeatures.map((feature) => feature.properties.siteId),
+          ]);
+
+          const popupData: Feature<Point, StationPlotPopupData>[] = [];
+
+          siteIds.forEach((siteId) => {
+            const meta = surfaceSiteMeta.get(siteId) ?? existingSiteMeta.get(siteId);
+
+            if (!meta) {
+              return;
+            }
+
+            const { lat, lon, siteName, siteCountry, siteState } = meta;
+            const currentTaf = latestTafBySite.get(siteId) ?? null;
+
+            popupData.push({
+              type: "Feature",
+              geometry: {
+                type: "Point",
+                coordinates: [lon, lat],
+              },
+              properties: {
+                siteId,
+                siteName,
+                siteCountry,
+                siteState,
+                metars: metarList[siteId] || [],
+                taf: currentTaf,
+                dataType: "site",
+              },
+            });
+          });
 
           const data: FeatureCollection<Point> = {
             type: "FeatureCollection",

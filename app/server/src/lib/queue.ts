@@ -89,7 +89,7 @@ export class TaskQueue {
       this.activeCount++;
       this.running.add(task.name);
 
-      void task
+      task
         .run()
         .catch(() => {
           // task-specific errors are logged in task.run; continue draining queue
@@ -97,7 +97,7 @@ export class TaskQueue {
         .finally(() => {
           this.activeCount--;
           this.running.delete(task.name);
-          void this.next();
+          this.next();
         });
     }
   }

@@ -106,7 +106,6 @@ export function generateTimeseriesGeoJson(data: Awaited<ReturnType<typeof fetchS
         },
         properties: {
           siteId: ob.siteId,
-
           ...parsedMetar,
         },
       };
