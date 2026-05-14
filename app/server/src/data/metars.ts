@@ -22,6 +22,7 @@ export async function getMetars<TSchema extends Record<string, SQLiteTableWithCo
   const { parser } = xmlParser();
 
   const metarData = (parser.parse(xml) as XMLCacheFile<CacheMetarData, "metar">).response.data.metar;
+  const cycleCreatedAt = new Date();
 
   // const dataKeys = new Set<string>();
 
@@ -62,6 +63,7 @@ export async function getMetars<TSchema extends Record<string, SQLiteTableWithCo
         return {
           siteId,
           validTime,
+          createdAt: cycleCreatedAt,
           rawText,
           category,
           windDir,

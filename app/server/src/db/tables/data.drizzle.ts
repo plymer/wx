@@ -20,6 +20,7 @@ export const metars = sqliteTable(
   {
     siteId: text().notNull(),
     validTime: integer({ mode: "timestamp_ms" }).notNull(),
+    createdAt: integer({ mode: "timestamp_ms" }),
     tt: real(),
     td: real(),
     windDir: integer(),

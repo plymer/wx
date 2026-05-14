@@ -1,5 +1,5 @@
 #!/usr/bin/node
-import { asc, desc, gt, eq, Relations, gte } from "drizzle-orm";
+import { asc, desc, gt, eq, Relations } from "drizzle-orm";
 import { generateTimeseriesGeoJson, limitResultsByKeys } from "./tiles/geoJson.js";
 import type { PayloadType } from "./tiles/types.js";
 import type { Feature, FeatureCollection, LineString, MultiPoint, Point, Position } from "geojson";
@@ -88,7 +88,6 @@ export async function fetchSurfaceData<
     throw new Error("Database connection is required to fetch surface data");
   }
   // Build conditions for data order
-
   const start = lastUpdatedTime === 0 ? new Date(Date.now() - (hours ?? 4) * HOUR) : new Date(lastUpdatedTime);
 
   try {
@@ -96,6 +95,7 @@ export async function fetchSurfaceData<
       .select({
         siteId: metars.siteId,
         validTime: metars.validTime,
+        createdAt: metars.createdAt,
         mslp: metars.mslp,
         tt: metars.tt,
         td: metars.td,
@@ -114,7 +114,7 @@ export async function fetchSurfaceData<
       })
       .from(metars)
       .leftJoin(stations, eq(stations.siteId, metars.siteId))
-      .where(gte(metars.validTime, start))
+      .where(gt(metars.createdAt, start))
       .orderBy(order === "asc" ? asc(metars.validTime) : desc(metars.validTime));
 
     // Limit the result set per site
@@ -262,6 +262,9 @@ export async function generateVectorTiles<
 
   let surfaceData: Awaited<ReturnType<typeof fetchSurfaceData>> = [];
 
+  const getSurfaceCursorTime = (obs: { createdAt: Date | null; validTime: Date }) =>
+    (obs.createdAt ?? obs.validTime).getTime();
+
   try {
     const startTime = performance.now();
     console.log("\x1b[0m%s\x1b[0m", "ℹ️ Info: Fetching data from the database...");
@@ -274,9 +277,6 @@ export async function generateVectorTiles<
     const endTime = performance.now();
     const duration = ((endTime - startTime) / 1000).toFixed(2);
 
-    if (surfaceData.length === 0) {
-      console.info("ℹ️ No new data fetched from the database, skipping payload generation");
-    }
     console.log(
       "\x1b[32m%s\x1b[0m",
       `✅ Success: Fetched ${surfaceData.length} records from the database in ${duration} seconds`,
@@ -295,7 +295,7 @@ export async function generateVectorTiles<
       switch (payloadType as PayloadType) {
         case "plot": {
           const maxTime = surfaceData.reduce(
-            (max, obs) => (new Date(obs.validTime).getTime() > max ? new Date(obs.validTime).getTime() : max),
+            (max, obs) => (getSurfaceCursorTime(obs) > max ? getSurfaceCursorTime(obs) : max),
             surfaceDataUpdatedId,
           );
 
@@ -315,7 +315,7 @@ export async function generateVectorTiles<
           const existingPopupFeatures = existingPopupCacheData.features as Feature<Point, StationPlotPopupData>[];
 
           const maxTime = surfaceData.reduce(
-            (max, obs) => (new Date(obs.validTime).getTime() > max ? new Date(obs.validTime).getTime() : max),
+            (max, obs) => (getSurfaceCursorTime(obs) > max ? getSurfaceCursorTime(obs) : max),
             surfaceDataUpdatedId,
           );
 
@@ -354,59 +354,19 @@ export async function generateVectorTiles<
             }
           });
 
-          const surfaceSiteMeta = new Map<
-            string,
-            { lat: number; lon: number; siteName: string | null; siteCountry: string | null; siteState: string | null }
-          >();
+          const popupData = surfaceData.reduce<Feature<Point, StationPlotPopupData>[]>((acc, m) => {
+            if (!m.lat || !m.lon) return acc;
 
-          surfaceData.forEach((m) => {
-            if (!m.lat || !m.lon || surfaceSiteMeta.has(m.siteId)) return;
+            const siteId = m.siteId;
+            const { lat, lon, siteName, siteCountry, siteState } = m;
+            const currentTaf = latestTafBySite.get(siteId) ?? null;
+            const existingFeature = acc.find((feature) => feature.properties.siteId === siteId);
 
-            surfaceSiteMeta.set(m.siteId, {
-              lat: m.lat,
-              lon: m.lon,
-              siteName: m.siteName,
-              siteCountry: m.siteCountry,
-              siteState: m.siteState,
-            });
-          });
-
-          const existingSiteMeta = new Map<
-            string,
-            { lat: number; lon: number; siteName: string | null; siteCountry: string | null; siteState: string | null }
-          >();
-
-          existingPopupFeatures.forEach((feature) => {
-            const [lon, lat] = feature.geometry.coordinates;
-            const { siteId, siteName, siteCountry, siteState } = feature.properties;
-
-            existingSiteMeta.set(siteId, {
-              lat,
-              lon,
-              siteName,
-              siteCountry,
-              siteState,
-            });
-          });
-
-          const siteIds = new Set<string>([
-            ...surfaceData.map((m) => m.siteId),
-            ...existingPopupFeatures.map((feature) => feature.properties.siteId),
-          ]);
-
-          const popupData: Feature<Point, StationPlotPopupData>[] = [];
-
-          siteIds.forEach((siteId) => {
-            const meta = surfaceSiteMeta.get(siteId) ?? existingSiteMeta.get(siteId);
-
-            if (!meta) {
-              return;
+            if (existingFeature) {
+              return acc;
             }
 
-            const { lat, lon, siteName, siteCountry, siteState } = meta;
-            const currentTaf = latestTafBySite.get(siteId) ?? null;
-
-            popupData.push({
+            const newFeature: Feature<Point, StationPlotPopupData> = {
               type: "Feature",
               geometry: {
                 type: "Point",
@@ -421,8 +381,42 @@ export async function generateVectorTiles<
                 taf: currentTaf,
                 dataType: "site",
               },
+            };
+
+            acc.push(newFeature);
+            return acc;
+          }, []);
+
+          const popupSitesWithFreshMetars = new Set(popupData.map((feature) => feature.properties.siteId));
+          let tafOnlyRefreshCount = 0;
+
+          existingPopupFeatures.forEach((feature) => {
+            const siteId = feature.properties.siteId;
+
+            if (popupSitesWithFreshMetars.has(siteId)) {
+              return;
+            }
+
+            const currentTaf = latestTafBySite.get(siteId) ?? null;
+
+            if (currentTaf === feature.properties.taf) {
+              return;
+            }
+
+            tafOnlyRefreshCount += 1;
+            popupData.push({
+              ...feature,
+              properties: {
+                ...feature.properties,
+                metars: [],
+                taf: currentTaf,
+              },
             });
           });
+
+          console.log(
+            `[POPUP] refresh summary: metarSites=${popupSitesWithFreshMetars.size} tafOnlySites=${tafOnlyRefreshCount} totalUpdates=${popupData.length}`,
+          );
 
           const data: FeatureCollection<Point> = {
             type: "FeatureCollection",

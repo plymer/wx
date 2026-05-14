@@ -35,7 +35,7 @@ function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, Sta
     const { lat, lon } = stations;
     const existingFeature = acc.find((feature) => feature.properties.siteId === siteId);
 
-    const metarData: MetarElements = {
+    const metarData: Omit<MetarElements, "createdAt"> = {
       category,
       td,
       tt,
