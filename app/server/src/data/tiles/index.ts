@@ -18,7 +18,7 @@ import type { PayloadType } from "./types.js";
 import { getStationCache } from "./redis.js";
 
 const MIN_ZOOM = 2;
-const MAX_ZOOM = 9;
+const MAX_ZOOM = 8;
 const VECTOR_TILE_EXTENT = 4096;
 const CLUSTER_TIMESTEP_BUCKET = 10 * MINUTE;
 const LATEST_SLICE_GRACE_PERIOD = 2 * MINUTE;

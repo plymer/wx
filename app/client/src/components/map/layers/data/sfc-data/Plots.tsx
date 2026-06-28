@@ -31,7 +31,7 @@ export const Plots = ({ frameTime }: { frameTime: number }) => {
         key="plot-data"
         type="vector"
         tiles={[tileUrl]}
-        maxzoom={9}
+        maxzoom={8}
         minzoom={2}
       >
         {/* Wind barbs */}
