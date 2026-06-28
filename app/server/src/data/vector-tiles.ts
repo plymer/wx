@@ -15,13 +15,13 @@ import { PAYLOAD_TYPE } from "../config/tiles/index.js";
 import type { StationPlotPopupData } from "../lib/types.js";
 import { generateTiles } from "./tiles/index.js";
 
-import fs from "fs/promises";
+// import fs from "fs/promises";
 
-const generateTestCsvData = async (tupleData: Tuple2DWithValue[]) => {
-  const csvLines = tupleData.map(([lon, lat, value]) => `${lon},${lat},${value}`);
+// const generateTestCsvData = async (tupleData: Tuple2DWithValue[]) => {
+//   const csvLines = tupleData.map(([lon, lat, value]) => `${lon},${lat},${value}`);
 
-  await fs.writeFile("/home/ryan/webdev/march-2d/src/barnes/input.csv", csvLines.join("\n"), "utf-8");
-};
+//   await fs.writeFile("/home/ryan/webdev/march-2d/src/barnes/input.csv", csvLines.join("\n"), "utf-8");
+// };
 
 type IsolineInputDataPoint = {
   lat: number;
@@ -200,7 +200,7 @@ export async function generateIsolines({
       [],
     );
 
-    generateTestCsvData(dataToInterpolate);
+    // generateTestCsvData(dataToInterpolate);
 
     const baseResolution = 2048;
 
