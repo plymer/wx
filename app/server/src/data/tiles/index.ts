@@ -300,7 +300,7 @@ export async function generateTiles(
 ) {
   type ZoomLevel = "min" | "med" | "max";
 
-  console.info("\x1b[37m%s\x1b[0m", `ℹ️ Starting tile generation for layers: ${Object.keys(data).join(", ")}`);
+  // console.info("\x1b[37m%s\x1b[0m", `ℹ️ Starting tile generation for layers: ${Object.keys(data).join(", ")}`);
 
   const now = new Date().getTime();
 
@@ -395,10 +395,10 @@ export async function generateTiles(
 
       const layer = layerName as PayloadType;
 
-      console.log(
-        "\x1b[34m%s\x1b[0m",
-        `Clustering layer '${layer}' with ${featureCollection.features.length} features...`,
-      );
+      // console.log(
+      //   "\x1b[34m%s\x1b[0m",
+      //   `Clustering layer '${layer}' with ${featureCollection.features.length} features...`,
+      // );
 
       acc[layer] = buildSliceClusterIndexes(flattenToPoints(featureCollection), layer, clusterConfig[layer]);
 
@@ -526,7 +526,6 @@ export async function generateTiles(
   const duration = ((endTime - startTime) / 1000).toFixed(2);
 
   console.log(
-    "\x1b[32m%s\x1b[0m",
-    `🏁 Wrote ${emittedTiles} vector tiles (z${MIN_ZOOM}-z${MAX_ZOOM}) to '${rootDir}' in ${duration} seconds.`,
+    `[VECTOR-TILES] ${emittedTiles} vector tiles (z${MIN_ZOOM}-z${MAX_ZOOM}) to '${rootDir}' in ${duration} seconds.`,
   );
 }

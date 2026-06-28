@@ -29,7 +29,7 @@ export const AlertsModal = ({ alerts }: Props) => {
               <div key={index} className="pb-2 not:last-of-type:border-b not:last-of-type:border-white">
                 <h1 className="font-bold text-lg flex justify-center place-items-center gap-2">
                   <AlertTriangle />
-                  {alert.alertBannerText}
+                  {alert.bannerText}
                 </h1>
                 <h3 className="my-1 text-xs text-center">{alert.issueTimeText}</h3>
                 <p className="whitespace-pre-wrap text-sm">{alert.text}</p>

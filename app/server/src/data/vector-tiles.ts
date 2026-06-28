@@ -15,6 +15,14 @@ import { PAYLOAD_TYPE } from "../config/tiles/index.js";
 import type { StationPlotPopupData } from "../lib/types.js";
 import { generateTiles } from "./tiles/index.js";
 
+import fs from "fs/promises";
+
+const generateTestCsvData = async (tupleData: Tuple2DWithValue[]) => {
+  const csvLines = tupleData.map(([lon, lat, value]) => `${lon},${lat},${value}`);
+
+  await fs.writeFile("/home/ryan/webdev/march-2d/src/barnes/input.csv", csvLines.join("\n"), "utf-8");
+};
+
 type IsolineInputDataPoint = {
   lat: number;
   lon: number;
@@ -192,6 +200,8 @@ export async function generateIsolines({
       [],
     );
 
+    generateTestCsvData(dataToInterpolate);
+
     const baseResolution = 2048;
 
     const fc = tupleArrayToGeoJSON(dataToInterpolate, "isolines", {
@@ -266,21 +276,21 @@ export async function generateVectorTiles<
     (obs.createdAt ?? obs.validTime).getTime();
 
   try {
-    const startTime = performance.now();
-    console.log("\x1b[0m%s\x1b[0m", "ℹ️ Info: Fetching data from the database...");
+    // const startTime = performance.now();
+    // console.log("\x1b[0m%s\x1b[0m", "ℹ️ Info: Fetching data from the database...");
     surfaceData = await fetchSurfaceData({
       db,
       order: "asc",
       lastUpdatedTime: surfaceDataUpdatedId,
       hours: 4,
     });
-    const endTime = performance.now();
-    const duration = ((endTime - startTime) / 1000).toFixed(2);
+    // const endTime = performance.now();
+    // const duration = ((endTime - startTime) / 1000).toFixed(2);
 
-    console.log(
-      "\x1b[32m%s\x1b[0m",
-      `✅ Success: Fetched ${surfaceData.length} records from the database in ${duration} seconds`,
-    );
+    // console.log(
+    //   "\x1b[32m%s\x1b[0m",
+    //   `✅ Success: Fetched ${surfaceData.length} records from the database in ${duration} seconds`,
+    // );
   } catch (error) {
     console.error("\x1b[31m%s\x1b[0m", "❌ Error: Failed while creating payload files:\n\n", (error as Error).stack);
     process.exit(1);
@@ -288,9 +298,9 @@ export async function generateVectorTiles<
 
   try {
     const generatePayload = async (payloadType: PayloadType) => {
-      const startTime = performance.now();
+      // const startTime = performance.now();
 
-      console.log("\x1b[0m%s\x1b[0m", `ℹ️ Info: Starting ${payloadType.toUpperCase()} payload generation...`);
+      // console.log("\x1b[0m%s\x1b[0m", `ℹ️ Info: Starting ${payloadType.toUpperCase()} payload generation...`);
 
       switch (payloadType as PayloadType) {
         case "plot": {
@@ -414,9 +424,9 @@ export async function generateVectorTiles<
             });
           });
 
-          console.log(
-            `[POPUP] refresh summary: metarSites=${popupSitesWithFreshMetars.size} tafOnlySites=${tafOnlyRefreshCount} totalUpdates=${popupData.length}`,
-          );
+          // console.log(
+          //   `[POPUP] refresh summary: metarSites=${popupSitesWithFreshMetars.size} tafOnlySites=${tafOnlyRefreshCount} totalUpdates=${popupData.length}`,
+          // );
 
           const data: FeatureCollection<Point> = {
             type: "FeatureCollection",
@@ -595,13 +605,13 @@ export async function generateVectorTiles<
         default:
           console.info(`ℹ️ No generation logic implemented for payload type '${payloadType}', skipping...`);
       }
-      const endTime = performance.now();
-      const duration = ((endTime - startTime) / 1000).toFixed(2);
+      // const endTime = performance.now();
+      // const duration = ((endTime - startTime) / 1000).toFixed(2);
 
-      console.log(
-        "\x1b[32m%s\x1b[0m",
-        `✅ Success: ${payloadType.toUpperCase()} payload generated in ${duration} seconds`,
-      );
+      // console.log(
+      //   "\x1b[32m%s\x1b[0m",
+      //   `✅ Success: ${payloadType.toUpperCase()} payload generated in ${duration} seconds`,
+      // );
     };
 
     const parallelPayloadTypes = PAYLOAD_TYPE.filter(
@@ -622,7 +632,7 @@ export async function generateVectorTiles<
       tileSetName: "realtime",
     });
 
-    console.log("\x1b[35m%s\x1b[0m", "🚀 Complete: All payload files generated successfully!");
+    // console.log("\x1b[35m%s\x1b[0m", "🚀 Complete: All payload files generated successfully!");
   } catch (error) {
     throw new Error(`\x1b[31m%s\x1b[0m❌ Error: Failed while creating payload files:\n\n ${(error as Error).stack}`);
   }

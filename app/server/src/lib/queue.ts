@@ -72,11 +72,6 @@ export class TaskQueue {
           runnableIndex = i;
           break;
         }
-
-        // Only log for the head item to avoid noisy repeated logs while scanning.
-        if (i === 0) {
-          console.log(`[QUEUE] Delaying #${candidate.id} ${candidate.name} (blocked by ${[...blockers].join(", ")})`);
-        }
       }
 
       if (runnableIndex === -1) {

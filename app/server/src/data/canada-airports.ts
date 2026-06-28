@@ -170,7 +170,6 @@ export async function scrapeWiki() {
   const results = await Promise.allSettled(
     Array.from(Object.entries(PROVINCES)).map(async (p) => {
       const [code, name] = p;
-      console.log(`Scraping ${name}...`);
       try {
         const features = await scrapeProvince(code, name);
 
@@ -186,7 +185,6 @@ export async function scrapeWiki() {
   for (const provinceList of results) {
     if (provinceList.status === "fulfilled") {
       const values = provinceList.value;
-      console.log(`[STATIONS] Inserting ${values.length} stations...`);
 
       // insert the station data, or update each station if it already exists
       await Promise.allSettled(
@@ -207,6 +205,4 @@ export async function scrapeWiki() {
       );
     }
   }
-
-  console.log(`[STATIONS] Done updating stations from WikiPedia.`);
 }

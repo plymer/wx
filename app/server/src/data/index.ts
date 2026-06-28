@@ -54,12 +54,11 @@ async function main() {
   const elapsedMs = Math.round(performance.now() - startedAt);
 
   console.log(
-    `[DATA] Summary: total=${tasks.length} succeeded=${tasks.length - failures.length} failed=${failures.length} elapsed=${elapsedMs}ms`,
+    `[DATA] Data Cycle Complete\nSucceeded: ${tasks.length - failures.length}/${tasks.length} ✅\nFailed: ${failures.length}/${tasks.length} ❌\nTime: ${elapsedMs}ms ⏱️`,
   );
 
   if (failures.length > 0) {
-    console.error(`[DATA] Completed with ${failures.length} task failure(s).`);
-    process.exit(1);
+    console.warn(`[DATA] ❌ Failed Tasks: ${failures.join(", ")}`);
   }
 
   process.exit(0);

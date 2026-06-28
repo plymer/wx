@@ -1,7 +1,6 @@
 // custom type definitions
 
 import { ANIM_CONTROLS, ANIMATION_STATES } from "../config/animation";
-import { API_CONFIG } from "../config/api";
 import { AVIATION_PRODUCTS } from "../config/aviationProducts";
 import { LAYER_TABS, MAP_LINES, MAP_PROJECTIONS, ZOOM_THRESHOLDS } from "../config/map";
 import { APP_MODES_LIST } from "../config/modes";
@@ -40,10 +39,6 @@ export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 export type IIMT<T, D extends string> = {
   [K in keyof T]: Prettify<{ [P in D]: K } & T[K]>;
 }[keyof T];
-
-// helper types for API configuration
-export type EndpointParams = keyof (typeof API_CONFIG)["endpoints"][number];
-export type EndpointUrls = (typeof API_CONFIG)["endpoints"][number]["url"];
 
 // use this to build the IIMT for API responses
 type ApiReponses<TData> = {

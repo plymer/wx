@@ -78,7 +78,7 @@ export async function getMetars<TSchema extends Record<string, SQLiteTableWithCo
       })
       .filter((entry) => entry !== undefined);
 
-    console.log(`[METAR] Inserting ${output.length} METARs...`);
+    // console.log(`[METAR] Inserting ${output.length} METARs...`);
 
     // console.log("METAR Data Keys:", Array.from(dataKeys).sort());
 
@@ -106,13 +106,13 @@ export async function getMetars<TSchema extends Record<string, SQLiteTableWithCo
       }),
     );
 
-    console.log(`[METAR] Cleaning up old data...`);
+    // console.log(`[METAR] Cleaning up old data...`);
     // now clean up the database and remove any metars older than 96 hours
     await db.delete(metars).where(lt(metars.validTime, new Date(Date.now() - 96 * HOUR)));
 
-    console.log(`[METAR] Cleanup complete.`);
+    // console.log(`[METAR] Cleanup complete.`);
 
-    console.log(`[METAR] Cache file processing complete.`);
+    // console.log(`[METAR] Cache file processing complete.`);
   } catch (error) {
     throw new Error(`[METAR] Error processing cache file: ${(error as Error).message}`);
   }

@@ -91,17 +91,7 @@ export async function getAqData<TSchema extends Record<string, SQLiteTableWithCo
     }),
   );
 
-  console.log(`[AQ Data] Inserted ${rows.length} rows into the database.`);
-
-  console.log(`[AQ Data] Cleaning up out of date records...`);
-
-  const holdHours = 4;
-  const cleanUpTime = new Date(now.getTime() - holdHours * HOUR);
-
-  const toDelete = (await db.select().from(aqData).where(lt(aqData.validTime, cleanUpTime))).length;
+  const cleanUpTime = new Date(now.getTime() - 4 * HOUR);
 
   await db.delete(aqData).where(lt(aqData.validTime, cleanUpTime));
-
-  console.log(`[AQ Data] Deleted ${toDelete} out of date records.`);
-  console.log(`[AQ Data] Process complete; exiting.`);
 }

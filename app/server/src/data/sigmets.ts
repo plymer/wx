@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { gt, lt, Relations } from "drizzle-orm";
 import { sigmets } from "../db/tables/data.drizzle.js";
-import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, HOUR } from "../lib/constants.js";
+import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../lib/types.js";
 import { cardinalToDegrees, generateDbConnection, readGzipFile, xmlParser } from "../lib/utils.js";
 import { airSigmetsSchema } from "../lib/validation.js";
@@ -115,7 +115,7 @@ export async function getSigmets<TSchema extends Record<string, SQLiteTableWithC
   // find which SIGMETs are still active in the DB so we can diff the AWC API response against them
   const activeInDb = recentSigmets.filter((s) => s.endTime > now);
 
-  const intlData = await fetch(`${avwxApi}isigmet?format=json`, { headers: { "User-Agent": "prairiewx/1.0" } })
+  const intlData = await fetch(`${avwxApi}isigmet?format=json`, { headers: DEFAULT_REMOTE_HEADERS })
     .then((response) => {
       if (!response.ok) {
         throw new Error(
@@ -291,16 +291,16 @@ export async function getSigmets<TSchema extends Record<string, SQLiteTableWithC
         await db.insert(sigmets).values(sigmet).onConflictDoNothing();
       }),
     );
-    console.log(`[SIGMET] Inserted/updated ${data.length} SIGMETs.`);
+    // console.log(`[SIGMET] Inserted/updated ${data.length} SIGMETs.`);
   } catch (error) {
     throw new Error(`[SIGMET] Could not insert SIGMETs into the database: ${(error as Error).message}`);
   }
 
-  console.log(`[SIGMET] Cleaning up old data...`);
+  // console.log(`[SIGMET] Cleaning up old data...`);
 
   try {
     await db.delete(sigmets).where(lt(sigmets.endTime, new Date(Date.now() - 12 * HOUR)));
-    console.log(`[SIGMET] Old data cleanup complete.`);
+    // console.log(`[SIGMET] Old data cleanup complete.`);
   } catch (error) {
     throw new Error(`[SIGMET] Could not clean up old SIGMETs in the database: ${(error as Error).message}`);
   }

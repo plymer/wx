@@ -526,7 +526,7 @@ export const updateCache = async (
       await setlastUpdatedTime("popup", lastUpdatedTime);
 
       const output = await getPopupCache();
-      console.log(`✅ Cache for '${cacheType}' updated successfully.`);
+      // console.log(`✅ Cache for '${cacheType}' updated successfully.`);
       return output;
     } catch (err) {
       console.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
@@ -569,7 +569,7 @@ export const updateCache = async (
       await setlastUpdatedTime(cacheType, lastUpdatedTime);
 
       const output = await getSurfacePlotCache();
-      console.log(`✅ Cache for '${cacheType}' updated successfully.`);
+      // console.log(`✅ Cache for '${cacheType}' updated successfully.`);
       return output;
     } catch (err) {
       console.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
@@ -632,7 +632,7 @@ export const updateCache = async (
       await setlastUpdatedTime(cacheType, lastUpdatedTime);
 
       const output = await getClusteredPointCache(cacheType);
-      console.log(`✅ Cache for '${cacheType}' updated successfully.`);
+      // console.log(`✅ Cache for '${cacheType}' updated successfully.`);
       return output;
     } catch (err) {
       console.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
@@ -688,7 +688,7 @@ export const updateCache = async (
       await setlastUpdatedTime(cacheType, lastUpdatedTime);
 
       const output = await getIsolineCache(cacheType);
-      console.log(`✅ Cache for '${cacheType}' updated successfully.`);
+      // console.log(`✅ Cache for '${cacheType}' updated successfully.`);
       return output;
     } catch (err) {
       console.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
@@ -718,7 +718,7 @@ export const updateCache = async (
     console.error(`❌ [Redis Save Failed] ${cacheType}: ${err instanceof Error ? err.message : String(err)}`);
   }
 
-  console.log(`✅ Cache for '${cacheType}' updated successfully.`);
+  // console.log(`✅ Cache for '${cacheType}' updated successfully.`);
   return output;
 };
 

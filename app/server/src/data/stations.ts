@@ -52,8 +52,6 @@ export async function buildStationCatalog() {
       })
       .filter((entry) => entry !== undefined); // filter out any undefined entries
 
-    console.log(`[STATION] Inserting ${output.length} stations...`);
-
     // insert the station data, or update each station if it already exists
     await Promise.allSettled(
       output.map(async (station) => {
@@ -74,8 +72,6 @@ export async function buildStationCatalog() {
           });
       }),
     );
-
-    console.log(`[STATION] Cache file processing complete.`);
   } catch (error) {
     console.error(`[STATION] Error processing station cache file: ${(error as Error).message}`);
     process.exit(1);
@@ -87,5 +83,4 @@ export async function buildStationCatalog() {
     console.error(`[STATION] Error scraping Canadian Sites from Wikipedia: ${(error as Error).message}`);
     process.exit(1);
   }
-  process.exit(0);
 }

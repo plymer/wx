@@ -28,7 +28,7 @@ export async function getPublicAlerts() {
     // write the data to a local file for caching
     await fs.writeFile(destination, JSON.stringify(alertsGeoJSON));
 
-    console.log(`[WXO] [ALERTS] Public alerts data successfully fetched and saved to ${destination}`);
+    // console.log(`[WXO] [ALERTS] Public alerts data successfully fetched and saved to ${destination}`);
   } catch (error) {
     console.error(`[WXO] [ALERTS] Error fetching public alerts: ${error}`);
     return;

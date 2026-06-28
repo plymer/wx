@@ -41,8 +41,6 @@ export async function getLightning<TSchema extends Record<string, SQLiteTableWit
 
   const urlList = bins.map((ts) => `https://weather.gc.ca/api/app/v2/Lightning/1/${ts}`);
 
-  console.log(`[LIGHTNING] Polling for strikes at ${bins.join(", ")}`);
-
   try {
     const responses = (
       await Promise.all(
@@ -50,7 +48,7 @@ export async function getLightning<TSchema extends Record<string, SQLiteTableWit
           fetch(url, { headers: DEFAULT_REMOTE_HEADERS })
             .then((res) => res.json() as Promise<LightningFC>)
             .catch((err) => {
-              console.error(`Error fetching data from ${url}:`, err.message);
+              console.error(`[LIGHTNING] Error when fetching data from ${url}:`, err.message);
               return null;
             }),
         ),
@@ -69,7 +67,7 @@ export async function getLightning<TSchema extends Record<string, SQLiteTableWit
         const strikeCoords = features
           .map((f) => {
             if (f.geometry.type !== "Point") {
-              throw new Error("Lightning feature not type 'Point'");
+              throw new Error("[LIGHTNING] Error: Lightning feature not type 'Point'");
             }
             return f.geometry.coordinates.join(",");
           })
@@ -85,14 +83,8 @@ export async function getLightning<TSchema extends Record<string, SQLiteTableWit
       }),
     );
 
-    const { changes } = await db
-      .delete(lightningData)
-      .where(lt(lightningData.dateFrom, new Date(new Date().getTime() - 4 * HOUR)));
-
-    console.log(`[LIGHTNING] Cleaned up ${changes} old lightning entries`);
-
-    console.log(`[LIGHTNING] Latest strikes updated for ${previousBin.toISOString()} - ${currentBin.toISOString()}`);
+    await db.delete(lightningData).where(lt(lightningData.dateFrom, new Date(new Date().getTime() - 4 * HOUR)));
   } catch (error) {
-    throw new Error(`Error fetching lightning: ${(error as Error).stack}`);
+    throw new Error(`[LIGHTNING] Error: ${(error as Error).stack}`);
   }
 }
