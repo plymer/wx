@@ -36,15 +36,14 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
     type: "FeatureCollection",
     features: data.filter((feature) => {
       // filter out features that don't have a validTime property
-      if (!feature.properties?.validTime) return false;
+      if (!feature.properties?.validTime || !feature.properties.pm25 || feature.properties.pm25 < 20) return false;
 
       // otherwise, filter based on the validTime property
       const validTime = feature.properties.validTime;
-      // show twice as much data in the last frame to make sure it isn't blank
-      const lastTimeStep = new Date(
-        frame === lastFrame ? displayTime - 30 * MINUTE : displayTime - 15 * MINUTE,
-      ).toISOString() as unknown as Date;
-      const displayTimeDate = new Date(displayTime).toISOString() as unknown as Date;
+
+      // for the latest frame of data, expand our valid window to 90 minutes to ensure we catch obs from last hour
+      const lastTimeStep = new Date(displayTime - 90 * MINUTE);
+      const displayTimeDate = new Date(displayTime);
 
       return validTime < displayTimeDate && validTime >= lastTimeStep;
     }),
@@ -53,12 +52,13 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
   return (
     <>
       <Source
+        key={`aq-data`}
         attribution={AQ_ATTRIBUTION["en"]}
         type="geojson"
         data={filteredData}
         id="aq-data-clusters"
         cluster={true}
-        clusterRadius={50}
+        clusterRadius={25}
         clusterProperties={{
           max_pm25: ["max", ["get", "pm25"]],
         }}
@@ -73,7 +73,7 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
             "text-size": 12,
             "text-font": ["Consolas-Regular"],
             "text-anchor": "center",
-            "text-allow-overlap": false,
+            "text-allow-overlap": true,
             "symbol-sort-key": ["get", "validTime"],
           }}
           paint={{
