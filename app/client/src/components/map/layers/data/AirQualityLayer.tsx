@@ -2,7 +2,7 @@ import { Layer, Source } from "react-map-gl/maplibre";
 import type { FeatureCollection } from "geojson";
 
 import { AQ_ATTRIBUTION, AQ_DISPLAY } from "@/config/vectorData";
-import { useFrame, useFrameCount } from "@/stateStores/map/animation";
+
 import { MINUTE } from "@shared/lib/constants";
 import { useShowAQ } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
@@ -17,8 +17,6 @@ interface Props {
 export const AirQualityLayer = ({ belowLayer }: Props) => {
   const enabled = useShowAQ();
 
-  const frame = useFrame();
-  const lastFrame = useFrameCount() - 1;
   const displayTime = useDisplayTime();
 
   const { data, isFetching } = useQuery(
