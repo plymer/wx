@@ -36,7 +36,7 @@ async function main() {
       run: () => generateVectorTiles(db),
       schedule: "* * * * *",
       dependsOn: ["TAFs", "METARs", "Lightning"],
-      enabled: false,
+      enabled: true,
     },
     { name: "PIREPs", run: () => getPireps(db), schedule: "* * * * *", enabled: false },
     { name: "SIGMETs", run: () => getSigmets(db), schedule: "* * * * *", enabled: true },

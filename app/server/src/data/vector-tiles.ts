@@ -565,43 +565,43 @@ export async function generateVectorTiles<
 
           break;
         }
-        case "isotherm": {
-          try {
-            const { data: popupCacheData, lastUpdatedTime: popupCachelastUpdatedTime } = await getCache("popup");
-            const popupFeatures = popupCacheData.features as Feature<Point, StationPlotPopupData>[];
-            const isolineInputData = getIsolineInputFromPopupFeatures(popupFeatures);
+        // case "isotherm": {
+        //   try {
+        //     const { data: popupCacheData, lastUpdatedTime: popupCachelastUpdatedTime } = await getCache("popup");
+        //     const popupFeatures = popupCacheData.features as Feature<Point, StationPlotPopupData>[];
+        //     const isolineInputData = getIsolineInputFromPopupFeatures(popupFeatures);
 
-            const features = await generateIsolines({
-              startTime: Date.now(),
-              field: "tt",
-              fieldInterval: 5,
-              data: isolineInputData,
-              interpolationSearchRadius: [0.5, 1.0],
-            });
+        //     const features = await generateIsolines({
+        //       startTime: Date.now(),
+        //       field: "tt",
+        //       fieldInterval: 5,
+        //       data: isolineInputData,
+        //       interpolationSearchRadius: [0.5, 1.0],
+        //     });
 
-            const data: FeatureCollection = {
-              type: "FeatureCollection",
-              features,
-            };
+        //     const data: FeatureCollection = {
+        //       type: "FeatureCollection",
+        //       features,
+        //     };
 
-            const updatedCache = await updateCache(
-              data,
-              popupCachelastUpdatedTime,
-              payloadType,
-              new Date(Date.now() - (3 * HOUR + 10 * MINUTE)),
-            );
+        //     const updatedCache = await updateCache(
+        //       data,
+        //       popupCachelastUpdatedTime,
+        //       payloadType,
+        //       new Date(Date.now() - (3 * HOUR + 10 * MINUTE)),
+        //     );
 
-            featureCollectionsByType[payloadType] = updatedCache.data as FeatureCollection<Point | LineString>;
-          } catch (error) {
-            console.error(
-              "\x1b[31m%s\x1b[0m",
-              `❌ Error: Failed to generate ${payloadType.toUpperCase()} payload:\n\n`,
-              (error as Error).stack,
-            );
-          }
+        //     featureCollectionsByType[payloadType] = updatedCache.data as FeatureCollection<Point | LineString>;
+        //   } catch (error) {
+        //     console.error(
+        //       "\x1b[31m%s\x1b[0m",
+        //       `❌ Error: Failed to generate ${payloadType.toUpperCase()} payload:\n\n`,
+        //       (error as Error).stack,
+        //     );
+        //   }
 
-          break;
-        }
+        //   break;
+        // }
         default:
           console.info(`ℹ️ No generation logic implemented for payload type '${payloadType}', skipping...`);
       }
@@ -621,9 +621,13 @@ export async function generateVectorTiles<
     await Promise.all(parallelPayloadTypes.map((payloadType) => generatePayload(payloadType)));
 
     // Isobars depend on popup cache contents, so run them only after popup update is finished.
-    if (PAYLOAD_TYPE.includes("isobar") || PAYLOAD_TYPE.includes("isotherm")) {
+    // if (PAYLOAD_TYPE.includes("isobar") || PAYLOAD_TYPE.includes("isotherm")) {
+    //   await generatePayload("isobar");
+    //   await generatePayload("isotherm");
+    // }
+
+    if (PAYLOAD_TYPE.includes("isobar")) {
       await generatePayload("isobar");
-      await generatePayload("isotherm");
     }
 
     await ensureStationListCache();
