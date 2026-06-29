@@ -18,6 +18,7 @@ import { getLightning } from "./lightning.js";
  */
 async function main() {
   const MAX_CONCURRENCY = 2;
+  const MAX_RUN_TIME_MS = 55 * 1000;
 
   const db = await generateDbConnection({ ...schemas, ...relations }, "data");
 
@@ -49,7 +50,16 @@ async function main() {
   );
   const startedAt = performance.now();
 
+  // enforce a hard timeout after 55 seconds to avoid overlap and OOM errors
+  const abortTimeout = setTimeout(() => {
+    console.error(`[DATA] Aborting refresh after ${MAX_RUN_TIME_MS}ms max runtime.`);
+    process.exit(1);
+  }, MAX_RUN_TIME_MS);
+
   const results = await Promise.allSettled(tasks.map((task) => queue.push(task.name, task.run, task.dependsOn)));
+
+  clearTimeout(abortTimeout); // clear the timeout when we finish all tasks
+
   const failures = results.filter((result) => result.status === "rejected");
   const elapsedMs = Math.round(performance.now() - startedAt);
 
