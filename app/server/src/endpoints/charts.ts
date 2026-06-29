@@ -266,6 +266,7 @@ export const chartsRouter = router({
   }),
   swo: publicProcedure.query(async (): Promise<OutlookData | null> => {
     try {
+      console.log("[API] Loading sigwx outlooks");
       return outlookHandler("swo");
     } catch (error) {
       throw new TRPCError({
@@ -276,6 +277,7 @@ export const chartsRouter = router({
   }),
   tso: publicProcedure.query(async (): Promise<OutlookData | null> => {
     try {
+      console.log("[API] Loading thunderstorm outlooks");
       return outlookHandler("tso");
     } catch (error) {
       throw new TRPCError({
