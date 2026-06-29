@@ -1,6 +1,7 @@
 import { publicProcedure, router } from "../lib/trpc.js";
 import * as fs from "fs/promises";
 import * as path from "path";
+import { HOUR } from "../lib/constants.js";
 
 export const globalMessageRouter = router({
   get: publicProcedure.query(async () => {
@@ -30,7 +31,9 @@ export const globalMessageRouter = router({
 
     const currentMessage = messages.length > 0 ? messages[0] : null;
 
-    const output = currentMessage
+    const messageNotExpired = currentMessage && new Date(currentMessage.timestamp).getTime() + 4 * HOUR > Date.now();
+
+    const output = messageNotExpired
       ? {
           title: currentMessage.title,
           message: currentMessage.message,
