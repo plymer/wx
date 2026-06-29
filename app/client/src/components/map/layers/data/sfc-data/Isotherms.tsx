@@ -1,3 +1,4 @@
+import { REALTIME_TILE_ZOOMS } from "@/config/map";
 import { useRealtimeTilesUrl } from "@/hooks/useRealtimeTilesUrl";
 import { useShowIsotherms } from "@/stateStores/map/vectorData";
 import type { FilterSpecification } from "maplibre-gl";
@@ -20,7 +21,13 @@ export const Isotherms = ({ frameTime }: Props) => {
   if (!enabled) return null;
 
   return (
-    <Source id="sfc-obs-isotherms" type="vector" tiles={[tileUrl]} maxzoom={8} minzoom={2}>
+    <Source
+      id="sfc-obs-isotherms"
+      type="vector"
+      tiles={[tileUrl]}
+      maxzoom={REALTIME_TILE_ZOOMS.MAX}
+      minzoom={REALTIME_TILE_ZOOMS.MIN}
+    >
       <Layer
         id="layer-sfc-obs-isotherms"
         type="line"

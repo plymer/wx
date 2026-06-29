@@ -6,6 +6,7 @@ import { useDisplayTime } from "@/hooks/useDisplayTime";
 
 import { useRealtimeTilesUrl } from "@/hooks/useRealtimeTilesUrl";
 import type { FilterSpecification } from "maplibre-gl";
+import { REALTIME_TILE_ZOOMS } from "@/config/map";
 
 interface Props {
   belowLayer?: string;
@@ -33,8 +34,8 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
         key="lightning-data-source"
         tiles={[tileUrl]}
         id="lightning-data"
-        maxzoom={9}
-        minzoom={2}
+        maxzoom={REALTIME_TILE_ZOOMS.MAX}
+        minzoom={REALTIME_TILE_ZOOMS.MIN}
       >
         <Layer
           source-layer="lightning"

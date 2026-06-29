@@ -437,7 +437,7 @@ export function outlookHandler(product: string) {
   for (const entry of officeDir) {
     if (!entry.isFile()) continue;
 
-    const [, office, region, validPeriod] =
+    const [_, office, region, validPeriod] =
       entry.name.match(/([a-zA-Z]+)(?:-)([0-9a-zA-z_-]+)(?:-)([0-9a-zA-z_]+)/) || [];
 
     // use zod to validate our office and region values, and to transform them into the correct format if necessary (lowercasing them and comparing them against the lookups in our config)

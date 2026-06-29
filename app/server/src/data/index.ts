@@ -44,7 +44,7 @@ async function main() {
     { name: "AQ Data", run: () => getAqData(db), schedule: "*/10 * * * *", enabled: true },
 
     { name: "Station Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *", enabled: true },
-  ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
+  ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour) && task.enabled); // filter by cron schedule and enabled flag
 
   console.log(
     `[DATA] Starting data refresh (tasks: ${tasks.length} / max concurrent ${MAX_CONCURRENCY}) - ${tasks.map((t) => t.name).join(", ")}`,
@@ -57,9 +57,7 @@ async function main() {
     process.exit(1);
   }, MAX_RUN_TIME_MS);
 
-  const results = await Promise.allSettled(
-    tasks.map((task) => queue.push(task.name, task.run, task.enabled, task.dependsOn)),
-  );
+  const results = await Promise.allSettled(tasks.map((task) => queue.push(task.name, task.run, task.dependsOn)));
 
   clearTimeout(abortTimeout); // clear the timeout when we finish all tasks
 

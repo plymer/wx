@@ -1,4 +1,4 @@
-import { ZOOM_THRESHOLDS } from "@/config/map";
+import { REALTIME_TILE_ZOOMS, ZOOM_THRESHOLDS } from "@/config/map";
 import { CAT_COLOURS, ICON_SIZES, STATION_TEXT_STYLE, WINDBARB_COLOURS } from "@/config/stationPlots";
 import { AWC_ATTRIBUTION } from "@/config/vectorData";
 
@@ -31,8 +31,8 @@ export const Plots = ({ frameTime }: { frameTime: number }) => {
         key="plot-data"
         type="vector"
         tiles={[tileUrl]}
-        maxzoom={8}
-        minzoom={2}
+        maxzoom={REALTIME_TILE_ZOOMS.MAX}
+        minzoom={REALTIME_TILE_ZOOMS.MIN}
       >
         {/* Wind barbs */}
         <Layer

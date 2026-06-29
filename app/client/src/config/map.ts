@@ -10,3 +10,5 @@ export const MAP_LINES = ["gfa", "lgf", "fir", "tafs", "bedposts", "publicRegion
 export const LAYER_TABS = ["satellite", "radar", "other", "projection", "overlays"] as const;
 
 export const ZOOM_THRESHOLDS = { mini: 2.25, reduced: 4.5, medium: 6, maximum: 8 } as const;
+
+export const REALTIME_TILE_ZOOMS = { MIN: 2, MAX: 8 } as const;

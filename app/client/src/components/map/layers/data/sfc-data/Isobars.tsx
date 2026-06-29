@@ -1,3 +1,4 @@
+import { REALTIME_TILE_ZOOMS } from "@/config/map";
 import { useRealtimeTilesUrl } from "@/hooks/useRealtimeTilesUrl";
 import { useShowIsobars } from "@/stateStores/map/vectorData";
 import type { FilterSpecification } from "maplibre-gl";
@@ -24,7 +25,14 @@ export const Isobars = ({ frameTime }: { frameTime: number }) => {
 
   return (
     <>
-      <Source key={`sfc-obs-isobars`} id={`sfc-obs-isobars`} type="vector" tiles={[tileUrl]} maxzoom={8} minzoom={2}>
+      <Source
+        key={`sfc-obs-isobars`}
+        id={`sfc-obs-isobars`}
+        type="vector"
+        tiles={[tileUrl]}
+        maxzoom={REALTIME_TILE_ZOOMS.MAX}
+        minzoom={REALTIME_TILE_ZOOMS.MIN}
+      >
         <Layer
           id={`layer-sfc-obs-isobars`}
           source-layer="isobar"

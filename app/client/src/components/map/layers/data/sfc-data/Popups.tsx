@@ -1,4 +1,4 @@
-import { ZOOM_THRESHOLDS } from "@/config/map";
+import { REALTIME_TILE_ZOOMS, ZOOM_THRESHOLDS } from "@/config/map";
 
 import { useRealtimeTilesUrl } from "@/hooks/useRealtimeTilesUrl";
 
@@ -18,7 +18,13 @@ export const Popups = ({ zoom }: Props) => {
   if (!enabled) return null;
 
   return (
-    <Source id="sfc-obs-interactive-target" type="vector" tiles={[tileUrl]} maxzoom={8} minzoom={2}>
+    <Source
+      id="sfc-obs-interactive-target"
+      type="vector"
+      tiles={[tileUrl]}
+      maxzoom={REALTIME_TILE_ZOOMS.MAX}
+      minzoom={REALTIME_TILE_ZOOMS.MIN}
+    >
       {/* Interactive target (invisible circles for click detection) */}
       <Layer
         id="layer-sfc-obs-target"
