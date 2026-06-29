@@ -17,7 +17,7 @@ import { getLightning } from "./lightning.js";
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
  */
 async function main() {
-  const MAX_CONCURRENCY = 2;
+  const MAX_CONCURRENCY = 1;
   const MAX_RUN_TIME_MS = 55 * 1000;
 
   const db = await generateDbConnection({ ...schemas, ...relations }, "data");
