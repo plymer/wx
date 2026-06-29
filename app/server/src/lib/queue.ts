@@ -3,6 +3,7 @@ export type DataTask = {
   run: () => Promise<void>;
   schedule: string;
   dependsOn?: string[];
+  enabled: boolean;
 };
 
 type QueuedTask = {
@@ -27,7 +28,12 @@ export class TaskQueue {
     this.nextTaskId = 1;
   }
 
-  push(name: string, task: () => Promise<void>, dependsOn?: string[]) {
+  push(name: string, task: () => Promise<void>, enabled: boolean, dependsOn?: string[]) {
+    if (!enabled) {
+      console.log(`[QUEUE] Skipping disabled task: ${name}`);
+      return Promise.resolve();
+    }
+
     return new Promise<void>((resolve, reject) => {
       const taskId = this.nextTaskId++;
       if (dependsOn) {

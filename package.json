@@ -6,6 +6,7 @@
   "author": "Ryan Pimiskern / Rose Carlsen",
   "type": "module",
   "scripts": {
+    "format": "pnpm --filter client run format && pnpm --filter server run format",
     "check": "pnpm run check:client && pnpm run check:server",
     "check:client": "pnpm --filter client run check",
     "check:server": "pnpm --filter server run check",
