@@ -284,4 +284,18 @@ export const chartsRouter = router({
       });
     }
   }),
+  publicOutlooks: publicProcedure.query(async (): Promise<{ swo: OutlookData | null; tso: OutlookData | null }> => {
+    try {
+      console.log("[API] Loading outlooks");
+      const swo = outlookHandler("swo");
+      const tso = outlookHandler("tso");
+
+      return { swo, tso };
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
 });

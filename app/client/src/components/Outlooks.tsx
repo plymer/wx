@@ -10,20 +10,18 @@ export default function Outlooks() {
   const product = useOutlookProduct();
   const actions = useOutlookActions();
 
-  const { data: swoData } = useQuery(api.charts.swo.queryOptions());
-  const { data: tsoData } = useQuery(api.charts.tso.queryOptions());
+  const { data } = useQuery(api.charts.publicOutlooks.queryOptions());
 
-  // api returns undefined when we're still waiting on the response from the API
-  if (tsoData === undefined || swoData === undefined) return;
+  if (data === undefined) return;
 
-  const currentData = product === "swo" ? swoData : tsoData;
+  const currentData = product === "swo" ? data.swo : data.tso;
 
   return (
     <div className="bg-neutral-800 text-white min-h-(--max-avn-height) max-md:min-h-(--md-avn-height)">
       <nav className="flex justify-center items-center md:p-2 max-md:pt-2">
         <label className="me-4 max-md:hidden">Product:</label>
         <Button
-          disabled={swoData === null}
+          disabled={data.swo === null}
           className={`${
             product === "swo" ? "active" : ""
           } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md grow`}
@@ -34,7 +32,7 @@ export default function Outlooks() {
           <div className="max-lg:hidden">Significant Weather Outlook</div>
         </Button>
         <Button
-          disabled={tsoData === null}
+          disabled={data.tso === null}
           className={`${
             product === "tso" ? "active" : ""
           } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md grow`}

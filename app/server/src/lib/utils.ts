@@ -422,8 +422,6 @@ export function outlookHandler(product: string) {
     throw new Error("OUTLOOK_DIR environment variable is not set");
   }
 
-  console.log(`[API] Loading outlooks`);
-
   const dirPath = path.join(outlookRootDir, product, "today");
 
   if (!existsSync(dirPath)) {
