@@ -435,3 +435,13 @@ export type PointForecastData = {
     set: string;
   };
 };
+
+export type WxmapIsolineSlotMetadata = {
+  slot: number;
+  generatedAt: number;
+  generatedAtIso: string;
+  layers: string[];
+  emittedTiles: number;
+  minZoom: number;
+  maxZoom: number;
+};

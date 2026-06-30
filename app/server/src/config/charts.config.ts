@@ -24,6 +24,7 @@ export const OFFICE_REGION_MAP = {
   mb: "Manitoba",
   "mb-arctic": "Manitoba & Eastern Arctic",
   mk: "Mackenzie",
+  "mk-mk": "Mackenzie",
   nt: "Northwest Territories",
   nu: "Nunavut",
   prairies: "Prairies",
