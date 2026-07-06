@@ -14,4 +14,4 @@ services:
       - "8080:80"
     volumes:
       - ./tiles:/srv/tiles:ro
-      - ./ops/nginx/tiles.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/tiles.conf:/etc/nginx/conf.d/default.conf:ro
