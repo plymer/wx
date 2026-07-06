@@ -10,7 +10,7 @@ import * as relations from "./db/relations/data.relations.drizzle.js";
 
 // utilities
 import { generateDbConnection } from "./lib/utils.js";
-import { redisClient } from "./lib/redis.js";
+import { redisClient } from "./services/redis.js";
 import { publicProcedure, router } from "./lib/trpc.js";
 
 // endpoint routers

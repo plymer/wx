@@ -11,7 +11,9 @@ import * as schemas from "../db/tables/data.drizzle.js";
 import * as relations from "../db/relations/data.relations.drizzle.js";
 import { runFromCron, TaskQueue, type DataTask } from "../lib/queue.js";
 import { buildStationCatalog } from "./stations.js";
+import { redisClient } from "../services/redis.js";
 
+export const cacheClient = await redisClient("data");
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
  */
