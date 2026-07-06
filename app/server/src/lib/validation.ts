@@ -98,7 +98,7 @@ export const metarSchema = z.object({
     .number()
     .optional()
     .transform((val) => (val === undefined ? null : val)),
-  skyCondition: z.union([z.undefined(), skyObjectSchema, z.array(skyObjectSchema)]),
+  skyCondition: z.union([z.undefined(), skyObjectSchema.optional(), z.array(skyObjectSchema).optional()]),
   flightCategory: z
     .enum(["VFR", "IFR", "MVFR", "LIFR", ""])
     .optional()
@@ -149,7 +149,7 @@ const tafForecastSchema = z.object({
     .string()
     .optional()
     .transform((val) => (val === undefined ? null : val)),
-  skyCondition: z.union([z.undefined(), skyObjectSchema, z.array(skyObjectSchema)]),
+  skyCondition: z.union([z.undefined(), skyObjectSchema.optional(), z.array(skyObjectSchema).optional()]),
 });
 
 export const tafSchema = z.object({
@@ -270,5 +270,5 @@ export const outlookRegionSchema = z
   })
   .transform((val) => {
     const regionEntry = Object.keys(OFFICE_REGION_MAP).find(([, region]) => region.toLowerCase() === val);
-    return regionEntry ? regionEntry[0] : val;
+    return regionEntry ?? val;
   });
