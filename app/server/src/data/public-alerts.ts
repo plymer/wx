@@ -1,11 +1,25 @@
 import "dotenv/config";
 import * as fs from "fs/promises";
 import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
+import type {
+  WarningProperties,
+  WxOAlert,
+  WxOPolygonAlert,
+  WxOPolygonProperties,
+} from "../lib/types.js";
+import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
+import * as turf from "@turf/turf";
+import { cacheClient } from "../main.js";
+import { PUBLIC_ALERTS_CACHE_KEY } from "../config/cache-keys.config.js";
+
+type AlertsGeoJsonResponse = {
+  type: "FeatureCollection";
+  uuid: string;
+  alerts: WxOPolygonAlert;
+  features: Feature<MultiPolygon, WxOPolygonProperties>[];
+};
 
 export async function getPublicAlerts() {
-  const dataDir = process.env.STATIC_DATA_DIR || "./static-data";
-  const destination = `${dataDir}/public-alerts.json`;
-
   const sourceUrl = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.en.geojson";
 
   try {
@@ -15,20 +29,130 @@ export async function getPublicAlerts() {
     }
 
     // extract the GeoJSON from the response
-    const alertsGeoJSON = await response.json();
+    const alertsGeoJSON = (await response.json()) as AlertsGeoJsonResponse;
 
-    // ensure the data directory exists
-    const dataDirExists = await fs
-      .access(dataDir)
-      .then(() => true)
-      .catch(() => false);
+    const alerts = Object.entries(alertsGeoJSON.alerts).reduce<Record<string, WxOAlert>>(
+      (acc, [alertRef, alert]) => {
+        acc[alertRef] = alert;
+        return acc;
+      },
+      {},
+    );
 
-    if (!dataDirExists) await fs.mkdir(dataDir, { recursive: true });
+    // create new features based on the alerts that are presently active
+    // each feature may have multiple alerts associated with it, so we need to create multiple features (with the same geometry) for each alert
 
-    // write the data to a local file for caching
-    await fs.writeFile(destination, JSON.stringify(alertsGeoJSON));
+    const extractedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];
 
-    console.log(`[WXO] [ALERTS] Public alerts data successfully fetched and saved to ${destination}`);
+    alertsGeoJSON.features.forEach((feature) => {
+      const alertArray = feature.properties.alerts;
+
+      alertArray.forEach((alertObject) => {
+        const alertData = alerts[alertObject.alertRef];
+
+        const newFeature: Feature<MultiPolygon, WarningProperties> = {
+          type: "Feature",
+          geometry: feature.geometry,
+          properties: {
+            alertCode: alertData.alertCode,
+            type: alertData.type,
+            issueTime: alertData.issueTime,
+            alertNameShort: alertData.alertNameShort,
+            bannerText: alertData.bannerText,
+            eventEndTime: alertData.eventEndTime,
+            eventOnsetTime: alertData.eventOnsetTime,
+            colour: alertData.colour,
+            impact: alertData.impact,
+            confidence: alertData.confidence,
+            dataType: "publicAlert",
+          },
+        };
+
+        extractedFeatures.push(newFeature);
+      });
+    });
+
+    // now we want to dissolve all feature polygons of the same alert code into single features
+    // group features by alertCode and flatten MultiPolygons to Polygons
+    const groupedByAlertCode = extractedFeatures.reduce<
+      Record<string, Feature<Polygon, WarningProperties>[]>
+    >((acc, feature) => {
+      const alertCode = feature.properties.alertCode;
+      if (!acc[alertCode]) {
+        acc[alertCode] = [];
+      }
+
+      // flatten MultiPolygon to individual Polygons
+      const flattened = turf.flatten(feature);
+      flattened.features.forEach((f) => {
+        acc[alertCode].push({
+          type: "Feature",
+          geometry: f.geometry as Polygon,
+          properties: feature.properties,
+        });
+      });
+
+      return acc;
+    }, {});
+
+    // dissolve each group
+    const dissolvedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];
+
+    Object.entries(groupedByAlertCode).forEach(([_, features]) => {
+      const properties = features[0].properties;
+
+      if (features.length === 1) {
+        // only one polygon for this alert code, convert back to MultiPolygon
+        dissolvedFeatures.push({
+          type: "Feature",
+          geometry: {
+            type: "MultiPolygon",
+            coordinates: [features[0].geometry.coordinates],
+          },
+          properties,
+        });
+      } else {
+        // combine all polygons with the same alert code
+        const featureCollection = turf.featureCollection(features);
+        const dissolved = turf.dissolve(featureCollection, { propertyName: "alertCode" });
+
+        // convert dissolved Polygons back to MultiPolygons
+        dissolved.features.forEach((dissolvedFeature) => {
+          let geometry: MultiPolygon;
+
+          if (dissolvedFeature.geometry.type === "Polygon") {
+            geometry = {
+              type: "MultiPolygon",
+              coordinates: [dissolvedFeature.geometry.coordinates],
+            };
+          } else {
+            // dissolve can sometimes return MultiPolygon if there are disjoint areas
+            geometry = dissolvedFeature.geometry as unknown as MultiPolygon;
+          }
+
+          dissolvedFeatures.push({
+            type: "Feature",
+            geometry,
+            properties,
+          });
+        });
+      }
+    });
+
+    const dataCollection: FeatureCollection<MultiPolygon, WarningProperties> = {
+      type: "FeatureCollection",
+      features: dissolvedFeatures,
+    };
+
+    // simplify the polygons to reduce complexity, improve client performance, and reduce payload size
+    const output = turf.simplify(dataCollection, {
+      tolerance: 0.001,
+      highQuality: false,
+      mutate: true,
+    });
+
+    // add to the cache
+    await cacheClient.setEx(PUBLIC_ALERTS_CACHE_KEY, 60 * 10, JSON.stringify(output));
   } catch (error) {
     console.error(`[WXO] [ALERTS] Error fetching public alerts: ${error}`);
     return;
