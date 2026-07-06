@@ -26,6 +26,8 @@ export const aqRouter = router({
         where: gte(aqData.validTime, then),
       });
 
+      console.log(`[API] Fetched ${data.length} AQ data points from the last ${hours} hours(s).`);
+
       const geoData = data.reduce((acc: Array<Feature<Point, AirQualityData>>, item: AQData) => {
         if (!item.lat || !item.lon) {
           console.warn(`Skipping item with missing coordinates: ${JSON.stringify(item)}`);
