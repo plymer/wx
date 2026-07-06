@@ -1,12 +1,6 @@
 import "dotenv/config";
-import * as fs from "fs/promises";
 import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
-import type {
-  WarningProperties,
-  WxOAlert,
-  WxOPolygonAlert,
-  WxOPolygonProperties,
-} from "../lib/types.js";
+import type { WarningProperties, WxOAlert, WxOPolygonAlert, WxOPolygonProperties } from "../lib/types.js";
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import * as turf from "@turf/turf";
 import { cacheClient } from "../main.js";
@@ -31,13 +25,10 @@ export async function getPublicAlerts() {
     // extract the GeoJSON from the response
     const alertsGeoJSON = (await response.json()) as AlertsGeoJsonResponse;
 
-    const alerts = Object.entries(alertsGeoJSON.alerts).reduce<Record<string, WxOAlert>>(
-      (acc, [alertRef, alert]) => {
-        acc[alertRef] = alert;
-        return acc;
-      },
-      {},
-    );
+    const alerts = Object.entries(alertsGeoJSON.alerts).reduce<Record<string, WxOAlert>>((acc, [alertRef, alert]) => {
+      acc[alertRef] = alert;
+      return acc;
+    }, {});
 
     // create new features based on the alerts that are presently active
     // each feature may have multiple alerts associated with it, so we need to create multiple features (with the same geometry) for each alert
@@ -74,26 +65,27 @@ export async function getPublicAlerts() {
 
     // now we want to dissolve all feature polygons of the same alert code into single features
     // group features by alertCode and flatten MultiPolygons to Polygons
-    const groupedByAlertCode = extractedFeatures.reduce<
-      Record<string, Feature<Polygon, WarningProperties>[]>
-    >((acc, feature) => {
-      const alertCode = feature.properties.alertCode;
-      if (!acc[alertCode]) {
-        acc[alertCode] = [];
-      }
+    const groupedByAlertCode = extractedFeatures.reduce<Record<string, Feature<Polygon, WarningProperties>[]>>(
+      (acc, feature) => {
+        const alertCode = feature.properties.alertCode;
+        if (!acc[alertCode]) {
+          acc[alertCode] = [];
+        }
 
-      // flatten MultiPolygon to individual Polygons
-      const flattened = turf.flatten(feature);
-      flattened.features.forEach((f) => {
-        acc[alertCode].push({
-          type: "Feature",
-          geometry: f.geometry as Polygon,
-          properties: feature.properties,
+        // flatten MultiPolygon to individual Polygons
+        const flattened = turf.flatten(feature);
+        flattened.features.forEach((f) => {
+          acc[alertCode].push({
+            type: "Feature",
+            geometry: f.geometry as Polygon,
+            properties: feature.properties,
+          });
         });
-      });
 
-      return acc;
-    }, {});
+        return acc;
+      },
+      {},
+    );
 
     // dissolve each group
     const dissolvedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];

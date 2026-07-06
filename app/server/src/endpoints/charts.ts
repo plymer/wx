@@ -28,16 +28,12 @@ export const chartsRouter = router({
 
         if (Object.hasOwn(results, geography)) {
           Object.assign(results[geography], {
-            [subProduct]: imageFrames.map(
-              (f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`,
-            ),
+            [subProduct]: imageFrames.map((f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`),
           });
         } else {
           Object.assign(results, {
             [gfa.geography.toLowerCase()]: {
-              [subProduct]: imageFrames.map(
-                (f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`,
-              ),
+              [subProduct]: imageFrames.map((f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`),
             },
           });
         }
@@ -58,8 +54,7 @@ export const chartsRouter = router({
 
   sigwx: publicProcedure.query(async (): Promise<OtherChartData[] | undefined> => {
     try {
-      const url =
-        "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=SIG_WX//MID_LEVEL/*";
+      const url = "https://plan.navcanada.ca/weather/api/alpha/?site=CYHZ&image=SIG_WX//MID_LEVEL/*";
 
       console.log("[API] Requesting SigWx charts");
 
@@ -82,22 +77,17 @@ export const chartsRouter = router({
           });
         } else {
           Object.assign(results, {
-            [sub_geography]: imageFrames.map(
-              (f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`,
-            ),
+            [sub_geography]: imageFrames.map((f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`),
           });
         }
       });
 
       if (!Object.keys(results).length || Object.keys(results).length === 0) return undefined;
 
-      return Object.entries(results).reduce(
-        (acc: { domain: string; images: string[] }[], [domain, images]) => {
-          acc.push({ domain, images });
-          return acc;
-        },
-        [],
-      );
+      return Object.entries(results).reduce((acc: { domain: string; images: string[] }[], [domain, images]) => {
+        acc.push({ domain, images });
+        return acc;
+      }, []);
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
@@ -124,28 +114,21 @@ export const chartsRouter = router({
 
         if (Object.hasOwn(results, geography)) {
           Object.assign(results[geography], {
-            [geography]: imageFrames.map(
-              (f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`,
-            ),
+            [geography]: imageFrames.map((f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`),
           });
         } else {
           Object.assign(results, {
-            [geography]: imageFrames.map(
-              (f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`,
-            ),
+            [geography]: imageFrames.map((f) => `${NAVCAN_IMAGE_URL}${f.images[f.images.length - 1].id}.image}`),
           });
         }
       });
 
       if (!Object.keys(results).length || Object.keys(results).length === 0) return undefined;
 
-      return Object.entries(results).reduce(
-        (acc: { domain: string; images: string[] }[], [domain, images]) => {
-          acc.push({ domain, images });
-          return acc;
-        },
-        [],
-      );
+      return Object.entries(results).reduce((acc: { domain: string; images: string[] }[], [domain, images]) => {
+        acc.push({ domain, images });
+        return acc;
+      }, []);
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
@@ -303,20 +286,18 @@ export const chartsRouter = router({
       });
     }
   }),
-  publicOutlooks: publicProcedure.query(
-    async (): Promise<{ swo: OutlookData | null; tso: OutlookData | null }> => {
-      try {
-        console.log("[API] Loading outlooks");
-        const swo = outlookHandler("swo");
-        const tso = outlookHandler("tso");
+  publicOutlooks: publicProcedure.query(async (): Promise<{ swo: OutlookData | null; tso: OutlookData | null }> => {
+    try {
+      console.log("[API] Loading outlooks");
+      const swo = outlookHandler("swo");
+      const tso = outlookHandler("tso");
 
-        return { swo, tso };
-      } catch (error) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: error instanceof Error ? error.message : "Unknown error",
-        });
-      }
-    },
-  ),
+      return { swo, tso };
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
 });

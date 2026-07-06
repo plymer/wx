@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "check": "tsc --noEmit && prettier --write . && eslint . --ext .ts,.tsx --fix",
+    "check": "tsc --noEmit && pnpm format && pnpm lint",
     "lint": "eslint . --ext .ts,.tsx --fix",
-    "format": "prettier --write .",
+    "format": "oxfmt",
     "build": "vite build",
     "preview": "vite preview"
   }
