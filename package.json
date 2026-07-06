@@ -72,6 +72,8 @@
     "@types/vt-pbf": "^3.1.1",
     "@vitejs/plugin-react": "^6.0.3",
     "globals": "^17.7.0",
+    "oxfmt": "^0.57.0",
+    "oxlint": "^1.72.0",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.2",
     "tailwindcss-animate": "^1.0.7",
