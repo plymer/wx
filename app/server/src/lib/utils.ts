@@ -106,11 +106,17 @@ export function getSunTimes(latLon: LatLon): SunTimes {
   // set sunrise and sunset times to "---" when the sun doesn't rise or set today
   const riseString: string =
     times.sunrise.getUTCHours().toString() !== "NaN"
-      ? leadZero(times.sunrise.getUTCHours(), 2) + ":" + leadZero(times.sunrise.getUTCMinutes(), 2) + "Z"
+      ? leadZero(times.sunrise.getUTCHours(), 2) +
+        ":" +
+        leadZero(times.sunrise.getUTCMinutes(), 2) +
+        "Z"
       : "---";
   const setString: string =
     times.sunsetStart.getUTCHours().toString() !== "NaN"
-      ? leadZero(times.sunsetStart.getUTCHours(), 2) + ":" + leadZero(times.sunsetStart.getUTCMinutes(), 2) + "Z"
+      ? leadZero(times.sunsetStart.getUTCHours(), 2) +
+        ":" +
+        leadZero(times.sunsetStart.getUTCMinutes(), 2) +
+        "Z"
       : "---";
 
   return { rise: riseString, set: setString };
@@ -143,7 +149,11 @@ export function processDimensionString(dim: string) {
  * @param coords - the input coordinates in the format of "lat,lon lat,lon lat,lon ..."
  * @returns a Position object that contains the coordinates of the resulting shape, formatted for injection into a GeoJSON object
  */
-export function processCoordinates(shape: XmetShapes | null, bufferSize: number | null, coords: string | null) {
+export function processCoordinates(
+  shape: XmetShapes | null,
+  bufferSize: number | null,
+  coords: string | null,
+) {
   if (!shape || !coords || coords.trim() === "") return null;
 
   const COORD_DELIMITER = " ";
@@ -177,8 +187,12 @@ export function processCoordinates(shape: XmetShapes | null, bufferSize: number 
       if (!bufferSize) return null;
       // we need to build two line offsets from the original line, and then weld them back together into a polygon
       // there should end up being 2n + 1 points in the output polygon, where n is the number of points in the input line
-      const offsetA = turf.lineOffset(turf.lineString(coordsList), bufferSize, { units: "nauticalmiles" });
-      const offsetB = turf.lineOffset(turf.lineString(coordsList), -bufferSize, { units: "nauticalmiles" });
+      const offsetA = turf.lineOffset(turf.lineString(coordsList), bufferSize, {
+        units: "nauticalmiles",
+      });
+      const offsetB = turf.lineOffset(turf.lineString(coordsList), -bufferSize, {
+        units: "nauticalmiles",
+      });
 
       // TODO :: this is not 100% accurate so we will need to re-build our normals-generator function and use that logic to build the accurate offset lines
 
@@ -196,7 +210,12 @@ export function processCoordinates(shape: XmetShapes | null, bufferSize: number 
 
     case "polygon":
       if (coordsList.length < 3) {
-        console.log("Error - A closed polygon must have at least 4 points", shape, bufferSize, coords);
+        console.log(
+          "Error - A closed polygon must have at least 4 points",
+          shape,
+          bufferSize,
+          coords,
+        );
         return null;
       } else if (coordsList.length >= 3) {
         // check to see if the first point is the same as the last point, if it is, return the coordsList as is
@@ -205,7 +224,12 @@ export function processCoordinates(shape: XmetShapes | null, bufferSize: number 
           // we might be trying to draw a triangle, so first off:
           //  1. check that the first and last points are not the same - if they are, that's wrong and we return null
           if (firstAndLastAreSame(coordsList)) {
-            console.log("Error - A triangle cannot have the same start and end point", shape, bufferSize, coords);
+            console.log(
+              "Error - A triangle cannot have the same start and end point",
+              shape,
+              bufferSize,
+              coords,
+            );
             return null;
           }
           //  2. check that the three points are not collinear - if they are, that's wrong and we return null
@@ -217,7 +241,12 @@ export function processCoordinates(shape: XmetShapes | null, bufferSize: number 
                 coordsList[2][0] * (coordsList[0][1] - coordsList[1][1]),
             );
           if (area === 0) {
-            console.log("Error - A triangle cannot have collinear points", shape, bufferSize, coords);
+            console.log(
+              "Error - A triangle cannot have collinear points",
+              shape,
+              bufferSize,
+              coords,
+            );
             return null;
           }
 
@@ -240,7 +269,9 @@ export function processCoordinates(shape: XmetShapes | null, bufferSize: number 
 }
 
 export function firstAndLastAreSame(coords: Position[]) {
-  return coords[0][0] === coords[coords.length - 1][0] && coords[0][1] === coords[coords.length - 1][1];
+  return (
+    coords[0][0] === coords[coords.length - 1][0] && coords[0][1] === coords[coords.length - 1][1]
+  );
 }
 
 export function isConvectiveSigmet(header: string): boolean {
@@ -267,7 +298,9 @@ export function getDbConnection(consumer: string) {
     );
   }
 
-  const dbPath = process.env.SQLITE_PATH ? path.resolve(process.env.SQLITE_PATH) : "./sqlite-db/wx.sqlite";
+  const dbPath = process.env.SQLITE_PATH
+    ? path.resolve(process.env.SQLITE_PATH)
+    : "./sqlite-db/wx.sqlite";
 
   mkdirSync(path.dirname(dbPath), { recursive: true });
 
@@ -416,13 +449,11 @@ export function limitResultsByKeys<T>(
 }
 
 export function outlookHandler(product: string) {
-  const outlookRootDir = process.env.OUTLOOK_DIR ?? "./images";
+  const outlookRootDir = process.env.OUTLOOK_DIR;
 
-  if (!outlookRootDir) {
+  if (!outlookRootDir || outlookRootDir.trim() === "") {
     throw new Error("OUTLOOK_DIR environment variable is not set");
   }
-
-  console.log(`[API] Loading outlooks`);
 
   const dirPath = path.join(outlookRootDir, product, "today");
 
@@ -432,11 +463,12 @@ export function outlookHandler(product: string) {
   }
 
   const officeDir = readdirSync(dirPath, { withFileTypes: true, recursive: true });
+
   const result: OutlookData = {} as OutlookData;
   for (const entry of officeDir) {
     if (!entry.isFile()) continue;
 
-    const [, office, region, validPeriod] =
+    const [_, office, region, validPeriod] =
       entry.name.match(/([a-zA-Z]+)(?:-)([0-9a-zA-z_-]+)(?:-)([0-9a-zA-z_]+)/) || [];
 
     // use zod to validate our office and region values, and to transform them into the correct format if necessary (lowercasing them and comparing them against the lookups in our config)
@@ -482,6 +514,11 @@ export function outlookHandler(product: string) {
 
       if (existingRegionData) {
         existingRegionData.panels.push(panel);
+        // the panels need to be sorted by the number in the valid period to ensure that
+        // ay 1 -> night 1 -> day 2... is followed rather than day 1 -> day 2 -> night 1
+        existingRegionData.panels.sort((a, b) =>
+          a.validPeriod.split("_")[1]?.localeCompare(b.validPeriod.split("_")[1]),
+        );
       } else {
         const regionData: RegionData = {
           office: officeKey,
@@ -491,14 +528,6 @@ export function outlookHandler(product: string) {
         };
 
         result[officeKey][region] = regionData;
-      }
-
-      // the panels need to be sorted by the number in the valid period to ensure that
-      // ay 1 -> night 1 -> day 2... is followed rather than day 1 -> day 2 -> night 1
-      if (existingRegionData?.panels.length > 1) {
-        existingRegionData.panels.sort((a, b) =>
-          a.validPeriod.split(" ")[1]?.localeCompare(b.validPeriod.split(" ")[1]),
-        );
       }
     }
   }
