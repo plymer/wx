@@ -49,8 +49,6 @@ export async function getTafs<TSchema extends Record<string, SQLiteTableWithColu
       })
       .filter((entry) => entry !== undefined);
 
-    console.log(`[TAF] Inserting ${output.length} TAFs...`);
-
     // insert the metar data, or update each metar if it already exists (our pk is siteId + validTime)
     await Promise.allSettled(
       output.map(async (taf) => {
@@ -64,13 +62,8 @@ export async function getTafs<TSchema extends Record<string, SQLiteTableWithColu
       }),
     );
 
-    console.log(`[TAF] Cleaning up old TAFs...`);
     // now clean up the database and remove any tafs older than 24 hours
     await db.delete(tafs).where(lt(tafs.validTime, new Date(Date.now() - 24 * HOUR)));
-
-    console.log(`[TAF] TAF cleanup complete.`);
-
-    console.log(`[TAF] TAF cache file processing complete.`);
   } catch (error) {
     throw new Error(`[TAF] Error processing TAF cache file: ${(error as Error).message}`);
   }
