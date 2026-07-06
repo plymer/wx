@@ -1,5 +1,5 @@
 import { and, asc, desc, eq, gt, gte } from "drizzle-orm";
-import suncalc, { type GetTimesResult } from "suncalc";
+import { getTimes } from "suncalc";
 import type { Feature, MultiPolygon } from "geojson";
 import { TRPCError } from "@trpc/server";
 
@@ -81,16 +81,23 @@ export const alphanumericRouter = router({
 
       const { siteId, name, lat, lon, elev_f, elev_m, country, state } = stationData;
 
-      const times: GetTimesResult = suncalc.getTimes(new Date(), lat, lon);
+      const times = getTimes(new Date(), lat, lon);
 
-      const sunrise: string =
-        times.sunrise.getUTCHours().toString() !== "NaN"
-          ? leadZero(times.sunrise.getUTCHours(), 2) + ":" + leadZero(times.sunrise.getUTCMinutes(), 2) + "Z"
-          : "---";
-      const sunset: string =
-        times.sunsetStart.getUTCHours().toString() !== "NaN"
-          ? leadZero(times.sunsetStart.getUTCHours(), 2) + ":" + leadZero(times.sunsetStart.getUTCMinutes(), 2) + "Z"
-          : "---";
+      const sunrise = times.sunrise
+        ? `${times.sunrise.getUTCHours().toString().padStart(2, "0")}:${times.sunrise.getUTCMinutes().toString().padStart(2, "0")}Z`
+        : times.alwaysUp
+          ? "Never Down"
+          : times.alwaysDown
+            ? "Never Up"
+            : "---";
+
+      const sunset = times.sunset
+        ? leadZero(times.sunset.getUTCHours(), 2) + ":" + leadZero(times.sunset.getUTCMinutes(), 2) + "Z"
+        : times.alwaysUp
+          ? "Never Down"
+          : times.alwaysDown
+            ? "Never Up"
+            : "---";
 
       return {
         siteId,
