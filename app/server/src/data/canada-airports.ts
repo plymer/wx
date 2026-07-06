@@ -3,6 +3,7 @@ import { load } from "cheerio";
 import type { StationData } from "../lib/types.js";
 import { generateDbConnection } from "../lib/utils.js";
 import { stations } from "../db/tables/data.drizzle.js";
+import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
 
 const PROVINCES = {
   AB: "Alberta",
@@ -137,7 +138,7 @@ function parseAirportTable(
 async function scrapeProvince(code: string, name: string): Promise<StationData[]> {
   const url = `${baseUrl}${name}&format=json`;
 
-  const json = (await fetch(url).then((res) => res.json())) as WikiParseResponse;
+  const json = (await fetch(url, { headers: DEFAULT_REMOTE_HEADERS }).then((res) => res.json())) as WikiParseResponse;
   const pageHtml = String(json?.parse?.text?.["*"] || "");
   const parseHtml = load(pageHtml);
 
@@ -169,7 +170,6 @@ export async function scrapeWiki() {
   const results = await Promise.allSettled(
     Array.from(Object.entries(PROVINCES)).map(async (p) => {
       const [code, name] = p;
-      console.log(`Scraping ${name}...`);
       try {
         const features = await scrapeProvince(code, name);
 
@@ -185,7 +185,6 @@ export async function scrapeWiki() {
   for (const provinceList of results) {
     if (provinceList.status === "fulfilled") {
       const values = provinceList.value;
-      console.log(`[STATIONS] Inserting ${values.length} stations...`);
 
       // insert the station data, or update each station if it already exists
       await Promise.allSettled(
@@ -206,6 +205,4 @@ export async function scrapeWiki() {
       );
     }
   }
-
-  console.log(`[STATIONS] Done updating stations from WikiPedia.`);
 }
