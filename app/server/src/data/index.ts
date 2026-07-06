@@ -9,7 +9,7 @@ import { createIsolines } from "./isolines.js";
 
 import * as schemas from "../db/tables/data.drizzle.js";
 import * as relations from "../db/relations/data.relations.drizzle.js";
-import { runFromCron, TaskQueue, type DataTask } from "../lib/queue.js";
+import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
 import { buildStationCatalog } from "./stations.js";
 import { redisClient } from "../services/redis.js";
 
