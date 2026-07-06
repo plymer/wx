@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readdirSync, statSync } from "fs";
 import path from "path";
-import suncalc, { type GetTimesResult } from "suncalc";
+
 import { createGunzip } from "zlib";
 import * as turf from "@turf/turf";
 import { XMLParser } from "fast-xml-parser";
@@ -12,13 +12,14 @@ import { Relations } from "drizzle-orm";
 import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 import "dotenv/config";
 
-import type { LatLon, SunTimes } from "./common.types.js";
+import type { SunTimes } from "./common.types.js";
 import type { XmetShapes } from "./alphanumeric.types.js";
 import { DEFAULT_REMOTE_HEADERS, MINUTE } from "./constants.js";
 
 import type { OutlookData, Panel, RegionData, WmoDirection } from "./types.js";
 import { OFFICE_REGION_MAP } from "../config/charts.config.js";
 import { outlookOfficeSchema, outlookRegionSchema } from "./validation.js";
+import { getTimes } from "suncalc";
 
 /**
  *
@@ -94,27 +95,42 @@ export function transformName(name: string): string {
 }
 
 /**
- *
- * @param lat the latitude of the point that the sun times are calculated for
- * @param lon the longitude of the point that the sun times are calculated for
- * @returns an object of type SunTimes containing a string for the sunrise and sunset in the format of "HH:mmZ" or "---" if the sun never rises or sets
+ * Calculate the sunrise and sunset times for a given longitude-latitude tuple
+ * @param [lon, lat] a longitude-latitude tuple for the point requested
+ * @returns rise and set strings formatted as "HH:MMZ" or "Never Up"/"Never Down" if the sun does not rise or set
  */
-export function getSunTimes(latLon: LatLon): SunTimes {
+export function getSunTimes([lon, lat]: Position): SunTimes {
   // create a suncalc time object
-  const times: GetTimesResult = suncalc.getTimes(new Date(), latLon.lat, latLon.lon);
+  const times = getTimes(new Date(), lat, lon);
 
-  // set sunrise and sunset times to "---" when the sun doesn't rise or set today
-  const riseString: string =
-    times.sunrise.getUTCHours().toString() !== "NaN"
-      ? leadZero(times.sunrise.getUTCHours(), 2) + ":" + leadZero(times.sunrise.getUTCMinutes(), 2) + "Z"
-      : "---";
-  const setString: string =
-    times.sunsetStart.getUTCHours().toString() !== "NaN"
-      ? leadZero(times.sunsetStart.getUTCHours(), 2) + ":" + leadZero(times.sunsetStart.getUTCMinutes(), 2) + "Z"
-      : "---";
+  const riseString = times.sunrise
+    ? `${times.sunrise.getUTCHours().toString().padStart(2, "0")}:${times.sunrise.getUTCMinutes().toString().padStart(2, "0")}Z`
+    : times.alwaysUp
+      ? "Never Down"
+      : times.alwaysDown
+        ? "Never Up"
+        : "---";
+
+  const setString = times.sunset
+    ? leadZero(times.sunset.getUTCHours(), 2) + ":" + leadZero(times.sunset.getUTCMinutes(), 2) + "Z"
+    : times.alwaysUp
+      ? "Never Down"
+      : times.alwaysDown
+        ? "Never Up"
+        : "---";
 
   return { rise: riseString, set: setString };
 }
+
+export function stringifyPosition([lon, lat]: Position): { lat: string; lon: string } {
+  return {
+    lat:
+      lat > 0 ? (Math.round(lat * 10) / 10).toString() + "°N" : Math.abs(Math.round(lat * 10) / 10).toString() + "°S",
+    lon:
+      lon > 0 ? (Math.round(lon * 10) / 10).toString() + "°E" : Math.abs(Math.round(lon * 10) / 10).toString() + "°W",
+  };
+}
+
 /**
  *
  * @param dim a string from the GetCapabilities document that represents the start time, end time, and time step interval in for format of `2025-02-19T01:30:00Z/2025-02-19T04:30:00Z/PT6M`

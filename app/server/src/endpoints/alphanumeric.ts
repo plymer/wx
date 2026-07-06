@@ -1,5 +1,4 @@
 import { and, asc, desc, eq, gt, gte } from "drizzle-orm";
-import { getTimes } from "suncalc";
 import type { Feature, MultiPolygon } from "geojson";
 import { TRPCError } from "@trpc/server";
 
@@ -11,7 +10,7 @@ import {
   xmetSchema,
 } from "../validationSchemas/alphanumeric.zod.js";
 import type { HubDiscussion, XmetEventData } from "../lib/alphanumeric.types.js";
-import { isConvectiveSigmet, leadZero, processCoordinates } from "../lib/utils.js";
+import { getSunTimes, isConvectiveSigmet, processCoordinates, stringifyPosition } from "../lib/utils.js";
 
 import { metars, sigmets, stations, tafs } from "../db/tables/data.drizzle.js";
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
@@ -81,35 +80,14 @@ export const alphanumericRouter = router({
 
       const { siteId, name, lat, lon, elev_f, elev_m, country, state } = stationData;
 
-      const times = getTimes(new Date(), lat, lon);
-
-      const sunrise = times.sunrise
-        ? `${times.sunrise.getUTCHours().toString().padStart(2, "0")}:${times.sunrise.getUTCMinutes().toString().padStart(2, "0")}Z`
-        : times.alwaysUp
-          ? "Never Down"
-          : times.alwaysDown
-            ? "Never Up"
-            : "---";
-
-      const sunset = times.sunset
-        ? leadZero(times.sunset.getUTCHours(), 2) + ":" + leadZero(times.sunset.getUTCMinutes(), 2) + "Z"
-        : times.alwaysUp
-          ? "Never Down"
-          : times.alwaysDown
-            ? "Never Up"
-            : "---";
+      const { rise: sunrise, set: sunset } = getSunTimes([lon, lat]);
+      const { lat: latString, lon: lonString } = stringifyPosition([lon, lat]);
 
       return {
         siteId,
         name,
-        lat:
-          lat > 0
-            ? (Math.round(lat * 10) / 10).toString() + "°N"
-            : Math.abs(Math.round(lat * 10) / 10).toString() + "°S",
-        lon:
-          lon > 0
-            ? (Math.round(lon * 10) / 10).toString() + "°E"
-            : Math.abs(Math.round(lon * 10) / 10).toString() + "°W",
+        lat: latString,
+        lon: lonString,
         elev_f,
         elev_m,
         country,
