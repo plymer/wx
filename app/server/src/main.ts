@@ -11,7 +11,7 @@ import * as relations from "./db/relations/data.relations.drizzle.js";
 // utilities
 import { generateDbConnection } from "./lib/utils.js";
 import { redisClient } from "./services/redis.js";
-import { publicProcedure, router } from "./lib/trpc.js";
+import { publicProcedure, router } from "./services/trpc.js";
 
 // endpoint routers
 import { aqRouter } from "./endpoints/aq.js";

@@ -8,7 +8,7 @@ import { HOUR } from "../lib/constants.js";
 
 import type { AirQualityData, AQData } from "../lib/types.js";
 import { db } from "../main.js";
-import { publicProcedure, router } from "../lib/trpc.js";
+import { publicProcedure, router } from "../services/trpc.js";
 
 export const aqRouter = router({
   aq: publicProcedure.input(aqSchema).query(async ({ input }): Promise<Array<Feature<Point, AirQualityData>>> => {

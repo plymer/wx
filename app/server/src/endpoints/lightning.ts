@@ -2,7 +2,7 @@ import type { Feature, MultiPoint, Point } from "geojson";
 import { TRPCError } from "@trpc/server";
 
 import type { LightningFC } from "../lib/lightning.types.js";
-import { publicProcedure, router } from "../lib/trpc.js";
+import { publicProcedure, router } from "../services/trpc.js";
 import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
 import { cacheClient } from "../main.js";
 

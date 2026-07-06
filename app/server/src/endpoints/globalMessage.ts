@@ -1,4 +1,4 @@
-import { publicProcedure, router } from "../lib/trpc.js";
+import { publicProcedure, router } from "../services/trpc.js";
 import * as fs from "fs/promises";
 import * as path from "path";
 

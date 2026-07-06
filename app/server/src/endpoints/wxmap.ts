@@ -18,7 +18,7 @@ import { metars, tafs } from "../db/tables/data.drizzle.js";
 import { HOUR } from "../lib/constants.js";
 
 import { cacheClient, db } from "../main.js";
-import { publicProcedure, router } from "../lib/trpc.js";
+import { publicProcedure, router } from "../services/trpc.js";
 
 import { limitResultsByKeys } from "../lib/utils.js";
 

@@ -1,5 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
-import { transformName } from "./utils.js";
+import { transformName } from "../lib/utils.js";
 
 export class WMSXMLParser {
   parser: XMLParser;

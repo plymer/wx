@@ -3,8 +3,8 @@ import type { WMSLayer } from "../lib/types.js";
 import { processDimensionString } from "../lib/utils.js";
 import { DATA_CUTOFF, EUMETSAT_GETCAPABILITIES, GEOMET_GETCAPABILITIES } from "../config/wms.config.js";
 import { eumetsatProductSchema, goesProductSchema, radarProductSchema } from "../validationSchemas/wms.zod.js";
-import { WMSXMLParser } from "../lib/xml-parser.js";
-import { publicProcedure, router } from "../lib/trpc.js";
+import { WMSXMLParser } from "../services/xml-parser.js";
+import { publicProcedure, router } from "../services/trpc.js";
 import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
 import { cacheClient } from "../main.js";
 

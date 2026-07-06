@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 
-import { publicProcedure, router } from "../lib/trpc.js";
+import { publicProcedure, router } from "../services/trpc.js";
 import type { NavCanImageList, NavCanResponse } from "../lib/alphanumeric.types.js";
 import type { GFAData, OtherChartData, OutlookData } from "../lib/types.js";
 
