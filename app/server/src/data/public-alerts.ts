@@ -93,8 +93,6 @@ export async function getPublicAlerts() {
       {},
     );
 
-    console.log(groupedAlerts);
-
     // dissolve each group
     const dissolvedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];
 
