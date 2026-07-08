@@ -13,8 +13,8 @@ importers:
   .:
     dependencies:
       '@plymer/fast-barnes-ts':
-        specifier: ^0.3.2
-        version: 0.3.2(@types/geojson@7946.0.16)
+        specifier: ^0.4.0
+        version: 0.4.0(@types/geojson@7946.0.16)
       '@tanstack/react-query':
         specifier: ^5.101.2
         version: 5.101.2(react@19.2.7)
@@ -1361,8 +1361,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@plymer/fast-barnes-ts@0.3.2':
-    resolution: {integrity: sha512-AjVeX5VRf5O0Bm9dezP6SehHmq47gAz9Mj2mHVl7ScnHUWDzcPPKoi4YJaGNZpUSAHVMyN412B9r/jAoqYceRQ==}
+  '@plymer/fast-barnes-ts@0.4.0':
+    resolution: {integrity: sha512-OT8h2yHaBGFImpLO5oa/MUEX/gJuUYHG6MWPPS/Ml0HOaKdMxgH/NCfnFKNVOtHfXmeom9RWIyI8+dXzACtibw==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/geojson': '>=7946.0.16'
@@ -6181,7 +6181,7 @@ snapshots:
   '@oxlint/binding-win32-x64-msvc@1.72.0':
     optional: true
 
-  '@plymer/fast-barnes-ts@0.3.2(@types/geojson@7946.0.16)':
+  '@plymer/fast-barnes-ts@0.4.0(@types/geojson@7946.0.16)':
     dependencies:
       '@types/geojson': 7946.0.16
       d3-contour: 4.0.2

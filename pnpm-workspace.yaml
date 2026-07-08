@@ -2,8 +2,8 @@ packages:
   - "app/client"
   - "app/server"
 overrides:
-  '@esbuild-kit/core-utils>esbuild': 0.25.12
-  '@rollup/plugin-terser>serialize-javascript': 7.0.5
+  "@esbuild-kit/core-utils>esbuild": 0.25.12
+  "@rollup/plugin-terser>serialize-javascript": 7.0.5
 shamefullyHoist: false
 strictPeerDependencies: false
 autoInstallPeers: true
@@ -12,3 +12,5 @@ ignoreWorkspaceRootCheck: true
 allowBuilds:
   better-sqlite3: true
   esbuild: true
+minimumReleaseAgeExclude:
+  - "@plymer/fast-barnes-ts"
