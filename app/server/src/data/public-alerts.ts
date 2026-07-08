@@ -35,10 +35,14 @@ export async function getPublicAlerts() {
 
     const extractedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];
 
+    // loop over every 'feature' in the feature collection
     alertsGeoJSON.features.forEach((feature) => {
+      // get the alerts associated with this feature
       const alertArray = feature.properties.alerts;
 
+      // for every active alert in the current feature, create a new feature with the same geometry but with the properties of the alert
       alertArray.forEach((alertObject) => {
+        // extract the alert data from the alerts lookup by the alertRef (the key of the object in the json resposne)
         const alertData = alerts[alertObject.alertRef];
 
         const newFeature: Feature<MultiPolygon, WarningProperties> = {
@@ -65,17 +69,19 @@ export async function getPublicAlerts() {
 
     // now we want to dissolve all feature polygons of the same alert code into single features
     // group features by alertCode and flatten MultiPolygons to Polygons
-    const groupedByAlertCode = extractedFeatures.reduce<Record<string, Feature<Polygon, WarningProperties>[]>>(
+    const groupedAlerts = extractedFeatures.reduce<Record<string, Feature<Polygon, WarningProperties>[]>>(
       (acc, feature) => {
         const alertCode = feature.properties.alertCode;
-        if (!acc[alertCode]) {
-          acc[alertCode] = [];
+        const alertColor = feature.properties.colour;
+        const key = `${alertCode}-${alertColor}`;
+        if (!acc[key]) {
+          acc[key] = [];
         }
 
         // flatten MultiPolygon to individual Polygons
         const flattened = turf.flatten(feature);
         flattened.features.forEach((f) => {
-          acc[alertCode].push({
+          acc[key].push({
             type: "Feature",
             geometry: f.geometry as Polygon,
             properties: feature.properties,
@@ -87,10 +93,12 @@ export async function getPublicAlerts() {
       {},
     );
 
+    console.log(groupedAlerts);
+
     // dissolve each group
     const dissolvedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];
 
-    Object.entries(groupedByAlertCode).forEach(([_, features]) => {
+    Object.entries(groupedAlerts).forEach(([_, features]) => {
       const properties = features[0].properties;
 
       if (features.length === 1) {

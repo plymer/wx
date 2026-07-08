@@ -28,6 +28,7 @@ export const AlertsLayer = ({ override }: Props) => {
         type="fill"
         paint={{
           "fill-color": ["match", ["get", "type"], "warning", "#ff0000", "watch", "#ffff00", "#808080"],
+          // "fill-color": ["get", "colour"],
           "fill-opacity": 0.45,
         }}
       />
