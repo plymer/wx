@@ -10,6 +10,7 @@ import {
 
 import type { DbShape } from "../services/database.js";
 import { isobars } from "../db/schemas.drizzle.js";
+import { lonLatToWebMercator } from "../lib/utils.js";
 
 export async function createIsolines<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
   if (!db) {
@@ -73,18 +74,18 @@ export async function createIsolines<TSchema extends Record<string, unknown>>(db
     });
 
     const lineData = marched.polylines.map((line, idx) => {
-      const coords = line.map(([x, y]) => {
-        const [lon, lat] = barnesParams.unproject(x, y);
-        return `${lon} ${lat}`;
+      const coords = line.map(([lon, lat]) => {
+        const { x, y } = lonLatToWebMercator(lon, lat);
+        return `${x} ${y}`;
       });
+
       const value = getIsolineThreshold(marched, idx);
 
-      return { value, geometry: `LINESTRING((${coords.join(",")}))` };
+      return { value, geometry: `LINESTRING(${coords.join(",")})` };
     });
 
     // insert the isolines data into the database
-
-    await Promise.allSettled(
+    await Promise.all(
       lineData.map(async (line) => {
         await db.insert(isobars).values({
           expiryTime: new Date(now + 90 * 60 * 1000), // 90 minutes from now
@@ -97,9 +98,7 @@ export async function createIsolines<TSchema extends Record<string, unknown>>(db
 
     const extrema = findGridExtrema2D(barnesResult, barnesParams.x0, barnesParams.step);
 
-    const extremaPointData = getExtremaLocations("mslp", extrema, barnesParams.unproject);
-
-    console.log(extremaPointData);
+    const _extremaPointData = getExtremaLocations("mslp", extrema, barnesParams.unproject);
 
     console.log(`[ISOLINES] Processing completed and results were cached.`);
   } catch (error) {
