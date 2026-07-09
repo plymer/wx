@@ -10,7 +10,7 @@ import type { StationPlotPopupData, WarningProperties, WxmapIsolineSlotMetadata 
 import { metars, tafs } from "../db/tables/pg.drizzle.js";
 import { HOUR } from "../lib/constants.js";
 
-import { cacheClient, pgDb as db } from "../main.js";
+import { cacheClient, db } from "../main.js";
 import { publicProcedure, router } from "../services/trpc.js";
 
 import { limitResultsByKeys } from "../lib/utils.js";

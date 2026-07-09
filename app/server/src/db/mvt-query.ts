@@ -38,7 +38,7 @@ https://postgis.net/docs/ST_AsMVT.html
  */
 
 import { sql } from "drizzle-orm";
-import { pgDb as db } from "../main.js";
+import { db } from "../main.js";
 
 const DATETIME_COLUMNS = new Set<string>(["validTime", "startTime", "expiryTime"]);
 const VECTOR_TILE_EXTENT = 4096;

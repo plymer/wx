@@ -12,11 +12,10 @@ import {
 import type { HubDiscussion, XmetEventData } from "../lib/alphanumeric.types.js";
 import { getSunTimes, isConvectiveSigmet, processCoordinates, stringifyPosition } from "../lib/utils.js";
 
-import { sigmets, stations, tafs } from "../db/tables/data.drizzle.js";
-import { metars } from "../db/tables/pg.drizzle.js";
+import { metars, sigmets, stations, tafs } from "../db/tables/pg.drizzle.js";
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 
-import { db, pgDb } from "../main.js";
+import { db } from "../main.js";
 import { publicProcedure, router } from "../services/trpc.js";
 import type { HubData, PointForecastData, WxOAPIResponse, XmetGeoJSON } from "../lib/types.js";
 
@@ -31,7 +30,7 @@ const HubSites: Record<string, string> = {
 
 export const alphanumericRouter = router({
   metars: publicProcedure.input(metarSchema).query(async ({ input }) => {
-    if (!pgDb) {
+    if (!db) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No avwx connection available" });
     }
 
@@ -41,7 +40,7 @@ export const alphanumericRouter = router({
     console.log("[API] Requesting METARs for:", searchSite, "for the last", hrs, "hours");
 
     try {
-      const metarData = await pgDb.query.metars.findMany({
+      const metarData = await db.query.metars.findMany({
         columns: { rawText: true },
         where: and(eq(metars.siteId, searchSite), gte(metars.validTime, new Date(Date.now() - hrs * HOUR))),
         orderBy: asc(metars.validTime),
