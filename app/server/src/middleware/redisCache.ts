@@ -1,5 +1,5 @@
 import { createMiddleware } from "hono/factory";
-import { gunzipSync } from "zlib";
+import { gunzipSync, gzipSync } from "zlib";
 import { cacheClient } from "../main.js";
 
 export const redisCache = (ttlMs: number, contentType: "json" | "text" | "mvt") =>
@@ -33,7 +33,7 @@ export const redisCache = (ttlMs: number, contentType: "json" | "text" | "mvt") 
       const cachedBase64 = await cacheClient.get(key);
 
       if (cachedBase64) {
-        const raw = gunzipSync(Buffer.from(cachedBase64, "base64")).toString();
+        const raw = gunzipSync(Buffer.from(cachedBase64, "base64"));
         const headerContentType =
           contentType === "json"
             ? "application/json"
@@ -41,7 +41,9 @@ export const redisCache = (ttlMs: number, contentType: "json" | "text" | "mvt") 
               ? "text/plain"
               : "application/vnd.mapbox-vector-tile";
 
-        return new Response(raw, {
+        const body = contentType === "mvt" ? raw : raw.toString("utf8");
+
+        return new Response(body, {
           headers: { "Content-Type": headerContentType, "X-Cache": "HIT" },
         });
       }
@@ -61,8 +63,11 @@ export const redisCache = (ttlMs: number, contentType: "json" | "text" | "mvt") 
       if (currentQueue < queueLimit) {
         const saveToCache = async () => {
           try {
-            const rawData = await c.res.clone().text();
-            const compressed = gunzipSync(Buffer.from(rawData)).toString("base64");
+            const rawData =
+              contentType === "mvt"
+                ? Buffer.from(await c.res.clone().arrayBuffer())
+                : Buffer.from(await c.res.clone().text(), "utf8");
+            const compressed = gzipSync(rawData).toString("base64");
             const ttlSec = ttlMs / 1000;
 
             const timeout = 800; // 800ms timeout for cache set op
@@ -74,7 +79,7 @@ export const redisCache = (ttlMs: number, contentType: "json" | "text" | "mvt") 
 
             await Promise.race([savePromise, timeoutPromise]);
           } catch (error) {
-            console.log("[REDIS CACHE] Error saving to cache:", error);
+            console.log("[REDIS CACHE]", error);
           }
         };
         saveToCache().catch(() => {});
