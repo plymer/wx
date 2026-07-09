@@ -1,9 +1,9 @@
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { LightningFC } from "../lib/lightning.types.js";
-import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 import { lt, type Relations } from "drizzle-orm";
-import type { generateDbConnection } from "../lib/utils.js";
-import { lightningData } from "../db/tables/data.drizzle.js";
+import { lightning } from "../db/tables/pg.drizzle.js";
+import type { DbShape } from "../services/pg-db.js";
+import type { PgTableWithColumns } from "drizzle-orm/pg-core";
 
 const formatDateToUrlDate = (date: Date) => {
   return date
@@ -13,8 +13,8 @@ const formatDateToUrlDate = (date: Date) => {
     .replace(/:/g, "");
 };
 
-export async function getLightning<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
-  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
+export async function getLightning<TSchema extends Record<string, PgTableWithColumns<any> | Relations<any, any>>>(
+  db: Awaited<DbShape<TSchema>>,
 ) {
   if (!db) {
     throw new Error("[LIGHTNING] Database connection failed.");
@@ -69,21 +69,23 @@ export async function getLightning<TSchema extends Record<string, SQLiteTableWit
             if (f.geometry.type !== "Point") {
               throw new Error("[LIGHTNING] Error: Lightning feature not type 'Point'");
             }
-            return f.geometry.coordinates.join(",");
+            return f.geometry.coordinates.join(" "); // 'lon lat' which are then joined by a comma for correct WKT geometries
           })
-          .join(" ");
+          .join(",");
+
+        const strikeCoordsGeom = `MULTIPOINT(${strikeCoords})`;
 
         await db
-          .insert(lightningData)
-          .values({ dateFrom: from, dateTo: to, strikes: strikeCoords })
+          .insert(lightning)
+          .values({ startTime: from, expiryTime: to, geometry: strikeCoordsGeom })
           .onConflictDoUpdate({
-            target: lightningData.dateFrom,
-            set: { dateFrom: from, dateTo: to, strikes: strikeCoords },
+            target: lightning.startTime,
+            set: { startTime: from, expiryTime: to, geometry: strikeCoordsGeom },
           });
       }),
     );
 
-    await db.delete(lightningData).where(lt(lightningData.dateFrom, new Date(new Date().getTime() - 4 * HOUR)));
+    await db.delete(lightning).where(lt(lightning.startTime, new Date(new Date().getTime() - 4 * HOUR)));
   } catch (error) {
     throw new Error(`[LIGHTNING] Error: ${(error as Error).stack}`);
   }
