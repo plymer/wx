@@ -13,7 +13,7 @@ export const queryClient = new QueryClient({
   },
 });
 
-const url = import.meta.env.DEV ? "http://localhost:3000/api/" : "/api/";
+const url = import.meta.env.DEV ? "http://localhost:3000/trpc/" : "/trpc/";
 
 const trpcClient = createTRPCClient<AppRouter>({
   links: [
