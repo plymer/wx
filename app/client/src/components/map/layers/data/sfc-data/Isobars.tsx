@@ -1,6 +1,5 @@
 import { useShowIsobars } from "@/stateStores/map/vectorData";
-import { Layer, Source } from "react-map-gl/maplibre";
-import { useTileUrl } from "@/hooks/useTileUrl";
+import { Layer } from "react-map-gl/maplibre";
 import type { FilterSpecification } from "maplibre-gl";
 
 interface Props {
@@ -9,7 +8,6 @@ interface Props {
 
 export const Isobars = ({ displayTime }: Props) => {
   const enabled = useShowIsobars();
-  const tileUrl = useTileUrl();
 
   const filter: FilterSpecification = [
     "all",
@@ -20,9 +18,10 @@ export const Isobars = ({ displayTime }: Props) => {
   if (!enabled) return null;
 
   return (
-    <Source key={`sfc-obs-isobars`} id={`sfc-obs-isobars`} type="vector" tiles={[tileUrl]}>
+    <>
       <Layer
         id={`layer-sfc-obs-isobars`}
+        source="vector-tile-source"
         source-layer="isobars"
         filter={filter}
         type="line"
@@ -37,6 +36,7 @@ export const Isobars = ({ displayTime }: Props) => {
       />
       <Layer
         id={`layer-sfc-obs-isobars-labels`}
+        source="vector-tile-source"
         source-layer="isobars"
         filter={filter}
         type="symbol"
@@ -58,6 +58,7 @@ export const Isobars = ({ displayTime }: Props) => {
       />
       {/* <Layer
         id={`layer-sfc-obs-mslp-extrema-value`}
+        source="vector-tile-source"
         source-layer="isobars"
         type="symbol"
         filter={["has", "kind"]}
@@ -76,6 +77,7 @@ export const Isobars = ({ displayTime }: Props) => {
       />
       <Layer
         id={`layer-sfc-obs-mslp-extrema-marker`}
+        source="vector-tile-source"
         source-layer="isobars"
         type="symbol"
         filter={["has", "kind"]}
@@ -92,6 +94,6 @@ export const Isobars = ({ displayTime }: Props) => {
           "text-halo-width": 2,
         }}
       /> */}
-    </Source>
+    </>
   );
 };

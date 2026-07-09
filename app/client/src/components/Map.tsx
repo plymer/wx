@@ -36,6 +36,7 @@ import { AirQualityLayer } from "./map/layers/data/AirQualityLayer";
 import { SigmetLayer } from "./map/layers/data/SigmetLayer";
 import { TerrainRGB } from "./map/layers/base/TerrainRGB";
 import { AlertsLayer } from "./map/layers/data/AlertsLayer";
+import { VectorTileSource } from "./map/layers/data/VectorTileSource";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -88,6 +89,7 @@ export default function WxMap() {
           style={{ backgroundColor: "var(--accent)", color: "var(--secondary)", border: "1px solid var(--primary)" }}
         />
 
+        <VectorTileSource />
         <TerrainRGB />
 
         <SatelliteLayer domain="west" />

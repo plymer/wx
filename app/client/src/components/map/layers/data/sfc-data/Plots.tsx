@@ -1,12 +1,9 @@
 import { ZOOM_THRESHOLDS } from "@/config/map";
 import { CAT_COLOURS, ICON_SIZES, STATION_TEXT_STYLE, WINDBARB_COLOURS } from "@/config/stationPlots";
-import { AWC_ATTRIBUTION } from "@/config/vectorData";
-
-import { useTileUrl } from "@/hooks/useTileUrl";
 
 import { useShowObs } from "@/stateStores/map/vectorData";
 import type { FilterSpecification } from "maplibre-gl";
-import { Layer, Source } from "react-map-gl/maplibre";
+import { Layer } from "react-map-gl/maplibre";
 
 interface Props {
   displayTime: number;
@@ -14,8 +11,6 @@ interface Props {
 
 export const Plots = ({ displayTime }: Props) => {
   const enabled = useShowObs();
-
-  const tileUrl = useTileUrl();
 
   const filter: FilterSpecification = [
     "all",
@@ -28,11 +23,12 @@ export const Plots = ({ displayTime }: Props) => {
   return (
     <>
       {/* Clustered source for text that can be culled when too dense */}
-      <Source attribution={AWC_ATTRIBUTION} id="plot-data" key="plot-data" type="vector" tiles={[tileUrl]}>
+      <>
         {/* Wind barbs */}
         <Layer
           id="layer-sfc-obs-windbarb"
           type="symbol"
+          source="vector-tile-source"
           source-layer="metars"
           filter={filter}
           minzoom={ZOOM_THRESHOLDS.mini}
@@ -79,6 +75,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           id="layer-sfc-obs-dot"
           type="symbol"
+          source="vector-tile-source"
           source-layer="metars"
           filter={filter}
           layout={{
@@ -121,6 +118,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-gust"
+          source="vector-tile-source"
           source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.reduced}
           filter={filter}
@@ -135,6 +133,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-id"
+          source="vector-tile-source"
           source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.reduced}
           filter={filter}
@@ -149,6 +148,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-tt"
+          source="vector-tile-source"
           source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.medium}
           filter={filter}
@@ -164,6 +164,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-td"
+          source="vector-tile-source"
           source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.medium}
           filter={filter}
@@ -179,6 +180,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-valid-time"
+          source="vector-tile-source"
           source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.medium}
           filter={filter}
@@ -194,6 +196,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-wx"
+          source="vector-tile-source"
           source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.reduced}
           filter={filter}
@@ -204,7 +207,7 @@ export const Plots = ({ displayTime }: Props) => {
             "text-anchor": "right",
           }}
         />
-      </Source>
+      </>
     </>
   );
 };
