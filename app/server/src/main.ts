@@ -35,7 +35,7 @@ export const db = await generateDbConnection(
   "api",
 );
 
-const pgDbConnection = new DatabaseConnection(pgSchemas);
+const pgDbConnection = new DatabaseConnection(pgSchemas, "api");
 export const pgDb = await pgDbConnection.getDb();
 
 export const cacheClient = await redisClient("api");

@@ -13,37 +13,9 @@ import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
 import { buildStationCatalog } from "./stations.js";
 import { redisClient } from "../services/redis.js";
 import { DatabaseConnection } from "../services/pg-db.js";
-import {
-  metars,
-  tafs,
-  stations,
-  stationVisibility,
-  isobars,
-  lightning,
-  aqData,
-  sigmets,
-  stationsRelations,
-  metarsRelations,
-  tafsRelations,
-  metarsTemporalView,
-} from "../db/tables/pg.drizzle.js";
+import * as pgSchema from "../db/tables/pg.drizzle.js";
 
 export const cacheClient = await redisClient("data");
-
-const pgSchema = {
-  metars,
-  tafs,
-  stations,
-  stationVisibility,
-  isobars,
-  lightning,
-  aqData,
-  sigmets,
-  stationsRelations,
-  metarsRelations,
-  tafsRelations,
-  metarsTemporalView,
-} as const;
 
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
@@ -52,7 +24,7 @@ async function main() {
   const MAX_CONCURRENCY = 2;
 
   const sqliteDb = await generateDbConnection({ ...schemas, ...relations }, "data");
-  const pgDbConnection = new DatabaseConnection(pgSchema);
+  const pgDbConnection = new DatabaseConnection(pgSchema, "data");
   const pgDb = await pgDbConnection.getDb();
 
   const currentTime = new Date();

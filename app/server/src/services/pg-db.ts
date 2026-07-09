@@ -18,21 +18,23 @@ export const credentials = {
 
 export class DatabaseConnection<TSchema extends Record<string, unknown>> {
   schema: TSchema;
+  consumer: string;
   db: ReturnType<typeof drizzle<TSchema>>;
-  constructor(dbSchema: TSchema) {
+  constructor(dbSchema: TSchema, consumer: string) {
     this.db = drizzle(
       `postgres://${credentials.user}:${credentials.password}@${credentials.host}:${credentials.port}/${credentials.database}`,
       { schema: dbSchema },
     );
     this.schema = dbSchema;
+    this.consumer = consumer;
   }
 
   async testConnection() {
     try {
       await this.db.execute("SELECT 1");
-      console.log("Postgres Database connection successful!");
+      console.log(`[${this.consumer.toUpperCase()}] Postgres connection successful!`);
     } catch (error) {
-      console.error("Postgres Database connection failed:", error);
+      console.error(`[${this.consumer.toUpperCase()}] Postgres connection failed:`, error);
     }
   }
 
