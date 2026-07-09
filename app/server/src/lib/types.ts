@@ -1,6 +1,7 @@
 import type { InferSelectModel } from "drizzle-orm";
 import type { FeatureCollection, MultiPolygon, Point } from "geojson";
-import { metars, pireps, sigmets, stations, tafs } from "../db/tables/data.drizzle.js";
+import { pireps, sigmets, stations, tafs } from "../db/tables/data.drizzle.js";
+import { metars } from "../db/tables/pg.drizzle.js";
 import { z } from "zod";
 import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation.js";
 import { aqData } from "../db/tables/data.drizzle.js";

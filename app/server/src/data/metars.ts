@@ -1,17 +1,19 @@
 import "dotenv/config";
 import { lt, Relations } from "drizzle-orm";
-import { generateDbConnection, readGzipFile } from "../lib/utils.js";
+import { readGzipFile } from "../lib/utils.js";
 import { xmlParser } from "../lib/utils.js";
-import { metars } from "../db/tables/data.drizzle.js";
+import { metars } from "../db/tables/pg.drizzle.js";
 import type { CacheMetarData, MetarData, XMLCacheFile } from "../lib/types.js";
 import { metarSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
-import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
+
+import type { PgTableWithColumns } from "drizzle-orm/pg-core";
+import type { DbShape } from "../services/pg-db.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/metars.cache.xml.gz";
 
-export async function getMetars<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
-  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
+export async function getMetars<TSchema extends Record<string, PgTableWithColumns<any> | Relations<any, any>>>(
+  db: Awaited<DbShape<TSchema>>,
 ) {
   if (!db) {
     throw new Error("[METAR] Database connection failed.");
@@ -42,6 +44,8 @@ export async function getMetars<TSchema extends Record<string, SQLiteTableWithCo
 
         // destructure the parsed data to get the fields we want
         const {
+          latitude,
+          longitude,
           stationId: siteId,
           observationTime: validTime,
           seaLevelPressureMb: mslp,
@@ -58,12 +62,19 @@ export async function getMetars<TSchema extends Record<string, SQLiteTableWithCo
 
         const hasQnh = /Q\d{4}/.test(rawText);
         const outputMslp = mslp ? mslp : hasQnh ? parseInt(rawText.match(/Q\d{4}/)?.[0].substring(1) ?? "0") : null;
+        const geometry = `POINT(${longitude} ${latitude})`;
 
         // return the data, ready to be inserted into the database
         return {
+          geometry,
           siteId,
           validTime,
           createdAt: cycleCreatedAt,
+          stationPriority: null,
+          stationType: rawText.includes("AUTO") ? "AUTO" : "MANNED",
+          obType: rawText.includes("SPECI") ? "SPECI" : "HOURLY",
+          ceiling: null, // we can calculate this later i suppose
+          timeString: `${validTime.getUTCHours().toString().padStart(2, "0")}${validTime.getUTCMinutes().toString().padStart(2, "0")}`,
           rawText,
           category,
           windDir,
@@ -101,6 +112,7 @@ export async function getMetars<TSchema extends Record<string, SQLiteTableWithCo
               vis: metar.vis,
               wxString: metar.wxString,
               rawText: metar.rawText,
+              createdAt: cycleCreatedAt,
             },
           });
       }),
