@@ -3,6 +3,7 @@ import type { LightningFC } from "../lib/lightning.types.js";
 import { lt } from "drizzle-orm";
 import { lightning } from "../db/tables/pg.drizzle.js";
 import type { DbShape } from "../services/pg-db.js";
+import { lonLatToWebMercator } from "../lib/utils.js";
 
 const formatDateToUrlDate = (date: Date) => {
   return date
@@ -66,7 +67,9 @@ export async function getLightning<TSchema extends Record<string, unknown>>(db: 
             if (f.geometry.type !== "Point") {
               throw new Error("[LIGHTNING] Error: Lightning feature not type 'Point'");
             }
-            return f.geometry.coordinates.join(" "); // 'lon lat' which are then joined by a comma for correct WKT geometries
+            const [lon, lat] = f.geometry.coordinates;
+            const { x, y } = lonLatToWebMercator(lon, lat);
+            return `${x} ${y}`;
           })
           .join(",");
 

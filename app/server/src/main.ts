@@ -4,6 +4,7 @@ import "dotenv/config";
 import z from "zod";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { compress } from "hono/compress";
 import { trpcServer } from "@hono/trpc-server";
 import { serve } from "@hono/node-server";
 
@@ -27,6 +28,7 @@ import { DatabaseConnection } from "./services/pg-db.js";
 const app = new Hono();
 
 app.use("*", cors());
+app.use(compress());
 
 const port = parseInt(process.env.PORT || "3000");
 

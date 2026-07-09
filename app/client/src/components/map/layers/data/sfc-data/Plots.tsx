@@ -1,123 +1,42 @@
 import { ZOOM_THRESHOLDS } from "@/config/map";
-import {
-  CAT_COLOURS,
-  ICON_SIZES,
-  STATION_DENSITY_THRESHOLDS,
-  STATION_PRIORITY_CANADA,
-  STATION_PRIORITY_MED,
-  STATION_PRIORITY_MIN,
-  STATION_TEXT_STYLE,
-  WINDBARB_COLOURS,
-} from "@/config/stationPlots";
+import { CAT_COLOURS, ICON_SIZES, STATION_TEXT_STYLE, WINDBARB_COLOURS } from "@/config/stationPlots";
 import { AWC_ATTRIBUTION } from "@/config/vectorData";
-import { useMapLoadingState } from "@/hooks/useMapLoadingState";
-import { api } from "@/lib/trpc";
-import { checkIfInBounds, filterSpacedPoints, hasValidCoordinates } from "@/lib/utils";
+
+import { useTileUrl } from "@/hooks/useTileUrl";
+
 import { useShowObs } from "@/stateStores/map/vectorData";
-import { HOUR, MINUTE } from "@shared/lib/constants";
-import type { StationPlotGeoJSON } from "@shared/lib/types";
-import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import type { FilterSpecification } from "maplibre-gl";
 import { Layer, Source } from "react-map-gl/maplibre";
 
 interface Props {
   displayTime: number;
-  viewport: [number, number, number, number] | undefined;
-  zoom: number;
 }
 
-export const Plots = ({ displayTime, viewport, zoom }: Props) => {
+export const Plots = ({ displayTime }: Props) => {
   const enabled = useShowObs();
 
-  const { data: plotData, isFetching: plotFetching } = useQuery(
-    api.wxmap.wxmapMetars.queryOptions(undefined, {
-      enabled,
-      refetchInterval: MINUTE,
-      trpc: { context: { skipBatch: true } },
-    }),
-  );
+  const tileUrl = useTileUrl(displayTime);
 
-  useMapLoadingState("sfc-plots", plotFetching);
+  console.log(tileUrl);
 
-  // construct our station priority list for each zoom level
-  // this will give us a computed list of stations to show at each zoom level
-  // use the predefined list of must-haves and then use a spatial algorithm to fill in the rest
-
-  const stationPriorityList = useMemo(() => {
-    if (!plotData) return { min: [], med: [], global: [] };
-    const radius = { min: 180, med: 100, max: 1 };
-
-    const key = "siteId";
-
-    return {
-      global: [...STATION_PRIORITY_CANADA, ...filterSpacedPoints(plotData, radius.min, key)],
-      min: [...STATION_PRIORITY_MIN, ...filterSpacedPoints(plotData, radius.min, key)],
-      med: [...STATION_PRIORITY_MED, ...filterSpacedPoints(plotData, radius.med, key)],
-    };
-  }, [plotData]);
-
-  // for every site in our list of data, we want to get the metar with the observation that is closest
-  // to our display time without being in the future and then collapse its properties into the final output
-
-  const features = plotData?.features.reduce<StationPlotGeoJSON["features"]>((acc, feature) => {
-    if (!viewport) return acc;
-    const coords = feature.geometry.coordinates;
-
-    // validate the coordinates
-    if (!hasValidCoordinates(coords)) return acc;
-
-    // if we are animating, only show stations that are in the current viewport
-    if (!checkIfInBounds(coords, viewport)) return acc;
-
-    // apply our zoom-based station density filtering'
-    if (zoom < STATION_DENSITY_THRESHOLDS.global) {
-      if (!stationPriorityList.global.includes(feature.properties.siteId)) return acc;
-    } else if (zoom < STATION_DENSITY_THRESHOLDS.min) {
-      if (!stationPriorityList.min.includes(feature.properties.siteId)) return acc;
-    } else if (zoom >= STATION_DENSITY_THRESHOLDS.min && zoom < STATION_DENSITY_THRESHOLDS.max) {
-      if (!stationPriorityList.med.includes(feature.properties.siteId)) return acc;
-    }
-
-    const metar = feature.properties.metars
-      .sort((a, b) => {
-        const aDiff = displayTime - new Date(a.validTime).getTime();
-        const bDiff = displayTime - new Date(b.validTime).getTime();
-        return aDiff - bDiff;
-      })
-      .find(
-        (m) =>
-          new Date(m.validTime).getTime() <= displayTime && new Date(m.validTime).getTime() >= displayTime - 2 * HOUR,
-      );
-
-    if (metar) {
-      acc.push({
-        type: "Feature",
-        geometry: feature.geometry,
-        properties: {
-          ...metar,
-          siteId: feature.properties.siteId,
-        },
-      });
-    }
-
-    return acc;
-  }, []);
-
-  const filteredPlots: StationPlotGeoJSON = {
-    type: "FeatureCollection",
-    features: features || [],
-  };
+  const filter: FilterSpecification = [
+    "all",
+    ["<=", ["get", "startTime"], ["to-number", displayTime]],
+    [">", ["get", "expiryTime"], ["to-number", displayTime]],
+  ];
 
   if (!enabled) return null;
 
   return (
     <>
       {/* Clustered source for text that can be culled when too dense */}
-      <Source attribution={AWC_ATTRIBUTION} id="plot-data" key="plot-data" type="geojson" data={filteredPlots}>
+      <Source attribution={AWC_ATTRIBUTION} id="plot-data" key="plot-data" type="vector" tiles={[tileUrl]}>
         {/* Wind barbs */}
         <Layer
           id="layer-sfc-obs-windbarb"
           type="symbol"
+          source-layer="plot-data"
+          filter={filter}
           minzoom={ZOOM_THRESHOLDS.mini}
           layout={{
             "icon-allow-overlap": true,
@@ -162,6 +81,8 @@ export const Plots = ({ displayTime, viewport, zoom }: Props) => {
         <Layer
           id="layer-sfc-obs-dot"
           type="symbol"
+          source-layer="plot-data"
+          filter={filter}
           layout={{
             "icon-allow-overlap": true,
             "icon-image": "icons:stn-hwos",
@@ -202,7 +123,9 @@ export const Plots = ({ displayTime, viewport, zoom }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-gust"
+          source-layer="plot-data"
           minzoom={ZOOM_THRESHOLDS.reduced}
+          filter={filter}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "windGst"],
@@ -214,7 +137,9 @@ export const Plots = ({ displayTime, viewport, zoom }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-id"
+          source-layer="plot-data"
           minzoom={ZOOM_THRESHOLDS.reduced}
+          filter={filter}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "siteId"],
@@ -226,7 +151,9 @@ export const Plots = ({ displayTime, viewport, zoom }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-tt"
+          source-layer="plot-data"
           minzoom={ZOOM_THRESHOLDS.medium}
+          filter={filter}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "tt"],
@@ -239,7 +166,9 @@ export const Plots = ({ displayTime, viewport, zoom }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-td"
+          source-layer="plot-data"
           minzoom={ZOOM_THRESHOLDS.medium}
+          filter={filter}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["get", "td"],
@@ -252,10 +181,12 @@ export const Plots = ({ displayTime, viewport, zoom }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-valid-time"
+          source-layer="plot-data"
           minzoom={ZOOM_THRESHOLDS.medium}
+          filter={filter}
           layout={{
             ...STATION_TEXT_STYLE.layout,
-            "text-field": ["get", "validTimeString"],
+            "text-field": ["get", "timeString"],
             "text-offset": [0, 3],
             "text-size": 10,
           }}
@@ -265,7 +196,9 @@ export const Plots = ({ displayTime, viewport, zoom }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-wx"
+          source-layer="plot-data"
           minzoom={ZOOM_THRESHOLDS.reduced}
+          filter={filter}
           layout={{
             ...STATION_TEXT_STYLE.layout,
             "text-field": ["concat", ["get", "vis"], " ", ["get", "wxString"]],

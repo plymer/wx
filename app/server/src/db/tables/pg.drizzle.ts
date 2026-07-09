@@ -42,7 +42,7 @@ export const geometry = customType<{
 export const metars = pgTable(
   "metars",
   {
-    geometry: geometry({ srid: 3857, type: "POINT" }).notNull(), // web mercator coordinates
+    geometry: geometry({ srid: 3857, type: "POINT" }), // web mercator coordinates
     siteId: varchar({ length: 4 }).notNull(),
     stationPriority: integer(),
     windDir: integer(),

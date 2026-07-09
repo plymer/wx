@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { lt } from "drizzle-orm";
-import { readGzipFile } from "../lib/utils.js";
+import { lonLatToWebMercator, readGzipFile } from "../lib/utils.js";
 import { xmlParser } from "../lib/utils.js";
 import { metars } from "../db/tables/pg.drizzle.js";
 import type { CacheMetarData, MetarData, XMLCacheFile } from "../lib/types.js";
@@ -58,7 +58,13 @@ export async function getMetars<TSchema extends Record<string, unknown>>(db: Awa
 
         const hasQnh = /Q\d{4}/.test(rawText);
         const outputMslp = mslp ? mslp : hasQnh ? parseInt(rawText.match(/Q\d{4}/)?.[0].substring(1) ?? "0") : null;
-        const geometry = `POINT(${longitude} ${latitude})`;
+
+        let geometry: string | null = null;
+
+        if (latitude !== undefined && longitude !== undefined) {
+          const { x, y } = lonLatToWebMercator(longitude, latitude);
+          geometry = `POINT(${x} ${y})`;
+        }
 
         // return the data, ready to be inserted into the database
         return {
@@ -108,6 +114,7 @@ export async function getMetars<TSchema extends Record<string, unknown>>(db: Awa
               vis: metar.vis,
               wxString: metar.wxString,
               rawText: metar.rawText,
+              geometry: metar.geometry,
               createdAt: cycleCreatedAt,
             },
           });

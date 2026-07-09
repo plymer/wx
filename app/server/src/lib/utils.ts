@@ -259,6 +259,14 @@ export function processCoordinates(shape: XmetShapes | null, bufferSize: number 
   }
 }
 
+export const lonLatToWebMercator = (lon: number, lat: number) => {
+  const clampedLat = Math.max(Math.min(lat, 85.05112878), -85.05112878);
+  const x = (lon * 20037508.34) / 180;
+  const y = (Math.log(Math.tan(((90 + clampedLat) * Math.PI) / 360)) / (Math.PI / 180)) * (20037508.34 / 180);
+
+  return { x, y };
+};
+
 export function firstAndLastAreSame(coords: Position[]) {
   return coords[0][0] === coords[coords.length - 1][0] && coords[0][1] === coords[coords.length - 1][1];
 }

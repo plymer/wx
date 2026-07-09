@@ -56,7 +56,7 @@ const TABLES = [
   },
   {
     name: "metars",
-    columns: ["validTime", "stationId"],
+    columns: ["validTime", "siteId"],
   },
   {
     name: "lightning",
@@ -391,7 +391,7 @@ function stationPlotQuery(z: number) {
         FROM metars_temporal
         CROSS JOIN bounds
         JOIN "stationVisibility" v
-        ON v."stationId" = metars_temporal."stationId"
+        ON v."siteId" = metars_temporal."siteId"
         WHERE
         v."minZoom" <= ${z}
         AND metars_temporal.geometry && bounds.query_geom
