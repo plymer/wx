@@ -1,17 +1,16 @@
 import "dotenv/config";
-import { gt, lt, Relations } from "drizzle-orm";
-import { sigmets } from "../db/tables/data.drizzle.js";
+import { gt, lt } from "drizzle-orm";
+import { sigmets } from "../db/tables/pg.drizzle.js";
 import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../lib/types.js";
-import { cardinalToDegrees, generateDbConnection, readGzipFile, xmlParser } from "../lib/utils.js";
+import { cardinalToDegrees, readGzipFile, xmlParser } from "../lib/utils.js";
 import { airSigmetsSchema } from "../lib/validation.js";
-import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
+
+import type { DbShape } from "../services/pg-db.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
-export async function getSigmets<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
-  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
-) {
+export async function getSigmets<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
   if (!db) {
     throw new Error("[SIGMET] Database connection failed.");
   }

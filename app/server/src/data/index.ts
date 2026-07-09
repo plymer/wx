@@ -1,14 +1,11 @@
-import { generateDbConnection } from "../lib/utils.js";
 import { getAqData } from "./aq-data.js";
 import { getMetars } from "./metars.js";
 // import { getPireps } from "./pireps.js";
 import { getPublicAlerts } from "./public-alerts.js";
 import { getSigmets } from "./sigmets.js";
 import { getTafs } from "./tafs.js";
-import { createIsolines } from "./isolines.js";
+import { getLightning } from "./lightning.js";
 
-import * as schemas from "../db/tables/data.drizzle.js";
-import * as relations from "../db/relations/data.relations.drizzle.js";
 import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
 import { buildStationCatalog } from "./stations.js";
 import { redisClient } from "../services/redis.js";
@@ -23,9 +20,8 @@ export const cacheClient = await redisClient("data");
 async function main() {
   const MAX_CONCURRENCY = 2;
 
-  const sqliteDb = await generateDbConnection({ ...schemas, ...relations }, "data");
   const pgDbConnection = new DatabaseConnection(pgSchema, "data");
-  const pgDb = await pgDbConnection.getDb();
+  const db = await pgDbConnection.getDb();
 
   const currentTime = new Date();
   const currentMinute = currentTime.getUTCMinutes();
@@ -33,13 +29,13 @@ async function main() {
 
   const queue = new TaskQueue(MAX_CONCURRENCY);
   const tasks: DataTask[] = [
-    { name: "TAFs", run: () => getTafs(sqliteDb), schedule: "*/5 * * * *" },
-    { name: "METARs", run: () => getMetars(pgDb), schedule: "* * * * *" },
+    { name: "TAFs", run: () => getTafs(db), schedule: "*/5 * * * *" },
+    { name: "METARs", run: () => getMetars(db), schedule: "* * * * *" },
+    { name: "Lightning", run: () => getLightning(db), schedule: "* * * * *" },
     // { name: "PIREPs", run: () => getPireps(db), schedule: "* * * * *" },
-    { name: "SIGMETs", run: () => getSigmets(sqliteDb), schedule: "* * * * *" },
+    { name: "SIGMETs", run: () => getSigmets(db), schedule: "* * * * *" },
     { name: "Public-Alerts", run: () => getPublicAlerts(), schedule: "* * * * *" },
-    { name: "AQ-Data", run: () => getAqData(sqliteDb), schedule: "*/10 * * * *" },
-    { name: "Isolines", run: () => createIsolines(sqliteDb), schedule: "*/10 * * * *" },
+    { name: "AQ-Data", run: () => getAqData(db), schedule: "*/10 * * * *" },
     { name: "Station-Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
 
