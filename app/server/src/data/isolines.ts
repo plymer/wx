@@ -11,6 +11,7 @@ import {
 import type { DbShape } from "../services/database.js";
 import { isobars } from "../db/schemas.drizzle.js";
 import { lonLatToWebMercator } from "../lib/utils.js";
+import { MINUTE } from "../lib/constants.js";
 
 export async function createIsolines<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
   if (!db) {
@@ -88,7 +89,7 @@ export async function createIsolines<TSchema extends Record<string, unknown>>(db
     await Promise.all(
       lineData.map(async (line) => {
         await db.insert(isobars).values({
-          expiryTime: new Date(now + 90 * 60 * 1000), // 90 minutes from now
+          expiryTime: new Date(now + 10 * MINUTE),
           startTime: new Date(now),
           value: line.value,
           geometry: line.geometry,
