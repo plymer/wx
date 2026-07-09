@@ -2,12 +2,12 @@ import "dotenv/config";
 import { lt } from "drizzle-orm";
 import { readGzipFile } from "../lib/utils.js";
 import { xmlParser } from "../lib/utils.js";
-import { tafs } from "../db/tables/pg.drizzle.js";
+import { tafs } from "../db/schemas.drizzle.js";
 import type { CacheTafData, TafData, XMLCacheFile } from "../lib/types.js";
 import { tafSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
 
-import type { DbShape } from "../services/pg-db.js";
+import type { DbShape } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/tafs.cache.xml.gz";
 

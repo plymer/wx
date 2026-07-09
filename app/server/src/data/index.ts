@@ -10,8 +10,9 @@ import { updateStationVisTable } from "./station-visibility.js";
 
 import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
 import { redisClient } from "../services/redis.js";
-import { DatabaseConnection } from "../services/pg-db.js";
-import * as pgSchema from "../db/tables/pg.drizzle.js";
+import { DatabaseConnection } from "../services/database.js";
+import * as pgSchema from "../db/schemas.drizzle.js";
+import { createIsolines } from "./isolines.js";
 
 export const cacheClient = await redisClient("data");
 
@@ -29,7 +30,7 @@ async function main() {
   const stationCatalogCount = await db.select().from(pgSchema.stations).limit(1);
   if (stationCatalogCount.length === 0) {
     console.log("[DATA] Station catalog is empty, building station catalog...");
-    await buildStationCatalog();
+    await buildStationCatalog(db);
   }
 
   const stationVisCount = await db.select().from(pgSchema.stationVisibility).limit(1);
@@ -51,7 +52,8 @@ async function main() {
     { name: "SIGMETs", run: () => getSigmets(db), schedule: "* * * * *" },
     { name: "Public-Alerts", run: () => getPublicAlerts(), schedule: "* * * * *" },
     { name: "AQ-Data", run: () => getAqData(db), schedule: "*/10 * * * *" },
-    { name: "Station-Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
+    { name: "Isolines", run: () => createIsolines(db), schedule: "* * * * *" },
+    { name: "Station-Catalog", run: () => buildStationCatalog(db), schedule: "0 0 * * *" },
     { name: "Station-Visibility", run: () => updateStationVisTable(), schedule: "0 0 * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
 

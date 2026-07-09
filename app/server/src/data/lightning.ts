@@ -1,8 +1,8 @@
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { LightningFC } from "../lib/lightning.types.js";
 import { lt } from "drizzle-orm";
-import { lightning } from "../db/tables/pg.drizzle.js";
-import type { DbShape } from "../services/pg-db.js";
+import { lightning } from "../db/schemas.drizzle.js";
+import type { DbShape } from "../services/database.js";
 import { lonLatToWebMercator } from "../lib/utils.js";
 
 const formatDateToUrlDate = (date: Date) => {

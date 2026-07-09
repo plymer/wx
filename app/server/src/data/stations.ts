@@ -2,21 +2,19 @@
 // stations update once per day
 
 import "dotenv/config";
-import { generateDbConnection, readGzipFile } from "../lib/utils.js";
-import { stations } from "../db/tables/data.drizzle.js";
+import { readGzipFile } from "../lib/utils.js";
+import { stations } from "../db/schemas.drizzle.js";
 import { FEET_PER_METRE } from "../lib/constants.js";
 import type { CacheStationData, StationData } from "../lib/types.js";
 import { stationSchema } from "../lib/validation.js";
 import { scrapeWiki } from "./canada-airports.js";
+import type { DbShape } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/stations.cache.json.gz";
 
-export async function buildStationCatalog() {
-  const db = await generateDbConnection({ stations }, "station");
-
+export async function buildStationCatalog<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
   if (!db) {
-    console.error(`[STATION] Database connection failed.`);
-    process.exit(1);
+    throw new Error("[STATIONS] Database connection failed.");
   }
 
   const data = await readGzipFile(RESOURCE_URL, "station");
@@ -78,7 +76,7 @@ export async function buildStationCatalog() {
   }
 
   try {
-    await scrapeWiki();
+    await scrapeWiki(db);
   } catch (error) {
     console.error(`[STATION] Error scraping Canadian Sites from Wikipedia: ${(error as Error).message}`);
     process.exit(1);

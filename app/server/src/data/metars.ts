@@ -2,11 +2,11 @@ import "dotenv/config";
 import { lt } from "drizzle-orm";
 import { lonLatToWebMercator, readGzipFile } from "../lib/utils.js";
 import { xmlParser } from "../lib/utils.js";
-import { metars } from "../db/tables/pg.drizzle.js";
+import { metars } from "../db/schemas.drizzle.js";
 import type { CacheMetarData, MetarData, XMLCacheFile } from "../lib/types.js";
 import { metarSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
-import type { DbShape } from "../services/pg-db.js";
+import type { DbShape } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/metars.cache.xml.gz";
 
@@ -76,7 +76,7 @@ export async function getMetars<TSchema extends Record<string, unknown>>(db: Awa
           stationType: rawText.includes("AUTO") ? "AUTO" : "MANNED",
           obType: rawText.includes("SPECI") ? "SPECI" : "HOURLY",
           ceiling: null, // we can calculate this later i suppose
-          timeString: `${validTime.getUTCHours().toString().padStart(2, "0")}${validTime.getUTCMinutes().toString().padStart(2, "0")}`,
+          timeString: `${validTime.getUTCHours().toString().padStart(2, "0")}:${validTime.getUTCMinutes().toString().padStart(2, "0")}`,
           rawText,
           category,
           windDir,

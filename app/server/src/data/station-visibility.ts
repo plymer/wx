@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
-import { DatabaseConnection } from "../services/pg-db.js";
-import { stations as stationsSchema, stationVisibility } from "../db/tables/pg.drizzle.js";
+import { DatabaseConnection } from "../services/database.js";
+import { stations as stationsSchema, stationVisibility } from "../db/schemas.drizzle.js";
 
 // prettier-ignore
 const BC_WINDS = ["CWAS","CWFG","CWRU","CWRO","CWEK","CWME","CWRO","CWQS","CWQK"]

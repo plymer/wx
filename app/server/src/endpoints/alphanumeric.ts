@@ -12,7 +12,7 @@ import {
 import type { HubDiscussion, XmetEventData } from "../lib/alphanumeric.types.js";
 import { getSunTimes, isConvectiveSigmet, processCoordinates, stringifyPosition } from "../lib/utils.js";
 
-import { metars, sigmets, stations, tafs } from "../db/tables/pg.drizzle.js";
+import { metars, sigmets, stations, tafs } from "../db/schemas.drizzle.js";
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 
 import { db } from "../main.js";

@@ -1,7 +1,7 @@
 import type { InferSelectModel } from "drizzle-orm";
 import type { FeatureCollection, MultiPolygon, Point } from "geojson";
-import { pireps, sigmets, stations, tafs } from "../db/tables/data.drizzle.js";
-import { metars, aqData } from "../db/tables/pg.drizzle.js";
+
+import { metars, aqData, sigmets, stations, tafs } from "../db/schemas.drizzle.js";
 import { z } from "zod";
 import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation.js";
 
@@ -123,7 +123,7 @@ export type AQData = InferSelectModel<typeof aqData>;
 export type StationData = InferSelectModel<typeof stations>;
 export type MetarData = InferSelectModel<typeof metars>;
 export type TafData = InferSelectModel<typeof tafs>;
-export type PirepData = InferSelectModel<typeof pireps>;
+// export type PirepData = InferSelectModel<typeof pireps>;
 export type SigmetData = InferSelectModel<typeof sigmets>;
 
 export type WmoDirection =

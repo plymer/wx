@@ -1,12 +1,12 @@
 import "dotenv/config";
 import { gt, lt } from "drizzle-orm";
-import { sigmets } from "../db/tables/pg.drizzle.js";
+import { sigmets } from "../db/schemas.drizzle.js";
 import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../lib/types.js";
 import { cardinalToDegrees, readGzipFile, xmlParser } from "../lib/utils.js";
 import { airSigmetsSchema } from "../lib/validation.js";
 
-import type { DbShape } from "../services/pg-db.js";
+import type { DbShape } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 

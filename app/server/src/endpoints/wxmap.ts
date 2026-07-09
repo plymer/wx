@@ -7,7 +7,7 @@ import "dotenv/config";
 import * as turf from "@turf/turf";
 
 import type { StationPlotPopupData, WarningProperties, WxmapIsolineSlotMetadata } from "../lib/types.js";
-import { metars, tafs } from "../db/tables/pg.drizzle.js";
+import { metars, tafs } from "../db/schemas.drizzle.js";
 import { HOUR } from "../lib/constants.js";
 
 import { cacheClient, db } from "../main.js";

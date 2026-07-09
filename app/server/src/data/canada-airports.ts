@@ -1,9 +1,9 @@
 import "dotenv/config";
 import { load } from "cheerio";
 import type { StationData } from "../lib/types.js";
-import { generateDbConnection } from "../lib/utils.js";
-import { stations } from "../db/tables/data.drizzle.js";
+import { stations } from "../db/schemas.drizzle.js";
 import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
+import type { DbShape } from "../services/database.js";
 
 const PROVINCES = {
   AB: "Alberta",
@@ -159,12 +159,9 @@ async function scrapeProvince(code: string, name: string): Promise<StationData[]
   return Array.from(deduped.values());
 }
 
-export async function scrapeWiki() {
-  const db = await generateDbConnection({ stations }, "wiki-station");
-
+export async function scrapeWiki<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
   if (!db) {
-    console.error(`[STATIONS] Database connection failed.`);
-    process.exit(1);
+    throw new Error("[STATIONS] Database connection failed.");
   }
 
   const results = await Promise.allSettled(

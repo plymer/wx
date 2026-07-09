@@ -1,11 +1,11 @@
 import "dotenv/config";
 import { lt } from "drizzle-orm";
-import { aqData } from "../db/tables/pg.drizzle.js";
+import { aqData } from "../db/schemas.drizzle.js";
 import type { AQData } from "../lib/types.js";
 import { aqSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
 
-import type { DbShape } from "../services/pg-db.js";
+import type { DbShape } from "../services/database.js";
 
 export async function getAqData<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
   if (!db) {

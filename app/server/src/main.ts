@@ -9,7 +9,7 @@ import { trpcServer } from "@hono/trpc-server";
 import { serve } from "@hono/node-server";
 
 // database schemas
-import * as pgSchemas from "./db/tables/pg.drizzle.js";
+import * as pgSchemas from "./db/schemas.drizzle.js";
 
 // utilities
 import { redisClient } from "./services/redis.js";
@@ -23,7 +23,7 @@ import { chartsRouter } from "./endpoints/charts.js";
 import { globalMessageRouter } from "./endpoints/globalMessage.js";
 import { apiRouter } from "./endpoints/api.js";
 
-import { DatabaseConnection } from "./services/pg-db.js";
+import { DatabaseConnection } from "./services/database.js";
 
 const app = new Hono();
 
