@@ -21,7 +21,8 @@
     "deploy:prod": "pnpm install && pm2 stop data.config.cjs && pnpm build && pm2 start data.config.cjs && pm2 restart prod.config.cjs && pm2 save",
     "deploy:dev": "pnpm install && pm2 stop data-dev.config.cjs && pnpm build && pm2 start data-dev.config.cjs && pm2 restart dev.config.cjs && pm2 save",
     "sprites:icons": "spreet --sdf public/sprites/icons public/sprites/icons && spreet --retina --sdf public/sprites/icons public/sprites/icons@2x",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push --config drizzle-pg.config.ts",
+    "db:studio": "drizzle-kit studio --config drizzle-pg.config.ts"
   },
   "dependencies": {
     "@plymer/fast-barnes-ts": "^0.4.0",
@@ -45,6 +46,7 @@
     "geojson-vt": "^4.0.3",
     "lucide-react": "^1.23.0",
     "maplibre-gl": "^5.24.0",
+    "pg": "^8.21.0",
     "radix-ui": "^1.6.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

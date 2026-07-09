@@ -1,9 +1,8 @@
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { LightningFC } from "../lib/lightning.types.js";
-import { lt, type Relations } from "drizzle-orm";
+import { lt } from "drizzle-orm";
 import { lightning } from "../db/tables/pg.drizzle.js";
 import type { DbShape } from "../services/pg-db.js";
-import type { PgTableWithColumns } from "drizzle-orm/pg-core";
 
 const formatDateToUrlDate = (date: Date) => {
   return date
@@ -13,9 +12,7 @@ const formatDateToUrlDate = (date: Date) => {
     .replace(/:/g, "");
 };
 
-export async function getLightning<TSchema extends Record<string, PgTableWithColumns<any> | Relations<any, any>>>(
-  db: Awaited<DbShape<TSchema>>,
-) {
+export async function getLightning<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
   if (!db) {
     throw new Error("[LIGHTNING] Database connection failed.");
   }

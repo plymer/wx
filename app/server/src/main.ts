@@ -21,6 +21,9 @@ import { wxmapRouter } from "./endpoints/wxmap.js";
 import { alphanumericRouter } from "./endpoints/alphanumeric.js";
 import { chartsRouter } from "./endpoints/charts.js";
 import { globalMessageRouter } from "./endpoints/globalMessage.js";
+import { DatabaseConnection } from "./services/pg-db.js";
+
+import * as pgSchemas from "./db/tables/pg.drizzle.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -31,6 +34,9 @@ export const db = await generateDbConnection(
   },
   "api",
 );
+
+const pgDbConnection = new DatabaseConnection(pgSchemas);
+export const pgDb = await pgDbConnection.getDb();
 
 export const cacheClient = await redisClient("api");
 

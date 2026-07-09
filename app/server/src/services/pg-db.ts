@@ -1,11 +1,9 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import "dotenv/config";
-import type { PgTableWithColumns } from "drizzle-orm/pg-core";
-import type { Relations } from "drizzle-orm";
 
 const dbUser = process.env.DB_USER ?? "postgres";
 const dbPassword = process.env.DB_PASSWORD ?? "password";
-const dbHost = process.env.DB_HOST ?? "localhost";
+const dbHost = process.env.DB_HOST ?? "127.0.0.1";
 const dbPort = process.env.DB_PORT ?? "5432";
 const dbName = process.env.DB_NAME ?? "wxdb";
 
@@ -18,12 +16,13 @@ export const credentials = {
   ssl: false,
 };
 
-export class DatabaseConnection<TSchema extends Record<string, PgTableWithColumns<any> | Relations<any, any>>> {
+export class DatabaseConnection<TSchema extends Record<string, unknown>> {
   schema: TSchema;
   db: ReturnType<typeof drizzle<TSchema>>;
   constructor(dbSchema: TSchema) {
     this.db = drizzle(
       `postgres://${credentials.user}:${credentials.password}@${credentials.host}:${credentials.port}/${credentials.database}`,
+      { schema: dbSchema },
     );
     this.schema = dbSchema;
   }
@@ -31,9 +30,9 @@ export class DatabaseConnection<TSchema extends Record<string, PgTableWithColumn
   async testConnection() {
     try {
       await this.db.execute("SELECT 1");
-      console.log("Database connection successful!");
+      console.log("Postgres Database connection successful!");
     } catch (error) {
-      console.error("Database connection failed:", error);
+      console.error("Postgres Database connection failed:", error);
     }
   }
 
@@ -43,5 +42,4 @@ export class DatabaseConnection<TSchema extends Record<string, PgTableWithColumn
   }
 }
 
-export type DbShape<TSchema extends Record<string, PgTableWithColumns<any> | Relations<any, any>>> =
-  DatabaseConnection<TSchema>["db"];
+export type DbShape<TSchema extends Record<string, unknown>> = DatabaseConnection<TSchema>["db"];

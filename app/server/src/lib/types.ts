@@ -169,7 +169,7 @@ export type RawIntlSigmetData = {
 };
 
 // used in intermediate steps of the api data return for /wxmap/metars
-export type MetarElements = Prettify<Omit<MetarData, "siteId" | "rawText" | "createdAt"> & { validTimeString: string }>;
+export type MetarElements = Prettify<Omit<MetarData, "siteId" | "rawText" | "geometry" | "createdAt">>;
 export type StationPlotData = {
   siteId: string;
   stationPriority: number;
@@ -177,7 +177,7 @@ export type StationPlotData = {
 };
 
 export type MetarWithStation = Prettify<
-  Omit<MetarData, "rawText"> & {
+  Omit<MetarData, "rawText" | "createdAt" | "geometry" | "stationPriority" | "stationType" | "obType" | "ceiling"> & {
     stations: {
       lat: number;
       lon: number;
