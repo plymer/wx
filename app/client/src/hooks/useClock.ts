@@ -19,6 +19,7 @@ function clockTick(
       const now = new Date(Math.floor(Date.now() / MINUTE) * MINUTE).getTime();
       actions.setEndTime(now);
       actions.setStartTime(now - 3 * HOUR);
+      actions.setClockTime(now);
     }, MINUTE),
   );
 }

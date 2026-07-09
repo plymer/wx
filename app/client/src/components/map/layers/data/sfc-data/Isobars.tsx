@@ -1,6 +1,7 @@
 import { useShowIsobars } from "@/stateStores/map/vectorData";
 import { Layer, Source } from "react-map-gl/maplibre";
 import { useTileUrl } from "@/hooks/useTileUrl";
+import type { FilterSpecification } from "maplibre-gl";
 
 interface Props {
   displayTime: number;
@@ -8,7 +9,13 @@ interface Props {
 
 export const Isobars = ({ displayTime }: Props) => {
   const enabled = useShowIsobars();
-  const tileUrl = useTileUrl(displayTime);
+  const tileUrl = useTileUrl();
+
+  const filter: FilterSpecification = [
+    "all",
+    ["<=", ["get", "startTime"], ["to-number", displayTime]],
+    [">", ["get", "expiryTime"], ["to-number", displayTime]],
+  ];
 
   if (!enabled) return null;
 
@@ -17,6 +24,7 @@ export const Isobars = ({ displayTime }: Props) => {
       <Layer
         id={`layer-sfc-obs-isobars`}
         source-layer="isobars"
+        filter={filter}
         type="line"
         layout={{
           "line-join": "round",
@@ -30,6 +38,7 @@ export const Isobars = ({ displayTime }: Props) => {
       <Layer
         id={`layer-sfc-obs-isobars-labels`}
         source-layer="isobars"
+        filter={filter}
         type="symbol"
         layout={{
           "symbol-placement": "line",

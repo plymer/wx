@@ -15,7 +15,7 @@ interface Props {
 export const Plots = ({ displayTime }: Props) => {
   const enabled = useShowObs();
 
-  const tileUrl = useTileUrl(displayTime);
+  const tileUrl = useTileUrl();
 
   const filter: FilterSpecification = [
     "all",

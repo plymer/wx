@@ -16,7 +16,7 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
   const enabled = useShowLightning();
 
   const displayTime = useDisplayTime();
-  const tileUrl = useTileUrl(displayTime);
+  const tileUrl = useTileUrl();
 
   if (!enabled) return;
 

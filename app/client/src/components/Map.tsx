@@ -112,7 +112,7 @@ export default function WxMap() {
 
         <AlertsLayer />
 
-        <LightningDataLayer timeRange={15} />
+        <LightningDataLayer />
 
         <DataPopup />
 
