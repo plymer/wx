@@ -17,8 +17,6 @@ export const Plots = ({ displayTime }: Props) => {
 
   const tileUrl = useTileUrl(displayTime);
 
-  console.log(tileUrl);
-
   const filter: FilterSpecification = [
     "all",
     ["<=", ["get", "startTime"], ["to-number", displayTime]],
@@ -35,7 +33,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           id="layer-sfc-obs-windbarb"
           type="symbol"
-          source-layer="plot-data"
+          source-layer="metars"
           filter={filter}
           minzoom={ZOOM_THRESHOLDS.mini}
           layout={{
@@ -81,7 +79,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           id="layer-sfc-obs-dot"
           type="symbol"
-          source-layer="plot-data"
+          source-layer="metars"
           filter={filter}
           layout={{
             "icon-allow-overlap": true,
@@ -123,7 +121,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-gust"
-          source-layer="plot-data"
+          source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.reduced}
           filter={filter}
           layout={{
@@ -137,7 +135,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-id"
-          source-layer="plot-data"
+          source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.reduced}
           filter={filter}
           layout={{
@@ -151,7 +149,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-tt"
-          source-layer="plot-data"
+          source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.medium}
           filter={filter}
           layout={{
@@ -166,7 +164,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-td"
-          source-layer="plot-data"
+          source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.medium}
           filter={filter}
           layout={{
@@ -181,7 +179,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-valid-time"
-          source-layer="plot-data"
+          source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.medium}
           filter={filter}
           layout={{
@@ -196,7 +194,7 @@ export const Plots = ({ displayTime }: Props) => {
         <Layer
           {...STATION_TEXT_STYLE}
           id="layer-sfc-obs-wx"
-          source-layer="plot-data"
+          source-layer="metars"
           minzoom={ZOOM_THRESHOLDS.reduced}
           filter={filter}
           layout={{

@@ -5,9 +5,10 @@ import { getPublicAlerts } from "./public-alerts.js";
 import { getSigmets } from "./sigmets.js";
 import { getTafs } from "./tafs.js";
 import { getLightning } from "./lightning.js";
+import { buildStationCatalog } from "./stations.js";
+import { updateStationVisTable } from "./station-visibility.js";
 
 import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
-import { buildStationCatalog } from "./stations.js";
 import { redisClient } from "../services/redis.js";
 import { DatabaseConnection } from "../services/pg-db.js";
 import * as pgSchema from "../db/tables/pg.drizzle.js";
@@ -23,6 +24,20 @@ async function main() {
   const pgDbConnection = new DatabaseConnection(pgSchema, "data");
   const db = await pgDbConnection.getDb();
 
+  // we need to check to see if we have a valid station catalog and station-visibility table
+
+  const stationCatalogCount = await db.select().from(pgSchema.stations).limit(1);
+  if (stationCatalogCount.length === 0) {
+    console.log("[DATA] Station catalog is empty, building station catalog...");
+    await buildStationCatalog();
+  }
+
+  const stationVisCount = await db.select().from(pgSchema.stationVisibility).limit(1);
+  if (stationVisCount.length === 0) {
+    console.log("[DATA] Station visibility table is empty, updating station visibility table...");
+    await updateStationVisTable();
+  }
+
   const currentTime = new Date();
   const currentMinute = currentTime.getUTCMinutes();
   const currentHour = currentTime.getUTCHours();
@@ -37,6 +52,7 @@ async function main() {
     { name: "Public-Alerts", run: () => getPublicAlerts(), schedule: "* * * * *" },
     { name: "AQ-Data", run: () => getAqData(db), schedule: "*/10 * * * *" },
     { name: "Station-Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
+    { name: "Station-Visibility", run: () => updateStationVisTable(), schedule: "0 0 * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
 
   console.log(
