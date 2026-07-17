@@ -9,7 +9,7 @@ import {
   singleSiteSchema,
   xmetSchema,
 } from "../validationSchemas/alphanumeric.zod.js";
-import type { HubDiscussion, XmetEventData } from "../lib/alphanumeric.types.js";
+import type { XmetEventData } from "../lib/alphanumeric.types.js";
 import { getSunTimes, isConvectiveSigmet, processCoordinates, stringifyPosition } from "../lib/utils.js";
 
 import { metars, sigmets, stations, tafs } from "../db/schemas.drizzle.js";
@@ -17,16 +17,7 @@ import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 
 import { db } from "../main.js";
 import { publicProcedure, router } from "../services/trpc.js";
-import type { HubData, PointForecastData, WxOAPIResponse, XmetGeoJSON } from "../lib/types.js";
-
-const HubSites: Record<string, string> = {
-  CYYZ: "Toronto Pearson Int'l Airport",
-  CYUL: "Montreal Trudeau Int'l Airport",
-  CYYC: "Calgary Int'l Airport",
-  CYVR: "Vancouver Int'l Airport",
-  CYOW: "Ottawa MacDonald Int'l Airport",
-  CYHZ: "Halifax Stanfield Airport",
-};
+import type { PointForecastData, WxOAPIResponse, XmetGeoJSON } from "../lib/types.js";
 
 export const alphanumericRouter = router({
   metars: publicProcedure.input(metarSchema).query(async ({ input }) => {
@@ -125,41 +116,6 @@ export const alphanumericRouter = router({
       }
 
       return tafData[0].rawText ? tafData[0].rawText : undefined;
-    } catch (error) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  }),
-
-  hubs: publicProcedure.input(singleSiteSchema).query(async ({ input }): Promise<HubData> => {
-    const { site } = input;
-    const url = "https://metaviation.az.ec.gc.ca/hubwx/scripts/getForecasterNotes.php";
-
-    try {
-      const hubs: HubDiscussion = await fetch(url, { headers: DEFAULT_REMOTE_HEADERS })
-        .then((hub) => hub.json())
-        .then((data) => data as HubDiscussion);
-
-      const siteName = HubSites[site as keyof typeof HubSites];
-
-      const {
-        strheaders: header,
-        strdiscussion: discussion,
-        stroutlook: outlook,
-        strforecaster: forecaster,
-        stroffice: office,
-      } = hubs[site as keyof HubDiscussion];
-
-      return {
-        siteName,
-        header,
-        discussion,
-        outlook,
-        forecaster,
-        office,
-      };
     } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",

@@ -49,15 +49,6 @@ export type Panel = {
   url: string;
 };
 
-export type HubData = {
-  siteName: string;
-  header: string;
-  discussion: string;
-  outlook: string;
-  forecaster: string;
-  office: string;
-};
-
 export type XmetTypes = (typeof XMET_TYPES)[number];
 
 export type XmetAPIData = {
