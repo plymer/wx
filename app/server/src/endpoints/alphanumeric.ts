@@ -143,7 +143,7 @@ export const alphanumericRouter = router({
       "Public, unrestricted access to hub discussions has been discontinued by ECCC. Sorry, forecasters.";
     const outlook = "N/A";
     const forecaster = "N/A";
-    const office = "N/A";
+    const office = "";
 
     return {
       siteName,
