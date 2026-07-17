@@ -106,24 +106,6 @@ export type TafObject = {
   }[];
 };
 
-export type HubDiscussionData = {
-  strtext: string;
-  strheaders: string;
-  strdiscussion: string;
-  stroutlook: string;
-  strforecaster: string;
-  stroffice: string;
-  str3hrconfidence: string;
-  int3hrconfidencecode: number;
-  str6hrconfidence: string;
-  int6hrconfidencecode: number;
-  strvariability: string;
-  intvariabilitycode: number;
-  dtLastModified: number;
-};
-
-export type HubDiscussion = Record<string, HubDiscussionData>;
-
 export type NavCanResponse = {
   meta: {
     now: string;

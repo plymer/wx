@@ -9,7 +9,7 @@ import {
   singleSiteSchema,
   xmetSchema,
 } from "../validationSchemas/alphanumeric.zod.js";
-import type { HubDiscussion, XmetEventData } from "../lib/alphanumeric.types.js";
+import type { XmetEventData } from "../lib/alphanumeric.types.js";
 import { getSunTimes, isConvectiveSigmet, processCoordinates, stringifyPosition } from "../lib/utils.js";
 
 import { metars, sigmets, stations, tafs } from "../db/tables/data.drizzle.js";
@@ -135,37 +135,24 @@ export const alphanumericRouter = router({
 
   hubs: publicProcedure.input(singleSiteSchema).query(async ({ input }): Promise<HubData> => {
     const { site } = input;
-    const url = "https://metaviation.az.ec.gc.ca/hubwx/scripts/getForecasterNotes.php";
 
-    try {
-      const hubs: HubDiscussion = await fetch(url, { headers: DEFAULT_REMOTE_HEADERS })
-        .then((hub) => hub.json())
-        .then((data) => data as HubDiscussion);
+    const siteName = HubSites[site as keyof typeof HubSites];
 
-      const siteName = HubSites[site as keyof typeof HubSites];
+    const header = `Outlook for ${siteName} (${site}) no longer available`;
+    const discussion =
+      "Public, unrestricted access to hub discussions has been discontinued by ECCC. Sorry, forecasters.";
+    const outlook = "N/A";
+    const forecaster = "N/A";
+    const office = "N/A";
 
-      const {
-        strheaders: header,
-        strdiscussion: discussion,
-        stroutlook: outlook,
-        strforecaster: forecaster,
-        stroffice: office,
-      } = hubs[site as keyof HubDiscussion];
-
-      return {
-        siteName,
-        header,
-        discussion,
-        outlook,
-        forecaster,
-        office,
-      };
-    } catch (error) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
+    return {
+      siteName,
+      header,
+      discussion,
+      outlook,
+      forecaster,
+      office,
+    };
   }),
 
   publicBulletin: publicProcedure.input(publicBulletinSchema).query(async ({ input }): Promise<string> => {
