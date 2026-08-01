@@ -1,6 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { gunzipSync, gzipSync } from "zlib";
-import { cacheClient } from "../main.js";
+import { cacheClient } from "../services/redis.js";
 
 export const redisCache = (ttlMs: number, contentType: "json" | "text" | "mvt") =>
   createMiddleware(async (c, next) => {

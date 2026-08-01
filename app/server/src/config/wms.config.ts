@@ -19,3 +19,13 @@ export const GOES_PRODUCTS = [
   "2km_Ash",
   "2km_NightIR",
 ] as const;
+
+export const HIMARWARI_PRODUCTS = [
+  "2km_Ash",
+  "2km_Channel03",
+  "2km_Channel13",
+  "2km_Channel15",
+  "2km_Dust",
+  "2km_NaturalColor",
+  "2km_SO2",
+] as const;

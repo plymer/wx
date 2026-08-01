@@ -2,11 +2,16 @@ import { TRPCError } from "@trpc/server";
 import type { WMSLayer } from "../lib/types.js";
 import { processDimensionString } from "../lib/utils.js";
 import { DATA_CUTOFF, EUMETSAT_GETCAPABILITIES, GEOMET_GETCAPABILITIES } from "../config/wms.config.js";
-import { eumetsatProductSchema, goesProductSchema, radarProductSchema } from "../validationSchemas/wms.zod.js";
+import {
+  eumetsatProductSchema,
+  goesProductSchema,
+  himawariProductSchema,
+  radarProductSchema,
+} from "../validationSchemas/wms.zod.js";
 import { WMSXMLParser } from "../services/xml-parser.js";
 import { publicProcedure, router } from "../services/trpc.js";
 import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
-import { cacheClient } from "../main.js";
+import { cacheClient } from "../services/redis.js";
 
 export const wmsRouter = router({
   radar: publicProcedure.input(radarProductSchema).query(async ({ input }) => {
@@ -85,6 +90,50 @@ export const wmsRouter = router({
       };
 
       await cacheClient.setEx(`wms:goes:${domain}:${product}`, 60 * 5, JSON.stringify(output));
+
+      return output;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
+
+  himawari: publicProcedure.input(himawariProductSchema).query(async ({ input }) => {
+    const { product } = input;
+
+    const dataCutoff = Date.now() - DATA_CUTOFF;
+
+    const cacheKey = `wms:himawari:north:${product}`;
+
+    try {
+      const cachedData = await cacheClient.get(cacheKey);
+
+      if (cachedData) {
+        console.log(`[API] Cache HIT for WMS Himawari (north) product: ${product}`);
+        return JSON.parse(cachedData) as WMSLayer;
+      }
+
+      console.log(`[API] Cache MISS for WMS Himawari (north) product: ${product}. Fetching from source...`);
+
+      const { parser } = new WMSXMLParser();
+
+      const xml = await fetch(`${GEOMET_GETCAPABILITIES}&layers=Himawari-North_${product}`, {
+        headers: DEFAULT_REMOTE_HEADERS,
+      }).then(async (response) => parser.parse(await response.text()));
+
+      const layerData = xml.wmsCapabilities.capability.layer.layer.layer.layer;
+
+      const output: WMSLayer = {
+        name: layerData.name,
+        dimension: layerData.dimension.value,
+        domain: "himawari",
+        type: "satellite",
+        timeSteps: processDimensionString(layerData.dimension.value).filter((time) => time.validTime >= dataCutoff),
+      };
+
+      await cacheClient.setEx(cacheKey, 60 * 5, JSON.stringify(output));
 
       return output;
     } catch (error) {
