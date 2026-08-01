@@ -30,7 +30,19 @@ interface Props {
 }
 
 const makeTileRequestString = (domain: WMSDomains, layerName: string, validTime: number) => {
-  const baseUrl = domain === "europe" || domain === "indianOcean" ? EUMETSAT_GETMAP : GEOMET_GETMAP;
+  let baseUrl;
+  switch (domain) {
+    case "europe":
+    case "indianOcean":
+      baseUrl = EUMETSAT_GETMAP;
+      break;
+    case "west":
+    case "east":
+      baseUrl = GEOMET_GETMAP;
+      break;
+    default:
+      baseUrl = GEOMET_GETMAP;
+  }
 
   return `${baseUrl}${layerName}&time=${makeISOTimeStamp(validTime, "data")}`;
 };
@@ -49,34 +61,47 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
 
   // safety checks
 
-  if (!apiData || !apiData.timeSteps || apiData.timeSteps.length === 0) return;
-
   // if the belowLayer is not in the map's layers, we cannot render this layer
   if (!belowLayer || !map.getLayer(belowLayer)) belowLayer = "wateroutline";
 
-  const layerId = "layer-" + apiData.type + "-" + apiData.domain;
+  const layerId = "layer-" + apiData?.type + "-" + apiData?.domain;
+
+  let bounds: [number, number, number, number] = MAP_BOUNDS;
+  let attribution = "";
+
+  if (apiData?.type === "satellite") {
+    switch (apiData.domain) {
+      case "europe":
+        bounds = EUMETSAT_BOUNDS;
+        attribution = EUMETSAT_ATTRIBUTION;
+        break;
+      case "indianOcean":
+        bounds = IODC_BOUNDS;
+        attribution = EUMETSAT_ATTRIBUTION;
+        break;
+      case "west":
+        bounds = GOES_WEST_BOUNDS;
+        attribution = GEOMET_ATTRIBUTION;
+        break;
+      case "east":
+        bounds = GOES_EAST_BOUNDS;
+        attribution = GEOMET_ATTRIBUTION;
+        break;
+      default:
+        bounds = MAP_BOUNDS;
+        attribution = GEOMET_ATTRIBUTION;
+    }
+  }
 
   const source: RasterSourceSpecification = {
-    attribution:
-      apiData.domain === "europe" || apiData.domain === "indianOcean" ? EUMETSAT_ATTRIBUTION : GEOMET_ATTRIBUTION,
+    attribution,
     type: "raster",
     tileSize: 256,
-    bounds:
-      apiData.type === "satellite"
-        ? apiData.domain === "europe"
-          ? EUMETSAT_BOUNDS
-          : apiData.domain === "indianOcean"
-            ? IODC_BOUNDS
-            : apiData.domain === "west"
-              ? GOES_WEST_BOUNDS
-              : GOES_EAST_BOUNDS
-        : MAP_BOUNDS,
+    bounds,
   };
 
   // filter all the time steps that are within our validity period
-  const filteredTimesteps = apiData.timeSteps.filter((time) => time.validTime > animation.startTime);
-
-  if (filteredTimesteps.length === 0) return; // if we have no valid time steps, don't render anything
+  const filteredTimesteps = apiData?.timeSteps?.filter((time) => time.validTime > animation.startTime) ?? [];
 
   const mappedTimesteps = useMemo(() => {
     const timesteps: number[] = [];
@@ -112,6 +137,8 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
   const maxFrame = animation.frameCount - 1;
 
   const transition: TransitionSpecification = { duration: 0 };
+
+  if (!apiData || mappedTimesteps.length === 0) return; // if we have no valid time steps, don't render anything
 
   /*
   rule for smooth animation:
