@@ -8,14 +8,14 @@ import {
   getIsolineThreshold,
 } from "@plymer/fast-barnes-ts";
 
-import type { DbShape } from "../services/database.js";
 import { isobars } from "../db/schemas.drizzle.js";
 import { lonLatToWebMercator } from "../lib/utils.js";
 import { MINUTE } from "../lib/constants.js";
+import { pgDb as db } from "../services/database.js";
 
-export async function createIsolines<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
+export async function createIsolines() {
   if (!db) {
-    throw new Error("[SIGMET] Database connection failed.");
+    throw new Error("[ISOLINES] Database connection failed.");
   }
 
   try {
@@ -88,7 +88,7 @@ export async function createIsolines<TSchema extends Record<string, unknown>>(db
     // insert the isolines data into the database
     await Promise.all(
       lineData.map(async (line) => {
-        await db.insert(isobars).values({
+        await db!.insert(isobars).values({
           expiryTime: new Date(now + 10 * MINUTE),
           startTime: new Date(now),
           value: line.value,

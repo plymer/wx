@@ -5,12 +5,20 @@ import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, DEFAULT_REMOTE_HEADERS, HOUR } fr
 import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../lib/types.js";
 import { cardinalToDegrees, readGzipFile, xmlParser } from "../lib/utils.js";
 import { airSigmetsSchema } from "../lib/validation.js";
-
-import type { DbShape } from "../services/database.js";
+import { pgDb as db } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
-export async function getSigmets<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
+const extractEventName = (text: string): string | null => {
+  const eventNameMatch = text.match(/(VA ERUPTION MT|VA|TC)\s+([A-Z0-9]+)/);
+  if (eventNameMatch) {
+    return eventNameMatch[2].trim();
+  } else {
+    return null;
+  }
+};
+
+export async function getSigmets() {
   if (!db) {
     throw new Error("[SIGMET] Database connection failed.");
   }
@@ -71,6 +79,8 @@ export async function getSigmets<TSchema extends Record<string, unknown>>(db: Aw
           return;
         }
 
+        const hazardName = extractEventName(rawText);
+
         const outputObject: SigmetData = {
           issueTime,
           endTime,
@@ -86,6 +96,7 @@ export async function getSigmets<TSchema extends Record<string, unknown>>(db: Aw
           direction,
           speed,
           hazard: hazard.type === "CONVECTIVE" ? "TS" : hazard.type,
+          hazardName,
           hazardTop,
           hazardBottom,
           finalCoords: null,
@@ -204,6 +215,7 @@ export async function getSigmets<TSchema extends Record<string, unknown>>(db: Aw
         numberCode,
         hazard,
         hazardTrend: chng,
+        hazardName: extractEventName(rawText),
         hazardBottom,
         hazardTop,
         initialShape,
@@ -287,7 +299,7 @@ export async function getSigmets<TSchema extends Record<string, unknown>>(db: Aw
   try {
     await Promise.allSettled(
       data.map(async (sigmet) => {
-        await db.insert(sigmets).values(sigmet).onConflictDoNothing();
+        await db!.insert(sigmets).values(sigmet).onConflictDoNothing();
       }),
     );
     // console.log(`[SIGMET] Inserted/updated ${data.length} SIGMETs.`);

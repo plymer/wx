@@ -38,7 +38,7 @@ https://postgis.net/docs/ST_AsMVT.html
  */
 
 import { sql } from "drizzle-orm";
-import { db } from "../main.js";
+import { pgDb as db } from "../services/database.js";
 
 const DATETIME_COLUMNS = new Set<string>(["validTime", "startTime", "expiryTime"]);
 const VECTOR_TILE_EXTENT = 4096;
@@ -401,6 +401,10 @@ function stationPlotQuery(z: number) {
 }
 
 export async function getTile(t: number, z: number, x: number, y: number) {
+  if (!db) {
+    throw new Error("[MVT-QUERY] Database connection failed.");
+  }
+
   const layerQueries = TABLES.map((table) => {
     const { name, columns } = table;
 

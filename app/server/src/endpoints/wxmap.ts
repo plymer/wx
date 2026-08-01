@@ -1,4 +1,3 @@
-import { asc, gt } from "drizzle-orm";
 import type { Feature, FeatureCollection, LineString, MultiPolygon, Point } from "geojson";
 import { TRPCError } from "@trpc/server";
 import * as fs from "fs/promises";
@@ -7,110 +6,18 @@ import "dotenv/config";
 import * as turf from "@turf/turf";
 
 import type { StationPlotPopupData, WarningProperties, WxmapIsolineSlotMetadata } from "../lib/types.js";
-import { metars, tafs } from "../db/schemas.drizzle.js";
+
 import { HOUR } from "../lib/constants.js";
 
-import { cacheClient, db } from "../main.js";
-import { publicProcedure, router } from "../services/trpc.js";
-
 import { limitResultsByKeys } from "../lib/utils.js";
-
-// import { SITE_IGNORES } from "../config/alphanumeric.config.js";
 import { wxmapIsolinesSchema } from "../validationSchemas/wxmap.zod.js";
 import { PUBLIC_ALERTS_CACHE_KEY } from "../config/cache-keys.config.js";
 
-// Generic function to convert METAR query results to GeoJSON features
-// function buildMetarFeatures(queryResult: MetarWithStation[]): Feature<Point, StationPlotData>[] {
-//   return queryResult.reduce<Feature<Point, StationPlotData>[]>((acc, metar) => {
-//     const {
-//       siteId,
-//       category,
-//       td,
-//       tt,
-//       vis,
-//       validTime,
-//       wxString,
-//       windDir,
-//       windGst,
-//       windSpd,
-//       stations,
-//       mslp,
-//       timeString,
-//     } = metar;
-
-//     if (!stations?.lat || !stations?.lon || SITE_IGNORES.includes(siteId)) {
-//       return acc;
-//     }
-
-//     const { lat, lon } = stations;
-//     const existingFeature = acc.find((feature) => feature.properties.siteId === siteId);
-
-//     const metarData: Omit<MetarElements, "createdAt" | "stationPriority" | "stationType" | "obType" | "ceiling"> = {
-//       category,
-//       td,
-//       tt,
-//       vis,
-//       mslp,
-//       validTime,
-//       timeString,
-//       wxString,
-//       windDir,
-//       windGst,
-//       windSpd,
-//     };
-
-//     if (existingFeature) {
-//       existingFeature.properties.metars.push(metarData);
-//     } else {
-//       const newFeature: Feature<Point, StationPlotData> = {
-//         type: "Feature",
-//         geometry: {
-//           type: "Point",
-//           coordinates: [lon, lat],
-//         },
-//         properties: {
-//           siteId,
-//           stationPriority: siteId.startsWith("CY") ? 1 : siteId.startsWith("C") ? 2 : 3,
-//           metars: [metarData],
-//         },
-//       };
-//       acc.push(newFeature);
-//     }
-
-//     return acc;
-//   }, []);
-// }
+import { publicProcedure, router } from "../services/trpc.js";
+import { pgDb as db } from "../services/database.js";
+import { cacheClient } from "../services/redis.js";
 
 export const wxmapRouter = router({
-  //   wxmapMetars: publicProcedure.query(async (): Promise<FeatureCollection<Point, StationPlotData>> => {
-  //     if (!db) {
-  //       throw new TRPCError({
-  //         code: "INTERNAL_SERVER_ERROR",
-  //         message: "No avwx connection available",
-  //       });
-  //     }
-
-  //     const cachedData = await cacheClient.get("wxmap:metars");
-
-  //     if (cachedData) {
-  //       console.log("[API] Cache HIT for wxmap metars");
-  //       return JSON.parse(cachedData) as FeatureCollection<Point, StationPlotData>;
-  //     }
-
-  //     console.log("[API] Cache MISS for wxmap metars. Fetching from source...");
-
-  //     const queryResult = (await db.query.metars.findMany({
-  //       where: gt(metars.validTime, new Date(Date.now() - 4 * HOUR)),
-  //       with: { stations: { columns: { lat: true, lon: true } } },
-  //     })) as MetarWithStation[];
-
-  //     const output = turf.featureCollection(buildMetarFeatures(queryResult));
-
-  //     await cacheClient.setEx("wxmap:metars", 60 * 15, JSON.stringify(output));
-
-  //     return output;
-  //   }),
-
   wxmapPopupData: publicProcedure.query(async (): Promise<FeatureCollection<Point, StationPlotPopupData>> => {
     if (!db) {
       throw new TRPCError({
@@ -130,11 +37,11 @@ export const wxmapRouter = router({
 
     const metarsQuery = await db.query.metars
       .findMany({
-        where: gt(metars.validTime, new Date(Date.now() - 4 * HOUR)),
+        where: { validTime: { gt: new Date(Date.now() - 4 * HOUR) } },
         with: {
           stations: { columns: { lat: true, lon: true, country: true, name: true, state: true } },
         },
-        orderBy: [asc(metars.validTime)],
+        orderBy: { validTime: "asc" },
       })
       .then((results) => limitResultsByKeys(results, 3, "siteId"));
 
@@ -151,8 +58,8 @@ export const wxmapRouter = router({
 
     const tafsQuery = await db.query.tafs
       .findMany({
-        where: gt(tafs.validTime, new Date(Date.now() - 8 * HOUR)),
-        orderBy: [asc(tafs.validTime)],
+        where: { validTime: { gt: new Date(Date.now() - 8 * HOUR) } },
+        orderBy: { validTime: "asc" },
       })
       .then((results) => limitResultsByKeys(results, 1, "siteId"));
 

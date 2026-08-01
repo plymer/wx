@@ -4,10 +4,9 @@ import { aqData } from "../db/schemas.drizzle.js";
 import type { AQData } from "../lib/types.js";
 import { aqSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
+import { pgDb as db } from "../services/database.js";
 
-import type { DbShape } from "../services/database.js";
-
-export async function getAqData<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
+export async function getAqData() {
   if (!db) {
     throw new Error("[AQ-DATA] Failed to connect to the database.");
   }
@@ -80,7 +79,7 @@ export async function getAqData<TSchema extends Record<string, unknown>>(db: Awa
   // prevent having duplicate entries in the database by checking for duplicate PKs
   await Promise.allSettled(
     rows.map(async (data) => {
-      await db
+      await db!
         .insert(aqData)
         .values(data)
         .onConflictDoUpdate({

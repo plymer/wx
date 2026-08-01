@@ -7,11 +7,11 @@ import type { CacheTafData, TafData, XMLCacheFile } from "../lib/types.js";
 import { tafSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
 
-import type { DbShape } from "../services/database.js";
+import { pgDb as db } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/tafs.cache.xml.gz";
 
-export async function getTafs<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
+export async function getTafs() {
   if (!db) {
     throw new Error("[TAF] Database connection failed.");
   }
@@ -51,7 +51,7 @@ export async function getTafs<TSchema extends Record<string, unknown>>(db: Await
     // insert the metar data, or update each metar if it already exists (our pk is siteId + validTime)
     await Promise.allSettled(
       output.map(async (taf) => {
-        await db
+        await db!
           .insert(tafs)
           .values(taf)
           .onConflictDoUpdate({

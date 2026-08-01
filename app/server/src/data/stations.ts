@@ -8,11 +8,11 @@ import { FEET_PER_METRE } from "../lib/constants.js";
 import type { CacheStationData, StationData } from "../lib/types.js";
 import { stationSchema } from "../lib/validation.js";
 import { scrapeWiki } from "./canada-airports.js";
-import type { DbShape } from "../services/database.js";
+import { pgDb as db } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/stations.cache.json.gz";
 
-export async function buildStationCatalog<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
+export async function buildStationCatalog() {
   if (!db) {
     throw new Error("[STATIONS] Database connection failed.");
   }
@@ -53,7 +53,7 @@ export async function buildStationCatalog<TSchema extends Record<string, unknown
     // insert the station data, or update each station if it already exists
     await Promise.allSettled(
       output.map(async (station) => {
-        await db
+        await db!
           .insert(stations)
           .values(station)
           .onConflictDoUpdate({
@@ -76,7 +76,7 @@ export async function buildStationCatalog<TSchema extends Record<string, unknown
   }
 
   try {
-    await scrapeWiki(db);
+    await scrapeWiki();
   } catch (error) {
     console.error(`[STATION] Error scraping Canadian Sites from Wikipedia: ${(error as Error).message}`);
     process.exit(1);

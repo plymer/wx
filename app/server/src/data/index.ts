@@ -22,15 +22,19 @@ export const cacheClient = await redisClient("data");
 async function main() {
   const MAX_CONCURRENCY = 2;
 
-  const pgDbConnection = new DatabaseConnection(pgSchema, "data");
+  const pgDbConnection = new DatabaseConnection("data");
   const db = await pgDbConnection.getDb();
+
+  if (!db) {
+    throw new Error("Database connection failed, exiting...");
+  }
 
   // we need to check to see if we have a valid station catalog and station-visibility table
 
   const stationCatalogCount = await db.select().from(pgSchema.stations).limit(1);
   if (stationCatalogCount.length === 0) {
     console.log("[DATA] Station catalog is empty, building station catalog...");
-    await buildStationCatalog(db);
+    await buildStationCatalog();
   }
 
   const stationVisCount = await db.select().from(pgSchema.stationVisibility).limit(1);
@@ -45,15 +49,15 @@ async function main() {
 
   const queue = new TaskQueue(MAX_CONCURRENCY);
   const tasks: DataTask[] = [
-    { name: "TAFs", run: () => getTafs(db), schedule: "*/5 * * * *" },
-    { name: "METARs", run: () => getMetars(db), schedule: "* * * * *" },
-    { name: "Lightning", run: () => getLightning(db), schedule: "* * * * *" },
-    // { name: "PIREPs", run: () => getPireps(db), schedule: "* * * * *" },
-    { name: "SIGMETs", run: () => getSigmets(db), schedule: "* * * * *" },
+    { name: "TAFs", run: () => getTafs(), schedule: "*/5 * * * *" },
+    { name: "METARs", run: () => getMetars(), schedule: "* * * * *" },
+    { name: "Lightning", run: () => getLightning(), schedule: "* * * * *" },
+    // { name: "PIREPs", run: () => getPireps(), schedule: "* * * * *" },
+    { name: "SIGMETs", run: () => getSigmets(), schedule: "* * * * *" },
     { name: "Public-Alerts", run: () => getPublicAlerts(), schedule: "* * * * *" },
-    { name: "AQ-Data", run: () => getAqData(db), schedule: "*/10 * * * *" },
-    { name: "Isolines", run: () => createIsolines(db), schedule: "*/10 * * * *" },
-    { name: "Station-Catalog", run: () => buildStationCatalog(db), schedule: "0 0 * * *" },
+    { name: "AQ-Data", run: () => getAqData(), schedule: "*/10 * * * *" },
+    { name: "Isolines", run: () => createIsolines(), schedule: "*/10 * * * *" },
+    { name: "Station-Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
     { name: "Station-Visibility", run: () => updateStationVisTable(), schedule: "0 0 * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
 

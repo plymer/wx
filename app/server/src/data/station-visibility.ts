@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
-import { DatabaseConnection } from "../services/database.js";
-import { stations as stationsSchema, stationVisibility } from "../db/schemas.drizzle.js";
+import { pgDb as db } from "../services/database.js";
+import { stationVisibility } from "../db/schemas.drizzle.js";
 
 // prettier-ignore
 const BC_WINDS = ["CWAS","CWFG","CWRU","CWRO","CWEK","CWME","CWRO","CWQS","CWQK"]
@@ -93,9 +93,10 @@ function withinRadius(lat1: number, lon1: number, lat2: number, lon2: number, ra
 
 export async function updateStationVisTable() {
   console.log("Updating stationVisibility table...");
-  const dbConnection = new DatabaseConnection({ ...stationVisibility, ...stationsSchema }, "station-visibility");
 
-  const db = await dbConnection.getDb();
+  if (!db) {
+    throw new Error("[STATION-VISIBILITY] Database connection failed.");
+  }
 
   const uniqueSitesQuery = sql`
     SELECT DISTINCT ON ("siteId")

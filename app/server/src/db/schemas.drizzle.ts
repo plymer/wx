@@ -1,4 +1,4 @@
-import { getTableColumns, relations, sql } from "drizzle-orm";
+import { getColumns, sql } from "drizzle-orm";
 import {
   customType,
   pgTable,
@@ -13,12 +13,12 @@ import {
   primaryKey,
 } from "drizzle-orm/pg-core";
 
-type GeometryType = "POINT" | "MULTIPOINT" | "LINESTRING" | "MULTILINESTRING" | "POLYGON" | "MULTIPOLYGON";
+type GeometryType = "point" | "MultiPoint" | "LineString" | "MultiLineString" | "polygon" | "MultiPolygon";
 
 const INITIAL_SHAPES = ["polygon", "line", "point"] as const;
 const HAZARD_TRENDS = ["NC", "INTSF", "WKN"] as const;
 
-export const geometry = customType<{
+const geometry = customType<{
   data: string;
   driverData: string;
   config: {
@@ -27,7 +27,7 @@ export const geometry = customType<{
   };
 }>({
   dataType(config) {
-    return `geometry(${config?.type ?? "POINT"}, ${config?.srid ?? 4326})`;
+    return `geometry(${config?.type ?? "point"}, ${config?.srid ?? 4326})`;
   },
 
   toDriver(value) {
@@ -42,7 +42,7 @@ export const geometry = customType<{
 export const metars = pgTable(
   "metars",
   {
-    geometry: geometry({ srid: 3857, type: "POINT" }), // web mercator coordinates
+    geometry: geometry({ srid: 3857, type: "point" }), // web mercator coordinates
     siteId: varchar({ length: 4 }).notNull(),
     stationPriority: integer(),
     windDir: integer(),
@@ -108,7 +108,7 @@ export const isobars = pgTable(
     value: integer().notNull(),
     startTime: timestamp({ mode: "date" }).notNull(),
     expiryTime: timestamp({ mode: "date" }).notNull(),
-    geometry: geometry({ srid: 3857, type: "LINESTRING" }).notNull(),
+    geometry: geometry({ srid: 3857, type: "LineString" }).notNull(),
   },
   (t) => [index("isobar_spatial_index").using("gist", t.geometry)],
 );
@@ -118,7 +118,7 @@ export const lightning = pgTable(
   {
     startTime: timestamp({ mode: "date" }).primaryKey(),
     expiryTime: timestamp({ mode: "date" }).notNull(),
-    geometry: geometry({ srid: 3857, type: "MULTIPOINT" }).notNull(),
+    geometry: geometry({ srid: 3857, type: "MultiPoint" }).notNull(),
   },
   (t) => [index("lightning_spatial_index").using("gist", t.geometry)],
 );
@@ -126,7 +126,7 @@ export const lightning = pgTable(
 export const aqData = pgTable(
   "aqData",
   {
-    geometry: geometry({ srid: 3857, type: "POINT" }).notNull(),
+    geometry: geometry({ srid: 3857, type: "point" }).notNull(),
     name: text(),
     type: text(),
     lat: doublePrecision(),
@@ -157,6 +157,7 @@ export const sigmets = pgTable(
     firRegion: text(),
     header: text().default("TEMP").notNull(),
     hazard: text(),
+    hazardName: text(),
     hazardTrend: text({ enum: HAZARD_TRENDS }),
     hazardBottom: text(),
     hazardTop: text(),
@@ -194,31 +195,10 @@ export const sigmets = pgTable(
 //   ],
 // );
 
-// one station has many metars
-// one metar belongs to one station
-export const stationsRelations = relations(stations, ({ many }) => ({
-  metars: many(metars),
-  tafs: many(tafs),
-}));
-
-export const metarsRelations = relations(metars, ({ one }) => ({
-  stations: one(stations, {
-    fields: [metars.siteId],
-    references: [stations.siteId],
-  }),
-}));
-
-export const tafsRelations = relations(tafs, ({ one }) => ({
-  stations: one(stations, {
-    fields: [tafs.siteId],
-    references: [stations.siteId],
-  }),
-}));
-
 export const metarsTemporalView = pgView("metars_temporal").as((qb) =>
   qb
     .select({
-      ...getTableColumns(metars),
+      ...getColumns(metars),
       startTime: sql<Date>`${metars.validTime}`.as("startTime"),
       expiryTime:
         sql<Date>`lead(${metars.validTime}, 1, ${metars.validTime} + interval '1 hour') over (partition by ${metars.siteId} order by ${metars.validTime})`.as(

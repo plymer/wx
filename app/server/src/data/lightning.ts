@@ -2,7 +2,7 @@ import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { LightningFC } from "../lib/lightning.types.js";
 import { lt } from "drizzle-orm";
 import { lightning } from "../db/schemas.drizzle.js";
-import type { DbShape } from "../services/database.js";
+import { pgDb as db } from "../services/database.js";
 import { lonLatToWebMercator } from "../lib/utils.js";
 
 const formatDateToUrlDate = (date: Date) => {
@@ -13,7 +13,7 @@ const formatDateToUrlDate = (date: Date) => {
     .replace(/:/g, "");
 };
 
-export async function getLightning<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
+export async function getLightning() {
   if (!db) {
     throw new Error("[LIGHTNING] Database connection failed.");
   }
@@ -75,7 +75,7 @@ export async function getLightning<TSchema extends Record<string, unknown>>(db: 
 
         const strikeCoordsGeom = `MULTIPOINT(${strikeCoords})`;
 
-        await db
+        await db!
           .insert(lightning)
           .values({ startTime: from, expiryTime: to, geometry: strikeCoordsGeom })
           .onConflictDoUpdate({

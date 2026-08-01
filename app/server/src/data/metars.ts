@@ -6,11 +6,11 @@ import { metars } from "../db/schemas.drizzle.js";
 import type { CacheMetarData, MetarData, XMLCacheFile } from "../lib/types.js";
 import { metarSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
-import type { DbShape } from "../services/database.js";
+import { pgDb as db } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/metars.cache.xml.gz";
 
-export async function getMetars<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
+export async function getMetars() {
   if (!db) {
     throw new Error("[METAR] Database connection failed.");
   }
@@ -98,7 +98,7 @@ export async function getMetars<TSchema extends Record<string, unknown>>(db: Awa
     // insert the metar data, or update each metar if it already exists (our pk is siteId + validTime)
     await Promise.allSettled(
       output.map(async (metar) => {
-        await db
+        await db!
           .insert(metars)
           .values(metar)
           .onConflictDoUpdate({

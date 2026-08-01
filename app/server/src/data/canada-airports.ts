@@ -3,7 +3,7 @@ import { load } from "cheerio";
 import type { StationData } from "../lib/types.js";
 import { stations } from "../db/schemas.drizzle.js";
 import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
-import type { DbShape } from "../services/database.js";
+import { pgDb as db } from "../services/database.js";
 
 const PROVINCES = {
   AB: "Alberta",
@@ -159,7 +159,7 @@ async function scrapeProvince(code: string, name: string): Promise<StationData[]
   return Array.from(deduped.values());
 }
 
-export async function scrapeWiki<TSchema extends Record<string, unknown>>(db: Awaited<DbShape<TSchema>>) {
+export async function scrapeWiki() {
   if (!db) {
     throw new Error("[STATIONS] Database connection failed.");
   }
@@ -186,7 +186,7 @@ export async function scrapeWiki<TSchema extends Record<string, unknown>>(db: Aw
       // insert the station data, or update each station if it already exists
       await Promise.allSettled(
         values.map(async (station) => {
-          await db
+          await db!
             .insert(stations)
             .values(station)
             .onConflictDoUpdate({

@@ -8,11 +8,7 @@ import { compress } from "hono/compress";
 import { trpcServer } from "@hono/trpc-server";
 import { serve } from "@hono/node-server";
 
-// database schemas
-import * as pgSchemas from "./db/schemas.drizzle.js";
-
 // utilities
-import { redisClient } from "./services/redis.js";
 import { publicProcedure, router } from "./services/trpc.js";
 
 // endpoint routers
@@ -23,19 +19,12 @@ import { chartsRouter } from "./endpoints/charts.js";
 import { globalMessageRouter } from "./endpoints/globalMessage.js";
 import { apiRouter } from "./endpoints/api.js";
 
-import { DatabaseConnection } from "./services/database.js";
-
 const app = new Hono();
 
 app.use("*", cors());
 app.use(compress());
 
 const port = parseInt(process.env.PORT || "3000");
-
-const pgDbConnection = new DatabaseConnection(pgSchemas, "api");
-export const db = await pgDbConnection.getDb();
-
-export const cacheClient = await redisClient("api");
 
 const greetRouter = router({
   greeting: publicProcedure

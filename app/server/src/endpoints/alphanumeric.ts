@@ -1,4 +1,3 @@
-import { and, asc, desc, eq, gt, gte } from "drizzle-orm";
 import type { Feature, MultiPolygon } from "geojson";
 import { TRPCError } from "@trpc/server";
 
@@ -12,12 +11,11 @@ import {
 import type { XmetEventData } from "../lib/alphanumeric.types.js";
 import { getSunTimes, isConvectiveSigmet, processCoordinates, stringifyPosition } from "../lib/utils.js";
 
-import { metars, sigmets, stations, tafs } from "../db/schemas.drizzle.js";
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 
-import { db } from "../main.js";
 import { publicProcedure, router } from "../services/trpc.js";
 import type { PointForecastData, WxOAPIResponse, XmetGeoJSON } from "../lib/types.js";
+import { pgDb as db } from "../services/database.js";
 
 export const alphanumericRouter = router({
   metars: publicProcedure.input(metarSchema).query(async ({ input }) => {
@@ -32,9 +30,9 @@ export const alphanumericRouter = router({
 
     try {
       const metarData = await db.query.metars.findMany({
+        where: { siteId: searchSite, validTime: { gte: new Date(Date.now() - hrs * HOUR) } },
         columns: { rawText: true },
-        where: and(eq(metars.siteId, searchSite), gte(metars.validTime, new Date(Date.now() - hrs * HOUR))),
-        orderBy: asc(metars.validTime),
+        orderBy: { validTime: "asc" },
       });
 
       if (!metarData || metarData.length === 0) {
@@ -62,7 +60,7 @@ export const alphanumericRouter = router({
 
     try {
       const stationData = await db.query.stations.findFirst({
-        where: eq(stations.siteId, searchSite),
+        where: { siteId: searchSite },
       });
 
       if (!stationData) {
@@ -107,8 +105,8 @@ export const alphanumericRouter = router({
     try {
       const tafData = await db.query.tafs.findMany({
         columns: { rawText: true },
-        where: eq(tafs.siteId, searchSite),
-        orderBy: desc(tafs.validTime),
+        where: { siteId: searchSite },
+        orderBy: { validTime: "desc" },
       });
 
       if (!tafData || tafData.length === 0) {
@@ -279,8 +277,8 @@ export const alphanumericRouter = router({
     try {
       const { hours } = input;
       const queryResult = await db.query.sigmets.findMany({
-        where: gt(sigmets.endTime, new Date(Date.now() - hours * HOUR)),
-        orderBy: [desc(sigmets.endTime)],
+        where: { endTime: { gt: new Date(Date.now() - hours * HOUR) } },
+        orderBy: { endTime: "desc" },
       });
 
       const xmetList = queryResult.sort((a, b) => new Date(b.endTime).getTime() - new Date(a.endTime).getTime());
