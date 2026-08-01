@@ -23,6 +23,10 @@ const relations = defineRelations(schemas, (r) => ({
   },
 }));
 
+const createDb = (client: Pool) => drizzle({ client, relations });
+
+type Database = ReturnType<typeof createDb>;
+
 export const credentials = {
   user: process.env.DB_USER ?? "postgres",
   password: process.env.DB_PASSWORD ?? "password",
@@ -33,14 +37,12 @@ export const credentials = {
 };
 
 export class DatabaseConnection {
-  private _db: ReturnType<typeof drizzle> | undefined;
-  private _relations: ReturnType<typeof defineRelations> | undefined;
+  private _db: Database | undefined;
   private _dbClient: Pool | undefined;
   private _consumer: string;
 
   constructor(consumer: string) {
     this._consumer = consumer;
-    this._relations = relations;
   }
 
   public async getDb() {
@@ -54,7 +56,7 @@ export class DatabaseConnection {
   public async connect() {
     const client = new Pool({ ...credentials });
     this._dbClient = client;
-    this._db = drizzle({ client: this._dbClient, relations: this._relations });
+    this._db = createDb(client);
 
     const isConnected = await this.testConnection();
 
