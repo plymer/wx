@@ -11,7 +11,7 @@ import { updateStationVisTable } from "./station-visibility.js";
 import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
 import { redisClient } from "../services/redis.js";
 import { DatabaseConnection } from "../services/database.js";
-import * as pgSchema from "../db/schemas.drizzle.js";
+import { stations, stationVisibility } from "../db/schemas.drizzle.js";
 import { createIsolines } from "./isolines.js";
 
 export const cacheClient = await redisClient("data");
@@ -23,6 +23,7 @@ async function main() {
   const MAX_CONCURRENCY = 2;
 
   const pgDbConnection = new DatabaseConnection("data");
+  await pgDbConnection.connect();
   const db = await pgDbConnection.getDb();
 
   if (!db) {
@@ -31,13 +32,13 @@ async function main() {
 
   // we need to check to see if we have a valid station catalog and station-visibility table
 
-  const stationCatalogCount = await db.select().from(pgSchema.stations).limit(1);
+  const stationCatalogCount = await db.select().from(stations).limit(1);
   if (stationCatalogCount.length === 0) {
     console.log("[DATA] Station catalog is empty, building station catalog...");
     await buildStationCatalog();
   }
 
-  const stationVisCount = await db.select().from(pgSchema.stationVisibility).limit(1);
+  const stationVisCount = await db.select().from(stationVisibility).limit(1);
   if (stationVisCount.length === 0) {
     console.log("[DATA] Station visibility table is empty, updating station visibility table...");
     await updateStationVisTable();

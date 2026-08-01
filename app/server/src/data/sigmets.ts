@@ -10,7 +10,7 @@ import { pgDb as db } from "../services/database.js";
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
 const extractEventName = (text: string): string | null => {
-  const eventNameMatch = text.match(/(VA ERUPTION MT|VA|TC)\s+([A-Z0-9]+)/);
+  const eventNameMatch = text.match(/(VA[\n\s]ERUPTION[\n\s]MT|VA|TC)\s+([A-Z0-9]+)/);
   if (eventNameMatch) {
     return eventNameMatch[2].trim();
   } else {

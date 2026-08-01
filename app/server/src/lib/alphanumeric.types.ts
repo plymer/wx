@@ -180,6 +180,7 @@ export type XmetEventData = {
     trend: "NC" | "INTSF" | "WKN" | null;
     top: string | null;
     bottom: string | null;
+    name: string | null;
   };
   motionVector: {
     direction: number | null;
