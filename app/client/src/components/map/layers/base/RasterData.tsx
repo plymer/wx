@@ -22,6 +22,7 @@ import {
 } from "@/config/rasterData";
 import type { WMSDomains, WMSLayer } from "@shared/lib/types";
 import type { TransitionSpecification } from "maplibre-gl";
+import { useMemo } from "react";
 
 interface Props {
   belowLayer?: string;
@@ -73,22 +74,39 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
   };
 
   // filter all the time steps that are within our validity period
-  const timeSteps = apiData.timeSteps.filter((time) => time.validTime > animation.startTime);
+  const filteredTimesteps = apiData.timeSteps.filter((time) => time.validTime > animation.startTime);
 
-  if (timeSteps.length === 0) return; // if we have no valid time steps, don't render anything
+  if (filteredTimesteps.length === 0) return; // if we have no valid time steps, don't render anything
 
-  // we also need to make sure we have enough frames to cover the entire animation, so first calculate the difference between the number of time steps we have filtered and the total number of frames
-  const timeStepsDiff = timeSteps.length - animation.frameCount;
+  const mappedTimesteps = useMemo(() => {
+    const timesteps: number[] = [];
 
-  // if our diff is negative, append the latest frame to the end of the times array until we have enough frames
-  // if our diff is positive, remove the earliest frames until we have the same number of frames as the animation.frameCount
-  if (timeStepsDiff < 0) {
-    for (let i = 0; i < -timeStepsDiff; i++) {
-      timeSteps.push(timeSteps[timeSteps.length - 1]);
+    for (let i = 0; i < animation.frameCount; i++) {
+      const minTime = animation.startTime + i * animation.deltaTime;
+      const maxTime = animation.startTime + (i + 1) * animation.deltaTime;
+
+      const candidate = filteredTimesteps.find(
+        (time) => time.validTime >= minTime && time.validTime <= maxTime,
+      )?.validTime;
+
+      if (candidate !== undefined) {
+        timesteps.push(candidate);
+      }
     }
-  } else if (timeStepsDiff > 0) {
-    timeSteps.splice(0, timeStepsDiff);
-  }
+
+    // we also need to make sure we have enough frames to cover the entire animation, so first calculate the difference between the number of time steps we have filtered and the total number of frames
+    const timeStepsDiff = timesteps.length - animation.frameCount;
+
+    // if our diff is negative, append the latest frame to the end of the times array until we have enough frames
+    // if our diff is positive, remove the earliest frames until we have the same number of frames as the animation.frameCount
+    if (timeStepsDiff < 0) {
+      for (let i = 0; i < -timeStepsDiff; i++) {
+        timesteps.push(timesteps[timesteps.length - 1]);
+      }
+    }
+
+    return timesteps;
+  }, [filteredTimesteps, animation.startTime, animation.deltaTime, animation.frameCount]);
 
   const maxFrameId = `${layerId}-${animation.frameCount - 1}`;
   const maxFrame = animation.frameCount - 1;
@@ -105,7 +123,7 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
       <Source
         {...source}
         key={maxFrameId}
-        tiles={[makeTileRequestString(apiData.domain, apiData.name, timeSteps[maxFrame].validTime)]}
+        tiles={[makeTileRequestString(apiData.domain, apiData.name, mappedTimesteps[maxFrame])]}
         id={maxFrameId}
       >
         <Layer
@@ -119,13 +137,13 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
         />
       </Source>
       {!animation.isStatic &&
-        timeSteps.map((u, index) => {
+        mappedTimesteps.map((u, index) => {
           if (index === maxFrame) return; // don't render the max frame again
           return (
             <Source
               {...source}
               key={`${layerId}-${index}`}
-              tiles={[makeTileRequestString(apiData.domain, apiData.name, u.validTime)]}
+              tiles={[makeTileRequestString(apiData.domain, apiData.name, u)]}
               id={`${layerId}-${index}`}
             >
               <Layer
