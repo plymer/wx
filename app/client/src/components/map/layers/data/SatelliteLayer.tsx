@@ -53,7 +53,33 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
     ),
   );
 
-  const data = domain === "europe" ? euData : domain === "indianOcean" ? iOData : goesData;
+  const { data: himawariData } = useQuery(
+    api.wms.himawari.queryOptions(
+      { product: "2km_Ash" },
+      {
+        enabled: showSatellite && domain === "himawari",
+        refetchInterval: MINUTE,
+      },
+    ),
+  );
+
+  let data;
+
+  switch (domain) {
+    case "europe":
+      data = euData;
+      break;
+    case "indianOcean":
+      data = iOData;
+      break;
+    case "west":
+    case "east":
+      data = goesData;
+      break;
+    case "himawari":
+      data = himawariData;
+      break;
+  }
 
   if (!showSatellite || !data) return;
 

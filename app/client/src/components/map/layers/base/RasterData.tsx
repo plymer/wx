@@ -19,6 +19,7 @@ import {
   EUMETSAT_ATTRIBUTION,
   GEOMET_ATTRIBUTION,
   IODC_BOUNDS,
+  HIMAWARI_BOUNDS,
 } from "@/config/rasterData";
 import type { WMSDomains, WMSLayer } from "@shared/lib/types";
 import type { TransitionSpecification } from "maplibre-gl";
@@ -38,6 +39,7 @@ const makeTileRequestString = (domain: WMSDomains, layerName: string, validTime:
       break;
     case "west":
     case "east":
+    case "himawari":
       baseUrl = GEOMET_GETMAP;
       break;
     default:
@@ -85,6 +87,10 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
         break;
       case "east":
         bounds = GOES_EAST_BOUNDS;
+        attribution = GEOMET_ATTRIBUTION;
+        break;
+      case "himawari":
+        bounds = HIMAWARI_BOUNDS;
         attribution = GEOMET_ATTRIBUTION;
         break;
       default:
