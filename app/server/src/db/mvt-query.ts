@@ -54,6 +54,7 @@ const TABLES = [
     name: "isobars",
     columns: ["startTime", "expiryTime", "value"],
   },
+  { name: "extrema", columns: ["startTime", "expiryTime", "value", "kind"] },
   {
     name: "metars",
     columns: ["validTime", "siteId"],

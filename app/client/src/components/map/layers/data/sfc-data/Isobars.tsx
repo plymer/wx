@@ -56,12 +56,12 @@ export const Isobars = ({ displayTime }: Props) => {
           "text-halo-width": 1.5,
         }}
       />
-      {/* <Layer
+      <Layer
         id={`layer-sfc-obs-mslp-extrema-value`}
         source="vector-tile-source"
-        source-layer="isobars"
+        source-layer="extrema"
+        filter={filter}
         type="symbol"
-        filter={["has", "kind"]}
         layout={{
           "text-field": ["get", "value"],
           "text-allow-overlap": true,
@@ -78,9 +78,9 @@ export const Isobars = ({ displayTime }: Props) => {
       <Layer
         id={`layer-sfc-obs-mslp-extrema-marker`}
         source="vector-tile-source"
-        source-layer="isobars"
+        source-layer="extrema"
+        filter={filter}
         type="symbol"
-        filter={["has", "kind"]}
         layout={{
           "text-field": ["match", ["get", "kind"], "max", "H", "min", "L", ""],
           "text-allow-overlap": true,
@@ -93,7 +93,7 @@ export const Isobars = ({ displayTime }: Props) => {
           "text-halo-color": "#fff",
           "text-halo-width": 2,
         }}
-      /> */}
+      />
     </>
   );
 };

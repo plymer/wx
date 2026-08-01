@@ -103,6 +103,8 @@ export async function createIsolines() {
 
     const extremaPointData = getExtremaLocations("mslp", extrema, barnesParams.unproject);
 
+    console.log(`[ISOLINES] Found ${extremaPointData.length} extrema points to store.`);
+
     await Promise.all(
       extremaPointData.map(async (point) => {
         const { x, y } = lonLatToWebMercator(point.lng, point.lat);
@@ -110,6 +112,7 @@ export async function createIsolines() {
 
         await db!.insert(extremaTable).values({
           expiryTime: new Date(now + 10 * MINUTE),
+          kind: point.kind,
           startTime: new Date(now),
           value: point.value,
           geometry,
@@ -117,7 +120,7 @@ export async function createIsolines() {
       }),
     );
 
-    console.log(`[ISOLINES] Processing completed and results were cached.`);
+    console.log(`[ISOLINES] Processing completed and results were stored.`);
   } catch (error) {
     console.error("[ISOLINES] Error during isoline processing:", (error as Error).stack);
     throw error;
