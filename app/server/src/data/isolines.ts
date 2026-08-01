@@ -8,7 +8,7 @@ import {
   getIsolineThreshold,
 } from "@plymer/fast-barnes-ts";
 
-import { isobars } from "../db/schemas.drizzle.js";
+import { isobars, extrema as extremaTable } from "../db/schemas.drizzle.js";
 import { lonLatToWebMercator } from "../lib/utils.js";
 import { MINUTE } from "../lib/constants.js";
 import { pgDb as db } from "../services/database.js";
@@ -47,10 +47,12 @@ export async function createIsolines() {
 
     const DATA_TYPES = ["mslp", "tt", "td"] as const;
 
-    const CONFIG: Record<
+    type IsolineConfig = Record<
       (typeof DATA_TYPES)[number],
       { spacing: number; resolution: number | readonly [number, number]; sigma: ReadonlyArray<number> }
-    > = {
+    >;
+
+    const CONFIG: IsolineConfig = {
       mslp: {
         spacing: 4,
         resolution: [baseResolution, baseResolution / 1.45],
@@ -75,8 +77,8 @@ export async function createIsolines() {
     });
 
     const lineData = marched.polylines.map((line, idx) => {
-      const coords = line.map(([lon, lat]) => {
-        const { x, y } = lonLatToWebMercator(lon, lat);
+      const coords = line.map(([lng, lat]) => {
+        const { x, y } = lonLatToWebMercator(lng, lat);
         return `${x} ${y}`;
       });
 
@@ -99,7 +101,21 @@ export async function createIsolines() {
 
     const extrema = findGridExtrema2D(barnesResult, barnesParams.x0, barnesParams.step);
 
-    const _extremaPointData = getExtremaLocations("mslp", extrema, barnesParams.unproject);
+    const extremaPointData = getExtremaLocations("mslp", extrema, barnesParams.unproject);
+
+    await Promise.all(
+      extremaPointData.map(async (point) => {
+        const { x, y } = lonLatToWebMercator(point.lng, point.lat);
+        const geometry = `POINT(${x} ${y})`;
+
+        await db!.insert(extremaTable).values({
+          expiryTime: new Date(now + 10 * MINUTE),
+          startTime: new Date(now),
+          value: point.value,
+          geometry,
+        });
+      }),
+    );
 
     console.log(`[ISOLINES] Processing completed and results were cached.`);
   } catch (error) {

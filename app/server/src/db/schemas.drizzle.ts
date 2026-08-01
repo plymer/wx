@@ -113,6 +113,14 @@ export const isobars = pgTable(
   (t) => [index("isobar_spatial_index").using("gist", t.geometry)],
 );
 
+export const extrema = pgTable("extrema", {
+  id: bigserial({ mode: "number" }).primaryKey(),
+  value: doublePrecision().notNull(),
+  startTime: timestamp({ mode: "date" }).notNull(),
+  expiryTime: timestamp({ mode: "date" }).notNull(),
+  geometry: geometry({ srid: 3857, type: "point" }).notNull(),
+});
+
 export const lightning = pgTable(
   "lightning",
   {
