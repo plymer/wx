@@ -159,7 +159,7 @@ const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
     .map((f) => {
       // apply our motion vector if applicable
 
-      console.log(f.properties?.hazard);
+      console.log(f.properties);
 
       if ((dataType === "airmet" || dataType === "sigmet") && f.properties)
         return applyMotionVector(displayTime, f.properties.startTime, f);
@@ -181,7 +181,19 @@ const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
         id={`layer-${dataType}-text`}
         type="symbol"
         layout={{
-          "text-field": ["get", "alphaCode"],
+          "text-field": [
+            "case",
+            ["!=", ["get", "name", ["get", "hazard"]], null],
+            [
+              "concat",
+              ["get", "type", ["get", "hazard"]],
+              " ",
+              ["get", "name", ["get", "hazard"]],
+              " ",
+              ["get", "alphaCode"],
+            ],
+            ["get", "alphaCode"],
+          ],
           "text-allow-overlap": true,
           "text-font": ["Consolas-Regular"],
         }}

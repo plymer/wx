@@ -303,6 +303,7 @@ export const alphanumericRouter = router({
             trend: xmet.hazardTrend,
             top: xmet.hazardTop,
             bottom: xmet.hazardBottom,
+            name: xmet.hazardName,
           };
 
           const dataType: "sigmet" = "sigmet";
