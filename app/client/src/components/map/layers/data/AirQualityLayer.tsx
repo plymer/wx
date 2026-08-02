@@ -51,7 +51,10 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
       .map((feature) => ({
         type: "Feature",
         geometry: { type: "Point", coordinates: [feature.lon!, feature.lat!] },
-        properties: feature,
+        properties: {
+          pm25: feature.pm25,
+          validTime: feature.validTime,
+        },
       })),
   };
 
