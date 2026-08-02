@@ -3,7 +3,7 @@ import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
 import type { WarningProperties, WxOAlert, WxOPolygonAlert, WxOPolygonProperties } from "../lib/types.js";
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import * as turf from "@turf/turf";
-import { cacheClient } from "./index.js";
+import { cacheClient } from "../services/redis.js";
 import { PUBLIC_ALERTS_CACHE_KEY } from "../config/cache-keys.config.js";
 
 type AlertsGeoJsonResponse = {

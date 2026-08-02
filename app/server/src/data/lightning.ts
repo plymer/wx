@@ -37,16 +37,17 @@ export async function getLightning() {
 
   const bins = [formatDateToUrlDate(currentBin), formatDateToUrlDate(previousBin)];
 
-  const urlList = bins.map((ts) => `https://weather.gc.ca/api/app/v2/Lightning/1/${ts}`);
-
   try {
     const responses = (
       await Promise.all(
-        urlList.map(async (url) =>
-          fetch(url, { headers: DEFAULT_REMOTE_HEADERS })
+        bins.map(async (ts) =>
+          fetch(`https://weather.gc.ca/api/app/v2/Lightning/1/${ts}`, { headers: DEFAULT_REMOTE_HEADERS })
             .then((res) => res.json() as Promise<LightningFC>)
             .catch((err) => {
-              console.error(`[LIGHTNING] Error when fetching data from ${url}:`, err.message);
+              console.error(
+                `[LIGHTNING] Error when fetching data from ${`https://weather.gc.ca/api/app/v2/Lightning/1/${ts}`}:`,
+                err.message,
+              );
               return null;
             }),
         ),

@@ -9,22 +9,15 @@ import { buildStationCatalog } from "./stations.js";
 import { updateStationVisTable } from "./station-visibility.js";
 
 import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
-import { redisClient } from "../services/redis.js";
-import { DatabaseConnection } from "../services/database.js";
+import { pgDb as db } from "../services/database.js";
 import { stations, stationVisibility } from "../db/schemas.drizzle.js";
 import { createIsolines } from "./isolines.js";
-
-export const cacheClient = await redisClient("data");
 
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
  */
 async function main() {
   const MAX_CONCURRENCY = 2;
-
-  const pgDbConnection = new DatabaseConnection("data");
-  await pgDbConnection.connect();
-  const db = await pgDbConnection.getDb();
 
   if (!db) {
     throw new Error("Database connection failed, exiting...");

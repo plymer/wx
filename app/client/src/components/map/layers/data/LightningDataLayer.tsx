@@ -2,6 +2,7 @@ import { Layer } from "react-map-gl/maplibre";
 import { LIGHTNING_DISPLAY } from "@/config/vectorData";
 import { useShowLightning } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
+import { MINUTE } from "@shared/lib/constants";
 
 interface Props {
   belowLayer?: string;
@@ -24,7 +25,7 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
       filter={[
         "all",
         ["<=", ["get", "startTime"], ["to-number", displayTime]],
-        [">", ["get", "expiryTime"], ["to-number", displayTime]],
+        [">", ["get", "expiryTime"], ["to-number", displayTime - 10 * MINUTE]],
       ]}
     />
   );
