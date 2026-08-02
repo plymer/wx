@@ -24,6 +24,7 @@ import { useAppMode, useSetAppMode } from "@/stateStores/app";
 import type { AppMode } from "@/lib/types";
 import { api } from "./lib/trpc";
 import { MINUTE } from "@shared/lib/constants";
+import { TwitterIcon } from "./components/ui/TwitterIcon";
 
 const appModesList: AppMode[] = Object.keys(APP_MODES_LIST).map((k) => k as AppMode);
 
@@ -52,9 +53,8 @@ export const App = () => {
 
   return (
     <main className="relative w-full max-w-(--breakpoint-2xl) mx-auto">
-      {/* large-screen nav bar */}
-      <nav className="flex justify-between px-4 mt-2 place-items-center max-md:hidden">
-        <img src="/site-icon.svg" className="size-10 inline me-2" />
+      <nav className="flex justify-between md:px-4 md:mt-2 max-md:px-2 place-items-center">
+        <img src="/site-icon.svg" className="md:size-10 max-md:size-6 inline me-2" />
         {appModesList.map((l, i) => (
           <Button
             key={i}
@@ -62,24 +62,19 @@ export const App = () => {
             className={appMode === l ? "active " : ""}
             onClick={() => handleSetAppMode(l)}
           >
-            {APP_MODES_LIST[l].longName}
+            <span className="max-md:hidden">{APP_MODES_LIST[l].longName}</span>
+            <span className="md:hidden">{APP_MODES_LIST[l].shortName}</span>
           </Button>
         ))}
-      </nav>
 
-      {/* small-screen nav bar */}
-      <nav className="flex justify-between px-2 place-items-center md:hidden ">
-        <img src="/site-icon.svg" className="w-6 h-6 inline" />
-        {appModesList.map((l, i) => (
-          <Button
-            key={i}
-            variant={"menuTab"}
-            className={appMode === l ? "active " : ""}
-            onClick={() => handleSetAppMode(l)}
-          >
-            {APP_MODES_LIST[l].shortName}
-          </Button>
-        ))}
+        <a
+          href="https://twitter.com/prairiewxca"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Reach out on Twitter"
+        >
+          <TwitterIcon className="text-neutral-800 fill-neutral-600 hover:fill-neutral-800 transition-all stroke-0 md:size-8 max-md:size-6" />
+        </a>
       </nav>
 
       {/* add the app mode components here */}
