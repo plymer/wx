@@ -44,7 +44,7 @@ export const metars = pgTable(
   {
     geometry: geometry({ srid: 3857, type: "point" }), // web mercator coordinates
     siteId: varchar({ length: 4 }).notNull(),
-    stationPriority: integer(),
+    stationPriority: integer().default(0),
     windDir: integer(),
     windSpd: integer(),
     windGst: integer(),
