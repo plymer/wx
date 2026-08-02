@@ -24,14 +24,14 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
       filter={[
         "all",
         ["<=", ["get", "startTime"], ["to-number", displayTime]],
-        [">", ["get", "expiryTime"], ["to-number", displayTime - 20 * MINUTE]],
+        [">", ["get", "expiryTime"], ["to-number", displayTime - 15 * MINUTE]],
       ]}
       type="symbol"
       id="lightning-data"
       layout={{
         "text-field": "X",
         "text-overlap": "always",
-        "text-size": 14,
+        "text-size": 16,
         "text-font": ["Metropolis-Regular"],
       }}
       paint={{
