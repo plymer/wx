@@ -76,7 +76,10 @@ export const App = () => {
           rel="noopener noreferrer"
           title="Reach out on Twitter"
         >
-          <TwitterIcon className="text-neutral-800 fill-neutral-600 hover:fill-neutral-800 transition-all stroke-0 md:size-8 max-md:size-6" />
+          <TwitterIcon
+            key="twitter-icon"
+            className="text-neutral-800 fill-neutral-600 hover:fill-neutral-800 transition-all stroke-0 md:size-8 max-md:size-6"
+          />
         </a>
       </nav>
 
