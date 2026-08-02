@@ -1,5 +1,5 @@
 import { Layer } from "react-map-gl/maplibre";
-import { LIGHTNING_DISPLAY } from "@/config/vectorData";
+
 import { useShowLightning } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
 import { MINUTE } from "@shared/lib/constants";
@@ -17,7 +17,6 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
 
   return (
     <Layer
-      {...LIGHTNING_DISPLAY}
       source="vector-tile-source"
       source-layer="lightning"
       key="lightning-data"
@@ -25,8 +24,22 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
       filter={[
         "all",
         ["<=", ["get", "startTime"], ["to-number", displayTime]],
-        [">", ["get", "expiryTime"], ["to-number", displayTime - 10 * MINUTE]],
+        [">", ["get", "expiryTime"], ["to-number", displayTime - 20 * MINUTE]],
       ]}
+      type="symbol"
+      id="lightning-data"
+      layout={{
+        "text-field": "X",
+        "text-overlap": "always",
+        "text-size": 14,
+        "text-font": ["Metropolis-Regular"],
+      }}
+      paint={{
+        "text-color": "rgb(255,0,155)",
+        "text-halo-color": "rgb(255,255,255)",
+        "text-halo-width": 1,
+        "text-opacity": ["case", ["<", ["get", "expiryTime"], ["to-number", displayTime - 10 * MINUTE]], 0.5, 1],
+      }}
     />
   );
 };
