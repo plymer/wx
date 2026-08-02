@@ -18,6 +18,7 @@ import { alphanumericRouter } from "./endpoints/alphanumeric.js";
 import { chartsRouter } from "./endpoints/charts.js";
 import { globalMessageRouter } from "./endpoints/globalMessage.js";
 import { apiRouter } from "./endpoints/api.js";
+import { aqRouter } from "./endpoints/aq.js";
 
 const app = new Hono();
 
@@ -42,10 +43,10 @@ const greetRouter = router({
 
 const appRouter = router({
   base: greetRouter,
+  aq: aqRouter,
   messages: globalMessageRouter,
   alpha: alphanumericRouter,
   charts: chartsRouter,
-
   wms: wmsRouter,
   wxmap: wxmapRouter,
 });

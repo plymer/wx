@@ -20,10 +20,11 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
   const displayTime = useDisplayTime();
 
   const { data, isFetching } = useQuery(
-    api.aq.aq.queryOptions(
-      { hours: 4 },
-      { enabled, refetchInterval: 10 * MINUTE, trpc: { context: { skipBatch: true } } },
-    ),
+    api.aq.aq.queryOptions(undefined, {
+      enabled,
+      refetchInterval: 10 * MINUTE,
+      trpc: { context: { skipBatch: true } },
+    }),
   );
 
   useMapLoadingState("aqData", isFetching);
@@ -32,19 +33,26 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
 
   const filteredData: FeatureCollection = {
     type: "FeatureCollection",
-    features: data.filter((feature) => {
-      // filter out features that don't have a validTime property
-      if (!feature.properties?.validTime || !feature.properties.pm25 || feature.properties.pm25 < 20) return false;
+    features: data
+      .filter((feature) => {
+        // filter out features that don't have a validTime property
+        if (!feature.validTime || !feature.pm25 || feature.pm25 < 20 || feature.lon === null || feature.lat === null)
+          return false;
 
-      // otherwise, filter based on the validTime property
-      const validTime = feature.properties.validTime;
+        // otherwise, filter based on the validTime property
+        const validTime = feature.validTime;
 
-      // for the latest frame of data, expand our valid window to 90 minutes to ensure we catch obs from last hour
-      const lastTimeStep = new Date(displayTime - 90 * MINUTE);
-      const displayTimeDate = new Date(displayTime);
+        // for the latest frame of data, expand our valid window to 90 minutes to ensure we catch obs from last hour
+        const lastTimeStep = new Date(displayTime - 90 * MINUTE);
+        const displayTimeDate = new Date(displayTime);
 
-      return validTime < displayTimeDate && validTime >= lastTimeStep;
-    }),
+        return validTime < displayTimeDate && validTime >= lastTimeStep;
+      })
+      .map((feature) => ({
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [feature.lon!, feature.lat!] },
+        properties: feature,
+      })),
   };
 
   return (

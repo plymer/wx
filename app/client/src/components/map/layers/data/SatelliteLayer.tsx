@@ -29,6 +29,7 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
       {
         enabled: showSatellite && domain === "europe",
         refetchInterval: MINUTE,
+        trpc: { context: { skipBatch: true } },
       },
     ),
   );
@@ -39,6 +40,7 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
       {
         enabled: showSatellite && domain === "indianOcean",
         refetchInterval: MINUTE,
+        trpc: { context: { skipBatch: true } },
       },
     ),
   );
@@ -49,6 +51,7 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
       {
         enabled: showSatellite && domain !== "europe" && domain !== "indianOcean",
         refetchInterval: MINUTE,
+        trpc: { context: { skipBatch: true } },
       },
     ),
   );
@@ -59,6 +62,7 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
       {
         enabled: showSatellite && domain === "himawari",
         refetchInterval: MINUTE,
+        trpc: { context: { skipBatch: true } },
       },
     ),
   );
