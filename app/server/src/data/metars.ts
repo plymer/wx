@@ -66,17 +66,19 @@ export async function getMetars() {
           geometry = `POINT(${x} ${y})`;
         }
 
+        const timeString = `${validTime.getUTCHours().toString().padStart(2, "0")}:${validTime.getUTCMinutes().toString().padStart(2, "0")}`;
+
         // return the data, ready to be inserted into the database
         return {
           geometry,
           siteId,
           validTime,
           createdAt: cycleCreatedAt,
-          stationPriority: null,
+          stationPriority: 0,
           stationType: rawText.includes("AUTO") ? "AUTO" : "MANNED",
           obType: rawText.includes("SPECI") ? "SPECI" : "HOURLY",
           ceiling: null, // we can calculate this later i suppose
-          timeString: `${validTime.getUTCHours().toString().padStart(2, "0")}:${validTime.getUTCMinutes().toString().padStart(2, "0")}`,
+          timeString,
           rawText,
           category,
           windDir,
