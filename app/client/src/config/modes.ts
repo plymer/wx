@@ -4,4 +4,4 @@ export const APP_MODES_LIST = {
   obs: { longName: "Observations", shortName: "OBS" },
   map: { longName: "Weather Map", shortName: "MAP" },
   otlk: { longName: "Outlook", shortName: "OTLK" },
-};
+} as const;
