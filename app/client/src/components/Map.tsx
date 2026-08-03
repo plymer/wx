@@ -37,6 +37,7 @@ import { SigmetLayer } from "./map/layers/data/SigmetLayer";
 import { TerrainRGB } from "./map/layers/base/TerrainRGB";
 import { AlertsLayer } from "./map/layers/data/AlertsLayer";
 import { VectorTileSource } from "./map/layers/data/VectorTileSource";
+import { SiteSearch } from "./map/controls/SiteSearch";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -122,6 +123,7 @@ export default function WxMap() {
         <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
           <MapOptions />
           <GeoLocation />
+          <SiteSearch />
         </div>
         <MapLoadingIndicator show={loadingState} />
       </WeatherMap>
