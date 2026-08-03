@@ -77,6 +77,8 @@ export const alphanumericRouter = router({
         name,
         lat: latString,
         lon: lonString,
+        rawLat: lat,
+        rawLon: lon,
         elev_f,
         elev_m,
         country,
