@@ -158,9 +158,6 @@ const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
     })
     .map((f) => {
       // apply our motion vector if applicable
-
-      console.log(f.properties);
-
       if ((dataType === "airmet" || dataType === "sigmet") && f.properties)
         return applyMotionVector(displayTime, f.properties.startTime, f);
       else return f;
@@ -189,7 +186,7 @@ const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
               ["get", "type", ["get", "hazard"]],
               " ",
               ["get", "name", ["get", "hazard"]],
-              " ",
+              "\n",
               ["get", "alphaCode"],
             ],
             ["get", "alphaCode"],

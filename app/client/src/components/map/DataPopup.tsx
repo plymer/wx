@@ -112,10 +112,8 @@ export const DataPopup = () => {
                 case "sigmet": {
                   const sigmetProps = feature.properties as XmetEventData;
 
-                  const hazard = JSON.parse(sigmetProps.hazard as unknown as string) as XmetEventData["hazard"];
-                  const motionVector = JSON.parse(
-                    sigmetProps.motionVector as unknown as string,
-                  ) as XmetEventData["motionVector"];
+                  const hazard = sigmetProps.hazard;
+                  const motionVector = sigmetProps.motionVector;
 
                   const hazardEventName = hazard.type === "VA" || hazard.type === "TC" ? hazard.name : null;
 
