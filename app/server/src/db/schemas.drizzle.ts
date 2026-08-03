@@ -210,7 +210,7 @@ export const metarsTemporalView = pgView("metars_temporal").as((qb) =>
       ...getColumns(metars),
       startTime: sql<Date>`${metars.validTime}`.as("startTime"),
       expiryTime:
-        sql<Date>`lead(${metars.validTime}, 1, ${metars.validTime} + interval '1 hour') over (partition by ${metars.siteId} order by ${metars.validTime})`.as(
+        sql<Date>`lead(${metars.validTime}, 1, ${metars.validTime} + interval '90 minutes') over (partition by ${metars.siteId} order by ${metars.validTime})`.as(
           "expiryTime",
         ),
     })
