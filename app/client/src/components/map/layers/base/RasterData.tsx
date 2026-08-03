@@ -120,10 +120,10 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
         (time) => time.validTime >= minTime && time.validTime <= maxTime,
       )?.validTime;
 
-      if (candidate !== undefined) {
-        timesteps.push(candidate);
-      }
+      if (candidate !== undefined) timesteps.push(candidate);
     }
+
+    if (timesteps.length === 0) return timesteps;
 
     // we also need to make sure we have enough frames to cover the entire animation, so first calculate the difference between the number of time steps we have filtered and the total number of frames
     const timeStepsDiff = timesteps.length - animation.frameCount;
