@@ -11,8 +11,8 @@ export const Isobars = ({ displayTime }: Props) => {
 
   const filter: FilterSpecification = [
     "all",
-    ["<=", ["get", "startTime"], ["to-number", displayTime]],
-    [">", ["get", "expiryTime"], ["to-number", displayTime]],
+    ["<=", ["get", "start_time"], ["to-number", displayTime]],
+    [">", ["get", "expiry_time"], ["to-number", displayTime]],
   ];
 
   if (!enabled) return null;
@@ -22,8 +22,8 @@ export const Isobars = ({ displayTime }: Props) => {
       <Layer
         id={`layer-sfc-obs-isobars`}
         source="vector-tile-source"
-        source-layer="isobars"
-        filter={filter}
+        source-layer="mslp"
+        // filter={filter}
         type="line"
         layout={{
           "line-join": "round",
@@ -37,8 +37,8 @@ export const Isobars = ({ displayTime }: Props) => {
       <Layer
         id={`layer-sfc-obs-isobars-labels`}
         source="vector-tile-source"
-        source-layer="isobars"
-        filter={filter}
+        source-layer="mslp"
+        // filter={filter}
         type="symbol"
         layout={{
           "symbol-placement": "line",
@@ -59,7 +59,7 @@ export const Isobars = ({ displayTime }: Props) => {
       <Layer
         id={`layer-sfc-obs-mslp-extrema-value`}
         source="vector-tile-source"
-        source-layer="extrema"
+        source-layer="mslp_extrema"
         filter={filter}
         type="symbol"
         layout={{
@@ -78,7 +78,7 @@ export const Isobars = ({ displayTime }: Props) => {
       <Layer
         id={`layer-sfc-obs-mslp-extrema-marker`}
         source="vector-tile-source"
-        source-layer="extrema"
+        source-layer="mslp_extrema"
         filter={filter}
         type="symbol"
         layout={{

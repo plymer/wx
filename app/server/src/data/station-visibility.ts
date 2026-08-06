@@ -1,6 +1,6 @@
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { pgDb as db } from "../services/database.js";
-import { stationVisibility } from "../db/schemas.drizzle.js";
+import { stations as stationsSchema } from "../db/schemas.drizzle.js";
 
 // prettier-ignore
 const BC_WINDS = ["CWAS","CWFG","CWRU","CWRO","CWEK","CWME","CWRO","CWQS","CWQK"]
@@ -92,20 +92,20 @@ function withinRadius(lat1: number, lon1: number, lat2: number, lon2: number, ra
 }
 
 export async function updateStationVisTable() {
-  console.log("Updating stationVisibility table...");
+  console.log("Updating station table with max zooms...");
 
   if (!db) {
     throw new Error("[STATION-VISIBILITY] Database connection failed.");
   }
 
   const uniqueSitesQuery = sql`
-    SELECT DISTINCT ON ("siteId")
-      "siteId",
+    SELECT DISTINCT ON (site_id)
+      site_id,
       ST_X(ST_Transform("geometry", 4326)) AS "lon",
       ST_Y(ST_Transform("geometry", 4326)) AS "lat"
-    FROM "metars"
-    WHERE "validTime" >= NOW() - INTERVAL '24 hour'
-    ORDER BY "siteId", "validTime" DESC
+    FROM metars
+    WHERE valid_time >= NOW() - INTERVAL '24 hour'
+    ORDER BY site_id, valid_time DESC
   `;
 
   const allData = await db.execute(uniqueSitesQuery);
@@ -140,31 +140,20 @@ export async function updateStationVisTable() {
 
   try {
     await db.transaction(async (tx) => {
-      // clear the old data before inserting our new data
-      await tx.execute(sql`TRUNCATE TABLE "stationVisibility";`);
-      if (minStations.length > 0) {
-        await tx
-          .insert(stationVisibility)
-          .values(minStations.map((siteId) => ({ siteId, minZoom: 0 })))
-          .onConflictDoNothing({ target: stationVisibility.siteId });
+      for (const siteId of maxStations) {
+        await tx.update(stationsSchema).set({ minZoom: 7.5 }).where(eq(stationsSchema.siteId, siteId));
       }
-      if (medStations.length > 0) {
-        await tx
-          .insert(stationVisibility)
-          .values(medStations.map((siteId) => ({ siteId, minZoom: 4.5 })))
-          .onConflictDoNothing({ target: stationVisibility.siteId });
+
+      for (const siteId of highStations) {
+        await tx.update(stationsSchema).set({ minZoom: 6 }).where(eq(stationsSchema.siteId, siteId));
       }
-      if (highStations.length > 0) {
-        await tx
-          .insert(stationVisibility)
-          .values(highStations.map((siteId) => ({ siteId, minZoom: 6 })))
-          .onConflictDoNothing({ target: stationVisibility.siteId });
+
+      for (const siteId of medStations) {
+        await tx.update(stationsSchema).set({ minZoom: 4.5 }).where(eq(stationsSchema.siteId, siteId));
       }
-      if (maxStations.length > 0) {
-        await tx
-          .insert(stationVisibility)
-          .values(maxStations.map((siteId) => ({ siteId, minZoom: 7.5 })))
-          .onConflictDoNothing({ target: stationVisibility.siteId });
+
+      for (const siteId of minStations) {
+        await tx.update(stationsSchema).set({ minZoom: 0 }).where(eq(stationsSchema.siteId, siteId));
       }
     });
   } catch (error) {

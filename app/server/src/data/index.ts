@@ -10,7 +10,7 @@ import { updateStationVisTable } from "./station-visibility.js";
 
 import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
 import { pgDb as db } from "../services/database.js";
-import { stations, stationVisibility } from "../db/schemas.drizzle.js";
+import { stations } from "../db/schemas.drizzle.js";
 import { createIsolines } from "./isolines.js";
 
 /**
@@ -29,11 +29,6 @@ async function main() {
   if (stationCatalogCount.length === 0) {
     console.log("[DATA] Station catalog is empty, building station catalog...");
     await buildStationCatalog();
-  }
-
-  const stationVisCount = await db.select().from(stationVisibility).limit(1);
-  if (stationVisCount.length === 0) {
-    console.log("[DATA] Station visibility table is empty, updating station visibility table...");
     await updateStationVisTable();
   }
 

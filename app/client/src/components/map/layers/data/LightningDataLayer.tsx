@@ -23,8 +23,8 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
       beforeId={belowLayer}
       filter={[
         "all",
-        ["<=", ["get", "startTime"], ["to-number", displayTime]],
-        [">", ["get", "expiryTime"], ["to-number", displayTime - 15 * MINUTE]],
+        ["<=", ["get", "start_time"], ["to-number", displayTime]],
+        [">", ["get", "expiry_time"], ["to-number", displayTime - 24 * MINUTE]],
       ]}
       type="symbol"
       id="lightning-data"
@@ -38,7 +38,7 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
         "text-color": "rgb(255,0,155)",
         "text-halo-color": "rgb(255,255,255)",
         "text-halo-width": 1,
-        "text-opacity": ["case", ["<", ["get", "expiryTime"], ["to-number", displayTime - 10 * MINUTE]], 0.5, 1],
+        "text-opacity": ["case", ["<", ["get", "expiry_time"], ["to-number", displayTime - 12 * MINUTE]], 0.5, 1],
       }}
     />
   );

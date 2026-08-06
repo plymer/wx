@@ -14,8 +14,8 @@ export const Plots = ({ displayTime }: Props) => {
 
   const filter: FilterSpecification = [
     "all",
-    ["<=", ["get", "startTime"], ["to-number", displayTime]],
-    [">", ["get", "expiryTime"], ["to-number", displayTime]],
+    ["<=", ["get", "start_time"], ["to-number", displayTime]],
+    [">", ["get", "expiry_time"], ["to-number", displayTime]],
   ];
 
   if (!enabled) return null;
@@ -37,7 +37,7 @@ export const Plots = ({ displayTime }: Props) => {
             "icon-image": [
               "concat",
               "windbarbs:wind-",
-              ["number-format", ["get", "windSpd"], { "min-fraction-digits": 0, "max-fraction-digits": 0 }],
+              ["number-format", ["get", "wind_spd"], { "min-fraction-digits": 0, "max-fraction-digits": 0 }],
             ],
             "icon-size": [
               "interpolate",
@@ -50,14 +50,14 @@ export const Plots = ({ displayTime }: Props) => {
               ZOOM_THRESHOLDS.maximum,
               ICON_SIZES.maximum.windbarb,
             ],
-            "icon-rotate": ["get", "windDir"],
+            "icon-rotate": ["get", "wind_dir"],
           }}
           paint={{
             "icon-halo-color": "#000",
             "icon-halo-width": 2,
             "icon-color": [
               "step",
-              ["get", "windSpd"],
+              ["get", "wind_spd"],
               "white",
               20,
               WINDBARB_COLOURS[20],
@@ -92,7 +92,7 @@ export const Plots = ({ displayTime }: Props) => {
               ZOOM_THRESHOLDS.maximum,
               ICON_SIZES.maximum.station,
             ],
-            "symbol-sort-key": ["get", "stationPriority"],
+            "symbol-sort-key": ["get", "station_priority"],
           }}
           paint={{
             "icon-color": [
@@ -124,7 +124,7 @@ export const Plots = ({ displayTime }: Props) => {
           filter={filter}
           layout={{
             ...STATION_TEXT_STYLE.layout,
-            "text-field": ["get", "windGst"],
+            "text-field": ["get", "wind_gst"],
             "text-anchor": "center",
             "text-offset": [0, 0],
           }}
@@ -139,7 +139,7 @@ export const Plots = ({ displayTime }: Props) => {
           filter={filter}
           layout={{
             ...STATION_TEXT_STYLE.layout,
-            "text-field": ["get", "siteId"],
+            "text-field": ["get", "site_id"],
             "text-offset": [1.5, 1.5],
           }}
         />
@@ -186,7 +186,7 @@ export const Plots = ({ displayTime }: Props) => {
           filter={filter}
           layout={{
             ...STATION_TEXT_STYLE.layout,
-            "text-field": ["get", "timeString"],
+            "text-field": ["get", "time_string"],
             "text-offset": [0, 3],
             "text-size": 10,
           }}
@@ -202,7 +202,7 @@ export const Plots = ({ displayTime }: Props) => {
           filter={filter}
           layout={{
             ...STATION_TEXT_STYLE.layout,
-            "text-field": ["concat", ["get", "vis"], " ", ["get", "wxString"]],
+            "text-field": ["concat", ["get", "vis"], " ", ["get", "wx_string"]],
             "text-offset": [-1.5, 0],
             "text-anchor": "right",
           }}

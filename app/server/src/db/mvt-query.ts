@@ -2,7 +2,7 @@
 
 create geometry inside the isobars table from lng/lat points (from WGS84 -> web mercator)
 
-INSERT INTO "isobars" ("startTime", "expiryTime", "geometry")
+INSERT INTO "isobars" ("start_time", "expiry_time", "geometry")
 VALUES (
     NOW(),
     NOW() + INTERVAL '1 hour',
@@ -40,36 +40,28 @@ https://postgis.net/docs/ST_AsMVT.html
 import { sql } from "drizzle-orm";
 import { pgDb as db } from "../services/database.js";
 
-const DATETIME_COLUMNS = new Set<string>(["validTime", "startTime", "expiryTime"]);
+const DATETIME_COLUMNS = new Set<string>(["valid_time", "start_time", "expiry_time"]);
 const VECTOR_TILE_EXTENT = 4096;
 const VECTOR_TILE_BUFFER = 64;
-const WEB_MERCATOR_WORLD_WIDTH = 40075016.68557849;
-const WEB_MERCATOR_MIN = -WEB_MERCATOR_WORLD_WIDTH / 2;
-const CLUSTER_MAX_ZOOM = 8;
-const CLUSTER_GRID_UNITS = 125;
-const CLUSTER_TIMESTEP_MINUTES = 10;
+const MIN_ZOOM = 2;
+const MAX_ZOOM = 8;
 
 const TABLES = [
   {
-    name: "isobars",
-    columns: ["startTime", "expiryTime", "value"],
+    name: "isolines",
+    columns: ["start_time", "expiry_time", "value", "line_type"],
   },
-  { name: "extrema", columns: ["startTime", "expiryTime", "value", "kind"] },
+  { name: "mslp_extrema", columns: ["start_time", "expiry_time", "value", "kind"] },
   {
     name: "metars",
-    columns: ["validTime", "siteId"],
+    columns: ["valid_time", "site_id"],
   },
   {
     name: "lightning",
-    columns: ["startTime", "expiryTime"],
+    columns: ["start_time", "expiry_time"],
   },
-  // { name: "pireps", columns: ["validTime", "rawText"] },
+  // { name: "pireps", columns: [valid_time, "rawText"] },
 ] as const;
-
-const getClusterCellSizeMeters = (z: number, clusterGridUnits: number) => {
-  const tileWidthMeters = WEB_MERCATOR_WORLD_WIDTH / Math.pow(2, z);
-  return (tileWidthMeters * clusterGridUnits) / VECTOR_TILE_EXTENT;
-};
 
 /*
 function pirepQuery(t: number, z: number) {
@@ -93,16 +85,16 @@ function pirepQuery(t: number, z: number) {
               extent => ${VECTOR_TILE_EXTENT},
               buffer => ${VECTOR_TILE_BUFFER}
             ) AS geometry,
-            (EXTRACT(EPOCH FROM p."validTime") * 1000)::bigint AS "startTime",
-            (EXTRACT(EPOCH FROM (p."validTime" + INTERVAL '1 hour')) * 1000)::bigint AS "expiryTime",
-            to_char(p."validTime", 'HH24:MI') AS "timeString",
+            (EXTRACT(EPOCH FROM p.valid_time) * 1000)::bigint AS "start_time",
+            (EXTRACT(EPOCH FROM (p.valid_time + INTERVAL '1 hour')) * 1000)::bigint AS "expiry_time",
+            to_char(p.valid_time, 'HH24:MI') AS "timeString",
             1::integer AS point_count,
             FALSE AS clustered
           FROM pireps AS p
           CROSS JOIN bounds
           CROSS JOIN pireps_request_time rt
           WHERE p.geometry && bounds.query_geom
-            AND p."validTime" >= rt.request_time - '4 hours'::interval
+            AND p.valid_time >= rt.request_time - '4 hours'::interval
         )
       `;
   }
@@ -114,15 +106,15 @@ function pirepQuery(t: number, z: number) {
 
         pireps_source AS (
           SELECT
-            p."validTime" AS valid_time,
-            p."validTime" AS start_time,
-            p."validTime" + INTERVAL '1 hour' AS expiry_time,
+            p.valid_time AS valid_time,
+            p.valid_time AS start_time,
+            p.valid_time + INTERVAL '1 hour' AS expiry_time,
             p.geometry
           FROM pireps AS p
           CROSS JOIN bounds
           CROSS JOIN pireps_request_time rt
           WHERE p.geometry && bounds.query_geom
-            AND p."validTime" >= rt.request_time - '4 hours'::interval
+            AND p.valid_time >= rt.request_time - '4 hours'::interval
         ),
 
         pireps_time_bounds AS (
@@ -230,8 +222,8 @@ function pirepQuery(t: number, z: number) {
               extent => ${VECTOR_TILE_EXTENT},
               buffer => ${VECTOR_TILE_BUFFER}
             ) AS geometry,
-            (EXTRACT(EPOCH FROM pireps_features.start_time) * 1000)::bigint AS "startTime",
-            (EXTRACT(EPOCH FROM pireps_features.expiry_time) * 1000)::bigint AS "expiryTime",
+            (EXTRACT(EPOCH FROM pireps_features.start_time) * 1000)::bigint AS "start_time",
+            (EXTRACT(EPOCH FROM pireps_features.expiry_time) * 1000)::bigint AS "expiry_time",
             to_char(pireps_features.valid_time, 'HH24:MI') AS "timeString",
             pireps_features.point_count,
             pireps_features.clustered
@@ -243,113 +235,90 @@ function pirepQuery(t: number, z: number) {
 }
 */
 
-function lightningQuery(t: number, z: number) {
-  // compute the cluster cell size based on the zoom level and grid units
-  const clusterCellSizeMeters = getClusterCellSizeMeters(z, CLUSTER_GRID_UNITS);
+function isolinesQuery(z: number) {
+  const dataTypes = ["mslp", "tt", "td"];
 
+  const toleranceMetres = z <= 4 ? 20_000 : z <= 6 ? 8_000 : z <= 8 ? 3_000 : z <= 10 ? 1_000 : 0;
+
+  return sql.join(
+    dataTypes.map((dataType) => {
+      return sql`
+      ${sql.raw(`${dataType}_layer`)} AS (
+        SELECT
+          ST_AsMVTGeom(
+            ST_SimplifyVW(
+              isolines.geometry,
+              ${toleranceMetres}
+            ),
+            bounds.geom,
+            extent => ${VECTOR_TILE_EXTENT},
+            buffer => ${VECTOR_TILE_BUFFER}
+          ) AS geometry,
+          isolines.value,
+          (EXTRACT(EPOCH FROM isolines.start_time) * 1000)::bigint AS start_time,
+          (EXTRACT(EPOCH FROM isolines.expiry_time) * 1000)::bigint AS expiry_time
+        FROM isolines
+        CROSS JOIN bounds
+        WHERE
+          isolines.line_type = ${dataType}
+          AND isolines.geometry && bounds.query_geom
+          AND isolines.start_time >= NOW() - INTERVAL '3.5 hours'
+      )
+    `;
+    }),
+    sql`, `,
+  );
+}
+
+function lightningQuery(z: number) {
   return sql`
-        -- use a date bin to group strikes such that we are spatially and temporally clustering strikes together
-        -- filter by the date bin, and then use the bounding box to filter the points that are in the tile
-        -- then use ST_DumpPoints to convert Multipoint into points
-        lightning_source AS (
+  
+        -- for zooms 2-8 use the pre-clustered strikes we created
+        clustered_strikes AS (
           SELECT
-            l."startTime" AS start_time,
-            l."expiryTime" AS expiry_time,
-            date_bin(
-              ${sql.raw(`'${CLUSTER_TIMESTEP_MINUTES} minutes'::interval`)},
-              l."startTime",
-              TIMESTAMP 'epoch' + (${t} * INTERVAL '1 millisecond')
-            ) AS cluster_start_time,
+            lc.start_time,
+            lc.expiry_time,
+            (dumped).geom AS geometry
+          FROM lightning_clustered AS lc
+          CROSS JOIN LATERAL ST_DumpPoints(lc.geometry) AS dumped
+          CROSS JOIN bounds
+          WHERE ${z} >= ${MIN_ZOOM}
+            AND ${z} <= ${MAX_ZOOM}
+            AND lc.zoom_level = ${z}
+            AND (dumped).geom && bounds.query_geom
+            AND lc.start_time >= NOW() - INTERVAL '4 hours'
+        ),
+
+        -- for zooms > 8 use the raw, unclustered strike data
+        raw_strikes AS (
+          SELECT
+            l.start_time,
+            l.expiry_time,
             (dumped).geom AS geometry
           FROM lightning AS l
-            CROSS JOIN bounds
           CROSS JOIN LATERAL ST_DumpPoints(l.geometry) AS dumped
-            WHERE l.geometry && bounds.query_geom
-              AND (dumped).geom && bounds.query_geom
+          CROSS JOIN bounds
+          WHERE ${z} > ${MAX_ZOOM}
+            AND (dumped).geom && bounds.query_geom
+            AND l.start_time >= NOW() - INTERVAL '4 hours'
         ),
+        
 
-        -- use an integer grid to group strikes together since this is faster than doing a ST_SnapToGrid or a ST_DBScan
-        lightning_cluster_buckets AS (
-          SELECT
-            floor((ST_X(geometry) - ${WEB_MERCATOR_MIN}) / ${clusterCellSizeMeters})::integer AS grid_x,
-            floor((ST_Y(geometry) - ${WEB_MERCATOR_MIN}) / ${clusterCellSizeMeters})::integer AS grid_y,
-            geometry,
-            start_time,
-            expiry_time
-            ,cluster_start_time
-          FROM lightning_source
-          WHERE ${z} <= ${CLUSTER_MAX_ZOOM}
-        ),
-
-        -- count the number of points in each grid cell and time bin so we can determine which points are clustered and which are not
-        lightning_cluster_members AS (
-          SELECT
-            grid_x,
-            grid_y,
-            geometry,
-            start_time,
-            expiry_time,
-            cluster_start_time,
-            COUNT(*) OVER (PARTITION BY grid_x, grid_y, cluster_start_time) AS bucket_count
-          FROM lightning_cluster_buckets
-        ),
-
-        -- clustered points that are part of a grid cell (for zoom levels <= CLUSTER_MAX_ZOOM)
-        lightning_clustered AS (
-          SELECT
-            ST_PointOnSurface(ST_Collect(geometry)) AS geometry,
-            cluster_start_time AS start_time,
-            MAX(expiry_time) AS expiry_time,
-            COUNT(*)::integer AS point_count,
-            TRUE AS clustered
-          FROM lightning_cluster_members
-          WHERE bucket_count > 1
-          GROUP BY grid_x, grid_y, cluster_start_time
-        ),
-
-        -- unclustered points that were part of a grid cell (for zoom levels <= CLUSTER_MAX_ZOOM)
-        lightning_unclustered_from_grid AS (
-          SELECT
-            geometry,
-            start_time,
-            expiry_time,
-            1::integer AS point_count,
-            FALSE AS clustered
-          FROM lightning_cluster_members
-          WHERE bucket_count = 1
-        ),
-
-        -- unclustered points that are not part of a grid cell (for zoom levels > CLUSTER_MAX_ZOOM)
-        lightning_unclustered_all AS (
-          SELECT
-            geometry,
-            start_time,
-            expiry_time,
-            1::integer AS point_count,
-            FALSE AS clustered
-          FROM lightning_source
-        ),
-
-        -- we need to union all three sources of the data together:
-        --   1. clustered points (when we're below the max zoom)
-        --   2. unclustered points (when we're below the max zoom)
-        --   3. all points (not clustered) when we are above the max zoom
+        -- combine the clustered and raw strikes into a single set of features for the requested tile
         lightning_features AS (
-          SELECT *
-          FROM lightning_clustered
-          WHERE ${z} <= ${CLUSTER_MAX_ZOOM}
+          SELECT
+            ST_PointOnSurface(clustered_strikes.geometry) AS geometry,
+            clustered_strikes.start_time,
+            clustered_strikes.expiry_time
+          FROM clustered_strikes
 
           UNION ALL
 
-          SELECT *
-          FROM lightning_unclustered_from_grid
-          WHERE ${z} <= ${CLUSTER_MAX_ZOOM}
-
-          UNION ALL
-
-          SELECT *
-          FROM lightning_unclustered_all
-          WHERE ${z} > ${CLUSTER_MAX_ZOOM}
+          SELECT 
+            raw_strikes.geometry,
+            raw_strikes.start_time,
+            raw_strikes.expiry_time
+          FROM raw_strikes
         ),
 
         -- finalize the query result by wrapping it as a vector tile geometry
@@ -361,10 +330,8 @@ function lightningQuery(t: number, z: number) {
               extent => ${VECTOR_TILE_EXTENT},
               buffer => ${VECTOR_TILE_BUFFER}
             ) AS geometry,
-            (EXTRACT(EPOCH FROM lightning_features.start_time) * 1000)::bigint AS "startTime",
-            (EXTRACT(EPOCH FROM lightning_features.expiry_time) * 1000)::bigint AS "expiryTime",
-            lightning_features.point_count,
-            lightning_features.clustered
+            (EXTRACT(EPOCH FROM lightning_features.start_time) * 1000)::bigint AS start_time,
+            (EXTRACT(EPOCH FROM lightning_features.expiry_time) * 1000)::bigint AS expiry_time
           FROM lightning_features
           CROSS JOIN bounds
           WHERE lightning_features.geometry && bounds.query_geom
@@ -387,16 +354,16 @@ function stationPlotQuery(z: number) {
             buffer => ${VECTOR_TILE_BUFFER}
           ) AS geometry,
           *,
-          (EXTRACT(EPOCH FROM metars_temporal."validTime") * 1000)::bigint AS "startTime",
-          (EXTRACT(EPOCH FROM metars_temporal."expiryTime") * 1000)::bigint AS "expiryTime"
+          (EXTRACT(EPOCH FROM metars_temporal.valid_time) * 1000)::bigint AS start_time,
+          (EXTRACT(EPOCH FROM metars_temporal.expiry_time) * 1000)::bigint AS expiry_time
         FROM metars_temporal
         CROSS JOIN bounds
-        JOIN "stationVisibility" v
-        ON v."siteId" = metars_temporal."siteId"
+        JOIN stations st
+        ON st.site_id = metars_temporal.site_id
         WHERE
-        v."minZoom" <= ${z}
+        st.min_zoom <= ${z}
         AND metars_temporal.geometry && bounds.query_geom
-          -- AND metars_temporal."validTime" <= NOW() - INTERVAL '3 hour'
+          -- AND metars_temporal.valid_time <= NOW() - INTERVAL '3 hour'
       )
       `;
 }
@@ -410,16 +377,18 @@ export async function getTile(t: number, z: number, x: number, y: number) {
     const { name, columns } = table;
 
     switch (name) {
+      case "isolines":
+        return isolinesQuery(z);
       // case "pireps":
       //   // special case that requires clustering of PIREPs at low zoom levels
       //   return pirepQuery(t, z);
       case "metars":
         // special case that requires doing a LEAD window function to
-        // compute expiryTime on the fly for each observation
+        // compute expiry_time on the fly for each observation
         return stationPlotQuery(z);
       case "lightning":
         // special case that requires clustering of lightning strikes at low zoom levels
-        return lightningQuery(t, z);
+        return lightningQuery(z);
       default:
         // if any other tables we don't have a special case for
         const layerName = `${name}_layer`;
@@ -460,7 +429,10 @@ export async function getTile(t: number, z: number, x: number, y: number) {
 
   // ensure that each query returns the result encoded as a vector tile using ST_AsMVT
   // the result is aliased to the name of the table (this is the layer name in the tile data that MapLibre references)
-  const tileSelects = TABLES.map(({ name }) => {
+  const tileSelects = [
+    ...[{ name: "mslp" }, { name: "tt" }, { name: "td" }],
+    ...TABLES.filter(({ name }) => name !== "isolines"),
+  ].map(({ name }) => {
     const layerName = `${name}_layer`;
 
     return sql`

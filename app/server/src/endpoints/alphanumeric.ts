@@ -67,7 +67,7 @@ export const alphanumericRouter = router({
         return undefined;
       }
 
-      const { siteId, name, lat, lon, elev_f, elev_m, country, state } = stationData;
+      const { siteId, name, lat, lon, elevF, elevM, country, state } = stationData;
 
       const { rise: sunrise, set: sunset } = getSunTimes([lon, lat]);
       const { lat: latString, lon: lonString } = stringifyPosition([lon, lat]);
@@ -79,8 +79,8 @@ export const alphanumericRouter = router({
         lon: lonString,
         rawLat: lat,
         rawLon: lon,
-        elev_f,
-        elev_m,
+        elevF,
+        elevM,
         country,
         state,
         sunrise,

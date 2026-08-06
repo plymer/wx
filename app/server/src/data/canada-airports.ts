@@ -125,10 +125,11 @@ function parseAirportTable(
       siteId,
       lat: coordinates.lat,
       lon: coordinates.lon,
-      elev_f: null,
-      elev_m: null,
+      elevF: null,
+      elevM: null,
       country: "CA",
       state: code,
+      minZoom: 7.5, // default value, will be updated later
     });
   });
 

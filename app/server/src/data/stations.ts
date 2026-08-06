@@ -42,10 +42,11 @@ export async function buildStationCatalog() {
           siteId: station.icaoId,
           lat: station.lat,
           lon: station.lon,
-          elev_f: Math.floor(station.elev * FEET_PER_METRE),
-          elev_m: station.elev,
+          elevF: Math.floor(station.elev * FEET_PER_METRE),
+          elevM: station.elev,
           country: station.country,
           state: station.state,
+          minZoom: 7.5, // default value, will be updated later
         };
       })
       .filter((entry) => entry !== undefined); // filter out any undefined entries
@@ -62,8 +63,8 @@ export async function buildStationCatalog() {
               name: station.name,
               lat: station.lat,
               lon: station.lon,
-              elev_f: station.elev_f,
-              elev_m: station.elev_m,
+              elevF: station.elevF,
+              elevM: station.elevM,
               country: station.country,
               state: station.state,
             },
