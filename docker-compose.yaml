@@ -9,6 +9,7 @@ services:
   db:
     container_name: db
     image: postgis/postgis:17-3.5
+    restart: unless-stopped
     volumes:
       - pg_data:/var/lib/postgresql/data
       - /tmp/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
@@ -22,6 +23,7 @@ services:
   pgbouncer:
     container_name: pgbouncer
     image: edoburu/pgbouncer:latest
+    restart: unless-stopped
     environment:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
