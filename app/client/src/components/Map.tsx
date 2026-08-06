@@ -34,10 +34,10 @@ import { SurfaceDataLayer } from "./map/layers/data/SurfaceDataLayer";
 import { DataPopup } from "./map/DataPopup";
 import { AirQualityLayer } from "./map/layers/data/AirQualityLayer";
 import { SigmetLayer } from "./map/layers/data/SigmetLayer";
-import { TerrainRGB } from "./map/layers/base/TerrainRGB";
 import { AlertsLayer } from "./map/layers/data/AlertsLayer";
 import { VectorTileSource } from "./map/layers/data/VectorTileSource";
 import { SiteSearch } from "./map/controls/SiteSearch";
+import { HillshadeLayer } from "./map/layers/base/Hillshade";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -91,7 +91,7 @@ export default function WxMap() {
         />
 
         <VectorTileSource />
-        <TerrainRGB />
+        <HillshadeLayer />
 
         <SatelliteLayer domain="west" />
         <SatelliteLayer domain="east" />
