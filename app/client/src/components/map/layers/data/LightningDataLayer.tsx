@@ -31,7 +31,7 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
       layout={{
         "text-field": "X",
         "text-overlap": "always",
-        "text-size": 16,
+        "text-size": 18,
         "text-font": ["Metropolis-Regular"],
       }}
       paint={{
