@@ -10,13 +10,24 @@ import { pgDb as db } from "../services/database.js";
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
 const extractEventName = (text: string): string | null => {
-  const eventNameMatch = text.match(/(VA[\n\s]ERUPTION[\n\s]MT|VA[\n\s]CLD[\n\s]MT|VA|TC)\s+((VOLCAN\s)?([A-Z0-9]+))/);
-  if (eventNameMatch) {
-    const candidate = eventNameMatch[2].trim();
-    if (candidate.includes("CSTL")) return null;
-    else return candidate;
-  } else {
-    return null;
+  const matches = text.match(/(VA[\n\s]ERUPTION[\n\s]MT|VA[\n\s]CLD[\n\s]MT|VA|TC)\s+((VOLCAN\s)?([A-Z0-9]+))/);
+
+  if (!matches) return null;
+
+  const [_whole, threat, name] = matches;
+
+  const normalizedThreat = threat.replace(/\s+/g, " ").trim();
+
+  switch (normalizedThreat) {
+    case "VA":
+    case "VA ERUPTION MT":
+    case "VA CLD MT":
+    case "VA CLD":
+      return name.length > 2 ? name : null;
+    case "TC":
+      return name;
+    default:
+      return null;
   }
 };
 

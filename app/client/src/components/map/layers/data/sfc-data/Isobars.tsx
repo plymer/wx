@@ -23,7 +23,7 @@ export const Isobars = ({ displayTime }: Props) => {
         id={`layer-sfc-obs-isobars`}
         source="vector-tile-source"
         source-layer="mslp"
-        // filter={filter}
+        filter={filter}
         type="line"
         layout={{
           "line-join": "round",
@@ -38,7 +38,7 @@ export const Isobars = ({ displayTime }: Props) => {
         id={`layer-sfc-obs-isobars-labels`}
         source="vector-tile-source"
         source-layer="mslp"
-        // filter={filter}
+        filter={filter}
         type="symbol"
         layout={{
           "symbol-placement": "line",
