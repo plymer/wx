@@ -24,13 +24,13 @@ export const alphanumericRouter = router({
     }
 
     const { site, hrs } = input;
-    const searchSite = site === "CYEU" ? "CWEU" : site;
+    const siteId = site === "CYEU" ? "CWEU" : site;
 
-    console.log("[API] Requesting METARs for:", searchSite, "for the last", hrs, "hours");
+    console.log("[API] Requesting METARs for:", siteId, "for the last", hrs, "hours");
 
     try {
       const metarData = await db.query.metars.findMany({
-        where: { siteId: searchSite, validTime: { gte: new Date(Date.now() - hrs * HOUR) } },
+        where: { siteId, validTime: { gte: new Date(Date.now() - hrs * HOUR) } },
         columns: { rawText: true },
         orderBy: { validTime: "asc" },
       });
@@ -54,20 +54,20 @@ export const alphanumericRouter = router({
     }
 
     const { site } = input;
-    const searchSite = site === "CWEU" ? "CYEU" : site;
+    const siteId = site === "CWEU" ? "CYEU" : site;
 
-    console.log("[API] Requesting site data for:", searchSite);
+    console.log("[API] Requesting site data for:", siteId);
 
     try {
       const stationData = await db.query.stations.findFirst({
-        where: { siteId: searchSite },
+        where: { siteId },
       });
 
       if (!stationData) {
         return undefined;
       }
 
-      const { siteId, name, lat, lon, elevF, elevM, country, state } = stationData;
+      const { name, lat, lon, elevF, elevM, country, state } = stationData;
 
       const { rise: sunrise, set: sunset } = getSunTimes([lon, lat]);
       const { lat: latString, lon: lonString } = stringifyPosition([lon, lat]);
@@ -100,14 +100,14 @@ export const alphanumericRouter = router({
     }
 
     const { site } = input;
-    const searchSite = site === "CWEU" ? "CYEU" : site;
+    const siteId = site === "CWEU" ? "CYEU" : site;
 
-    console.log("[API] Requesting TAF for:", searchSite);
+    console.log("[API] Requesting TAF for:", siteId);
 
     try {
       const tafData = await db.query.tafs.findMany({
         columns: { rawText: true },
-        where: { siteId: searchSite },
+        where: { siteId },
         orderBy: { validTime: "desc" },
       });
 

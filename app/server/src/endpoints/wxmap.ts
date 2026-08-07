@@ -1,17 +1,12 @@
-import type { Feature, FeatureCollection, LineString, MultiPolygon, Point } from "geojson";
+import type { Feature, FeatureCollection, MultiPolygon, Point } from "geojson";
 import { TRPCError } from "@trpc/server";
-
 import "dotenv/config";
 import * as turf from "@turf/turf";
 
 import type { StationPlotPopupData, WarningProperties } from "../lib/types.js";
-
 import { HOUR } from "../lib/constants.js";
-
 import { limitResultsByKeys } from "../lib/utils.js";
-import { wxmapIsolinesSchema } from "../validationSchemas/wxmap.zod.js";
 import { PUBLIC_ALERTS_CACHE_KEY } from "../config/cache-keys.config.js";
-
 import { publicProcedure, router } from "../services/trpc.js";
 import { pgDb as db } from "../services/database.js";
 import { cacheClient } from "../services/redis.js";
@@ -103,49 +98,6 @@ export const wxmapRouter = router({
 
     return output;
   }),
-
-  wxmapIsolines: publicProcedure
-    .input(wxmapIsolinesSchema)
-    .query(
-      async ({
-        input,
-      }): Promise<
-        FeatureCollection<Point | LineString, { value: number } | { kind: "max" | "min"; value: number }>[]
-      > => {
-        const { type } = input;
-
-        const cachedData = await cacheClient.lRange(`wxmap:isolines:${type}`, 0, -1);
-
-        if (cachedData.length > 0) {
-          console.log(`[API] Cache HIT for WxMap Isolines - ${type} (${cachedData.length} items)`);
-
-          return cachedData.flatMap((item) => JSON.parse(item)) as FeatureCollection<
-            Point | LineString,
-            { value: number } | { kind: "max" | "min"; value: number }
-          >[];
-        } else {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "No cache client available for isolines",
-          });
-        }
-      },
-    ),
-
-  // deprecated
-  wxmapPublicWarnings: publicProcedure
-    .meta({ deprecated: true })
-    .query(async (): Promise<FeatureCollection<MultiPolygon, WarningProperties> | null> => {
-      const cachedData = await cacheClient.get(PUBLIC_ALERTS_CACHE_KEY);
-
-      if (cachedData) {
-        console.log("[API] Cache HIT for WxMap Public Warnings");
-        return JSON.parse(cachedData) as FeatureCollection<MultiPolygon, WarningProperties>;
-      }
-
-      console.error("[API] [ERROR] Cache MISS for WxMap Public Warnings - no cache data found.");
-      return null;
-    }),
 
   wxmapPublicAlerts: publicProcedure.query(
     async (): Promise<FeatureCollection<MultiPolygon, WarningProperties> | null> => {
