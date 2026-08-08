@@ -158,8 +158,5 @@ export async function updateStationVisTable() {
     });
   } catch (error) {
     console.error("Error inserting stations into stationVisibility table:", error);
-    process.exit(1);
   }
-
-  process.exit(0);
 }

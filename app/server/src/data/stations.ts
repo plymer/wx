@@ -73,13 +73,11 @@ export async function buildStationCatalog() {
     );
   } catch (error) {
     console.error(`[STATION] Error processing station cache file: ${(error as Error).message}`);
-    process.exit(1);
   }
 
   try {
     await scrapeWiki();
   } catch (error) {
     console.error(`[STATION] Error scraping Canadian Sites from Wikipedia: ${(error as Error).message}`);
-    process.exit(1);
   }
 }
