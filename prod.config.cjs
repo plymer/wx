@@ -1,4 +1,5 @@
 const path = require("path");
+const dotenv = require("dotenv/config");
 
 const ENV_VARS = {
   NODE_ENV: "production",
