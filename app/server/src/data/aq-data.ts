@@ -1,15 +1,12 @@
 import "dotenv/config";
-import { lt, Relations } from "drizzle-orm";
-import { aqData } from "../db/tables/data.drizzle.js";
+import { lt } from "drizzle-orm";
+import { aqData } from "../db/schemas.drizzle.js";
 import type { AQData } from "../lib/types.js";
 import { aqSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
-import { generateDbConnection } from "../lib/utils.js";
-import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
+import { pgDb as db } from "../services/database.js";
 
-export async function getAqData<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
-  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
-) {
+export async function getAqData() {
   if (!db) {
     throw new Error("[AQ-DATA] Failed to connect to the database.");
   }
@@ -61,9 +58,12 @@ export async function getAqData<TSchema extends Record<string, SQLiteTableWithCo
       // if any of these columns are null, skip this row
       if (!monitor || !network || !lat || !lng || !date || !pm25_recent_r) return acc;
 
+      const geometry = `POINT(${lng} ${lat})`;
+
       const data: AQData = {
         name: monitor,
         type: network,
+        geometry,
         lat,
         lon: lng,
         validTime: date,
@@ -79,7 +79,7 @@ export async function getAqData<TSchema extends Record<string, SQLiteTableWithCo
   // prevent having duplicate entries in the database by checking for duplicate PKs
   await Promise.allSettled(
     rows.map(async (data) => {
-      await db
+      await db!
         .insert(aqData)
         .values(data)
         .onConflictDoUpdate({

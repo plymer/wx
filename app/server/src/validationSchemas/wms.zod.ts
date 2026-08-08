@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GOES_PRODUCTS, RADAR_PRODUCTS } from "../config/wms.config.js";
+import { GOES_PRODUCTS, HIMARWARI_PRODUCTS, RADAR_PRODUCTS } from "../config/wms.config.js";
 
 export const radarProductSchema = z.strictObject({
   product: z.enum(RADAR_PRODUCTS),
@@ -8,6 +8,10 @@ export const radarProductSchema = z.strictObject({
 export const goesProductSchema = z.strictObject({
   domain: z.enum(["east", "west"]),
   product: z.enum(GOES_PRODUCTS),
+});
+
+export const himawariProductSchema = z.strictObject({
+  product: z.enum(HIMARWARI_PRODUCTS),
 });
 
 export const eumetsatProductSchema = z.strictObject({

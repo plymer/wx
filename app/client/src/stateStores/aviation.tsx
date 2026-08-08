@@ -8,13 +8,12 @@ type AviationState = {
   subProduct: "cldwx" | "turbc";
   domain: ProductDomains;
   timeStep: number;
-  hub: string;
+
   actions: {
     setProduct: (product: Products) => void;
     setSubProduct: (product: "cldwx" | "turbc") => void;
     setDomain: (domain: ProductDomains) => void;
     setTimeStep: (timeStep: number) => void;
-    setHub: (hub: string) => void;
   };
 };
 
@@ -26,13 +25,12 @@ const useAviation = create<AviationState>()(
       subProduct: "cldwx",
       domain: "gfacn31",
       timeStep: 0,
-      hub: "cyyc",
+
       actions: {
         setProduct: (newProduct: Products) => set({ product: newProduct }),
         setSubProduct: (newSubProduct: "cldwx" | "turbc") => set({ subProduct: newSubProduct }),
         setDomain: (newDomain: ProductDomains) => set({ domain: newDomain }),
         setTimeStep: (newTimeStep: number) => set({ timeStep: newTimeStep }),
-        setHub: (newHub: string) => set({ hub: newHub }),
       },
     }),
     {
@@ -42,7 +40,6 @@ const useAviation = create<AviationState>()(
           subProduct: state.subProduct,
           domain: state.domain,
           timeStep: state.timeStep,
-          hub: state.hub,
         }) as Partial<AviationState>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as AviationState) }),
       name: "aviationOptions",
@@ -56,5 +53,5 @@ export const useAvProduct = () => useAviation((state) => state.product);
 export const useAvSubProduct = () => useAviation((state) => state.subProduct);
 export const useDomain = () => useAviation((state) => state.domain);
 export const useTimeStep = () => useAviation((state) => state.timeStep);
-export const useHub = () => useAviation((state) => state.hub);
+
 export const useAviationActions = () => useAviation((state) => state.actions);

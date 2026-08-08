@@ -1,18 +1,17 @@
 import "dotenv/config";
-import { lt, Relations } from "drizzle-orm";
-import { generateDbConnection, readGzipFile } from "../lib/utils.js";
+import { lt } from "drizzle-orm";
+import { readGzipFile } from "../lib/utils.js";
 import { xmlParser } from "../lib/utils.js";
-import { tafs } from "../db/tables/data.drizzle.js";
+import { tafs } from "../db/schemas.drizzle.js";
 import type { CacheTafData, TafData, XMLCacheFile } from "../lib/types.js";
 import { tafSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
-import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
+
+import { pgDb as db } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/tafs.cache.xml.gz";
 
-export async function getTafs<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
-  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
-) {
+export async function getTafs() {
   if (!db) {
     throw new Error("[TAF] Database connection failed.");
   }
@@ -52,7 +51,7 @@ export async function getTafs<TSchema extends Record<string, SQLiteTableWithColu
     // insert the metar data, or update each metar if it already exists (our pk is siteId + validTime)
     await Promise.allSettled(
       output.map(async (taf) => {
-        await db
+        await db!
           .insert(tafs)
           .values(taf)
           .onConflictDoUpdate({

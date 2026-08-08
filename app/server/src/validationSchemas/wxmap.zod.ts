@@ -7,7 +7,3 @@ export const wxmapMetarSchema = z.strictObject({
     .transform((val) => val.split(",").map((v) => v.trim().toUpperCase()))
     .optional(),
 });
-
-export const wxmapIsolinesSchema = z.strictObject({
-  type: z.enum(["mslp", "tt", "td"]),
-});

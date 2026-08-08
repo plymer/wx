@@ -1,7 +1,6 @@
 import type { SatelliteDomains } from "@shared/lib/types";
 import RasterDataLayer from "../base/RasterData";
 import { useSatelliteProduct, useShowSatellite } from "@/stateStores/map/rasterData";
-import { useMapRef } from "@/stateStores/map/mapView";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
 import { MINUTE } from "@shared/lib/constants";
@@ -11,12 +10,11 @@ interface Props {
   domain: SatelliteDomains;
 }
 
-export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain }: Props) => {
+export const SatelliteLayer = ({ domain }: Props) => {
   const showSatellite = useShowSatellite();
   const satelliteProduct = useSatelliteProduct();
-  const mapRef = useMapRef();
 
-  const belowLayerId = mapRef?.getLayer(belowLayer) ? belowLayer : "wateroutline";
+  const belowLayerId = "satellite-target";
 
   // daytime visible product:
   // mtg_fd:rgb_cloudphase
@@ -29,6 +27,7 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
       {
         enabled: showSatellite && domain === "europe",
         refetchInterval: MINUTE,
+        trpc: { context: { skipBatch: true } },
       },
     ),
   );
@@ -39,6 +38,7 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
       {
         enabled: showSatellite && domain === "indianOcean",
         refetchInterval: MINUTE,
+        trpc: { context: { skipBatch: true } },
       },
     ),
   );
@@ -49,11 +49,39 @@ export const SatelliteLayer = ({ belowLayer = "layer-radar-national-18", domain 
       {
         enabled: showSatellite && domain !== "europe" && domain !== "indianOcean",
         refetchInterval: MINUTE,
+        trpc: { context: { skipBatch: true } },
       },
     ),
   );
 
-  const data = domain === "europe" ? euData : domain === "indianOcean" ? iOData : goesData;
+  const { data: himawariData } = useQuery(
+    api.wms.himawari.queryOptions(
+      { product: "2km_Ash" },
+      {
+        enabled: showSatellite && domain === "himawari",
+        refetchInterval: MINUTE,
+        trpc: { context: { skipBatch: true } },
+      },
+    ),
+  );
+
+  let data;
+
+  switch (domain) {
+    case "europe":
+      data = euData;
+      break;
+    case "indianOcean":
+      data = iOData;
+      break;
+    case "west":
+    case "east":
+      data = goesData;
+      break;
+    case "himawari":
+      data = himawariData;
+      break;
+  }
 
   if (!showSatellite || !data) return;
 

@@ -13,3 +13,5 @@ export const redisClient = async (context: string) => {
 
   return client;
 };
+
+export const cacheClient = await redisClient("cache");

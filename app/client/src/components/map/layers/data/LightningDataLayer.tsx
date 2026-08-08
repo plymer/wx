@@ -1,79 +1,45 @@
-import { Layer, Source } from "react-map-gl/maplibre";
+import { Layer } from "react-map-gl/maplibre";
 
-import type { FeatureCollection, Point } from "geojson";
-import { CLUSTERED, LIGHTNING_DISPLAY, UNCLUSTERED } from "@/config/vectorData";
-import { MINUTE } from "@shared/lib/constants";
-import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
 import { useShowLightning } from "@/stateStores/map/vectorData";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
-import { api } from "@/lib/trpc";
-import { useQuery } from "@tanstack/react-query";
-import { useMapLoadingState } from "@/hooks/useMapLoadingState";
+import { MINUTE } from "@shared/lib/constants";
 
 interface Props {
   belowLayer?: string;
-  timeRange?: number;
 }
 
-export const LightningDataLayer = ({ belowLayer, timeRange = 15 }: Props) => {
+export const LightningDataLayer = ({ belowLayer }: Props) => {
   const enabled = useShowLightning();
 
   const displayTime = useDisplayTime();
 
-  const { data, isFetching } = useQuery(
-    api.lightning.lightning.queryOptions(undefined, {
-      enabled,
-      refetchInterval: MINUTE,
-      trpc: { context: { skipBatch: true } },
-    }),
-  );
-
-  useMapLoadingState("lightning", isFetching);
-
-  if (!enabled || !data) return;
-
-  const filteredData: FeatureCollection = {
-    type: "FeatureCollection",
-    features: data.reduce((acc: FeatureCollection<Point, { validTime: number }>["features"], feature) => {
-      if (
-        feature.properties.validTime >= displayTime - timeRange * MINUTE &&
-        feature.properties.validTime <= displayTime
-      ) {
-        // convert MultiPoint to array of Point features to enable clustering
-        if (feature.geometry.type === "MultiPoint") {
-          feature.geometry.coordinates.forEach((coord) => {
-            acc.push({
-              ...feature,
-              geometry: { type: "Point", coordinates: coord },
-            });
-          });
-        }
-      }
-      return acc;
-    }, []),
-  };
+  if (!enabled) return;
 
   return (
-    <>
-      <Source
-        type="geojson"
-        attribution={GEOMET_ATTRIBUTION}
-        key="lightning-data-source"
-        data={filteredData}
-        id="lightning-data"
-        cluster={true}
-        clusterMaxZoom={12}
-        clusterRadius={4}
-      >
-        <Layer {...LIGHTNING_DISPLAY} key="lightning-data" filter={UNCLUSTERED} beforeId={belowLayer} />
-        <Layer
-          {...LIGHTNING_DISPLAY}
-          key="lightning-data-cluster"
-          id="lightning-data-cluster"
-          filter={CLUSTERED}
-          beforeId="lightning-data"
-        />
-      </Source>
-    </>
+    <Layer
+      source="vector-tile-source"
+      source-layer="lightning"
+      key="lightning-data"
+      beforeId={belowLayer}
+      filter={[
+        "all",
+        ["<=", ["get", "start_time"], ["to-number", displayTime]],
+        [">", ["get", "expiry_time"], ["to-number", displayTime - 24 * MINUTE]],
+      ]}
+      type="symbol"
+      id="lightning-data"
+      layout={{
+        "text-field": "X",
+        "text-overlap": "always",
+        "text-size": 18,
+        "text-font": ["Metropolis-Regular"],
+      }}
+      paint={{
+        "text-color": "rgb(255,0,155)",
+        "text-halo-color": "rgb(255,255,255)",
+        "text-halo-width": 1,
+        "text-opacity": ["case", ["<", ["get", "expiry_time"], ["to-number", displayTime - 12 * MINUTE]], 0.5, 1],
+      }}
+    />
   );
 };

@@ -115,7 +115,6 @@ export const AVIATION_PRODUCTS = {
       timeSteps: 2,
     },
   ],
-  hubs: [],
 } as const;
 
 export const PRODUCTS = Object.keys(AVIATION_PRODUCTS) as Array<keyof typeof AVIATION_PRODUCTS>;

@@ -13,6 +13,7 @@ import type { MapProjections } from "@/lib/types";
 import useMapClock from "@/hooks/useClock";
 import { useUIActions } from "@/stateStores/map/ui";
 import { useMapLoadingState } from "@/hooks/useMapLoadingState";
+import { useRegisterMaplibreWorker } from "@/hooks/useRegisterMaplibreWorker";
 
 interface Props {
   viewState: Partial<ViewState>;
@@ -23,6 +24,8 @@ interface Props {
 }
 
 const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLayers }: Props) => {
+  useRegisterMaplibreWorker();
+
   // subscribe to our global state stores
   const mapState = useMapStateActions();
   const { updateFromMapEvent } = useUpdateMapViewstate();

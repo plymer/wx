@@ -1,17 +1,37 @@
 import "dotenv/config";
-import { gt, lt, Relations } from "drizzle-orm";
-import { sigmets } from "../db/tables/data.drizzle.js";
+import { gt, lt } from "drizzle-orm";
+import { sigmets } from "../db/schemas.drizzle.js";
 import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../lib/types.js";
-import { cardinalToDegrees, generateDbConnection, readGzipFile, xmlParser } from "../lib/utils.js";
+import { cardinalToDegrees, readGzipFile, xmlParser } from "../lib/utils.js";
 import { airSigmetsSchema } from "../lib/validation.js";
-import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
+import { pgDb as db } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
-export async function getSigmets<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
-  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
-) {
+const extractEventName = (text: string): string | null => {
+  const matches = text.match(/(VA[\n\s]ERUPTION[\n\s]MT|VA[\n\s]CLD[\n\s]MT|VA|TC)\s+((VOLCAN\s)?([A-Z0-9]+))/);
+
+  if (!matches) return null;
+
+  const [_whole, threat, name] = matches;
+
+  const normalizedThreat = threat.replace(/\s+/g, " ").trim();
+
+  switch (normalizedThreat) {
+    case "VA":
+    case "VA ERUPTION MT":
+    case "VA CLD MT":
+    case "VA CLD":
+      return name.length > 2 ? name : null;
+    case "TC":
+      return name;
+    default:
+      return null;
+  }
+};
+
+export async function getSigmets() {
   if (!db) {
     throw new Error("[SIGMET] Database connection failed.");
   }
@@ -72,6 +92,8 @@ export async function getSigmets<TSchema extends Record<string, SQLiteTableWithC
           return;
         }
 
+        const hazardName = extractEventName(rawText);
+
         const outputObject: SigmetData = {
           issueTime,
           endTime,
@@ -87,6 +109,7 @@ export async function getSigmets<TSchema extends Record<string, SQLiteTableWithC
           direction,
           speed,
           hazard: hazard.type === "CONVECTIVE" ? "TS" : hazard.type,
+          hazardName,
           hazardTop,
           hazardBottom,
           finalCoords: null,
@@ -205,6 +228,7 @@ export async function getSigmets<TSchema extends Record<string, SQLiteTableWithC
         numberCode,
         hazard,
         hazardTrend: chng,
+        hazardName: extractEventName(rawText),
         hazardBottom,
         hazardTop,
         initialShape,
@@ -288,7 +312,7 @@ export async function getSigmets<TSchema extends Record<string, SQLiteTableWithC
   try {
     await Promise.allSettled(
       data.map(async (sigmet) => {
-        await db.insert(sigmets).values(sigmet).onConflictDoNothing();
+        await db!.insert(sigmets).values(sigmet).onConflictDoNothing();
       }),
     );
     // console.log(`[SIGMET] Inserted/updated ${data.length} SIGMETs.`);

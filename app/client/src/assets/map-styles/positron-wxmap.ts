@@ -4,7 +4,8 @@ export const PUBLIC_URL = new URL(import.meta.url).origin;
 
 const ROAD_COLOUR_FAR = "rgb(160,160,160)";
 const ROAD_COLOUR_CLOSE = "rgb(40,40,40)";
-const WATER_OUTLINE = "rgb(100, 100, 100)";
+const WATER_OUTLINE = "rgb(200, 200, 200)";
+const WATER_CASING = "rgb(25, 25, 25)";
 const WATER_COLOUR = "rgb(11, 19, 23)";
 
 const SHOW_MOTORWAYS = 4.8;
@@ -32,6 +33,28 @@ export const positronWxMap: StyleSpecification = {
       source: "openmaptiles",
       "source-layer": "water",
       paint: { "fill-color": WATER_COLOUR },
+    },
+    {
+      id: "satellite-target",
+      type: "line",
+      source: "openmaptiles",
+      "source-layer": "water",
+      layout: { visibility: "none" },
+    },
+    {
+      id: "radar-target",
+      type: "line",
+      source: "openmaptiles",
+      "source-layer": "water",
+      layout: { visibility: "none" },
+    },
+    {
+      id: "wateroutline-casing",
+      type: "line",
+      source: "openmaptiles",
+      filter: ["all", ["==", "$type", "Polygon"], ["==", "class", "ocean"]],
+      "source-layer": "water",
+      paint: { "line-color": WATER_CASING, "line-width": 3 },
     },
     {
       id: "wateroutline",

@@ -1,63 +1,22 @@
-import { gte } from "drizzle-orm";
-import type { Feature, Point } from "geojson";
+import { publicProcedure, router } from "../services/trpc.js";
+import { pgDb as db } from "../services/database.js";
 import { TRPCError } from "@trpc/server";
-
-import { aqData } from "../db/tables/data.drizzle.js";
-import { aqSchema } from "../validationSchemas/aq.zod.js";
 import { HOUR } from "../lib/constants.js";
 
-import type { AirQualityData, AQData } from "../lib/types.js";
-import { db } from "../main.js";
-import { publicProcedure, router } from "../services/trpc.js";
-
 export const aqRouter = router({
-  aq: publicProcedure.input(aqSchema).query(async ({ input }): Promise<Array<Feature<Point, AirQualityData>>> => {
+  aq: publicProcedure.query(async () => {
     if (!db) {
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "No AQ database connection available" });
-    }
-
-    const { hours } = input;
-    console.log(`[API] Fetching AQ data from the last ${hours} hours(s)...`);
-
-    const then = new Date(new Date().getTime() - hours * HOUR);
-
-    try {
-      const data = await db.query.aqData.findMany({
-        where: gte(aqData.validTime, then),
-      });
-
-      console.log(`[API] Fetched ${data.length} AQ data points from the last ${hours} hours(s).`);
-
-      const geoData = data.reduce((acc: Array<Feature<Point, AirQualityData>>, item: AQData) => {
-        if (!item.lat || !item.lon) {
-          console.warn(`Skipping item with missing coordinates: ${JSON.stringify(item)}`);
-          return acc;
-        }
-
-        const output: Feature<Point, AirQualityData> = {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [item.lon, item.lat],
-          },
-          properties: {
-            name: item.name,
-            type: item.type,
-            pm25: item.pm25,
-            validTime: item.validTime,
-          },
-        };
-
-        acc.push(output);
-        return acc;
-      }, []);
-
-      return geoData;
-    } catch (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: error instanceof Error ? error.message : "Unknown error",
+        message: "No avwx connection available",
       });
     }
+
+    const aqData = await db.query.aqData.findMany({
+      where: { validTime: { gt: new Date(Date.now() - 4 * HOUR) } },
+      orderBy: { validTime: "asc" },
+    });
+
+    return aqData;
   }),
 });

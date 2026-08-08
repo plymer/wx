@@ -10,15 +10,6 @@ import { useViewportBounds } from "@/stateStores/map/mapView";
 import type { StationPlotPopupData, WarningProperties } from "@shared/lib/types";
 import type { XmetEventData } from "@shared/lib/alphanumeric.types";
 
-const extractEventName = (text: string): string | null => {
-  const eventNameMatch = text.match(/(VA ERUPTION MT|VA|TC)\s+([A-Z0-9]+)/);
-  if (eventNameMatch) {
-    return eventNameMatch[2].trim();
-  } else {
-    return null;
-  }
-};
-
 export const DataPopup = () => {
   const popupData = usePopupData();
   const { setPopupData } = useUIActions();
@@ -84,10 +75,8 @@ export const DataPopup = () => {
                   const { siteId, siteCountry, siteState, siteName, metars, taf } =
                     feature.properties as StationPlotPopupData;
 
-                  const metarArray = JSON.parse(metars as unknown as string) as string[];
-
                   const parsedMetar =
-                    metarArray.length > 0 ? (formatSigWx(metarArray[metarArray.length - 1], "metar") as string) : null;
+                    metars.length > 0 ? (formatSigWx(metars[metars.length - 1], "metar") as string) : null;
 
                   const parsedTaf = taf ? (formatSigWx(taf, "taf") as ParsedTAF) : null;
 
@@ -123,16 +112,10 @@ export const DataPopup = () => {
                 case "sigmet": {
                   const sigmetProps = feature.properties as XmetEventData;
 
-                  const hazard = JSON.parse(sigmetProps.hazard as unknown as string) as XmetEventData["hazard"];
-                  const motionVector = JSON.parse(
-                    sigmetProps.motionVector as unknown as string,
-                  ) as XmetEventData["motionVector"];
+                  const hazard = sigmetProps.hazard;
+                  const motionVector = sigmetProps.motionVector;
 
-                  // const isUsaSigmet =
-                  //   sigmetProps.issuer === "KKCI" || sigmetProps.issuer === "PAWU" || sigmetProps.issuer === "PHFO";
-
-                  const hazardEventName =
-                    hazard.type === "VA" || hazard.type === "TC" ? extractEventName(sigmetProps.text) : null;
+                  const hazardEventName = hazard.type === "VA" || hazard.type === "TC" ? hazard.name : null;
 
                   return (
                     <div
@@ -143,7 +126,7 @@ export const DataPopup = () => {
                       <div className="flex justify-around font-mono text-center place-items-center">
                         <div className="flex place-items-center gap-1 justify-center">
                           <AlertTriangle size={12} />
-                          {hazard.type} {hazardEventName ? `${hazardEventName} ` : " "}
+                          {hazard.type} {hazardEventName ? `${hazardEventName} ` : ""}
                         </div>
 
                         <div>

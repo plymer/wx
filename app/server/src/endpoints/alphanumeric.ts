@@ -1,4 +1,3 @@
-import { and, asc, desc, eq, gt, gte } from "drizzle-orm";
 import type { Feature, MultiPolygon } from "geojson";
 import { TRPCError } from "@trpc/server";
 
@@ -12,21 +11,11 @@ import {
 import type { XmetEventData } from "../lib/alphanumeric.types.js";
 import { getSunTimes, isConvectiveSigmet, processCoordinates, stringifyPosition } from "../lib/utils.js";
 
-import { metars, sigmets, stations, tafs } from "../db/tables/data.drizzle.js";
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 
-import { db } from "../main.js";
 import { publicProcedure, router } from "../services/trpc.js";
-import type { HubData, PointForecastData, WxOAPIResponse, XmetGeoJSON } from "../lib/types.js";
-
-const HubSites: Record<string, string> = {
-  CYYZ: "Toronto Pearson Int'l Airport",
-  CYUL: "Montreal Trudeau Int'l Airport",
-  CYYC: "Calgary Int'l Airport",
-  CYVR: "Vancouver Int'l Airport",
-  CYOW: "Ottawa MacDonald Int'l Airport",
-  CYHZ: "Halifax Stanfield Airport",
-};
+import type { PointForecastData, WxOAPIResponse, XmetGeoJSON } from "../lib/types.js";
+import { pgDb as db } from "../services/database.js";
 
 export const alphanumericRouter = router({
   metars: publicProcedure.input(metarSchema).query(async ({ input }) => {
@@ -35,15 +24,15 @@ export const alphanumericRouter = router({
     }
 
     const { site, hrs } = input;
-    const searchSite = site === "CYEU" ? "CWEU" : site;
+    const siteId = site === "CYEU" ? "CWEU" : site;
 
-    console.log("[API] Requesting METARs for:", searchSite, "for the last", hrs, "hours");
+    console.log("[API] Requesting METARs for:", siteId, "for the last", hrs, "hours");
 
     try {
       const metarData = await db.query.metars.findMany({
+        where: { siteId, validTime: { gte: new Date(Date.now() - hrs * HOUR) } },
         columns: { rawText: true },
-        where: and(eq(metars.siteId, searchSite), gte(metars.validTime, new Date(Date.now() - hrs * HOUR))),
-        orderBy: asc(metars.validTime),
+        orderBy: { validTime: "asc" },
       });
 
       if (!metarData || metarData.length === 0) {
@@ -65,20 +54,20 @@ export const alphanumericRouter = router({
     }
 
     const { site } = input;
-    const searchSite = site === "CWEU" ? "CYEU" : site;
+    const siteId = site === "CWEU" ? "CYEU" : site;
 
-    console.log("[API] Requesting site data for:", searchSite);
+    console.log("[API] Requesting site data for:", siteId);
 
     try {
       const stationData = await db.query.stations.findFirst({
-        where: eq(stations.siteId, searchSite),
+        where: { siteId },
       });
 
       if (!stationData) {
         return undefined;
       }
 
-      const { siteId, name, lat, lon, elev_f, elev_m, country, state } = stationData;
+      const { name, lat, lon, elevF, elevM, country, state } = stationData;
 
       const { rise: sunrise, set: sunset } = getSunTimes([lon, lat]);
       const { lat: latString, lon: lonString } = stringifyPosition([lon, lat]);
@@ -88,8 +77,10 @@ export const alphanumericRouter = router({
         name,
         lat: latString,
         lon: lonString,
-        elev_f,
-        elev_m,
+        rawLat: lat,
+        rawLon: lon,
+        elevF,
+        elevM,
         country,
         state,
         sunrise,
@@ -109,15 +100,15 @@ export const alphanumericRouter = router({
     }
 
     const { site } = input;
-    const searchSite = site === "CWEU" ? "CYEU" : site;
+    const siteId = site === "CWEU" ? "CYEU" : site;
 
-    console.log("[API] Requesting TAF for:", searchSite);
+    console.log("[API] Requesting TAF for:", siteId);
 
     try {
       const tafData = await db.query.tafs.findMany({
         columns: { rawText: true },
-        where: eq(tafs.siteId, searchSite),
-        orderBy: desc(tafs.validTime),
+        where: { siteId },
+        orderBy: { validTime: "desc" },
       });
 
       if (!tafData || tafData.length === 0) {
@@ -131,28 +122,6 @@ export const alphanumericRouter = router({
         message: error instanceof Error ? error.message : "Unknown error",
       });
     }
-  }),
-
-  hubs: publicProcedure.input(singleSiteSchema).query(async ({ input }): Promise<HubData> => {
-    const { site } = input;
-
-    const siteName = HubSites[site as keyof typeof HubSites];
-
-    const header = `Outlook for ${siteName} (${site}) no longer available`;
-    const discussion =
-      "Public, unrestricted access to hub discussions has been discontinued by ECCC. Sorry, forecasters.";
-    const outlook = "N/A";
-    const forecaster = "N";
-    const office = "A";
-
-    return {
-      siteName,
-      header,
-      discussion,
-      outlook,
-      forecaster,
-      office,
-    };
   }),
 
   publicBulletin: publicProcedure.input(publicBulletinSchema).query(async ({ input }): Promise<string> => {
@@ -310,8 +279,8 @@ export const alphanumericRouter = router({
     try {
       const { hours } = input;
       const queryResult = await db.query.sigmets.findMany({
-        where: gt(sigmets.endTime, new Date(Date.now() - hours * HOUR)),
-        orderBy: [desc(sigmets.endTime)],
+        where: { endTime: { gt: new Date(Date.now() - hours * HOUR) } },
+        orderBy: { endTime: "desc" },
       });
 
       const xmetList = queryResult.sort((a, b) => new Date(b.endTime).getTime() - new Date(a.endTime).getTime());
@@ -336,6 +305,7 @@ export const alphanumericRouter = router({
             trend: xmet.hazardTrend,
             top: xmet.hazardTop,
             bottom: xmet.hazardBottom,
+            name: xmet.hazardName,
           };
 
           const dataType: "sigmet" = "sigmet";

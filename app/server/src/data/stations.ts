@@ -2,21 +2,19 @@
 // stations update once per day
 
 import "dotenv/config";
-import { generateDbConnection, readGzipFile } from "../lib/utils.js";
-import { stations } from "../db/tables/data.drizzle.js";
+import { readGzipFile } from "../lib/utils.js";
+import { stations } from "../db/schemas.drizzle.js";
 import { FEET_PER_METRE } from "../lib/constants.js";
 import type { CacheStationData, StationData } from "../lib/types.js";
 import { stationSchema } from "../lib/validation.js";
 import { scrapeWiki } from "./canada-airports.js";
+import { pgDb as db } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/stations.cache.json.gz";
 
 export async function buildStationCatalog() {
-  const db = await generateDbConnection({ stations }, "station");
-
   if (!db) {
-    console.error(`[STATION] Database connection failed.`);
-    process.exit(1);
+    throw new Error("[STATIONS] Database connection failed.");
   }
 
   const data = await readGzipFile(RESOURCE_URL, "station");
@@ -44,10 +42,11 @@ export async function buildStationCatalog() {
           siteId: station.icaoId,
           lat: station.lat,
           lon: station.lon,
-          elev_f: Math.floor(station.elev * FEET_PER_METRE),
-          elev_m: station.elev,
+          elevF: Math.floor(station.elev * FEET_PER_METRE),
+          elevM: station.elev,
           country: station.country,
           state: station.state,
+          minZoom: 7.5, // default value, will be updated later
         };
       })
       .filter((entry) => entry !== undefined); // filter out any undefined entries
@@ -55,7 +54,7 @@ export async function buildStationCatalog() {
     // insert the station data, or update each station if it already exists
     await Promise.allSettled(
       output.map(async (station) => {
-        await db
+        await db!
           .insert(stations)
           .values(station)
           .onConflictDoUpdate({
@@ -64,8 +63,8 @@ export async function buildStationCatalog() {
               name: station.name,
               lat: station.lat,
               lon: station.lon,
-              elev_f: station.elev_f,
-              elev_m: station.elev_m,
+              elevF: station.elevF,
+              elevM: station.elevM,
               country: station.country,
               state: station.state,
             },
@@ -74,13 +73,11 @@ export async function buildStationCatalog() {
     );
   } catch (error) {
     console.error(`[STATION] Error processing station cache file: ${(error as Error).message}`);
-    process.exit(1);
   }
 
   try {
     await scrapeWiki();
   } catch (error) {
     console.error(`[STATION] Error scraping Canadian Sites from Wikipedia: ${(error as Error).message}`);
-    process.exit(1);
   }
 }

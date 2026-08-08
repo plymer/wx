@@ -1,7 +1,7 @@
-import { useAviationActions, useHub, useAvProduct, useTimeStep } from "@/stateStores/aviation";
+import { useAviationActions, useAvProduct, useTimeStep } from "@/stateStores/aviation";
 import AvChartsGFA from "./aviation/AvChartsGFA";
 import AvChartsOther from "./aviation/AvChartsOther";
-import HubDiscussion from "./aviation/HubDiscussion";
+
 import Button from "./ui/Button";
 import { AVIATION_PRODUCTS, GFA_PLACEHOLDER_DATA, PRODUCTS } from "@/config/aviationProducts";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +9,6 @@ import { api } from "@/lib/trpc";
 
 export default function Aviation() {
   const product = useAvProduct();
-  const hub = useHub();
   const timeStep = useTimeStep();
   const actions = useAviationActions();
 
@@ -19,12 +18,6 @@ export default function Aviation() {
   const { data: sigwxData } = useQuery(api.charts.sigwx.queryOptions());
 
   const handleChangeProduct = (p: ReturnType<typeof useAvProduct>) => {
-    // if we're switching to hubs, we don't need to update all of the other state so just bail early
-    if (p === "hubs") {
-      actions.setProduct(p);
-      return;
-    }
-
     const newProduct = AVIATION_PRODUCTS[p][0];
 
     // if we don't have a domain for the new product, we can't switch to it
@@ -62,8 +55,6 @@ export default function Aviation() {
         {product === "hlt" && <AvChartsOther product={product} data={hltData} />}
 
         {product === "sigwx" && <AvChartsOther product={product} data={sigwxData} />}
-
-        {product === "hubs" && <HubDiscussion hub={hub} />}
       </div>
     </>
   );

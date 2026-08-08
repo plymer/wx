@@ -3,13 +3,9 @@
 import type {
   CircleLayerSpecification,
   FillLayerSpecification,
-  FilterSpecification,
   LineLayerSpecification,
   SymbolLayerSpecification,
 } from "maplibre-gl";
-
-export const CLUSTERED: FilterSpecification = ["has", "point_count"];
-export const UNCLUSTERED: FilterSpecification = ["!", ["has", "point_count"]];
 
 export const AWC_ATTRIBUTION = "<a href='https://www.aviationweather.gov/'>NOAA AWC</a>";
 
@@ -27,20 +23,6 @@ export const VECTOR_DATA_TYPES = [
 ] as const;
 
 export const XMET_TYPES = ["airmet", "sigmet"] as const;
-
-export const LIGHTNING_DISPLAY: SymbolLayerSpecification = {
-  type: "symbol",
-  id: "lightning-data",
-  source: "lightning-data",
-  layout: {
-    "text-field": "X",
-    "text-overlap": "always",
-    "symbol-sort-key": ["get", "validTime"],
-    "text-size": 14,
-    "text-font": ["Metropolis-Regular"],
-  },
-  paint: { "text-color": "rgb(255,0,155)", "text-halo-color": "rgb(255,255,255)", "text-halo-width": 1 },
-};
 
 const SIGMET_COLOUR = "rgb(184,6,6)";
 
@@ -128,14 +110,6 @@ export const AQ_VALUE_DISPLAY: SymbolLayerSpecification = {
     "text-halo-color": "rgb(255,255,255)",
     "text-halo-width": 1,
   },
-};
-
-export const VECTOR_DISPLAY_CONFIGS = {
-  lightning: LIGHTNING_DISPLAY,
-  sigmet: SIGMET_DISPLAY,
-  airmet: AIRMET_DISPLAY,
-  pirep: PIREP_DISPLAY,
-  aq: AQ_DISPLAY,
 };
 
 export const AQ_ATTRIBUTION = { en: "<a href='https://cyclone.unbc.ca/aqmap/'>UNBC Cyclone</a>" };

@@ -1,26 +1,36 @@
-import { generateDbConnection } from "../lib/utils.js";
 import { getAqData } from "./aq-data.js";
 import { getMetars } from "./metars.js";
 // import { getPireps } from "./pireps.js";
 import { getPublicAlerts } from "./public-alerts.js";
 import { getSigmets } from "./sigmets.js";
 import { getTafs } from "./tafs.js";
+import { getLightning } from "./lightning.js";
+import { buildStationCatalog } from "./stations.js";
+import { updateStationVisTable } from "./station-visibility.js";
+
+import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
+import { pgDb as db } from "../services/database.js";
+import { stations } from "../db/schemas.drizzle.js";
 import { createIsolines } from "./isolines.js";
 
-import * as schemas from "../db/tables/data.drizzle.js";
-import * as relations from "../db/relations/data.relations.drizzle.js";
-import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
-import { buildStationCatalog } from "./stations.js";
-import { redisClient } from "../services/redis.js";
-
-export const cacheClient = await redisClient("data");
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
  */
 async function main() {
   const MAX_CONCURRENCY = 2;
 
-  const db = await generateDbConnection({ ...schemas, ...relations }, "data");
+  if (!db) {
+    throw new Error("Database connection failed, exiting...");
+  }
+
+  // we need to check to see if we have a valid station catalog and station-visibility table
+
+  const stationCatalogCount = await db.select().from(stations).limit(1);
+  if (stationCatalogCount.length === 0) {
+    console.log("[DATA] Station catalog is empty, building station catalog...");
+    await buildStationCatalog();
+    await updateStationVisTable();
+  }
 
   const currentTime = new Date();
   const currentMinute = currentTime.getUTCMinutes();
@@ -28,14 +38,16 @@ async function main() {
 
   const queue = new TaskQueue(MAX_CONCURRENCY);
   const tasks: DataTask[] = [
-    { name: "TAFs", run: () => getTafs(db), schedule: "*/5 * * * *" },
-    { name: "METARs", run: () => getMetars(db), schedule: "* * * * *" },
-    // { name: "PIREPs", run: () => getPireps(db), schedule: "* * * * *" },
-    { name: "SIGMETs", run: () => getSigmets(db), schedule: "* * * * *" },
+    { name: "TAFs", run: () => getTafs(), schedule: "*/5 * * * *" },
+    { name: "METARs", run: () => getMetars(), schedule: "* * * * *" },
+    { name: "Lightning", run: () => getLightning(), schedule: "* * * * *" },
+    // { name: "PIREPs", run: () => getPireps(), schedule: "* * * * *" },
+    { name: "SIGMETs", run: () => getSigmets(), schedule: "* * * * *" },
     { name: "Public-Alerts", run: () => getPublicAlerts(), schedule: "* * * * *" },
-    { name: "AQ-Data", run: () => getAqData(db), schedule: "*/10 * * * *" },
-    { name: "Isolines", run: () => createIsolines(db), schedule: "*/10 * * * *" },
+    { name: "AQ-Data", run: () => getAqData(), schedule: "*/10 * * * *" },
+    { name: "Isolines", run: () => createIsolines(), schedule: "*/10 * * * *" },
     { name: "Station-Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
+    { name: "Station-Visibility", run: () => updateStationVisTable(), schedule: "0 0 * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
 
   console.log(

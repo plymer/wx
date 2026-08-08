@@ -1,38 +1,31 @@
 // third-party dependencies
 import "dotenv/config";
-import { createHTTPServer } from "@trpc/server/adapters/standalone";
-import cors from "cors";
-import z from "zod";
 
-// database schemas
-import * as schemas from "./db/tables/data.drizzle.js";
-import * as relations from "./db/relations/data.relations.drizzle.js";
+import z from "zod";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { compress } from "hono/compress";
+import { trpcServer } from "@hono/trpc-server";
+import { serve } from "@hono/node-server";
 
 // utilities
-import { generateDbConnection } from "./lib/utils.js";
-import { redisClient } from "./services/redis.js";
 import { publicProcedure, router } from "./services/trpc.js";
 
 // endpoint routers
-import { aqRouter } from "./endpoints/aq.js";
-import { lightningRouter } from "./endpoints/lightning.js";
 import { wmsRouter } from "./endpoints/wms.js";
 import { wxmapRouter } from "./endpoints/wxmap.js";
 import { alphanumericRouter } from "./endpoints/alphanumeric.js";
 import { chartsRouter } from "./endpoints/charts.js";
 import { globalMessageRouter } from "./endpoints/globalMessage.js";
+import { apiRouter } from "./endpoints/api.js";
+import { aqRouter } from "./endpoints/aq.js";
 
-const PORT = process.env.PORT || 3000;
+const app = new Hono();
 
-export const db = await generateDbConnection(
-  {
-    ...schemas,
-    ...relations,
-  },
-  "api",
-);
+app.use("*", cors());
+app.use(compress());
 
-export const cacheClient = await redisClient("api");
+const port = parseInt(process.env.PORT || "3000");
 
 const greetRouter = router({
   greeting: publicProcedure
@@ -50,23 +43,31 @@ const greetRouter = router({
 
 const appRouter = router({
   base: greetRouter,
+  aq: aqRouter,
   messages: globalMessageRouter,
   alpha: alphanumericRouter,
   charts: chartsRouter,
-  lightning: lightningRouter,
   wms: wmsRouter,
   wxmap: wxmapRouter,
-  aq: aqRouter,
 });
+
+app.use(
+  "/trpc/*",
+  trpcServer({
+    router: appRouter,
+  }),
+);
+
+app.route("/api", apiRouter);
+
+// serve the app
+serve({ fetch: app.fetch, port });
 
 // Export type router type signature,
 // NOT the router itself.
 export type AppRouter = typeof appRouter;
 
-createHTTPServer({
-  middleware: cors(),
-  router: appRouter,
-  basePath: "/api/",
-}).listen(PORT);
+export default app;
 
-console.log(`[API] tRPC server listening on http://localhost:${PORT}/api/`);
+console.log(`[API] Hono server listening on http://localhost:${port}/api/`);
+console.log(`[API] tRPC server listening on http://localhost:${port}/trpc/`);

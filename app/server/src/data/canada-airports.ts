@@ -1,9 +1,9 @@
 import "dotenv/config";
 import { load } from "cheerio";
 import type { StationData } from "../lib/types.js";
-import { generateDbConnection } from "../lib/utils.js";
-import { stations } from "../db/tables/data.drizzle.js";
+import { stations } from "../db/schemas.drizzle.js";
 import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
+import { pgDb as db } from "../services/database.js";
 
 const PROVINCES = {
   AB: "Alberta",
@@ -125,10 +125,11 @@ function parseAirportTable(
       siteId,
       lat: coordinates.lat,
       lon: coordinates.lon,
-      elev_f: null,
-      elev_m: null,
+      elevF: null,
+      elevM: null,
       country: "CA",
       state: code,
+      minZoom: 7.5, // default value, will be updated later
     });
   });
 
@@ -160,11 +161,8 @@ async function scrapeProvince(code: string, name: string): Promise<StationData[]
 }
 
 export async function scrapeWiki() {
-  const db = await generateDbConnection({ stations }, "wiki-station");
-
   if (!db) {
-    console.error(`[STATIONS] Database connection failed.`);
-    process.exit(1);
+    throw new Error("[STATIONS] Database connection failed.");
   }
 
   const results = await Promise.allSettled(
@@ -189,7 +187,7 @@ export async function scrapeWiki() {
       // insert the station data, or update each station if it already exists
       await Promise.allSettled(
         values.map(async (station) => {
-          await db
+          await db!
             .insert(stations)
             .values(station)
             .onConflictDoUpdate({

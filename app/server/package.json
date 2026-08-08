@@ -10,6 +10,7 @@
     "check": "tsc --noEmit && pnpm format && pnpm lint",
     "build": "tsc",
     "dev": "tsx watch src/main.ts",
+    "dev:data": "tsx watch src/data/index.ts",
     "dev:data:sigmets": "tsx watch src/data/sigmets.ts",
     "dev:data:metars": "tsx watch src/data/metars.ts",
     "dev:data:stations": "tsx watch src/data/canada-airports.ts",

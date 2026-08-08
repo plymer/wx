@@ -1,9 +1,10 @@
 import type { InferSelectModel } from "drizzle-orm";
 import type { FeatureCollection, MultiPolygon, Point } from "geojson";
-import { metars, pireps, sigmets, stations, tafs } from "../db/tables/data.drizzle.js";
+
+import { metars, aqData, sigmets, stations, tafs } from "../db/schemas.drizzle.js";
 import { z } from "zod";
 import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation.js";
-import { aqData } from "../db/tables/data.drizzle.js";
+
 import { XMET_TYPES } from "../config/alphanumeric.config.js";
 import type { OUTLOOK_OFFICES } from "../config/charts.config.js";
 
@@ -48,15 +49,6 @@ export type Panel = {
   url: string;
 };
 
-export type HubData = {
-  siteName: string;
-  header: string;
-  discussion: string;
-  outlook: string;
-  forecaster: string;
-  office: string;
-};
-
 export type XmetTypes = (typeof XMET_TYPES)[number];
 
 export type XmetAPIData = {
@@ -81,7 +73,7 @@ export type XmetAPIData = {
 export type XmetGeoJSON = FeatureCollection<MultiPolygon, XmetAPIData>;
 
 export type RadarDomains = "national";
-export type SatelliteDomains = "east" | "west" | "europe" | "indianOcean";
+export type SatelliteDomains = "east" | "west" | "europe" | "indianOcean" | "himawari";
 export type WMSDomains = Prettify<RadarDomains | SatelliteDomains>;
 export type WMSLayerTypes = "radar" | "satellite";
 export type WMSLayer = {
@@ -122,7 +114,7 @@ export type AQData = InferSelectModel<typeof aqData>;
 export type StationData = InferSelectModel<typeof stations>;
 export type MetarData = InferSelectModel<typeof metars>;
 export type TafData = InferSelectModel<typeof tafs>;
-export type PirepData = InferSelectModel<typeof pireps>;
+// export type PirepData = InferSelectModel<typeof pireps>;
 export type SigmetData = InferSelectModel<typeof sigmets>;
 
 export type WmoDirection =
@@ -168,7 +160,7 @@ export type RawIntlSigmetData = {
 };
 
 // used in intermediate steps of the api data return for /wxmap/metars
-export type MetarElements = Prettify<Omit<MetarData, "siteId" | "rawText" | "createdAt"> & { validTimeString: string }>;
+export type MetarElements = Prettify<Omit<MetarData, "siteId" | "rawText" | "geometry" | "createdAt">>;
 export type StationPlotData = {
   siteId: string;
   stationPriority: number;
@@ -176,7 +168,7 @@ export type StationPlotData = {
 };
 
 export type MetarWithStation = Prettify<
-  Omit<MetarData, "rawText"> & {
+  Omit<MetarData, "rawText" | "createdAt" | "geometry" | "stationPriority" | "stationType" | "obType" | "ceiling"> & {
     stations: {
       lat: number;
       lon: number;

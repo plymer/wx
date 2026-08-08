@@ -10,6 +10,7 @@ function clockTick(
   const initialTime = new Date(Math.floor(Date.now() / MINUTE) * MINUTE).getTime();
   actions.setEndTime(initialTime);
   actions.setStartTime(initialTime - 3 * HOUR);
+  actions.setClockTime(initialTime);
 
   // our actual clock mechanism that updates the clock's time data in state
   // we are storing the NodeJS.Timeout that setInterval returns in state so we can
@@ -19,6 +20,7 @@ function clockTick(
       const now = new Date(Math.floor(Date.now() / MINUTE) * MINUTE).getTime();
       actions.setEndTime(now);
       actions.setStartTime(now - 3 * HOUR);
+      actions.setClockTime(now);
     }, MINUTE),
   );
 }

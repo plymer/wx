@@ -61,6 +61,7 @@ const MAX_NORTH = 85;
 const EAST_WEST_SPLIT = -90;
 const GOES_METEOSAT_SPLIT = -30;
 const METEOSAT_INDIAN_OCEAN_SPLIT = 50;
+const INDIAN_OCEAN_HIMAWARI_SPLIT = 120;
 export const MAP_BOUNDS: LngLatBoundsLike & [number, number, number, number] = [
   MAX_WEST,
   MAX_SOUTH,
@@ -74,6 +75,13 @@ export const GOES_EAST_BOUNDS: [number, number, number, number] = [
   MAX_NORTH,
 ];
 export const GOES_WEST_BOUNDS: [number, number, number, number] = [MAX_WEST, MAX_SOUTH, EAST_WEST_SPLIT, MAX_NORTH];
+
+export const HIMAWARI_BOUNDS: [number, number, number, number] = [
+  INDIAN_OCEAN_HIMAWARI_SPLIT,
+  MAX_SOUTH,
+  MAX_EAST,
+  MAX_NORTH,
+];
 export const RADAR_BOUNDS: [number, number, number, number] = [MAX_WEST, MAX_SOUTH, MAX_EAST, 60];
 export const EUMETSAT_BOUNDS: [number, number, number, number] = [
   GOES_METEOSAT_SPLIT,
@@ -81,4 +89,9 @@ export const EUMETSAT_BOUNDS: [number, number, number, number] = [
   METEOSAT_INDIAN_OCEAN_SPLIT,
   MAX_NORTH,
 ];
-export const IODC_BOUNDS: [number, number, number, number] = [METEOSAT_INDIAN_OCEAN_SPLIT, MAX_SOUTH, 180, MAX_NORTH];
+export const IODC_BOUNDS: [number, number, number, number] = [
+  METEOSAT_INDIAN_OCEAN_SPLIT,
+  MAX_SOUTH,
+  INDIAN_OCEAN_HIMAWARI_SPLIT,
+  MAX_NORTH,
+];

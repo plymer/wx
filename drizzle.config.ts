@@ -1,13 +1,12 @@
 /// <reference types="node" />
 
-import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
-
-const sqlitePath = process.env.SQLITE_PATH ?? "./sqlite-db/wx.sqlite";
+import { credentials } from "./app/server/src/services/database.js";
 
 export default defineConfig({
+  dialect: "postgresql",
+  dbCredentials: credentials,
+  extensionsFilters: ["postgis"],
+  schema: "./app/server/src/db/schemas.drizzle.ts",
   out: "./drizzle",
-  schema: "app/server/src/db/tables/data.drizzle.ts",
-  dialect: "sqlite",
-  dbCredentials: { url: sqlitePath },
 });

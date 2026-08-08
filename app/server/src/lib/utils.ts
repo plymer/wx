@@ -1,15 +1,11 @@
-import { existsSync, mkdirSync, readdirSync, statSync } from "fs";
+import { existsSync, readdirSync, statSync } from "fs";
 import path from "path";
 
 import { createGunzip } from "zlib";
 import * as turf from "@turf/turf";
 import { XMLParser } from "fast-xml-parser";
 import type { Position } from "geojson";
-import { drizzle, type BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
-import type BetterSqlite3 from "better-sqlite3";
-import { Relations } from "drizzle-orm";
-import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
+
 import "dotenv/config";
 
 import type { SunTimes } from "./common.types.js";
@@ -259,58 +255,20 @@ export function processCoordinates(shape: XmetShapes | null, bufferSize: number 
   }
 }
 
+export const lonLatToWebMercator = (lon: number, lat: number) => {
+  const clampedLat = Math.max(Math.min(lat, 85.05112878), -85.05112878);
+  const x = (lon * 20037508.34) / 180;
+  const y = (Math.log(Math.tan(((90 + clampedLat) * Math.PI) / 360)) / (Math.PI / 180)) * (20037508.34 / 180);
+
+  return { x, y };
+};
+
 export function firstAndLastAreSame(coords: Position[]) {
   return coords[0][0] === coords[coords.length - 1][0] && coords[0][1] === coords[coords.length - 1][1];
 }
 
 export function isConvectiveSigmet(header: string): boolean {
   return header.includes("WSUS3");
-}
-
-export async function generateDbConnection<
-  TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>,
->(dbSchema: TSchema, consumer: string) {
-  const connection = getDbConnection(consumer);
-
-  const db = drizzle(connection, { schema: dbSchema });
-
-  const isConnected = await testDbConnection(db, consumer);
-
-  if (isConnected) return db;
-  else return undefined;
-}
-
-export function getDbConnection(consumer: string) {
-  if (!process.env.SQLITE_PATH) {
-    console.warn(
-      `[${consumer.toUpperCase()}] SQLITE_PATH environment variable is not set. Using default path './sqlite-db/wx.sqlite'.`,
-    );
-  }
-
-  const dbPath = process.env.SQLITE_PATH ? path.resolve(process.env.SQLITE_PATH) : "./sqlite-db/wx.sqlite";
-
-  mkdirSync(path.dirname(dbPath), { recursive: true });
-
-  const connection = new Database(dbPath);
-  connection.pragma("journal_mode = WAL");
-
-  return connection;
-}
-
-export async function testDbConnection<TSchema extends Record<string, unknown>>(
-  db: BetterSQLite3Database<TSchema> & {
-    $client: BetterSqlite3.Database;
-  },
-  consumer: string,
-) {
-  try {
-    db.$client.prepare("SELECT 1").get();
-    console.log(`[${consumer.toUpperCase()}] Database connection is valid.`);
-    return true;
-  } catch (err) {
-    console.error(`[${consumer.toUpperCase()}] Database connection failed:`, err);
-    return false;
-  }
 }
 
 export async function readGzipFile(url: string, dataType: string) {

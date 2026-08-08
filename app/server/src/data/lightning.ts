@@ -1,9 +1,9 @@
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { LightningFC } from "../lib/lightning.types.js";
-import type { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
-import { lt, type Relations } from "drizzle-orm";
-import type { generateDbConnection } from "../lib/utils.js";
-import { lightningData } from "../db/tables/data.drizzle.js";
+import { lt, sql, desc } from "drizzle-orm";
+import { lightning } from "../db/schemas.drizzle.js";
+import { pgDb as db } from "../services/database.js";
+import { lonLatToWebMercator } from "../lib/utils.js";
 
 const formatDateToUrlDate = (date: Date) => {
   return date
@@ -13,9 +13,7 @@ const formatDateToUrlDate = (date: Date) => {
     .replace(/:/g, "");
 };
 
-export async function getLightning<TSchema extends Record<string, SQLiteTableWithColumns<any> | Relations<any, any>>>(
-  db: Awaited<ReturnType<typeof generateDbConnection<TSchema>>>,
-) {
+export async function getLightning() {
   if (!db) {
     throw new Error("[LIGHTNING] Database connection failed.");
   }
@@ -39,16 +37,17 @@ export async function getLightning<TSchema extends Record<string, SQLiteTableWit
 
   const bins = [formatDateToUrlDate(currentBin), formatDateToUrlDate(previousBin)];
 
-  const urlList = bins.map((ts) => `https://weather.gc.ca/api/app/v2/Lightning/1/${ts}`);
-
   try {
     const responses = (
       await Promise.all(
-        urlList.map(async (url) =>
-          fetch(url, { headers: DEFAULT_REMOTE_HEADERS })
+        bins.map(async (ts) =>
+          fetch(`https://weather.gc.ca/api/app/v2/Lightning/1/${ts}`, { headers: DEFAULT_REMOTE_HEADERS })
             .then((res) => res.json() as Promise<LightningFC>)
             .catch((err) => {
-              console.error(`[LIGHTNING] Error when fetching data from ${url}:`, err.message);
+              console.error(
+                `[LIGHTNING] Error when fetching data from ${`https://weather.gc.ca/api/app/v2/Lightning/1/${ts}`}:`,
+                err.message,
+              );
               return null;
             }),
         ),
@@ -69,22 +68,109 @@ export async function getLightning<TSchema extends Record<string, SQLiteTableWit
             if (f.geometry.type !== "Point") {
               throw new Error("[LIGHTNING] Error: Lightning feature not type 'Point'");
             }
-            return f.geometry.coordinates.join(",");
+            const [lon, lat] = f.geometry.coordinates;
+            const { x, y } = lonLatToWebMercator(lon, lat);
+            return `${x} ${y}`;
           })
-          .join(" ");
+          .join(",");
 
-        await db
-          .insert(lightningData)
-          .values({ dateFrom: from, dateTo: to, strikes: strikeCoords })
+        const strikeCoordsGeom = strikeCoords.length > 0 ? `MULTIPOINT(${strikeCoords})` : "MULTIPOINT EMPTY";
+
+        await db!
+          .insert(lightning)
+          .values({ startTime: from, expiryTime: to, geometry: strikeCoordsGeom })
           .onConflictDoUpdate({
-            target: lightningData.dateFrom,
-            set: { dateFrom: from, dateTo: to, strikes: strikeCoords },
+            target: lightning.startTime,
+            set: { startTime: from, expiryTime: to, geometry: strikeCoordsGeom },
           });
       }),
     );
 
-    await db.delete(lightningData).where(lt(lightningData.dateFrom, new Date(new Date().getTime() - 4 * HOUR)));
+    // now cluster our lightning data for faster queries
+
+    const minZoom = 2;
+    const maxZoom = 8;
+    const webMercatorWidth = 40075016.68557849; // width of the world in web mercator coordinates
+    const tileSize = 512;
+    const clusterPixels = 32;
+
+    function getClusterSizeMetres(z: number) {
+      const mPx = webMercatorWidth / (tileSize * Math.pow(2, z));
+      return mPx * clusterPixels;
+    }
+
+    const latestTimes = await db
+      .select({ startTime: lightning.startTime, expiryTime: lightning.expiryTime })
+      .from(lightning)
+      .orderBy(desc(lightning.startTime))
+      .limit(2);
+
+    for (const t of latestTimes) {
+      let sourceTable = sql.identifier("lightning");
+      let sourceWhere = sql`WHERE start_time = (${t.startTime}::timestamptz AT TIME ZONE 'UTC')`;
+
+      // oxlint-disable-next-line
+      for (let z = maxZoom; z >= minZoom; z--) {
+        const cellSize = getClusterSizeMetres(z);
+
+        await db.execute(sql`
+          WITH raw_pts AS (
+            SELECT
+            (dp).geom::geometry(Point,3857) as geom,
+            ST_SnapToGrid((dp).geom::geometry(Point,3857), ${cellSize}) as cell
+          FROM ${sourceTable}
+          CROSS JOIN LATERAL ST_DumpPoints(geometry) dp
+          ${sourceWhere}
+        ),
+        bucketed AS (
+          SELECT DISTINCT ON (cell)
+            geom
+          FROM raw_pts
+          ORDER BY cell
+        ),
+        assembled AS (
+          SELECT
+            COALESCE(
+              ST_Multi(ST_Collect(geom))::geometry(MultiPoint,3857),
+              'MULTIPOINT EMPTY'::geometry(MultiPoint,3857)
+            ) as geometry
+          FROM bucketed
+        ),
+        deleted AS (
+          DELETE FROM lightning_clustered
+          WHERE start_time = (${t.startTime}::timestamptz AT TIME ZONE 'UTC') AND zoom_level = ${z}
+          RETURNING 1
+        )
+        INSERT INTO lightning_clustered
+          (start_time, expiry_time, zoom_level, geometry)
+        SELECT
+          (${t.startTime}::timestamptz AT TIME ZONE 'UTC'),
+          (${t.expiryTime}::timestamptz AT TIME ZONE 'UTC'),
+          ${z},
+          geometry
+        FROM assembled
+        ON CONFLICT (start_time, zoom_level)
+        DO UPDATE SET geometry = EXCLUDED.geometry
+        `);
+
+        // next iteration uses the previous zoom's output
+        sourceTable = sql.identifier("lightning_clustered");
+        sourceWhere = sql`
+          WHERE start_time = (${t.startTime}::timestamptz AT TIME ZONE 'UTC')
+            AND zoom_level = ${z}
+        `;
+      }
+    }
+
+    await db.delete(lightning).where(lt(lightning.startTime, new Date(new Date().getTime() - 4 * HOUR)));
   } catch (error) {
-    throw new Error(`[LIGHTNING] Error: ${(error as Error).stack}`);
+    if (error instanceof Error) {
+      const causeMessage = (error as { cause?: { message?: string } }).cause?.message;
+      throw new Error(`[LIGHTNING] Error: ${error.message}${causeMessage ? ` | cause: ${causeMessage}` : ""}`, {
+        cause: error,
+      });
+    }
+
+    throw new Error(`[LIGHTNING] Error: Unknown failure`, { cause: error });
   }
 }
