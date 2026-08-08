@@ -14,6 +14,8 @@ const ENV_VARS = {
   TILES_DIR: process.env.TILES_DIR,
 };
 
+console.log("Data environment variables:", ENV_VARS);
+
 module.exports = {
   apps: [
     {
