@@ -17,7 +17,8 @@ export async function createIsolines() {
     throw new Error("[ISOLINES] Database connection failed.");
   }
 
-  const DATA_TYPES = ["mslp", "tt", "td"] as const;
+  // const DATA_TYPES = ["mslp", "tt", "td"] as const;
+  const DATA_TYPES = ["mslp", "tt"] as const;
   const BASE_RESOLUTION = 2048;
 
   type IsolineConfig = Record<
@@ -36,11 +37,11 @@ export async function createIsolines() {
       resolution: [BASE_RESOLUTION * 2, (BASE_RESOLUTION * 2) / 1.45],
       sigma: [0.5, 1.0],
     },
-    td: {
-      spacing: 5,
-      resolution: [BASE_RESOLUTION * 2, (BASE_RESOLUTION * 2) / 1.45],
-      sigma: [0.4, 0.6],
-    },
+    // td: {
+    //   spacing: 5,
+    //   resolution: [BASE_RESOLUTION * 2, (BASE_RESOLUTION * 2) / 1.45],
+    //   sigma: [0.4, 0.6],
+    // },
   };
 
   await Promise.allSettled(
