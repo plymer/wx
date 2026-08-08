@@ -16,8 +16,6 @@ const ENV_VARS = {
   PORT: 3000,
 };
 
-console.log("Production environment variables:", ENV_VARS);
-
 module.exports = {
   apps: [
     {
