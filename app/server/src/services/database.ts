@@ -128,4 +128,6 @@ export class DatabaseConnection {
 
 const pgDbConnection = new DatabaseConnection("data");
 await pgDbConnection.connect();
+
 export const pgDb = await pgDbConnection.getDb();
+export const pgConnection = pgDbConnection;

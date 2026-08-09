@@ -9,7 +9,7 @@ import { buildStationCatalog } from "./stations.js";
 import { updateStationVisTable } from "./station-visibility.js";
 
 import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
-import { pgDb as db } from "../services/database.js";
+import { pgDb as db, pgConnection } from "../services/database.js";
 import { stations } from "../db/schemas.drizzle.js";
 import { createIsolines } from "./isolines.js";
 
@@ -67,6 +67,9 @@ async function main() {
     console.error(`[DATA] Completed with ${failures.length} task failure(s).`);
     process.exit(1);
   }
+
+  // disconnect from the database
+  await pgConnection.disconnect();
 
   process.exit(0);
 }
