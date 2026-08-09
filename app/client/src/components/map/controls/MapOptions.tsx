@@ -233,14 +233,14 @@ export default function MapOptions({ ...props }: ButtonProps) {
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="border-black bg-neutral-800 text-white p-4 overflow-y-auto"
+        className="bg-transparent border-none text-white p-2 overflow-y-auto"
         showCloseButton={false}
       >
         <Accordion
           type="single"
           value={tab}
           onValueChange={UIActions.setLayersTab as (value: string) => void}
-          className="gap-2 text-black my-4 p-2 bg-white border-neutral-400 rounded-md border-px"
+          className="gap-2 text-black my-4 p-2 bg-white border-neutral-800 rounded-md border drop-shadow-2xl"
         >
           <AccordionItem value="satellite">
             <AccordionTrigger
