@@ -235,6 +235,11 @@ export default function MapOptions({ ...props }: ButtonProps) {
         side="left"
         className="bg-transparent border-none text-white p-2 overflow-y-auto"
         showCloseButton={false}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setIsOpen(false);
+          }
+        }}
       >
         <Accordion
           type="single"
