@@ -39,6 +39,7 @@ https://postgis.net/docs/ST_AsMVT.html
 
 import { sql } from "drizzle-orm";
 import { pgDb as db } from "../services/database.js";
+import { DATA_TYPES as ISOLINE_FIELDS } from "../data/isolines.js";
 
 const DATETIME_COLUMNS = new Set<string>(["valid_time", "start_time", "expiry_time"]);
 const VECTOR_TILE_EXTENT = 4096;
@@ -296,7 +297,7 @@ export async function getTile(t: number, z: number, x: number, y: number) {
   // ensure that each query returns the result encoded as a vector tile using ST_AsMVT
   // the result is aliased to the name of the table (this is the layer name in the tile data that MapLibre references)
   const tileSelects = [
-    ...[{ name: "mslp" }, { name: "tt" }, { name: "td" }],
+    ...ISOLINE_FIELDS.map((field) => ({ name: field })),
     ...TABLES.filter(({ name }) => name !== "isolines"),
   ].map(({ name }) => {
     const layerName = `${name}_layer`;

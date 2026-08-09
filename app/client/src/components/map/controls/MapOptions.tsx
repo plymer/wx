@@ -140,13 +140,13 @@ export default function MapOptions({ ...props }: ButtonProps) {
       state: vector.showIsotherms,
       toggle: vectorActions.toggleIsotherms,
     },
-    {
-      icon: <Rss className="shrink-0" />,
-      type: "isodrosotherms",
-      name: "TD",
-      state: vector.showIsodrosotherms,
-      toggle: vectorActions.toggleIsodrosotherms,
-    },
+    // {
+    //   icon: <Rss className="shrink-0" />,
+    //   type: "isodrosotherms",
+    //   name: "TD",
+    //   state: vector.showIsodrosotherms,
+    //   toggle: vectorActions.toggleIsodrosotherms,
+    // },
     // {
     //   type: "pirep",
     //   name: "PIREPs",
