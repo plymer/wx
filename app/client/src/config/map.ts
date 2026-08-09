@@ -7,6 +7,6 @@ export const MAP_PROJECTIONS = ["mercator", "globe"] as const;
 
 export const MAP_LINES = ["gfa", "lgf", "fir", "tafs", "bedposts", "publicRegions", "marineRegions"] as const;
 
-export const LAYER_TABS = ["satellite", "radar", "other", "projection", "overlays"] as const;
+export const LAYER_TABS = ["satellite", "radar", "wxdata", "projection", "geography"] as const;
 
 export const ZOOM_THRESHOLDS = { mini: 2.25, reduced: 4.5, medium: 6, maximum: 8 } as const;

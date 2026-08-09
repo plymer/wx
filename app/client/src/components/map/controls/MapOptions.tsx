@@ -15,6 +15,7 @@ import {
   Droplet,
   Snowflake,
   Rss,
+  X,
 } from "lucide-react";
 
 import { SATELLITE_CHANNELS } from "@/config/rasterData";
@@ -230,156 +231,162 @@ export default function MapOptions({ ...props }: ButtonProps) {
           <Layers />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="border-black bg-gray-800 text-white p-4" showCloseButton={false}>
-        <div className="text-black my-4 p-2 bg-white border-neutral-400 rounded-md border-px">
-          <Accordion type="single" value={tab} onValueChange={UIActions.setLayersTab as (value: string) => void}>
-            <AccordionItem value="satellite">
-              <AccordionTrigger
-                value="satellite"
-                className="flex justify-center gap-2 font-bold text-lg bg-gray-600 text-white"
+      <SheetContent
+        side="left"
+        className="border-black bg-neutral-800 text-white p-4 overflow-y-auto"
+        showCloseButton={false}
+      >
+        <Accordion
+          type="single"
+          value={tab}
+          onValueChange={UIActions.setLayersTab as (value: string) => void}
+          className="gap-2 text-black my-4 p-2 bg-white border-neutral-400 rounded-md border-px"
+        >
+          <AccordionItem value="satellite">
+            <AccordionTrigger
+              value="satellite"
+              className={`flex justify-center gap-2 font-bold text-lg bg-accent/80 hover:bg-accent text-white ${tab === "satellite" && "bg-accent rounded-b-none"}`}
+            >
+              <Satellite className="shrink-0 size-6" /> Satellite
+            </AccordionTrigger>
+            <AccordionContent className="flex max-lg:flex-col max-lg:gap-2 items-center border border-accent rounded-b-md p-2 h-fit">
+              <DataToggle
+                dataOption={{
+                  name: "Show Satellite",
+                  state: raster.showSatellite,
+                  toggle: rasterActions.toggleSatellite,
+                  type: "satellite",
+                }}
+                className="flex items-center justify-between p-2 rounded-md text-black border border-input max-lg:w-full lg:min-w-48"
+              />
+              <Select
+                value={raster.satelliteProduct}
+                onValueChange={(selectVal) => rasterActions.setSatelliteProduct(selectVal as SatelliteChannelsWMSName)}
               >
-                <Satellite className="shrink-0 size-6" /> Satellite
-              </AccordionTrigger>
-              <AccordionContent className="flex items-center gap-2 my-2 border-2 border-gray-600 rounded-md p-2">
-                <DataToggle
-                  dataOption={{
-                    name: "Show Satellite",
-                    state: raster.showSatellite,
-                    toggle: rasterActions.toggleSatellite,
-                    type: "satellite",
-                  }}
-                  className="flex items-center justify-between p-2 rounded-md text-black border border-input min-w-48"
-                />
-                <Select
-                  value={raster.satelliteProduct}
-                  onValueChange={(selectVal) =>
-                    rasterActions.setSatelliteProduct(selectVal as SatelliteChannelsWMSName)
-                  }
+                <SelectTrigger disabled={!raster.showSatellite} className="w-full text-black">
+                  <SelectValue placeholder="Select Satellite Channel" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(SATELLITE_CHANNELS) as SatelliteChannelsList[]).map((ch, index) => (
+                    <SelectItem key={index} value={SATELLITE_CHANNELS[ch].wms}>
+                      {SATELLITE_CHANNELS[ch].menuName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="radar">
+            <AccordionTrigger
+              value="radar"
+              className={`flex justify-center gap-2 font-bold text-lg bg-accent/80 hover:bg-accent text-white ${tab === "radar" && "bg-accent rounded-b-none"}`}
+            >
+              <Radar className="shrink-0 size-6" /> Radar
+            </AccordionTrigger>
+            <AccordionContent className="border border-accent rounded-b-md p-2 h-fit">
+              <DataToggle
+                dataOption={{
+                  name: "Show Radar",
+                  state: raster.showRadar,
+                  toggle: rasterActions.toggleRadar,
+                  type: "radar",
+                }}
+                className="flex items-center justify-between p-2 rounded-md text-black border border-input"
+              />
+              <div className="grid lg:grid-cols-2 max-lg:gap-2">
+                <Button
+                  type="button"
+                  variant="drawer"
+                  onClick={() => rasterActions.setRadarProduct("RADAR_1KM_RRAI")}
+                  disabled={!raster.showRadar}
+                  className={`max-lg:rounded-md ${raster.radarProduct === "RADAR_1KM_RRAI" && "active"}`}
                 >
-                  <SelectTrigger disabled={!raster.showSatellite} className="w-full text-black">
-                    <SelectValue placeholder="Select Satellite Channel" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(Object.keys(SATELLITE_CHANNELS) as SatelliteChannelsList[]).map((ch, index) => (
-                      <SelectItem key={index} value={SATELLITE_CHANNELS[ch].wms}>
-                        {SATELLITE_CHANNELS[ch].menuName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="radar">
-              <AccordionTrigger
-                value="radar"
-                className="flex justify-center gap-2 font-bold text-lg bg-gray-600 text-white"
+                  <Droplet />
+                  Rain Rate
+                </Button>
+                <Button
+                  type="button"
+                  variant="drawer"
+                  onClick={() => rasterActions.setRadarProduct("RADAR_1KM_RSNO")}
+                  disabled={!raster.showRadar}
+                  className={`max-lg:rounded-md ${raster.radarProduct === "RADAR_1KM_RSNO" && "active"}`}
+                >
+                  <Snowflake />
+                  Snow Rate
+                </Button>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="wxdata">
+            <AccordionTrigger
+              value="wxdata"
+              className={`flex justify-center gap-2 font-bold text-lg bg-accent/80 hover:bg-accent text-white ${tab === "wxdata" && "bg-accent rounded-b-none"}`}
+            >
+              <CloudLightning className="shrink-0  size-6" /> Wx Plots
+            </AccordionTrigger>
+            <AccordionContent className="border border-accent rounded-b-md p-2 h-fit">
+              <div className="grid lg:grid-cols-2 max-lg:grid-cols-1 gap-2">
+                {VECTOR_DATA_OPTIONS.map((item, i) => (
+                  <DataToggle
+                    key={i}
+                    dataOption={item}
+                    className="flex items-center grow justify-between p-2 rounded-md text-black border border-input"
+                  />
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="projection">
+            <AccordionTrigger
+              value="projection"
+              className={`flex justify-center gap-2 font-bold text-lg bg-accent/80 hover:bg-accent text-white ${tab === "projection" && "bg-accent rounded-b-none"}`}
+            >
+              <ScanEye className="shrink-0  size-6" /> Projection
+            </AccordionTrigger>
+            <AccordionContent className="flex max-lg:flex-col max-lg:gap-2 items-center border border-accent rounded-b-md p-2 h-fit">
+              <Button
+                type="button"
+                variant="drawer"
+                onClick={() => mapActions.setProjection("globe")}
+                className={`max-lg:rounded-md ${map.projection === "globe" && "active"}`}
               >
-                <Radar className="shrink-0 size-6" /> Radar
-              </AccordionTrigger>
-              <AccordionContent className="flex items-center gap-2 my-2 border-2 border-gray-600 rounded-md p-2">
-                <DataToggle
-                  dataOption={{
-                    name: "Show Radar",
-                    state: raster.showRadar,
-                    toggle: rasterActions.toggleRadar,
-                    type: "radar",
-                  }}
-                  className="flex items-center justify-between p-2 rounded-md text-black border border-input"
-                />
-                <div className="flex items-center">
-                  <Button
-                    type="button"
-                    variant="drawer"
-                    onClick={() => rasterActions.setRadarProduct("RADAR_1KM_RRAI")}
-                    disabled={!raster.showRadar}
-                    className={`${raster.radarProduct === "RADAR_1KM_RRAI" && "active"}`}
-                  >
-                    <Droplet />
-                    Rain Rate
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="drawer"
-                    onClick={() => rasterActions.setRadarProduct("RADAR_1KM_RSNO")}
-                    disabled={!raster.showRadar}
-                    className={`${raster.radarProduct === "RADAR_1KM_RSNO" && "active"}`}
-                  >
-                    <Snowflake />
-                    Snow Rate
-                  </Button>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="other">
-              <AccordionTrigger
-                value="other"
-                className="flex justify-center gap-2 font-bold text-lg bg-gray-600 text-white"
+                <Globe className="me-2 size-6" />
+                Globe
+              </Button>
+              <Button
+                type="button"
+                variant="drawer"
+                onClick={() => mapActions.setProjection("mercator")}
+                className={`max-lg:rounded-md ${map.projection === "mercator" && "active"}`}
               >
-                <CloudLightning className="shrink-0  size-6" /> Wx Plots
-              </AccordionTrigger>
-              <AccordionContent className="flex items-center gap-2 my-2 border-2 border-gray-600 rounded-md p-2">
-                <div className="grid grid-cols-2 gap-2">
-                  {VECTOR_DATA_OPTIONS.map((item, i) => (
-                    <DataToggle
-                      key={i}
-                      dataOption={item}
-                      className="flex items-center justify-between p-2 rounded-md text-black border border-input"
-                    />
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="projection">
-              <AccordionTrigger
-                value="projection"
-                className="flex justify-center gap-2 font-bold text-lg bg-gray-600 text-white"
-              >
-                <ScanEye className="shrink-0  size-6" /> Projection
-              </AccordionTrigger>
-              <AccordionContent className="flex items-center gap-2 my-2 border-2 border-gray-600 rounded-md p-2">
-                <div className="flex items-center">
-                  <Button
-                    type="button"
-                    variant="drawer"
-                    onClick={() => mapActions.setProjection("globe")}
-                    className={`${map.projection === "globe" && "active"}`}
-                  >
-                    <Globe className="me-2 size-6" />
-                    Globe
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="drawer"
-                    onClick={() => mapActions.setProjection("mercator")}
-                    className={`${map.projection === "mercator" && "active"}`}
-                  >
-                    <Map className="me-2 size-6" />
-                    Mercator
-                  </Button>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="overlays">
-              <AccordionTrigger
-                value="overlays"
-                className="flex justify-center gap-2 font-bold text-lg bg-gray-600 text-white"
-              >
-                <List className="shrink-0  size-6" /> Geography
-              </AccordionTrigger>
-              <AccordionContent className="flex items-center gap-2 my-2 border-2 border-gray-600 rounded-md p-2">
-                <div className="grid grid-cols-2 gap-2">
-                  {OVERLAYS.map((item, i) => (
-                    <DataToggle
-                      key={i}
-                      dataOption={item}
-                      className="flex items-center justify-between p-2 rounded-md  text-black border border-input"
-                    />
-                  ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
+                <Map className="me-2 size-6" />
+                Mercator
+              </Button>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="geography">
+            <AccordionTrigger
+              value="geography"
+              className={`flex justify-center gap-2 font-bold text-lg bg-accent/80 hover:bg-accent text-white ${tab === "geography" && "bg-accent rounded-b-none"}`}
+            >
+              <List className="shrink-0 size-6" /> Geography
+            </AccordionTrigger>
+            <AccordionContent className="border border-accent rounded-b-md p-2 h-fit">
+              <div className="grid lg:grid-cols-2 max-lg:grid-cols-1 gap-2">
+                {OVERLAYS.map((item, i) => (
+                  <DataToggle
+                    key={i}
+                    dataOption={item}
+                    className="flex items-center grow justify-between p-2 rounded-md text-black border border-input"
+                  />
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          <Button onClick={() => setIsOpen(false)}>
+            <X /> Close
+          </Button>
+        </Accordion>
       </SheetContent>
     </Sheet>
   );
