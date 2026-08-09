@@ -8,7 +8,7 @@ import { Plots } from "./sfc-data/Plots";
 import { Isodrosotherms } from "./sfc-data/Isodrosotherms";
 import { Isotherms } from "./sfc-data/Isotherms";
 
-export const SurfaceDataLayer = () => {
+export const SurfaceDataLayer = ({ hidePopups = false }: { hidePopups?: boolean }) => {
   const zoom = useZoom();
 
   const displayTime = useDisplayTime();
@@ -19,7 +19,7 @@ export const SurfaceDataLayer = () => {
       <Isotherms displayTime={displayTime} />
       <Isobars displayTime={displayTime} />
       <Plots displayTime={displayTime} />
-      <Popups zoom={zoom} />
+      {!hidePopups && <Popups zoom={zoom} />}
     </>
   );
 };
