@@ -41,8 +41,8 @@ import {
 } from "@/stateStores/map/vectorData";
 import type { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
-import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "@/components/ui/Drawer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "@/components/ui/Sheet";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/Accordion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 import Button, { type ButtonProps } from "@/components/ui/Button";
 import DataToggle from "@/components/ui/DataToggle";
@@ -222,45 +222,25 @@ export default function MapOptions({ ...props }: ButtonProps) {
   ] as const;
 
   return (
-    <div className="w-full">
-      <Drawer open={isOpen} onOpenChange={setIsOpen}>
-        <DrawerTitle content="Realtime Data Options" />
-        <DrawerDescription content="Change how and what realtime data is being displayed" />
-        <DrawerTrigger asChild>
-          <Button size="icon" variant="floating" {...props}>
-            <Layers />
-          </Button>
-        </DrawerTrigger>
-        <DrawerContent className="border-black bg-gray-800 text-white">
-          <div className="text-black mx-auto my-4 max-md:w-[calc(100dvw-1rem)] p-2 bg-white border-neutral-400 rounded-md border-px">
-            <Tabs
-              value={tab}
-              onValueChange={UIActions.setLayersTab as (value: string) => void}
-              className="w-full min-h-[25svh] px"
-            >
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="other" className="flex justify-center gap-2">
-                  <CloudLightning className="shrink-0  size-6" />
-                  <span className="max-md:hidden">Wx Plots</span>
-                </TabsTrigger>
-                <TabsTrigger value="satellite" className="flex justify-center gap-2">
-                  <Satellite className="shrink-0  size-6" />
-                  <span className="max-md:hidden">Satellite</span>
-                </TabsTrigger>
-                <TabsTrigger value="radar" className="flex justify-center gap-2">
-                  <Radar className="shrink-0 size-6" />
-                  <span className="max-md:hidden">Radar</span>
-                </TabsTrigger>
-                <TabsTrigger value="projection" className="flex justify-center gap-2">
-                  <ScanEye className="shrink-0  size-6" />
-                  <span className="max-md:hidden">Projection</span>
-                </TabsTrigger>
-                <TabsTrigger value="overlays" className="flex justify-center gap-2">
-                  <List className="shrink-0  size-6" />
-                  <span className="max-md:hidden">Geography</span>
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="satellite">
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetTitle content="Realtime Data Options" />
+      <SheetDescription content="Change how and what realtime data is being displayed" />
+      <SheetTrigger asChild>
+        <Button size="icon" variant="floating" {...props}>
+          <Layers />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="border-black bg-gray-800 text-white p-4" showCloseButton={false}>
+        <div className="text-black my-4 p-2 bg-white border-neutral-400 rounded-md border-px">
+          <Accordion type="single" value={tab} onValueChange={UIActions.setLayersTab as (value: string) => void}>
+            <AccordionItem value="satellite">
+              <AccordionTrigger
+                value="satellite"
+                className="flex justify-center gap-2 font-bold text-lg bg-gray-600 text-white"
+              >
+                <Satellite className="shrink-0 size-6" /> Satellite
+              </AccordionTrigger>
+              <AccordionContent className="flex items-center gap-2 my-2 border-2 border-gray-600 rounded-md p-2">
                 <DataToggle
                   dataOption={{
                     name: "Show Satellite",
@@ -268,7 +248,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
                     toggle: rasterActions.toggleSatellite,
                     type: "satellite",
                   }}
-                  className="flex items-center justify-between p-2 rounded-md text-black border border-input"
+                  className="flex items-center justify-between p-2 rounded-md text-black border border-input min-w-48"
                 />
                 <Select
                   value={raster.satelliteProduct}
@@ -287,8 +267,16 @@ export default function MapOptions({ ...props }: ButtonProps) {
                     ))}
                   </SelectContent>
                 </Select>
-              </TabsContent>
-              <TabsContent value="radar">
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="radar">
+              <AccordionTrigger
+                value="radar"
+                className="flex justify-center gap-2 font-bold text-lg bg-gray-600 text-white"
+              >
+                <Radar className="shrink-0 size-6" /> Radar
+              </AccordionTrigger>
+              <AccordionContent className="flex items-center gap-2 my-2 border-2 border-gray-600 rounded-md p-2">
                 <DataToggle
                   dataOption={{
                     name: "Show Radar",
@@ -320,8 +308,16 @@ export default function MapOptions({ ...props }: ButtonProps) {
                     Snow Rate
                   </Button>
                 </div>
-              </TabsContent>
-              <TabsContent value="other">
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="other">
+              <AccordionTrigger
+                value="other"
+                className="flex justify-center gap-2 font-bold text-lg bg-gray-600 text-white"
+              >
+                <CloudLightning className="shrink-0  size-6" /> Wx Plots
+              </AccordionTrigger>
+              <AccordionContent className="flex items-center gap-2 my-2 border-2 border-gray-600 rounded-md p-2">
                 <div className="grid grid-cols-2 gap-2">
                   {VECTOR_DATA_OPTIONS.map((item, i) => (
                     <DataToggle
@@ -331,8 +327,16 @@ export default function MapOptions({ ...props }: ButtonProps) {
                     />
                   ))}
                 </div>
-              </TabsContent>
-              <TabsContent value="projection">
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="projection">
+              <AccordionTrigger
+                value="projection"
+                className="flex justify-center gap-2 font-bold text-lg bg-gray-600 text-white"
+              >
+                <ScanEye className="shrink-0  size-6" /> Projection
+              </AccordionTrigger>
+              <AccordionContent className="flex items-center gap-2 my-2 border-2 border-gray-600 rounded-md p-2">
                 <div className="flex items-center">
                   <Button
                     type="button"
@@ -353,8 +357,16 @@ export default function MapOptions({ ...props }: ButtonProps) {
                     Mercator
                   </Button>
                 </div>
-              </TabsContent>
-              <TabsContent value="overlays">
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="overlays">
+              <AccordionTrigger
+                value="overlays"
+                className="flex justify-center gap-2 font-bold text-lg bg-gray-600 text-white"
+              >
+                <List className="shrink-0  size-6" /> Geography
+              </AccordionTrigger>
+              <AccordionContent className="flex items-center gap-2 my-2 border-2 border-gray-600 rounded-md p-2">
                 <div className="grid grid-cols-2 gap-2">
                   {OVERLAYS.map((item, i) => (
                     <DataToggle
@@ -364,11 +376,11 @@ export default function MapOptions({ ...props }: ButtonProps) {
                     />
                   ))}
                 </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </DrawerContent>
-      </Drawer>
-    </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
