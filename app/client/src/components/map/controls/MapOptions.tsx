@@ -123,21 +123,21 @@ export default function MapOptions({ ...props }: ButtonProps) {
     {
       icon: <Thermometer className="shrink-0" />,
       type: "surfaceObs",
-      name: "Observations",
+      name: "Surface Plots",
       state: vector.showObs,
       toggle: vectorActions.toggleObs,
     },
     {
       icon: <Rss className="shrink-0" />,
       type: "isobars",
-      name: "MSLP",
+      name: "Isobars",
       state: vector.showIsobars,
       toggle: vectorActions.toggleIsobars,
     },
     {
       icon: <Rss className="shrink-0" />,
       type: "isotherms",
-      name: "TT",
+      name: "Isotherms",
       state: vector.showIsotherms,
       toggle: vectorActions.toggleIsotherms,
     },
@@ -327,7 +327,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
               value="wxdata"
               className={`flex justify-center gap-2 font-bold text-lg bg-accent/80 hover:bg-accent text-white ${tab === "wxdata" && "bg-accent rounded-b-none"}`}
             >
-              <CloudLightning className="shrink-0  size-6" /> Wx Plots
+              <CloudLightning className="shrink-0  size-6" /> Obs and Alerts
             </AccordionTrigger>
             <AccordionContent className="border border-accent rounded-b-md p-2 h-fit">
               <div className="grid lg:grid-cols-2 max-lg:grid-cols-1 gap-2">
