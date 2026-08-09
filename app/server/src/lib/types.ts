@@ -52,6 +52,7 @@ export type Panel = {
 export type XmetTypes = (typeof XMET_TYPES)[number];
 
 export type XmetAPIData = {
+  firRegion: string;
   issuer: string;
   header: string;
   domain: string;

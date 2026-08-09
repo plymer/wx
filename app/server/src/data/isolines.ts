@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { lt, sql } from "drizzle-orm";
 
 import {
   generateMarchedIsolines,
@@ -9,7 +9,7 @@ import {
 
 import { isolines, mslpExtrema } from "../db/schemas.drizzle.js";
 import { lonLatToWebMercator } from "../lib/utils.js";
-import { MINUTE } from "../lib/constants.js";
+import { HOUR, MINUTE } from "../lib/constants.js";
 import { pgDb as db } from "../services/database.js";
 
 export async function createIsolines() {
@@ -17,8 +17,8 @@ export async function createIsolines() {
     throw new Error("[ISOLINES] Database connection failed.");
   }
 
-  // const DATA_TYPES = ["mslp", "tt", "td"] as const;
-  const DATA_TYPES = ["mslp", "tt"] as const;
+  const DATA_TYPES = ["mslp", "tt", "td"] as const;
+  // const DATA_TYPES = ["mslp", "tt"] as const;
   const BASE_RESOLUTION = 2048;
 
   type IsolineConfig = Record<
@@ -34,14 +34,14 @@ export async function createIsolines() {
     },
     tt: {
       spacing: 5,
-      resolution: [BASE_RESOLUTION * 2, (BASE_RESOLUTION * 2) / 1.45],
-      sigma: [0.5, 1.0],
+      resolution: [BASE_RESOLUTION * 1.5, (BASE_RESOLUTION * 1.5) / 1.45],
+      sigma: [0.6, 1.2],
     },
-    // td: {
-    //   spacing: 5,
-    //   resolution: [BASE_RESOLUTION * 2, (BASE_RESOLUTION * 2) / 1.45],
-    //   sigma: [0.4, 0.6],
-    // },
+    td: {
+      spacing: 2,
+      resolution: [BASE_RESOLUTION * 1.5, (BASE_RESOLUTION * 1.5) / 1.45],
+      sigma: [0.4, 0.6],
+    },
   };
 
   await Promise.allSettled(
@@ -49,17 +49,39 @@ export async function createIsolines() {
       try {
         const now = new Date().getTime();
 
-        const distinctQuery = sql`
+        // clear out old isolines and mslp extrema data from the database
+        await db!.delete(isolines).where(lt(isolines.startTime, new Date(now - 3.5 * HOUR)));
+        await db!.delete(mslpExtrema).where(lt(mslpExtrema.startTime, new Date(now - 3.5 * HOUR)));
+
+        const northernHemisphereQuery = sql`
           SELECT DISTINCT ON (site_id)
             metars.${sql.identifier(dataType)} AS value,
             ST_X(ST_Transform("geometry", 4326)) AS lng,
             ST_Y(ST_Transform("geometry", 4326)) AS lat
           FROM metars
           WHERE valid_time >= NOW() - INTERVAL '90 minute'
+           AND ST_Intersects(
+              ST_Transform("geometry", 4326),
+              ST_MakeEnvelope(-180, 10, 180, 85, 4326)
+            )
           ORDER BY site_id, valid_time DESC
         `;
 
-        const queryResult = await db!.execute(distinctQuery);
+        const northAmericaQuery = sql`
+          SELECT DISTINCT ON (site_id)
+            metars.${sql.identifier(dataType)} AS value,
+            ST_X(ST_Transform("geometry", 4326)) AS lng,
+            ST_Y(ST_Transform("geometry", 4326)) AS lat
+          FROM metars
+          WHERE valid_time >= NOW() - INTERVAL '90 minute'
+            AND ST_Intersects(
+              ST_Transform("geometry", 4326),
+              ST_MakeEnvelope(-130, 25, -30, 60, 4326)
+            )
+          ORDER BY site_id, valid_time DESC
+        `;
+
+        const queryResult = await db!.execute(dataType === "mslp" ? northernHemisphereQuery : northAmericaQuery);
 
         const rows = queryResult.rows as Array<{
           value: number | null;
@@ -116,11 +138,11 @@ export async function createIsolines() {
             barnesResult,
             barnesParams.x0,
             barnesParams.step,
-            { minProminence: 0.0000001 },
+            { minProminence: 0.00000001 },
             barnesParams.unproject,
           );
 
-          console.log(`[ISOLINES] Found ${extremaPointData.length} extrema points to store.`);
+          console.log(`[ISOLINES] Found ${extremaPointData.length} ${dataType} extrema points to store.`);
 
           await Promise.all(
             extremaPointData.map(async (point) => {
@@ -135,7 +157,7 @@ export async function createIsolines() {
           );
         }
 
-        console.log(`[ISOLINES] Processing completed and results were stored.`);
+        console.log(`[ISOLINES] '${dataType}' processing completed and results were stored.`);
       } catch (error) {
         console.error("[ISOLINES] Error during isoline processing:", (error as Error).stack);
         throw error;

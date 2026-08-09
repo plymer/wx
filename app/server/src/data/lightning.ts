@@ -1,7 +1,7 @@
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { LightningFC } from "../lib/lightning.types.js";
 import { lt, sql, desc } from "drizzle-orm";
-import { lightning } from "../db/schemas.drizzle.js";
+import { lightning, lightningClustered } from "../db/schemas.drizzle.js";
 import { pgDb as db } from "../services/database.js";
 import { lonLatToWebMercator } from "../lib/utils.js";
 
@@ -163,6 +163,9 @@ export async function getLightning() {
     }
 
     await db.delete(lightning).where(lt(lightning.startTime, new Date(new Date().getTime() - 4 * HOUR)));
+    await db
+      .delete(lightningClustered)
+      .where(lt(lightningClustered.startTime, new Date(new Date().getTime() - 4 * HOUR)));
   } catch (error) {
     if (error instanceof Error) {
       const causeMessage = (error as { cause?: { message?: string } }).cause?.message;

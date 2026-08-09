@@ -68,6 +68,7 @@ export type XmetAPIData = {
   alphaCode?: string;
   charCode: string;
   numberCode: number;
+  firRegion: string;
   sequenceId: string;
   startTime: number;
   endTime: number;

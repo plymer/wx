@@ -287,6 +287,7 @@ export const alphanumericRouter = router({
 
       const xmetEvents: XmetEventData[] = xmetList
         .map((xmet) => {
+          const firRegion = xmet.firRegion;
           const issuer = xmet.issuer;
           const text = xmet.rawText;
           const domain = xmet.domain;
@@ -315,6 +316,7 @@ export const alphanumericRouter = router({
           const sequenceId = !isConvectiveSigmet(header) ? `${domain}${charCode}` : `conv`;
 
           return {
+            firRegion,
             issuer,
             text,
             domain,
@@ -335,6 +337,7 @@ export const alphanumericRouter = router({
       const output: Feature<MultiPolygon, XmetEventData>[] | undefined = xmetEvents
         .map((xmet) => {
           const {
+            firRegion,
             issuer,
             text,
             domain,
@@ -359,6 +362,7 @@ export const alphanumericRouter = router({
               type: "MultiPolygon",
             },
             properties: {
+              firRegion,
               issuer,
               header,
               domain,

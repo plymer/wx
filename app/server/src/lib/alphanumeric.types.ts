@@ -167,6 +167,7 @@ export type XmetEventGeometry = {
 
 export type XmetEventData = {
   issuer: string | null;
+  firRegion: string | null;
   header: string;
   startTime: number;
   endTime: number;

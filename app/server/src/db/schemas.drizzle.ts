@@ -243,5 +243,6 @@ export const metarsTemporalView = snakeCase.view("metars_temporal").as((qb) =>
           "expiry_time",
         ),
     })
-    .from(metars),
+    .from(metars)
+    .where(sql`${metars.validTime} >= NOW() - INTERVAL '4 hours'`),
 );

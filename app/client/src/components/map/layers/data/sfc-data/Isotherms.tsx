@@ -1,40 +1,30 @@
-import { useMapLoadingState } from "@/hooks/useMapLoadingState";
-import { api } from "@/lib/trpc";
 import { useShowIsotherms } from "@/stateStores/map/vectorData";
-import { MINUTE } from "@shared/lib/constants";
-import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
-import { Layer, Source } from "react-map-gl/maplibre";
+import type { FilterSpecification } from "maplibre-gl";
+import { Layer } from "react-map-gl/maplibre";
 
 interface Props {
-  currentFrame: number;
+  displayTime: number;
 }
 
-export const Isotherms = ({ currentFrame }: Props) => {
+export const Isotherms = ({ displayTime }: Props) => {
   const enabled = useShowIsotherms();
 
-  const { data: isothermData, isFetching: isothermFetching } = useQuery(
-    api.wxmap.wxmapIsolines.queryOptions(
-      { type: "tt" },
-      {
-        enabled,
-        refetchInterval: 10 * MINUTE,
-        trpc: { context: { skipBatch: true } },
-      },
-    ),
-  );
-
-  useMapLoadingState("sfc-isotherms", isothermFetching);
-
-  const isotherms = useMemo(() => isothermData?.[currentFrame], [isothermData, currentFrame]);
+  const filter: FilterSpecification = [
+    "all",
+    ["<=", ["get", "start_time"], ["to-number", displayTime]],
+    [">", ["get", "expiry_time"], ["to-number", displayTime]],
+  ];
 
   if (!enabled) return null;
 
   return (
-    <Source id="sfc-obs-isotherms" type="geojson" data={isotherms ?? { type: "FeatureCollection", features: [] }}>
+    <>
       <Layer
         id="layer-sfc-obs-isotherms"
         type="line"
+        source="vector-tile-source"
+        source-layer="tt"
+        filter={filter}
         layout={{
           "line-join": "round",
           "line-cap": "round",
@@ -52,12 +42,15 @@ export const Isotherms = ({ currentFrame }: Props) => {
       <Layer
         id="layer-sfc-obs-isotherms-labels"
         type="symbol"
+        source="vector-tile-source"
+        source-layer="tt"
+        filter={filter}
         layout={{
           "symbol-placement": "line",
           "symbol-spacing": 800,
           "text-field": ["to-string", ["round", ["get", "value"]]],
-          "text-font": ["Consolas-Regular"],
-          "text-size": 18,
+          "text-font": ["Metropolis-Regular"],
+          "text-size": 14,
           "text-rotation-alignment": "viewport",
           "text-allow-overlap": true,
         }}
@@ -68,10 +61,10 @@ export const Isotherms = ({ currentFrame }: Props) => {
             "#f0f",
             ["case", ["<", ["get", "value"], 0], "#00f", "#f00"],
           ],
-          "text-halo-color": "#fff",
-          "text-halo-width": 1.5,
+          "text-halo-color": "#000",
+          "text-halo-width": 12,
         }}
       />
-    </Source>
+    </>
   );
 };

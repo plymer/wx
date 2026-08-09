@@ -65,11 +65,9 @@ const TABLES = [
 
 /*
 function pirepQuery(t: number, z: number) {
-  // similar to lightning, we need to cluster PIREPs at low zooms
-  // we'll use a similar time binning to generate the clusters at the time slices
-  // they are single points, not multipoints so we dont need to ST_DumpPoints
+  
 
-  const clusterCellSizeMeters = getClusterCellSizeMeters(z, CLUSTER_GRID_UNITS);
+  
 
   if (z > CLUSTER_MAX_ZOOM) {
     return sql`
@@ -100,137 +98,7 @@ function pirepQuery(t: number, z: number) {
   }
 
   return sql`
-        pireps_request_time AS (
-          SELECT TIMESTAMP 'epoch' + (${t} * INTERVAL '1 millisecond') AS request_time
-        ),
-
-        pireps_source AS (
-          SELECT
-            p.valid_time AS valid_time,
-            p.valid_time AS start_time,
-            p.valid_time + INTERVAL '1 hour' AS expiry_time,
-            p.geometry
-          FROM pireps AS p
-          CROSS JOIN bounds
-          CROSS JOIN pireps_request_time rt
-          WHERE p.geometry && bounds.query_geom
-            AND p.valid_time >= rt.request_time - '4 hours'::interval
-        ),
-
-        pireps_time_bounds AS (
-          SELECT
-            MIN(start_time) AS min_start,
-            MAX(expiry_time) AS max_expiry
-          FROM pireps_source
-        ),
-
-        pireps_slice_seed AS (
-          SELECT
-            min_start,
-            max_expiry,
-            ${sql.raw(`'${CLUSTER_TIMESTEP_MINUTES * 2} minutes'::interval`)} AS step_interval,
-            ${sql.raw(`'${CLUSTER_TIMESTEP_MINUTES * 2} minutes'::interval`)} AS grace_interval
-          FROM pireps_time_bounds
-        ),
-
-        pireps_active_in_slices AS (
-          SELECT
-            s.geometry,
-            s.valid_time,
-            gs.slice_start,
-            CASE
-              WHEN gs.slice_start + seed.step_interval >= seed.max_expiry
-                THEN gs.slice_start + seed.step_interval + seed.grace_interval
-              ELSE gs.slice_start + seed.step_interval
-            END AS slice_visibility_expiry
-          FROM pireps_source AS s
-          CROSS JOIN pireps_slice_seed AS seed
-          CROSS JOIN LATERAL generate_series(
-            date_bin(seed.step_interval, s.start_time, TIMESTAMP 'epoch'),
-            s.expiry_time,
-            seed.step_interval
-          ) AS gs(slice_start)
-          WHERE s.start_time <= gs.slice_start
-            AND s.expiry_time > gs.slice_start
-            AND s.valid_time <= gs.slice_start + seed.step_interval
-        ),
-
-        pireps_cluster_buckets AS (
-          SELECT
-            floor((ST_X(geometry) - ${WEB_MERCATOR_MIN}) / ${clusterCellSizeMeters})::integer AS grid_x,
-            floor((ST_Y(geometry) - ${WEB_MERCATOR_MIN}) / ${clusterCellSizeMeters})::integer AS grid_y,
-            geometry,
-            valid_time,
-            slice_start,
-            slice_visibility_expiry
-          FROM pireps_active_in_slices
-          WHERE ${z} <= ${CLUSTER_MAX_ZOOM}
-        ),
-
-        pireps_grouped AS (
-          SELECT
-            grid_x,
-            grid_y,
-            slice_start,
-            slice_visibility_expiry,
-            ST_PointOnSurface(ST_Collect(geometry)) AS geometry,
-            MAX(valid_time) AS valid_time,
-            COUNT(*)::integer AS point_count
-          FROM pireps_cluster_buckets
-          GROUP BY grid_x, grid_y, slice_start, slice_visibility_expiry
-        ),
-
-        pireps_from_slices AS (
-          SELECT
-            geometry,
-            valid_time,
-            slice_start AS start_time,
-            slice_visibility_expiry AS expiry_time,
-            point_count,
-            point_count > 1 AS clustered
-          FROM pireps_grouped
-        ),
-
-        pireps_unclustered_all AS (
-          SELECT
-            geometry,
-            valid_time,
-            valid_time AS start_time,
-            valid_time + INTERVAL '1 hour' AS expiry_time,
-            1::integer AS point_count,
-            FALSE AS clustered
-          FROM pireps_source
-        ),
-
-        pireps_features AS (
-          SELECT *
-          FROM pireps_from_slices
-          WHERE ${z} <= ${CLUSTER_MAX_ZOOM}
-
-          UNION ALL
-
-          SELECT *
-          FROM pireps_unclustered_all
-          WHERE ${z} > ${CLUSTER_MAX_ZOOM}
-        ),
-
-        pireps_layer AS (
-          SELECT
-            ST_AsMVTGeom(
-              pireps_features.geometry,
-              bounds.geom,
-              extent => ${VECTOR_TILE_EXTENT},
-              buffer => ${VECTOR_TILE_BUFFER}
-            ) AS geometry,
-            (EXTRACT(EPOCH FROM pireps_features.start_time) * 1000)::bigint AS "start_time",
-            (EXTRACT(EPOCH FROM pireps_features.expiry_time) * 1000)::bigint AS "expiry_time",
-            to_char(pireps_features.valid_time, 'HH24:MI') AS "timeString",
-            pireps_features.point_count,
-            pireps_features.clustered
-          FROM pireps_features
-          CROSS JOIN bounds
-          WHERE pireps_features.geometry && bounds.query_geom
-        )
+       
       `;
 }
 */
@@ -363,7 +231,6 @@ function stationPlotQuery(z: number) {
         WHERE
         st.min_zoom <= ${z}
         AND metars_temporal.geometry && bounds.query_geom
-          -- AND metars_temporal.valid_time <= NOW() - INTERVAL '3 hour'
       )
       `;
 }

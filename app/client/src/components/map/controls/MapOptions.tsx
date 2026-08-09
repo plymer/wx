@@ -10,11 +10,11 @@ import {
   Map,
   List,
   FlameKindling,
-  LineSquiggle,
   Thermometer,
   TriangleAlert,
   Droplet,
   Snowflake,
+  Rss,
 } from "lucide-react";
 
 import { SATELLITE_CHANNELS } from "@/config/rasterData";
@@ -127,26 +127,26 @@ export default function MapOptions({ ...props }: ButtonProps) {
       toggle: vectorActions.toggleObs,
     },
     {
-      icon: <LineSquiggle className="shrink-0" />,
+      icon: <Rss className="shrink-0" />,
       type: "isobars",
-      name: "Isobars",
+      name: "MSLP",
       state: vector.showIsobars,
       toggle: vectorActions.toggleIsobars,
     },
-    // {
-    //   icon: <LineSquiggle className="shrink-0" />,
-    //   type: "isotherms",
-    //   name: "Temperature (Experimental)",
-    //   state: vector.showIsotherms,
-    //   toggle: vectorActions.toggleIsotherms,
-    // },
-    // {
-    //   icon: <LineSquiggle className="shrink-0" />,
-    //   type: "isodrosotherms",
-    //   name: "Dewpoint (Experimental)",
-    //   state: vector.showIsodrosotherms,
-    //   toggle: vectorActions.toggleIsodrosotherms,
-    // },
+    {
+      icon: <Rss className="shrink-0" />,
+      type: "isotherms",
+      name: "TT",
+      state: vector.showIsotherms,
+      toggle: vectorActions.toggleIsotherms,
+    },
+    {
+      icon: <Rss className="shrink-0" />,
+      type: "isodrosotherms",
+      name: "TD",
+      state: vector.showIsodrosotherms,
+      toggle: vectorActions.toggleIsodrosotherms,
+    },
     // {
     //   type: "pirep",
     //   name: "PIREPs",
