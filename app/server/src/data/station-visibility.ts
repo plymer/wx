@@ -92,8 +92,6 @@ function withinRadius(lat1: number, lon1: number, lat2: number, lon2: number, ra
 }
 
 export async function updateStationVisTable() {
-  console.log("Updating station table with max zooms...");
-
   if (!db) {
     throw new Error("[STATION-VISIBILITY] Database connection failed.");
   }
@@ -113,12 +111,10 @@ export async function updateStationVisTable() {
   const stations: Station[] = (allData.rows as unknown as Record<string, unknown>[]).map((row) => ({
     lon: Number(row.lon),
     lat: Number(row.lat),
-    siteId: String(row.siteId),
+    siteId: String(row.site_id),
   }));
 
   const filterRadius = { min: 200, med: 50, high: 25, max: 0 };
-
-  // this may not be working as intended
 
   const minStations = Array.from(
     new Set([...STATION_PRIORITY_MIN, ...filterSpacedPoints(stations, filterRadius.min, STATION_PRIORITY_MIN)]),
@@ -133,30 +129,31 @@ export async function updateStationVisTable() {
     new Set([...medStations, ...filterSpacedPoints(stations, filterRadius.max, medStations)]),
   );
 
-  console.log("Min stations:", minStations.length);
-  console.log("Med stations:", medStations.length);
-  console.log("High stations:", highStations.length);
-  console.log("Max stations:", maxStations.length);
+  const output = new Map<string, number>();
+
+  for (const siteId of maxStations) {
+    output.set(siteId, 7.5);
+  }
+
+  for (const siteId of highStations) {
+    output.set(siteId, 6.5);
+  }
+
+  for (const siteId of medStations) {
+    output.set(siteId, 4.5);
+  }
+
+  for (const siteId of minStations) {
+    output.set(siteId, 0);
+  }
 
   try {
     await db.transaction(async (tx) => {
-      for (const siteId of maxStations) {
-        await tx.update(stationsSchema).set({ minZoom: 7.5 }).where(eq(stationsSchema.siteId, siteId));
-      }
-
-      for (const siteId of highStations) {
-        await tx.update(stationsSchema).set({ minZoom: 6 }).where(eq(stationsSchema.siteId, siteId));
-      }
-
-      for (const siteId of medStations) {
-        await tx.update(stationsSchema).set({ minZoom: 4.5 }).where(eq(stationsSchema.siteId, siteId));
-      }
-
-      for (const siteId of minStations) {
-        await tx.update(stationsSchema).set({ minZoom: 0 }).where(eq(stationsSchema.siteId, siteId));
+      for (const [siteId, minZoom] of output.entries()) {
+        await tx.update(stationsSchema).set({ minZoom }).where(eq(stationsSchema.siteId, siteId));
       }
     });
   } catch (error) {
-    console.error("Error inserting stations into stationVisibility table:", error);
+    console.error("[STATION-VISIBILITY] Error updating station visibility table:", (error as Error).message);
   }
 }

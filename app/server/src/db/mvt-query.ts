@@ -228,9 +228,8 @@ function stationPlotQuery(z: number) {
         CROSS JOIN bounds
         JOIN stations st
         ON st.site_id = metars_temporal.site_id
-        WHERE
-        st.min_zoom <= ${z}
-        AND metars_temporal.geometry && bounds.query_geom
+        WHERE st.min_zoom <= ${z}
+          AND metars_temporal.geometry && bounds.query_geom
       )
       `;
 }

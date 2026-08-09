@@ -47,7 +47,7 @@ async function main() {
     { name: "AQ-Data", run: () => getAqData(), schedule: "*/10 * * * *" },
     { name: "Isolines", run: () => createIsolines(), schedule: "*/10 * * * *" },
     { name: "Station-Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
-    { name: "Station-Visibility", run: () => updateStationVisTable(), schedule: "0 0 * * *" },
+    { name: "Station-Visibility", run: () => updateStationVisTable(), schedule: "* * * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
 
   console.log(
