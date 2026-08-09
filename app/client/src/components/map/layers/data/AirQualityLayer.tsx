@@ -13,18 +13,21 @@ import { useIsVisible } from "@/hooks/useIsVisible";
 
 interface Props {
   belowLayer?: string;
+  override?: boolean;
 }
 
-export const AirQualityLayer = ({ belowLayer }: Props) => {
+export const AirQualityLayer = ({ belowLayer, override }: Props) => {
   const enabled = useShowAQ();
 
   const isVisible = useIsVisible(AQ_BOUNDS);
 
   const displayTime = useDisplayTime();
 
+  const shouldLoad = (override && isVisible) || (enabled && isVisible);
+
   const { data, isFetching } = useQuery(
     api.aq.aq.queryOptions(undefined, {
-      enabled: enabled && isVisible,
+      enabled: shouldLoad,
       refetchInterval: 10 * MINUTE,
       trpc: { context: { skipBatch: true } },
     }),
@@ -32,7 +35,7 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
 
   useMapLoadingState("aqData", isFetching);
 
-  if (!isVisible || !enabled || !data) return;
+  if (!shouldLoad || !data) return;
 
   const filteredData: FeatureCollection = {
     type: "FeatureCollection",

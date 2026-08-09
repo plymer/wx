@@ -88,8 +88,10 @@ export type SiteData = {
   siteId: string;
   lat: string;
   lon: string;
-  elev_f: number | null;
-  elev_m: number | null;
+  rawLat: number;
+  rawLon: number;
+  elevF: number | null;
+  elevM: number | null;
   country: string | null;
   state: string | null;
   sunrise: string;
