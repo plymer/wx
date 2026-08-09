@@ -36,7 +36,7 @@ import { AirQualityLayer } from "./map/layers/data/AirQualityLayer";
 import { SigmetLayer } from "./map/layers/data/SigmetLayer";
 import { AlertsLayer } from "./map/layers/data/AlertsLayer";
 import { VectorTileSource } from "./map/layers/data/VectorTileSource";
-import { SiteSearch } from "./map/controls/SiteSearch";
+// import { SiteSearch } from "./map/controls/SiteSearch";
 import { HillshadeLayer } from "./map/layers/base/Hillshade";
 
 export default function WxMap() {
@@ -123,7 +123,7 @@ export default function WxMap() {
         <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
           <MapOptions />
           <GeoLocation />
-          <SiteSearch />
+          {/* <SiteSearch /> */}
         </div>
         <MapLoadingIndicator show={loadingState} />
       </WeatherMap>
