@@ -113,3 +113,5 @@ export const AQ_VALUE_DISPLAY: SymbolLayerSpecification = {
 };
 
 export const AQ_ATTRIBUTION = { en: "<a href='https://cyclone.unbc.ca/aqmap/'>UNBC Cyclone</a>" };
+
+export const AQ_BOUNDS: [number, number, number, number] = [-141, 40, -30, 85];

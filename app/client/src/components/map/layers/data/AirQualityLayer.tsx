@@ -1,7 +1,7 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 import type { FeatureCollection } from "geojson";
 
-import { AQ_ATTRIBUTION, AQ_DISPLAY } from "@/config/vectorData";
+import { AQ_ATTRIBUTION, AQ_BOUNDS, AQ_DISPLAY } from "@/config/vectorData";
 
 import { MINUTE } from "@shared/lib/constants";
 import { useShowAQ } from "@/stateStores/map/vectorData";
@@ -9,6 +9,7 @@ import { useDisplayTime } from "@/hooks/useDisplayTime";
 import { api } from "@/lib/trpc";
 import { useQuery } from "@tanstack/react-query";
 import { useMapLoadingState } from "@/hooks/useMapLoadingState";
+import { useIsVisible } from "@/hooks/useIsVisible";
 
 interface Props {
   belowLayer?: string;
@@ -17,11 +18,13 @@ interface Props {
 export const AirQualityLayer = ({ belowLayer }: Props) => {
   const enabled = useShowAQ();
 
+  const isVisible = useIsVisible(AQ_BOUNDS);
+
   const displayTime = useDisplayTime();
 
   const { data, isFetching } = useQuery(
     api.aq.aq.queryOptions(undefined, {
-      enabled,
+      enabled: enabled && isVisible,
       refetchInterval: 10 * MINUTE,
       trpc: { context: { skipBatch: true } },
     }),
@@ -29,7 +32,7 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
 
   useMapLoadingState("aqData", isFetching);
 
-  if (!enabled || !data) return;
+  if (!isVisible || !enabled || !data) return;
 
   const filteredData: FeatureCollection = {
     type: "FeatureCollection",
