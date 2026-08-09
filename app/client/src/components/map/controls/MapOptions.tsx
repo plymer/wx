@@ -16,6 +16,9 @@ import {
   Snowflake,
   Rss,
   X,
+  CirclePlus,
+  AlertTriangle,
+  Plane,
 } from "lucide-react";
 
 import { SATELLITE_CHANNELS } from "@/config/rasterData";
@@ -39,6 +42,7 @@ import {
   useShowIsobars,
   useShowIsotherms,
   useShowIsodrosotherms,
+  usePublicAlertsFilterLevel,
 } from "@/stateStores/map/vectorData";
 import type { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
@@ -75,6 +79,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
     showSIGMETs: useShowSIGMETs(),
     showAIRMETs: useShowAIRMETs(),
     showPublicAlerts: useShowPublicAlerts(),
+    alertsFilterLevel: usePublicAlertsFilterLevel(),
   };
 
   const raster = {
@@ -154,6 +159,24 @@ export default function MapOptions({ ...props }: ButtonProps) {
     //   state: vector.showPIREPs,
     //   toggle: vectorActions.togglePIREPs,
     // },
+  ] as const;
+
+  const ALERTS_DATA_OPTIONS: ToggleDataOption[] = [
+    {
+      icon: <Plane className="shrink-0" />,
+      type: "airmet",
+      name: "AIRMETs",
+      // state: vector.showAIRMETs,
+      state: false,
+      toggle: vectorActions.toggleAIRMETs,
+    },
+    {
+      icon: <Plane className="shrink-0" />,
+      type: "sigmet",
+      name: "SIGMETs",
+      state: vector.showSIGMETs,
+      toggle: vectorActions.toggleSIGMETs,
+    },
     {
       icon: <TriangleAlert className="shrink-0" />,
       type: "publicAlerts",
@@ -161,19 +184,6 @@ export default function MapOptions({ ...props }: ButtonProps) {
       state: vector.showPublicAlerts,
       toggle: vectorActions.togglePublicAlerts,
     },
-    {
-      icon: <TriangleAlert className="shrink-0" />,
-      type: "sigmet",
-      name: "SIGMETs",
-      state: vector.showSIGMETs,
-      toggle: vectorActions.toggleSIGMETs,
-    },
-    // {
-    //   type: "airmet",
-    //   name: "AIRMETs",
-    //   state: vector.showAIRMETs,
-    //   toggle: vectorActions.toggleAIRMETs,
-    // },
   ] as const;
 
   // vector options config
@@ -327,17 +337,70 @@ export default function MapOptions({ ...props }: ButtonProps) {
               value="wxdata"
               className={`flex justify-center gap-2 font-bold text-lg bg-accent/80 hover:bg-accent text-white ${tab === "wxdata" && "bg-accent rounded-b-none"}`}
             >
-              <CloudLightning className="shrink-0  size-6" /> Obs and Alerts
+              <CloudLightning className="shrink-0  size-6" /> Observations
             </AccordionTrigger>
             <AccordionContent className="border border-accent rounded-b-md p-2 h-fit">
               <div className="grid lg:grid-cols-2 max-lg:grid-cols-1 gap-2">
-                {VECTOR_DATA_OPTIONS.map((item, i) => (
-                  <DataToggle
-                    key={i}
-                    dataOption={item}
-                    className="flex items-center grow justify-between p-2 rounded-md text-black border border-input"
-                  />
-                ))}
+                {VECTOR_DATA_OPTIONS.map((item, i) => {
+                  return (
+                    <DataToggle
+                      key={i}
+                      dataOption={item}
+                      className="flex items-center grow justify-between p-2 rounded-md text-black border border-input"
+                    />
+                  );
+                })}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="alerts">
+            <AccordionTrigger
+              value="alerts"
+              className={`flex justify-center gap-2 font-bold text-lg bg-accent/80 hover:bg-accent text-white ${tab === "alerts" && "bg-accent rounded-b-none"}`}
+            >
+              <AlertTriangle className="shrink-0  size-6" /> Alerts
+            </AccordionTrigger>
+            <AccordionContent className="border border-accent rounded-b-md p-2 h-fit">
+              <div className="grid lg:grid-cols-2 max-lg:grid-cols-1 gap-2">
+                {ALERTS_DATA_OPTIONS.map((item, i) => {
+                  if (item.type === "publicAlerts") {
+                    return (
+                      <div key={i} className="lg:col-span-2 grid lg:grid-cols-2 max-lg:grid-cols-1 gap-2">
+                        <DataToggle
+                          key={i}
+                          dataOption={item}
+                          className="flex items-center grow justify-between p-2 rounded-md text-black border border-input"
+                        />
+                        <div className="flex max-lg:flex-col max-lg:gap-2">
+                          <Button
+                            variant="drawer"
+                            onClick={() => vectorActions.togglePublicAlertsFilterLevel()}
+                            className={`max-lg:rounded-md ${vector.alertsFilterLevel === "all" && "active"} ${vector.showPublicAlerts && "disabled:opacity-100"}`}
+                            disabled={!vector.showPublicAlerts || vector.alertsFilterLevel === "all"}
+                          >
+                            <CirclePlus /> All Public Alerts
+                          </Button>
+                          <Button
+                            variant="drawer"
+                            onClick={() => vectorActions.togglePublicAlertsFilterLevel()}
+                            className={`max-lg:rounded-md ${vector.alertsFilterLevel === "convective" && "active"} ${vector.showPublicAlerts && "disabled:opacity-100"}`}
+                            disabled={!vector.showPublicAlerts || vector.alertsFilterLevel === "convective"}
+                          >
+                            <CloudLightning />
+                            Convective Alerts Only
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return (
+                    <DataToggle
+                      key={i}
+                      dataOption={item}
+                      className="flex items-center grow justify-between p-2 rounded-md text-black border border-input"
+                    />
+                  );
+                })}
               </div>
             </AccordionContent>
           </AccordionItem>
