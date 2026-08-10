@@ -24,6 +24,8 @@ import { AlertsLayer } from "../map/layers/data/AlertsLayer";
 import { SelectedFxPoint } from "../map/layers/overlays/SelectedFxPoint";
 import { useRegisterMaplibreWorker } from "@/hooks/useRegisterMaplibreWorker";
 import { AirQualityLayer } from "../map/layers/data/AirQualityLayer";
+import { VectorTileSource } from "../map/layers/data/VectorTileSource";
+import { HillshadeLayer } from "../map/layers/base/Hillshade";
 
 interface Props {
   searchCoords: Position | null;
@@ -102,6 +104,8 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
       >
         {isMapInitialized && baseMapLayers ? (
           <>
+            <VectorTileSource />
+            <HillshadeLayer />
             <SatelliteLayer domain="west" />
             <SatelliteLayer domain="east" />
             <RadarLayer />
