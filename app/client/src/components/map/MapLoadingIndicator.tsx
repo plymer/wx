@@ -1,5 +1,5 @@
 import { Loader2 } from "lucide-react";
-import SlideComponent from "./SlideComponent";
+import SlideComponent from "@/components/ui/SlideComponent";
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   show: boolean;

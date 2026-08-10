@@ -6,12 +6,12 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { useHours, useObsActions, useSite, useUnits } from "@/stateStores/observations";
 
-import { Input } from "./ui/Input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
-import METARs from "./observations/METARs";
-import SiteMetadata from "./observations/SiteMetadata";
-import TAF from "./observations/TAF";
-import Button from "./ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
+import METARs from "@/components/observations/METARs";
+import SiteMetadata from "@/components/observations/SiteMetadata";
+import TAF from "@/components/observations/TAF";
+import Button from "@/components/ui/Button";
 import { api } from "@/lib/trpc";
 import { MINUTE } from "@shared/lib/constants";
 

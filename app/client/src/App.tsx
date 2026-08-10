@@ -10,11 +10,11 @@ import { Toaster } from "@/components/ui/Sonner";
 import { TwitterIcon } from "@/components/ui/TwitterIcon";
 
 // app mode components
-import Observations from "@/components/Observations";
-import WxMap from "@/components/Map";
-import Aviation from "@/components/Aviation";
-import Outlooks from "@/components/Outlooks";
-import Public from "@/components/Public";
+import Observations from "@/routes/Observations";
+import WxMap from "@/routes/Map";
+import Aviation from "@/routes/Aviation";
+import Outlooks from "@/routes/Outlooks";
+import Public from "@/routes/Public";
 
 // hooks
 import useHashPath from "@/hooks/useHashPath";
