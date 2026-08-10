@@ -412,42 +412,73 @@ export default function MapOptions({ ...props }: ButtonProps) {
             >
               <Map className="shrink-0  size-6" /> Map View
             </AccordionTrigger>
-            <AccordionContent className="flex max-lg:flex-col max-lg:gap-2 items-center border border-accent rounded-b-md p-2 h-fit">
-              <h1 className="w-full max-lg:text-center">Basemap Style</h1>
-              {BASEMAP_TYPES.map((type) => (
+            <AccordionContent className="flex flex-col gap-2 items-center border border-accent rounded-b-md p-2 h-fit">
+              <h1 className="text-center w-full">Basemap Style</h1>
+              <div className="flex max-lg:flex-col max-lg:gap-2 w-full">
+                {BASEMAP_TYPES.map((type) => {
+                  let textColourForButton = "text-black";
+                  let buttonText = "";
+
+                  switch (type) {
+                    case "hillshade":
+                      textColourForButton = "text-white";
+                      buttonText = "Default";
+                      break;
+                    case "liberty":
+                      textColourForButton = "text-black";
+                      buttonText = "Navigation";
+                      break;
+                    case "aerial":
+                      textColourForButton = "text-white";
+                      buttonText = "Satellite";
+                      break;
+                    default:
+                      break;
+                  }
+
+                  return (
+                    <Button
+                      key={type}
+                      type="button"
+                      variant="drawer"
+                      onClick={() => mapActions.setBaseMap(type)}
+                      className={`group relative max-lg:rounded-md  overflow-hidden hover:bg-white bg-white ${map.basemap === type && "active"}`}
+                    >
+                      <img
+                        className={`w-fit absolute transition-opacity ${map.basemap !== type && "group-hover:opacity-100 opacity-50"}`}
+                        src={`/${type}.png`}
+                      />
+                      <span
+                        className={`group absolute top-1/2 left-1/2 -translate-1/2 rounded-full border border-neutral-800 px-2 py-0.5 ${map.basemap === type ? "bg-accent" : "bg-neutral-800 group-hover:bg-accent"} text-white font-bold`}
+                      >
+                        {buttonText}
+                      </span>
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <h1 className="text-center w-full">Projection</h1>
+              <div className="flex max-lg:flex-col max-lg:gap-2 w-full">
                 <Button
-                  key={type}
                   type="button"
                   variant="drawer"
-                  onClick={() => mapActions.setBaseMap(type)}
-                  className={`max-lg:rounded-md ${map.basemap === type && "active"}`}
+                  onClick={() => mapActions.setProjection("globe")}
+                  className={`max-lg:rounded-md ${map.projection === "globe" && "active"}`}
                 >
-                  {type === "hillshade" && <Grid3X3 className="shrink-0" />}
-                  {type === "liberty" && <Map className="shrink-0" />}
-                  {type === "aerial" && <Droplet className="shrink-0" />}
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                  <Globe className="shrink-0" />
+                  Globe
                 </Button>
-              ))}
-
-              <h1 className="w-full max-lg:text-center">Projection</h1>
-              <Button
-                type="button"
-                variant="drawer"
-                onClick={() => mapActions.setProjection("globe")}
-                className={`max-lg:rounded-md ${map.projection === "globe" && "active"}`}
-              >
-                <Globe className="shrink-0" />
-                Globe
-              </Button>
-              <Button
-                type="button"
-                variant="drawer"
-                onClick={() => mapActions.setProjection("mercator")}
-                className={`max-lg:rounded-md ${map.projection === "mercator" && "active"}`}
-              >
-                <Grid3X3 className="shrink-0" />
-                Mercator
-              </Button>
+                <Button
+                  type="button"
+                  variant="drawer"
+                  onClick={() => mapActions.setProjection("mercator")}
+                  className={`max-lg:rounded-md ${map.projection === "mercator" && "active"}`}
+                >
+                  <Grid3X3 className="shrink-0" />
+                  Mercator
+                </Button>
+              </div>
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="geography">

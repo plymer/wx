@@ -18,7 +18,7 @@ export const buttonVariants = cva(
           "bg-primary text-primary-foreground border-neutral-400 border-1 hover:bg-accent p-2 rounded-md disabled:opacity-100 drop-shadow-2xl",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         drawer:
-          "bg-neutral-200 w-full text-black hover:bg-accent hover:text-white [&.active]:bg-accent  [&.active]:text-white rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md",
+          "bg-neutral-200 w-full text-black hover:bg-accent hover:text-white [&.active]:bg-accent [&.active]:text-white rounded-none first-of-type:rounded-s-md last-of-type:rounded-e-md",
         expandingIcon:
           "bg-primary text-white whitespace-nowrap overflow-hidden w-fit not-hover:w-10 h-10 items-center not-hover:*:me-6 border-1 border-neutral-400",
         animation:

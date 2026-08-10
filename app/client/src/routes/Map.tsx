@@ -16,6 +16,7 @@ import {
   useBearing,
   usePitch,
   useLayersLoading,
+  useBaseMap,
 } from "@/stateStores/map/mapView";
 import { useAnimationActions } from "@/stateStores/map/animation";
 
@@ -39,12 +40,14 @@ import { VectorTileSource } from "@/components/map/layers/data/VectorTileSource"
 // import { SiteSearch } from "@/components/map/controls/SiteSearch";
 import { HillshadeLayer } from "@/components/map/layers/base/Hillshade";
 import { AerialImageryLayer } from "@/components/map/layers/base/Aerial";
+import { libertyWxMap } from "@/assets/map-styles/liberty-wxmap";
 
 export default function WxMap() {
   // global state store subscriptions
   const loadingState = useLayersLoading().length > 0;
   const projection = useProjection();
   const animation = useAnimationActions();
+  const baseMap = useBaseMap();
 
   const viewState: Partial<ViewState> = {
     latitude: useLatitude(),
@@ -61,8 +64,7 @@ export default function WxMap() {
     animation.pause();
   }, []);
 
-  // import the map style - this may need to change to allow different map styles in the future
-  const mapStyle = positronWxMap;
+  const mapStyle = baseMap === "aerial" || baseMap === "hillshade" ? positronWxMap : libertyWxMap;
 
   // const interactiveLayers = ["layer-pirep", "layer-sigmet", "layer-airmet", "layer-sfc-obs-target"]
   const interactiveLayers = ["layer-sfc-obs-target", "layer-sigmet", "layer-wxo-alerts"];
