@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 
 import type { Map } from "maplibre-gl";
 import type { PaddingOptions, ViewState } from "react-map-gl/maplibre";
-import type { MapProjections } from "../../lib/types";
+import type { BaseMapType, MapProjections } from "../../lib/types";
 
 interface MapStateStore extends ViewState {
   mapRef: Map | null;
@@ -14,6 +14,7 @@ interface MapStateStore extends ViewState {
   pitch: number;
   padding: PaddingOptions;
   projection: MapProjections;
+  baseMap: BaseMapType;
   viewportBounds?: [number, number, number, number];
   layersLoading: string[];
   actions: {
@@ -24,6 +25,7 @@ interface MapStateStore extends ViewState {
     setLongitude: (lon: number) => void;
     setZoom: (zoom: number) => void;
     setProjection: (proj: MapProjections) => void;
+    setBaseMap: (basemap: BaseMapType) => void;
     setViewportBounds: (bounds: [number, number, number, number]) => void;
   };
 }
@@ -40,6 +42,7 @@ const useMapViewState = create<MapStateStore>()(
       pitch: 0,
       padding: { top: 0, left: 0, right: 0, bottom: 0 },
       projection: "mercator",
+      baseMap: "hillshade",
       viewportBounds: undefined,
       layersLoading: [],
       actions: {
@@ -58,6 +61,7 @@ const useMapViewState = create<MapStateStore>()(
         setLongitude: (newLongitude) => set(() => ({ longitude: newLongitude })),
         setZoom: (newZoom) => set(() => ({ zoom: newZoom })),
         setProjection: (newProjection) => set(() => ({ projection: newProjection })),
+        setBaseMap: (newBaseMap) => set(() => ({ baseMap: newBaseMap })),
         setViewportBounds: (newBounds) => set(() => ({ viewportBounds: newBounds })),
       },
     }),
@@ -68,6 +72,7 @@ const useMapViewState = create<MapStateStore>()(
           longitude: state.longitude,
           zoom: state.zoom,
           projection: state.projection,
+          baseMap: state.baseMap,
           viewportBounds: state.viewportBounds,
         }) as Partial<MapStateStore>,
       merge: (persistedState, currentState) => ({
@@ -89,6 +94,7 @@ export const useBearing = () => useMapViewState((state) => state.bearing);
 export const usePitch = () => useMapViewState((state) => state.pitch);
 export const usePadding = () => useMapViewState((state) => state.padding);
 export const useProjection = () => useMapViewState((state) => state.projection);
+export const useBaseMap = () => useMapViewState((state) => state.baseMap);
 export const useViewportBounds = () => useMapViewState((state) => state.viewportBounds);
 export const useLayersLoading = () => useMapViewState((state) => state.layersLoading);
 export const useMapStateActions = () => useMapViewState((state) => state.actions);

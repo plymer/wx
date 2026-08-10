@@ -1,8 +1,11 @@
+import { useBaseMap } from "@/stateStores/map/mapView";
 import { useShowSatellite } from "@/stateStores/map/rasterData";
 import { Source, Layer } from "react-map-gl/maplibre";
 
 export const HillshadeLayer = () => {
-  const enabled = !useShowSatellite();
+  const baseMap = useBaseMap();
+  const showSatellite = useShowSatellite();
+  const enabled = !showSatellite && baseMap === "hillshade";
 
   if (!enabled) return null;
 

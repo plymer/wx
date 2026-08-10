@@ -38,6 +38,7 @@ import { AlertsLayer } from "@/components/map/layers/data/AlertsLayer";
 import { VectorTileSource } from "@/components/map/layers/data/VectorTileSource";
 // import { SiteSearch } from "@/components/map/controls/SiteSearch";
 import { HillshadeLayer } from "@/components/map/layers/base/Hillshade";
+import { AerialImageryLayer } from "@/components/map/layers/base/Aerial";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -92,6 +93,7 @@ export default function WxMap() {
 
         <VectorTileSource />
         <HillshadeLayer />
+        <AerialImageryLayer />
 
         <SatelliteLayer domain="west" />
         <SatelliteLayer domain="east" />

@@ -76,6 +76,7 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
     <Map
       maxTileCacheSize={512}
       maxTileCacheZoomLevels={10}
+      maxZoom={13}
       fadeDuration={0}
       latitude={viewState.latitude}
       longitude={viewState.longitude}

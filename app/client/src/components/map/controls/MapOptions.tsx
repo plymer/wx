@@ -6,7 +6,6 @@ import {
   Layers,
   Radar,
   Satellite,
-  ScanEye,
   Map,
   List,
   FlameKindling,
@@ -19,6 +18,7 @@ import {
   CirclePlus,
   AlertTriangle,
   Plane,
+  Grid3X3,
 } from "lucide-react";
 
 import { SATELLITE_CHANNELS } from "@/config/rasterData";
@@ -51,7 +51,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 import Button, { type ButtonProps } from "@/components/ui/Button";
 import DataToggle from "@/components/ui/DataToggle";
-import { useMapStateActions, useProjection } from "@/stateStores/map/mapView";
+import { useBaseMap, useMapStateActions, useProjection } from "@/stateStores/map/mapView";
 import {
   useGFAOverlay,
   useLGFOverlay,
@@ -62,6 +62,7 @@ import {
   useMarineRegionsOverlay,
   useVectorOverlayActions,
 } from "@/stateStores/map/overlays";
+import { BASEMAP_TYPES } from "@/config/map";
 
 export default function MapOptions({ ...props }: ButtonProps) {
   // local state
@@ -99,7 +100,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
     showMarineRegions: useMarineRegionsOverlay(),
   };
 
-  const map = { projection: useProjection() };
+  const map = { projection: useProjection(), basemap: useBaseMap() };
 
   const tab = useLayersTab();
 
@@ -409,16 +410,33 @@ export default function MapOptions({ ...props }: ButtonProps) {
               value="projection"
               className={`flex justify-center gap-2 font-bold text-lg bg-accent/80 hover:bg-accent text-white ${tab === "projection" && "bg-accent rounded-b-none"}`}
             >
-              <ScanEye className="shrink-0  size-6" /> Projection
+              <Map className="shrink-0  size-6" /> Map View
             </AccordionTrigger>
             <AccordionContent className="flex max-lg:flex-col max-lg:gap-2 items-center border border-accent rounded-b-md p-2 h-fit">
+              <h1 className="w-full max-lg:text-center">Basemap Style</h1>
+              {BASEMAP_TYPES.map((type) => (
+                <Button
+                  key={type}
+                  type="button"
+                  variant="drawer"
+                  onClick={() => mapActions.setBaseMap(type)}
+                  className={`max-lg:rounded-md ${map.basemap === type && "active"}`}
+                >
+                  {type === "hillshade" && <Grid3X3 className="shrink-0" />}
+                  {type === "liberty" && <Map className="shrink-0" />}
+                  {type === "aerial" && <Droplet className="shrink-0" />}
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </Button>
+              ))}
+
+              <h1 className="w-full max-lg:text-center">Projection</h1>
               <Button
                 type="button"
                 variant="drawer"
                 onClick={() => mapActions.setProjection("globe")}
                 className={`max-lg:rounded-md ${map.projection === "globe" && "active"}`}
               >
-                <Globe className="me-2 size-6" />
+                <Globe className="shrink-0" />
                 Globe
               </Button>
               <Button
@@ -427,7 +445,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
                 onClick={() => mapActions.setProjection("mercator")}
                 className={`max-lg:rounded-md ${map.projection === "mercator" && "active"}`}
               >
-                <Map className="me-2 size-6" />
+                <Grid3X3 className="shrink-0" />
                 Mercator
               </Button>
             </AccordionContent>
