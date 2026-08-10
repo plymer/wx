@@ -20,15 +20,15 @@ export default defineConfig({
       },
     }),
   ],
-  cacheDir: path.resolve(__dirname, "../../node_modules/.vite"),
-  root: path.resolve(__dirname),
+  cacheDir: path.resolve(import.meta.dirname, "../../node_modules/.vite"),
+  root: path.resolve(import.meta.dirname),
   base: "/",
 
   // But serve from the client directory
-  publicDir: path.resolve(__dirname, "../../public"),
+  publicDir: path.resolve(import.meta.dirname, "../../public"),
   build: {
     emptyOutDir: true,
-    outDir: path.resolve(__dirname, "../../dist"),
+    outDir: path.resolve(import.meta.dirname, "../../dist"),
     rolldownOptions: {
       output: {
         codeSplitting: {
@@ -43,8 +43,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@shared": path.resolve(__dirname, "../server/src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
+      "@shared": path.resolve(import.meta.dirname, "../server/src"),
     },
   },
   preview: {
