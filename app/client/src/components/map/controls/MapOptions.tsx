@@ -416,20 +416,16 @@ export default function MapOptions({ ...props }: ButtonProps) {
               <h1 className="text-center w-full">Basemap Style</h1>
               <div className="flex max-lg:flex-col max-lg:gap-2 w-full">
                 {BASEMAP_TYPES.map((type) => {
-                  let textColourForButton = "text-black";
                   let buttonText = "";
 
                   switch (type) {
                     case "hillshade":
-                      textColourForButton = "text-white";
                       buttonText = "Default";
                       break;
                     case "liberty":
-                      textColourForButton = "text-black";
                       buttonText = "Navigation";
                       break;
                     case "aerial":
-                      textColourForButton = "text-white";
                       buttonText = "Satellite";
                       break;
                     default:
