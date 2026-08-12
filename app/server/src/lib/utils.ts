@@ -12,7 +12,7 @@ import type { SunTimes } from "./common.types.js";
 import type { XmetShapes } from "./alphanumeric.types.js";
 import { DEFAULT_REMOTE_HEADERS, MINUTE } from "./constants.js";
 
-import type { OutlookData, Panel, RegionData, WmoDirection } from "./types.js";
+import type { OutlookData, Panel, RegionData, TextDirection, WmoDirection } from "./types.js";
 import { OFFICE_REGION_MAP } from "../config/charts.config.js";
 import { outlookOfficeSchema, outlookRegionSchema } from "./validation.js";
 import { getTimes } from "suncalc";
@@ -327,23 +327,39 @@ export function xmlParser() {
  * @param dir - a string representing a cardinal direction, such as "N" or "SSW", or a "-"" for no direction
  * @returns a number representing the direction in degrees, such as 0 or 202.5
  */
-export function cardinalToDegrees(dir: WmoDirection): number {
+export function cardinalToDegrees(dir: WmoDirection | TextDirection): number {
   const directionMap: { [key: string]: number } = {
+    NORTH: 0,
     N: 0,
+    NORTHNORTHEAST: 22.5,
     NNE: 22.5,
+    NORTHEAST: 45,
     NE: 45,
+    EASTNORTHEAST: 67.5,
     ENE: 67.5,
+    EAST: 90,
     E: 90,
+    EASTSOUTHEAST: 112.5,
     ESE: 112.5,
+    SOUTHEAST: 135,
     SE: 135,
+    SOUTHSOUTHEAST: 157.5,
     SSE: 157.5,
+    SOUTH: 180,
     S: 180,
+    SOUTHSOUTHWEST: 202.5,
     SSW: 202.5,
+    SOUTHWEST: 225,
     SW: 225,
+    WESTSOUTHWEST: 247.5,
     WSW: 247.5,
+    WEST: 270,
     W: 270,
+    WESTNORTHWEST: 292.5,
     WNW: 292.5,
+    NORTHWEST: 315,
     NW: 315,
+    NORTHNORTHWEST: 337.5,
     NNW: 337.5,
     "-": 0,
   };

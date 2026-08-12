@@ -7,7 +7,7 @@ import { Popup, type PopupInstance } from "react-map-gl/maplibre";
 import Button from "../ui/Button";
 import { AlertTriangle, CircleAlert, OctagonAlert, OctagonX, X } from "lucide-react";
 import { useViewportBounds } from "@/stateStores/map/mapView";
-import type { StationPlotPopupData, WarningProperties } from "@shared/lib/types";
+import type { StationPlotPopupData, WxOAlertMetadataProperties } from "@shared/lib/types";
 import type { XmetEventData } from "@shared/lib/alphanumeric.types";
 
 export const DataPopup = () => {
@@ -59,6 +59,37 @@ export const DataPopup = () => {
         <div className="flex flex-col gap-2 max-h-[33dvh] w-full overflow-y-auto">
           {featureList
             .sort((a, b) => {
+              if (a.properties.dataType === "publicAlert" && b.properties.dataType !== "publicAlert") {
+                return -1;
+              } else if (a.properties.dataType !== "publicAlert" && b.properties.dataType === "publicAlert") {
+                return 1;
+              } else if (a.properties.dataType === "publicAlert" && b.properties.dataType === "publicAlert") {
+                if (a.properties.type === "warning" && b.properties.type !== "warning") {
+                  return -1;
+                } else if (a.properties.type !== "warning" && b.properties.type === "warning") {
+                  return 1;
+                } else if (a.properties.type === "warning" && b.properties.type === "warning") {
+                  if (a.properties.colour === "red" && b.properties.colour !== "red") {
+                    return -1;
+                  } else if (a.properties.colour !== "red" && b.properties.colour === "red") {
+                    return 1;
+                  } else if (a.properties.colour === "red" && b.properties.colour === "red") {
+                    return 0;
+                  } else if (a.properties.colour === "orange" && b.properties.colour !== "orange") {
+                    return -1;
+                  } else if (a.properties.colour !== "orange" && b.properties.colour === "orange") {
+                    return 1;
+                  } else if (a.properties.colour === "orange" && b.properties.colour === "orange") {
+                    return 0;
+                  } else if (a.properties.colour === "yellow" && b.properties.colour !== "yellow") {
+                    return -1;
+                  } else if (a.properties.colour !== "yellow" && b.properties.colour === "yellow") {
+                    return 1;
+                  } else if (a.properties.colour === "yellow" && b.properties.colour === "yellow") {
+                    return 0;
+                  }
+                }
+              }
               if (a.properties.dataType === "sigmet" && b.properties.dataType !== "sigmet") {
                 return -1;
               } else if (a.properties.dataType !== "sigmet" && b.properties.dataType === "sigmet") {
@@ -149,28 +180,33 @@ export const DataPopup = () => {
                   );
                 }
                 case "publicAlert":
-                  const alertProps = feature.properties as WarningProperties;
+                  const alertProps = feature.properties as WxOAlertMetadataProperties;
 
                   const headerColour =
-                    alertProps.type === "warning"
+                    alertProps.colour === "red"
                       ? "bg-red-800"
-                      : alertProps.type === "watch"
+                      : alertProps.colour === "yellow"
                         ? "bg-yellow-400"
-                        : "bg-neutral-400";
+                        : alertProps.colour === "orange"
+                          ? "bg-orange-600"
+                          : "bg-neutral-400";
+                  const textColour = alertProps.colour === "yellow" ? "text-black" : "text-white";
 
                   return (
-                    <div
-                      key={new Date(alertProps.issueTime).getTime()}
-                      className={`grid grid-cols-7 gap-2  items-center text-center ${headerColour} rounded-md p-2`}
-                    >
-                      <div className="flex justify-center">
-                        {alertProps.type !== "watch" && alertProps.type !== "warning" && <CircleAlert />}
-                        {alertProps.type === "watch" && <OctagonAlert />}
-                        {alertProps.type === "warning" && <OctagonX />}
+                    <div key={new Date(alertProps.issueTime).getTime()} className="p-2">
+                      <div
+                        className={`grid grid-cols-7 gap-2  items-center text-center ${headerColour} ${textColour} rounded-md p-2`}
+                      >
+                        <div className="flex justify-center">
+                          {alertProps.type !== "watch" && alertProps.type !== "warning" && <CircleAlert />}
+                          {alertProps.type === "watch" && <OctagonAlert />}
+                          {alertProps.type === "warning" && <OctagonX />}
+                        </div>
+                        <h1 className="col-span-6 flex gap-1 items-center font-bold justify-left">
+                          {alertProps.bannerText}
+                        </h1>
                       </div>
-                      <div className=" col-span-6 flex gap-1 items-center font-bold justify-left">
-                        {alertProps.bannerText}
-                      </div>
+                      <div className="p-2 whitespace-pre-wrap">{alertProps.text}</div>
                     </div>
                   );
               }

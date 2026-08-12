@@ -1,16 +1,17 @@
 import "dotenv/config";
 import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
-import type { WarningProperties, WxOAlert, WxOPolygonAlert, WxOPolygonProperties } from "../lib/types.js";
+import type { WxOAlertMetadataProperties, WxOAlertFeatureProperties, TextDirection } from "../lib/types.js";
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import * as turf from "@turf/turf";
 import { cacheClient } from "../services/redis.js";
 import { PUBLIC_ALERTS_CACHE_KEY } from "../config/cache-keys.config.js";
+import { cardinalToDegrees } from "../lib/utils.js";
 
 type AlertsGeoJsonResponse = {
   type: "FeatureCollection";
   uuid: string;
-  alerts: WxOPolygonAlert;
-  features: Feature<MultiPolygon, WxOPolygonProperties>[];
+  alerts: Record<string, WxOAlertMetadataProperties>;
+  features: Feature<MultiPolygon, WxOAlertFeatureProperties>[];
 };
 
 export async function getPublicAlerts() {
@@ -25,15 +26,18 @@ export async function getPublicAlerts() {
     // extract the GeoJSON from the response
     const alertsGeoJSON = (await response.json()) as AlertsGeoJsonResponse;
 
-    const alerts = Object.entries(alertsGeoJSON.alerts).reduce<Record<string, WxOAlert>>((acc, [alertRef, alert]) => {
-      acc[alertRef] = alert;
-      return acc;
-    }, {});
+    const alerts = Object.entries(alertsGeoJSON.alerts).reduce<Record<string, WxOAlertMetadataProperties>>(
+      (acc, [alertRef, alert]) => {
+        acc[alertRef] = alert;
+        return acc;
+      },
+      {},
+    );
 
     // create new features based on the alerts that are presently active
     // each feature may have multiple alerts associated with it, so we need to create multiple features (with the same geometry) for each alert
 
-    const extractedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];
+    const extractedFeatures: Feature<MultiPolygon, WxOAlertMetadataProperties>[] = [];
 
     // loop over every 'feature' in the feature collection
     alertsGeoJSON.features.forEach((feature) => {
@@ -45,20 +49,42 @@ export async function getPublicAlerts() {
         // extract the alert data from the alerts lookup by the alertRef (the key of the object in the json resposne)
         const alertData = alerts[alertObject.alertRef];
 
-        const newFeature: Feature<MultiPolygon, WarningProperties> = {
+        // the new polygon text contains hex codes (\u00A0) in it (lmao wtf) so we need to remove them,
+        // otherwise the client will throw an error when trying to render the text
+        const text = alertData.text.replace(/[\u00A0\u202F]/g, " ");
+
+        // we also need to parse the string to extract the motion vector from the text if the alert type is a 'freeform'
+
+        let direction: number | null = null;
+        let speed: number | null = null;
+
+        if (alertData.zoneType === "freeform") {
+          console.log(`[WXO] [ALERTS] Parsing motion vector from text: ${text}`);
+
+          const motionVectorRegex = /moving\s+([a-z]+)\s+at\s+(\d{1,3})\s+km\/h/i;
+          const match = text.match(motionVectorRegex);
+          if (match) {
+            console.log(`[WXO] [ALERTS] Motion vector found: ${match[1]} at ${match[2]} km/h`);
+            const directionStr = match[1].toUpperCase() as TextDirection;
+            speed = Number(match[2]); // convert speed to number
+
+            direction = cardinalToDegrees(directionStr);
+          } else {
+            console.log(`[WXO] [ALERTS] No motion vector found in text`);
+          }
+
+          console.log("-------", direction, speed);
+        }
+
+        const newFeature: Feature<MultiPolygon, WxOAlertMetadataProperties> = {
           type: "Feature",
           geometry: feature.geometry,
           properties: {
-            alertCode: alertData.alertCode,
-            type: alertData.type,
-            issueTime: alertData.issueTime,
-            alertNameShort: alertData.alertNameShort,
-            bannerText: alertData.bannerText,
-            eventEndTime: alertData.eventEndTime,
-            eventOnsetTime: alertData.eventOnsetTime,
-            colour: alertData.colour,
-            impact: alertData.impact,
-            confidence: alertData.confidence,
+            ...alertData,
+            text: alertData.text.replace(/[\u00A0\u202F]/g, " "), // the new polygon text contains hex codes (\u00A0) in it (lmao wtf) so we need to remove them, otherwise the client will throw an error when trying to render the text
+            weighting: String(alertData.weighting),
+            direction,
+            speed,
             dataType: "publicAlert",
           },
         };
@@ -69,19 +95,18 @@ export async function getPublicAlerts() {
 
     // now we want to dissolve all feature polygons of the same alert code into single features
     // group features by alertCode and flatten MultiPolygons to Polygons
-    const groupedAlerts = extractedFeatures.reduce<Record<string, Feature<Polygon, WarningProperties>[]>>(
+    const groupedAlerts = extractedFeatures.reduce<Record<string, Feature<Polygon, WxOAlertMetadataProperties>[]>>(
       (acc, feature) => {
-        const alertCode = feature.properties.alertCode;
-        const alertColor = feature.properties.colour;
-        const key = `${alertCode}-${alertColor}`;
-        if (!acc[key]) {
-          acc[key] = [];
+        const alertId = feature.properties.id;
+
+        if (!acc[alertId]) {
+          acc[alertId] = [];
         }
 
         // flatten MultiPolygon to individual Polygons
         const flattened = turf.flatten(feature);
         flattened.features.forEach((f) => {
-          acc[key].push({
+          acc[alertId].push({
             type: "Feature",
             geometry: f.geometry as Polygon,
             properties: feature.properties,
@@ -94,7 +119,7 @@ export async function getPublicAlerts() {
     );
 
     // dissolve each group
-    const dissolvedFeatures: Feature<MultiPolygon, WarningProperties>[] = [];
+    const dissolvedFeatures: Feature<MultiPolygon, WxOAlertMetadataProperties>[] = [];
 
     Object.entries(groupedAlerts).forEach(([_, features]) => {
       const properties = features[0].properties;
@@ -112,7 +137,7 @@ export async function getPublicAlerts() {
       } else {
         // combine all polygons with the same alert code
         const featureCollection = turf.featureCollection(features);
-        const dissolved = turf.dissolve(featureCollection, { propertyName: "alertCode" });
+        const dissolved = turf.dissolve(featureCollection, { propertyName: "id" });
 
         // convert dissolved Polygons back to MultiPolygons
         dissolved.features.forEach((dissolvedFeature) => {
@@ -137,7 +162,7 @@ export async function getPublicAlerts() {
       }
     });
 
-    const dataCollection: FeatureCollection<MultiPolygon, WarningProperties> = {
+    const dataCollection: FeatureCollection<MultiPolygon, WxOAlertMetadataProperties> = {
       type: "FeatureCollection",
       features: dissolvedFeatures,
     };

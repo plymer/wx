@@ -137,6 +137,24 @@ export type WmoDirection =
   | "NNW"
   | "-";
 
+export type TextDirection =
+  | "NORTH"
+  | "NORTHNORTHEAST"
+  | "NORTHEAST"
+  | "EASTNORTHEAST"
+  | "EAST"
+  | "EASTSOUTHEAST"
+  | "SOUTHEAST"
+  | "SOUTHSOUTHEAST"
+  | "SOUTH"
+  | "SOUTH-SOUTHWEST"
+  | "SOUTHWEST"
+  | "WEST-SOUTHWEST"
+  | "WEST"
+  | "WEST-NORTHWEST"
+  | "NORTHWEST"
+  | "NORTH-NORTHWEST";
+
 export type AirQualityData = Prettify<Nullable<Omit<AQData, "lat" | "lon" | "validTime"> & { validTime: Date }>>;
 
 export type RawIntlSigmetData = {
@@ -339,7 +357,7 @@ export type WxOAPIResponse = {
   tc2Id: string;
 };
 
-export type WxOPolygonProperties = {
+export type WxOAlertFeatureProperties = {
   index: string;
   name: string;
   prov: string;
@@ -356,23 +374,31 @@ export type WxOPolygonProperties = {
   }[];
 };
 
-export type WarningProperties = Prettify<
-  Pick<
-    WxOAlert,
-    | "alertCode"
-    | "type"
-    | "issueTime"
-    | "alertNameShort"
-    | "colour"
-    | "impact"
-    | "confidence"
-    | "bannerText"
-    | "eventEndTime"
-    | "eventOnsetTime"
-  > & {
-    dataType: "publicAlert";
-  }
->;
+export type WxOAlertMetadataProperties = {
+  alertCode: string;
+  type: AlertType;
+  zoneType: "freeform" | "fixed";
+  alertName: string;
+  alertNameShort: string;
+  program: string;
+  issueTime: string;
+  timezone: string;
+  issueTimeText: string;
+  issuingOfficeTZ: string;
+  id: string;
+  expiry: string;
+  text: string;
+  bannerText: string;
+  headerText: string;
+  colour: AlertColour;
+  impact: string;
+  confidence: string;
+  direction: number | null;
+  speed: number | null;
+  weighting: string;
+  special_text: [{ type: string; link: string }];
+  dataType: "publicAlert";
+};
 
 export type PointForecastData = {
   placeName: string;

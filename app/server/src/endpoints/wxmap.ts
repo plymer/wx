@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import "dotenv/config";
 import * as turf from "@turf/turf";
 
-import type { StationPlotPopupData, WarningProperties } from "../lib/types.js";
+import type { StationPlotPopupData, WxOAlertMetadataProperties } from "../lib/types.js";
 import { HOUR } from "../lib/constants.js";
 import { limitResultsByKeys } from "../lib/utils.js";
 import { PUBLIC_ALERTS_CACHE_KEY } from "../config/cache-keys.config.js";
@@ -100,12 +100,12 @@ export const wxmapRouter = router({
   }),
 
   wxmapPublicAlerts: publicProcedure.query(
-    async (): Promise<FeatureCollection<MultiPolygon, WarningProperties> | null> => {
+    async (): Promise<FeatureCollection<MultiPolygon, WxOAlertMetadataProperties> | null> => {
       const cachedData = await cacheClient.get(PUBLIC_ALERTS_CACHE_KEY);
 
       if (cachedData) {
         console.log("[API] Cache HIT for WxMap Public Alerts");
-        return JSON.parse(cachedData) as FeatureCollection<MultiPolygon, WarningProperties>;
+        return JSON.parse(cachedData) as FeatureCollection<MultiPolygon, WxOAlertMetadataProperties>;
       }
 
       console.error("[API] [ERROR] Cache MISS for WxMap Public Alerts - no cache data found.");

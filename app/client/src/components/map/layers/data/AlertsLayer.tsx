@@ -1,15 +1,48 @@
 import { useMapLoadingState } from "@/hooks/useMapLoadingState";
 import { api } from "@/lib/trpc";
 import { usePublicAlertsFilterLevel, useShowPublicAlerts } from "@/stateStores/map/vectorData";
+import { HOUR } from "@shared/lib/constants";
 import { useQuery } from "@tanstack/react-query";
-import type { FilterSpecification } from "maplibre-gl";
+import type { DataDrivenPropertyValueSpecification, FilterSpecification } from "maplibre-gl";
 import { Source, Layer } from "react-map-gl/maplibre";
+import * as turf from "@turf/turf";
+import type { Feature, MultiPolygon } from "geojson";
+import type { WxOAlertMetadataProperties } from "@shared/lib/types";
+import { useDisplayTime } from "@/hooks/useDisplayTime";
 
 interface Props {
   override?: boolean;
 }
 
+const applyMotionVector = (
+  displayTime: number,
+  startTime: number,
+  feature: Feature<MultiPolygon, WxOAlertMetadataProperties>,
+) => {
+  // if we have no motion vector, our object is stationary so bail out
+  if (!feature || !feature.properties || !feature.properties.speed || !feature.properties.direction) return feature;
+
+  // calculate the elapsed time in milliseconds
+  const elapsedTime = (displayTime - startTime) / HOUR;
+
+  // speed is in knots
+  const spd = feature.properties.speed;
+
+  // direction is in degrees, or can be null for STNR Xmets
+  const direction = feature.properties.direction ?? 0;
+
+  // nautical miles traveled in the elapsed time
+  const distance = spd * elapsedTime;
+
+  const translated = turf.transformTranslate(turf.multiPolygon(feature.geometry.coordinates), distance, direction, {
+    units: "kilometres",
+  });
+
+  return { ...translated, properties: feature.properties };
+};
+
 export const AlertsLayer = ({ override }: Props) => {
+  const displayTime = useDisplayTime();
   const enabled = useShowPublicAlerts();
   const filterAlertLevel = usePublicAlertsFilterLevel();
 
@@ -19,15 +52,35 @@ export const AlertsLayer = ({ override }: Props) => {
 
   useMapLoadingState("alerts", isFetching);
 
+  const fillColourExpr: DataDrivenPropertyValueSpecification<string> = [
+    "case",
+    ["has", "colour"],
+    ["get", "colour"],
+    "grey",
+  ];
+
   const filter: FilterSpecification =
     filterAlertLevel === "convective"
-      ? ["in", ["get", "alertCode"], ["literal", ["STV", "STW", "TRW", "TRV"]]]
+      ? [
+          "all",
+
+          ["in", ["get", "alertCode"], ["literal", ["STV", "STW", "TRW", "TRV"]]],
+        ]
       : ["all"];
 
   if (!override && !enabled) return null;
 
+  const features = data?.features
+    .filter((f) => {
+      if (f.properties.zoneType === "freeform") {
+        return new Date(f.properties.issueTime).getTime() < displayTime;
+      }
+      return true;
+    })
+    .map((f) => applyMotionVector(displayTime, new Date(f.properties.issueTime).getTime(), f));
+
   return (
-    <Source id="wxo-alerts-source" type="geojson" data={data ?? { type: "FeatureCollection", features: [] }}>
+    <Source id="wxo-alerts-source" type="geojson" data={{ type: "FeatureCollection", features: features ?? [] }}>
       <Layer
         key="layer-wxo-alerts"
         id="layer-wxo-alerts"
@@ -35,9 +88,8 @@ export const AlertsLayer = ({ override }: Props) => {
         filter={filter}
         type="fill"
         paint={{
-          "fill-color": ["match", ["get", "type"], "warning", "#ff0000", "watch", "#ffff00", "#808080"],
-          // "fill-color": ["get", "colour"],
-          "fill-opacity": 0.45,
+          "fill-color": fillColourExpr,
+          "fill-opacity": ["match", ["get", "type"], "warning", 0.35, 0.175],
         }}
       />
       <Layer
@@ -48,9 +100,19 @@ export const AlertsLayer = ({ override }: Props) => {
         type="line"
         minzoom={4}
         paint={{
-          "line-color": ["match", ["get", "type"], "warning", "#ff0000", "watch", "#ffff00", "#808080"],
-          "line-opacity": 0.85,
-          "line-width": 5,
+          "line-color": fillColourExpr,
+          "line-opacity": ["match", ["get", "type"], "warning", 0.8, 1],
+          "line-width": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            2,
+            ["match", ["get", "type"], "warning", 2, 1],
+            8,
+            ["match", ["get", "type"], "warning", 6, 2],
+          ],
+          "line-offset": ["match", ["get", "type"], "warning", 1.5, 1],
+          "line-dasharray": ["match", ["get", "type"], "warning", ["literal", [1, 0]], ["literal", [3, 1]]],
         }}
       />
       <Layer
