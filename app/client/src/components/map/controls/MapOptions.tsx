@@ -265,31 +265,44 @@ export default function MapOptions({ ...props }: ButtonProps) {
             >
               <Satellite className="shrink-0 size-6" /> Satellite
             </AccordionTrigger>
-            <AccordionContent className="flex max-lg:flex-col max-lg:gap-2 items-center border border-accent rounded-b-md p-2 h-fit">
-              <DataToggle
-                dataOption={{
-                  name: "Show Satellite",
-                  state: raster.showSatellite,
-                  toggle: rasterActions.toggleSatellite,
-                  type: "satellite",
-                }}
-                className="flex items-center justify-between p-2 rounded-md text-black border border-input max-lg:w-full lg:min-w-48"
-              />
-              <Select
-                value={raster.satelliteProduct}
-                onValueChange={(selectVal) => rasterActions.setSatelliteProduct(selectVal as SatelliteChannelsWMSName)}
-              >
-                <SelectTrigger disabled={!raster.showSatellite} className="w-full text-black">
-                  <SelectValue placeholder="Select Satellite Channel" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(Object.keys(SATELLITE_CHANNELS) as SatelliteChannelsList[]).map((ch, index) => (
-                    <SelectItem key={index} value={SATELLITE_CHANNELS[ch].wms}>
-                      {SATELLITE_CHANNELS[ch].menuName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <AccordionContent className="flex flex-col gap-2 border border-accent rounded-b-md p-2 h-fit">
+              {map.basemap !== "hillshade" && (
+                <div className="text-sm text-neutral-800 text-center">
+                  Satellite imagery is only available when the basemap is set to "Default"
+                </div>
+              )}
+              <div className="flex max-lg:flex-col max-lg: gap-2 items-center">
+                <DataToggle
+                  disabled={map.basemap !== "hillshade"}
+                  dataOption={{
+                    name: "Show Satellite",
+                    state: raster.showSatellite,
+                    toggle: rasterActions.toggleSatellite,
+                    type: "satellite",
+                  }}
+                  className="flex items-center justify-between p-2 rounded-md text-black border border-input max-lg:w-full lg:min-w-48"
+                />
+                <Select
+                  value={raster.satelliteProduct}
+                  onValueChange={(selectVal) =>
+                    rasterActions.setSatelliteProduct(selectVal as SatelliteChannelsWMSName)
+                  }
+                >
+                  <SelectTrigger
+                    disabled={!raster.showSatellite || map.basemap !== "hillshade"}
+                    className="w-full text-black"
+                  >
+                    <SelectValue placeholder="Select Satellite Channel" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(Object.keys(SATELLITE_CHANNELS) as SatelliteChannelsList[]).map((ch, index) => (
+                      <SelectItem key={index} value={SATELLITE_CHANNELS[ch].wms}>
+                        {SATELLITE_CHANNELS[ch].menuName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="radar">

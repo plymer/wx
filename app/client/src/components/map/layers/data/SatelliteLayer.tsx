@@ -6,6 +6,7 @@ import { api } from "@/lib/trpc";
 import { MINUTE } from "@shared/lib/constants";
 import { SATELLITE_DOMAINS } from "@/config/rasterData";
 import { useIsVisible } from "@/hooks/useIsVisible";
+import { useBaseMap } from "@/stateStores/map/mapView";
 
 interface Props {
   belowLayer?: string;
@@ -15,6 +16,7 @@ interface Props {
 export const SatelliteLayer = ({ domain }: Props) => {
   const showSatellite = useShowSatellite();
   const satelliteProduct = useSatelliteProduct();
+  const baseMap = useBaseMap();
 
   const isVisible = useIsVisible(SATELLITE_DOMAINS[domain]);
 
@@ -29,7 +31,7 @@ export const SatelliteLayer = ({ domain }: Props) => {
     api.wms.eumetsat.queryOptions(
       { domain: "europe", product: "mtg_fd:rgb_fog" },
       {
-        enabled: isVisible && showSatellite && domain === "europe",
+        enabled: baseMap === "hillshade" && isVisible && showSatellite && domain === "europe",
         refetchInterval: MINUTE,
         trpc: { context: { skipBatch: true } },
       },
@@ -40,7 +42,7 @@ export const SatelliteLayer = ({ domain }: Props) => {
     api.wms.eumetsat.queryOptions(
       { domain: "indianOcean", product: "msg_iodc:rgb_fog" },
       {
-        enabled: isVisible && showSatellite && domain === "indianOcean",
+        enabled: baseMap === "hillshade" && isVisible && showSatellite && domain === "indianOcean",
         refetchInterval: MINUTE,
         trpc: { context: { skipBatch: true } },
       },
@@ -51,7 +53,7 @@ export const SatelliteLayer = ({ domain }: Props) => {
     api.wms.goes.queryOptions(
       { domain: domain as "east" | "west", product: satelliteProduct },
       {
-        enabled: isVisible && showSatellite && (domain === "east" || domain === "west"),
+        enabled: baseMap === "hillshade" && isVisible && showSatellite && (domain === "east" || domain === "west"),
         refetchInterval: MINUTE,
         trpc: { context: { skipBatch: true } },
       },
@@ -62,7 +64,7 @@ export const SatelliteLayer = ({ domain }: Props) => {
     api.wms.himawari.queryOptions(
       { product: "2km_Ash" },
       {
-        enabled: isVisible && showSatellite && domain === "himawari",
+        enabled: baseMap === "hillshade" && isVisible && showSatellite && domain === "himawari",
         refetchInterval: MINUTE,
         trpc: { context: { skipBatch: true } },
       },
@@ -87,7 +89,7 @@ export const SatelliteLayer = ({ domain }: Props) => {
       break;
   }
 
-  if (!isVisible || !showSatellite || !data) return;
+  if (baseMap !== "hillshade" || !isVisible || !showSatellite || !data) return;
 
   return <RasterDataLayer apiData={data} belowLayer={belowLayerId} />;
 };
