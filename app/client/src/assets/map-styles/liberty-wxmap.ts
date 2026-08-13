@@ -1219,6 +1219,25 @@ export const libertyWxMap: StyleSpecification = {
       },
     },
     {
+      id: "boundary_state",
+      type: "line",
+      source: "openmaptiles",
+      "source-layer": "boundary",
+      filter: ["all", ["==", "admin_level", 4], ["==", "maritime", 0]],
+      layout: {
+        "line-cap": "round",
+        "line-join": "round",
+        visibility: "visible",
+      },
+      paint: {
+        "line-blur": 0.4,
+        "line-color": "rgb(0, 0, 0)",
+        // "line-dasharray": [2, 2],
+        "line-opacity": 1,
+        "line-width": 1,
+      },
+    },
+    {
       id: "boundary_3",
       type: "line",
       source: "openmaptiles",
