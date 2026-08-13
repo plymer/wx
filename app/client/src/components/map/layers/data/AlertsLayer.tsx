@@ -121,7 +121,7 @@ export const AlertsLayer = ({ override }: Props) => {
         minzoom={4}
         paint={{
           "line-color": ["case", ["has", "colour"], ["get", "colour"], "grey"],
-          "line-layer-opacity": ["match", ["get", "type"], "warning", 0.8, 1],
+          "line-opacity": ["match", ["get", "type"], "warning", 0.8, 1], // this isn't supported in iOS safari???
           "line-width": [
             "interpolate",
             ["linear"],
