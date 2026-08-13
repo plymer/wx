@@ -1,6 +1,9 @@
 import type { StyleSpecification } from "maplibre-gl";
 import { PUBLIC_URL } from "./positron-wxmap";
 
+const WATER_OUTLINE = "rgb(158,189,255)";
+const WATER_CASING = "rgb(25, 25, 25)";
+
 export const libertyWxMap: StyleSpecification = {
   version: 8,
   metadata: { "maputnik:renderer": "mlgljs" },
@@ -196,12 +199,19 @@ export const libertyWxMap: StyleSpecification = {
       layout: { visibility: "none" },
     },
     {
+      id: "wateroutline-casing",
+      type: "line",
+      source: "openmaptiles",
+      filter: ["all", ["==", "$type", "Polygon"], ["==", "class", "ocean"]],
+      "source-layer": "water",
+      paint: { "line-color": WATER_CASING, "line-width": 1.5 },
+    },
+    {
       id: "wateroutline",
       type: "line",
       source: "openmaptiles",
       "source-layer": "water",
-      filter: ["!=", ["get", "brunnel"], "tunnel"],
-      paint: { "line-color": "rgb(158,189,255)" },
+      paint: { "line-color": WATER_OUTLINE },
     },
     {
       id: "waterway_tunnel",

@@ -104,7 +104,6 @@ export const AlertsLayer = ({ override }: Props) => {
         beforeId="place_state"
         filter={nonWarningCasingFilter}
         type="line"
-        minzoom={4}
         paint={{
           "line-color": "black",
           "line-opacity": 1,
@@ -118,10 +117,9 @@ export const AlertsLayer = ({ override }: Props) => {
         beforeId="place_state"
         filter={filter}
         type="line"
-        minzoom={4}
         paint={{
           "line-color": ["case", ["has", "colour"], ["get", "colour"], "grey"],
-          "line-opacity": ["match", ["get", "type"], "warning", 0.8, 1], // this isn't supported in iOS safari???
+          "line-opacity": ["match", ["get", "type"], "warning", 0.8, 1], // line-layer-opacity isn't supported in iOS safari???
           "line-width": [
             "interpolate",
             ["linear"],
