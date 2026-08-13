@@ -3,7 +3,7 @@ import { api } from "@/lib/trpc";
 import { usePublicAlertsFilterLevel, useShowPublicAlerts } from "@/stateStores/map/vectorData";
 import { HOUR } from "@shared/lib/constants";
 import { useQuery } from "@tanstack/react-query";
-import type { DataDrivenPropertyValueSpecification, FilterSpecification } from "maplibre-gl";
+import type { FilterSpecification } from "maplibre-gl";
 import { Source, Layer } from "react-map-gl/maplibre";
 import * as turf from "@turf/turf";
 import type { Feature, MultiPolygon } from "geojson";
@@ -52,21 +52,19 @@ export const AlertsLayer = ({ override }: Props) => {
 
   useMapLoadingState("alerts", isFetching);
 
-  const fillColourExpr: DataDrivenPropertyValueSpecification<string> = [
-    "case",
-    ["has", "colour"],
-    ["get", "colour"],
-    "grey",
-  ];
-
   const filter: FilterSpecification =
+    filterAlertLevel === "convective"
+      ? ["all", ["in", ["get", "alertCode"], ["literal", ["STV", "STW", "TRW", "TRV"]]]]
+      : ["all"];
+
+  const nonWarningCasingFilter: FilterSpecification =
     filterAlertLevel === "convective"
       ? [
           "all",
-
           ["in", ["get", "alertCode"], ["literal", ["STV", "STW", "TRW", "TRV"]]],
+          ["!=", ["get", "type"], "warning"],
         ]
-      : ["all"];
+      : ["all", ["!=", ["get", "type"], "warning"]];
 
   if (!override && !enabled) return null;
 
@@ -88,8 +86,30 @@ export const AlertsLayer = ({ override }: Props) => {
         filter={filter}
         type="fill"
         paint={{
-          "fill-color": fillColourExpr,
-          "fill-opacity": ["match", ["get", "type"], "warning", 0.35, 0.175],
+          "fill-color": ["case", ["has", "colour"], ["get", "colour"], "grey"],
+          "fill-opacity": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            2,
+            ["match", ["get", "type"], "warning", 0.35, 0.175],
+            7,
+            0.05,
+          ],
+        }}
+      />
+      <Layer
+        key="layer-wxo-alerts-outline-casing"
+        id="layer-wxo-alerts-outline-casing"
+        beforeId="place_state"
+        filter={nonWarningCasingFilter}
+        type="line"
+        minzoom={4}
+        paint={{
+          "line-color": "black",
+          "line-opacity": 1,
+          "line-width": ["interpolate", ["linear"], ["zoom"], 2, 4, 8, 8],
+          "line-offset": 1,
         }}
       />
       <Layer
@@ -100,8 +120,8 @@ export const AlertsLayer = ({ override }: Props) => {
         type="line"
         minzoom={4}
         paint={{
-          "line-color": fillColourExpr,
-          "line-opacity": ["match", ["get", "type"], "warning", 0.8, 1],
+          "line-color": ["case", ["has", "colour"], ["get", "colour"], "grey"],
+          "line-layer-opacity": ["match", ["get", "type"], "warning", 0.8, 1],
           "line-width": [
             "interpolate",
             ["linear"],
@@ -115,6 +135,7 @@ export const AlertsLayer = ({ override }: Props) => {
           "line-dasharray": ["match", ["get", "type"], "warning", ["literal", [1, 0]], ["literal", [3, 1]]],
         }}
       />
+
       <Layer
         key="layer-wxo-alerts-labels"
         id="layer-wxo-alerts-labels"
@@ -122,11 +143,18 @@ export const AlertsLayer = ({ override }: Props) => {
         filter={filter}
         type="symbol"
         minzoom={4.75}
-        paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
+        paint={{
+          "text-color": ["match", ["get", "type"], "statement", "white", ["get", "colour"]],
+          "text-halo-color": "black",
+          "text-halo-width": 2,
+        }}
         layout={{
+          "symbol-placement": ["step", ["zoom"], "point", 8, "line"],
+          "symbol-spacing": 250,
           "text-field": ["get", "bannerText"],
           "text-size": 12,
           "text-allow-overlap": true,
+          "text-offset": ["step", ["zoom"], ["literal", [0, 0]], 8, ["literal", [0, 1]]],
           "text-font": ["Open-Sans-Italic"],
         }}
       />
