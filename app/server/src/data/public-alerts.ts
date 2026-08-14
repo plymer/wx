@@ -7,7 +7,7 @@ import { cardinalToDegrees } from "../lib/utils.js";
 import { pgDb as db } from "../services/database.js";
 
 import { publicAlerts } from "../db/schemas.drizzle.js";
-import { and, gt, inArray, notInArray, type InferInsertModel } from "drizzle-orm";
+import { and, gt, inArray, lt, notInArray, type InferInsertModel } from "drizzle-orm";
 
 type AlertsGeoJsonResponse = {
   type: "FeatureCollection";
@@ -258,7 +258,7 @@ export async function getPublicAlerts() {
       await tx.update(publicAlerts).set({ expiry: now }).where(inArray(publicAlerts.id, staleAlertIds));
 
       // finally, let's purge the database of alerts that are older than 24 hours
-      await tx.delete(publicAlerts).where(gt(publicAlerts.issueTime, new Date(now.getTime() - 24 * HOUR)));
+      await tx.delete(publicAlerts).where(lt(publicAlerts.issueTime, new Date(now.getTime() - 24 * HOUR)));
     });
   } catch (error) {
     throw new Error(`[WXO] [ALERTS] Error fetching public alerts: ${error}`);
