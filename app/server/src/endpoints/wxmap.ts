@@ -3,10 +3,10 @@ import { TRPCError } from "@trpc/server";
 import "dotenv/config";
 import * as turf from "@turf/turf";
 
-import type { StationPlotPopupData, WxOAlertMetadataProperties } from "../lib/types.js";
+import type { AlertColour, AlertType, StationPlotPopupData, WxOAlertMapProperties } from "../lib/types.js";
 import { HOUR } from "../lib/constants.js";
 import { limitResultsByKeys } from "../lib/utils.js";
-import { PUBLIC_ALERTS_CACHE_KEY } from "../config/cache-keys.config.js";
+
 import { publicProcedure, router } from "../services/trpc.js";
 import { pgDb as db } from "../services/database.js";
 import { cacheClient } from "../services/redis.js";
@@ -100,16 +100,55 @@ export const wxmapRouter = router({
   }),
 
   wxmapPublicAlerts: publicProcedure.query(
-    async (): Promise<FeatureCollection<MultiPolygon, WxOAlertMetadataProperties> | null> => {
-      const cachedData = await cacheClient.get(PUBLIC_ALERTS_CACHE_KEY);
-
-      if (cachedData) {
-        console.log("[API] Cache HIT for WxMap Public Alerts");
-        return JSON.parse(cachedData) as FeatureCollection<MultiPolygon, WxOAlertMetadataProperties>;
+    async (): Promise<FeatureCollection<MultiPolygon, WxOAlertMapProperties> | null> => {
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "No database connection available",
+        });
       }
 
-      console.error("[API] [ERROR] Cache MISS for WxMap Public Alerts - no cache data found.");
-      return null;
+      try {
+        const alerts = await db.query.publicAlerts.findMany({
+          where: { issueTime: { gt: new Date(Date.now() - 12 * HOUR) } },
+        });
+
+        const features: Feature<MultiPolygon, WxOAlertMapProperties>[] = alerts
+          .filter((alert) => alert.coords !== null && alert.colour !== undefined)
+          .map((alert) => {
+            const { coords, ...properties } = alert;
+            const geometry = JSON.parse(coords!) as MultiPolygon;
+
+            return {
+              type: "Feature",
+              geometry,
+              properties: {
+                ...properties,
+                dataType: "publicAlert",
+                alertType: properties.type as AlertType,
+                startTime: new Date(properties.issueTime).getTime(),
+                expiryTime: new Date(properties.expiry).getTime(),
+                colour: properties.colour as AlertColour,
+                impact: properties.impact ?? "",
+                confidence: properties.confidence ?? "",
+                level: properties.level ?? 0,
+              },
+            };
+          });
+
+        const featureCollection: FeatureCollection<MultiPolygon, WxOAlertMapProperties> = {
+          type: "FeatureCollection",
+          features,
+        };
+
+        return featureCollection;
+      } catch (error) {
+        console.error("Error fetching public alerts:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch public alerts",
+        });
+      }
     },
   ),
 });

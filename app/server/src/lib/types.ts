@@ -395,10 +395,17 @@ export type WxOAlertMetadataProperties = {
   confidence: string;
   direction: number | null;
   speed: number | null;
-  weighting: string;
-  special_text: [{ type: string; link: string }];
+  level: number;
   dataType: "publicAlert";
 };
+
+export type WxOAlertMapProperties = Prettify<
+  Omit<WxOAlertMetadataProperties, "type" | "issueTime" | "expiry"> & {
+    alertType: AlertType;
+    startTime: number;
+    expiryTime: number;
+  }
+>;
 
 export type PointForecastData = {
   placeName: string;

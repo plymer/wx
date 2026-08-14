@@ -7,7 +7,7 @@ import type { FilterSpecification } from "maplibre-gl";
 import { Source, Layer } from "react-map-gl/maplibre";
 import * as turf from "@turf/turf";
 import type { Feature, MultiPolygon } from "geojson";
-import type { WxOAlertMetadataProperties } from "@shared/lib/types";
+import type { WxOAlertMapProperties } from "@shared/lib/types";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
 
 interface Props {
@@ -17,7 +17,7 @@ interface Props {
 const applyMotionVector = (
   displayTime: number,
   startTime: number,
-  feature: Feature<MultiPolygon, WxOAlertMetadataProperties>,
+  feature: Feature<MultiPolygon, WxOAlertMapProperties>,
 ) => {
   // if we have no motion vector, our object is stationary so bail out
   if (!feature || !feature.properties || !feature.properties.speed || !feature.properties.direction) return feature;
@@ -30,6 +30,8 @@ const applyMotionVector = (
 
   // direction is in degrees, or can be null for STNR Xmets
   const direction = feature.properties.direction ?? 0;
+
+  console.log(elapsedTime, spd, direction);
 
   // nautical miles traveled in the elapsed time
   const distance = spd * elapsedTime;
@@ -54,28 +56,44 @@ export const AlertsLayer = ({ override }: Props) => {
 
   const filter: FilterSpecification =
     filterAlertLevel === "convective"
-      ? ["all", ["in", ["get", "alertCode"], ["literal", ["STV", "STW", "TRW", "TRV"]]]]
-      : ["all"];
+      ? [
+          "all",
+          ["in", ["get", "alertCode"], ["literal", ["STV", "STW", "TRW", "TRV"]]],
+          ["<=", ["get", "startTime"], ["to-number", displayTime]],
+          [">", ["get", "expiryTime"], ["to-number", displayTime]],
+        ]
+      : [
+          "all",
+          ["<=", ["get", "startTime"], ["to-number", displayTime]],
+          [">", ["get", "expiryTime"], ["to-number", displayTime]],
+        ];
 
   const nonWarningCasingFilter: FilterSpecification =
     filterAlertLevel === "convective"
       ? [
           "all",
           ["in", ["get", "alertCode"], ["literal", ["STV", "STW", "TRW", "TRV"]]],
-          ["!=", ["get", "type"], "warning"],
+          ["!=", ["get", "alertType"], "warning"],
+          ["<=", ["get", "startTime"], ["to-number", displayTime]],
+          [">", ["get", "expiryTime"], ["to-number", displayTime]],
         ]
-      : ["all", ["!=", ["get", "type"], "warning"]];
+      : [
+          "all",
+          ["!=", ["get", "alertType"], "warning"],
+          ["<=", ["get", "startTime"], ["to-number", displayTime]],
+          [">", ["get", "expiryTime"], ["to-number", displayTime]],
+        ];
 
   if (!override && !enabled) return null;
 
   const features = data?.features
     .filter((f) => {
       if (f.properties.zoneType === "freeform") {
-        return new Date(f.properties.issueTime).getTime() < displayTime;
+        return f.properties.startTime < displayTime;
       }
       return true;
     })
-    .map((f) => applyMotionVector(displayTime, new Date(f.properties.issueTime).getTime(), f));
+    .map((f) => applyMotionVector(displayTime, f.properties.startTime, f));
 
   return (
     <Source id="wxo-alerts-source" type="geojson" data={{ type: "FeatureCollection", features: features ?? [] }}>
@@ -92,7 +110,7 @@ export const AlertsLayer = ({ override }: Props) => {
             ["linear"],
             ["zoom"],
             2,
-            ["match", ["get", "type"], "warning", 0.35, 0.175],
+            ["match", ["get", "alertType"], "warning", 0.35, 0.175],
             7,
             0.05,
           ],
@@ -119,18 +137,18 @@ export const AlertsLayer = ({ override }: Props) => {
         type="line"
         paint={{
           "line-color": ["case", ["has", "colour"], ["get", "colour"], "grey"],
-          "line-opacity": ["match", ["get", "type"], "warning", 0.8, 1], // line-layer-opacity isn't supported in iOS safari???
+          "line-opacity": ["match", ["get", "alertType"], "warning", 0.8, 1], // line-layer-opacity isn't supported in iOS safari???
           "line-width": [
             "interpolate",
             ["linear"],
             ["zoom"],
             2,
-            ["match", ["get", "type"], "warning", 2, 1],
+            ["match", ["get", "alertType"], "warning", 2, 1],
             8,
-            ["match", ["get", "type"], "warning", 6, 2],
+            ["match", ["get", "alertType"], "warning", 6, 2],
           ],
-          "line-offset": ["match", ["get", "type"], "warning", 1.5, 1],
-          "line-dasharray": ["match", ["get", "type"], "warning", ["literal", [1, 0]], ["literal", [3, 1]]],
+          "line-offset": ["match", ["get", "alertType"], "warning", 1.5, 1],
+          "line-dasharray": ["match", ["get", "alertType"], "warning", ["literal", [1, 0]], ["literal", [3, 1]]],
         }}
       />
 
@@ -142,14 +160,19 @@ export const AlertsLayer = ({ override }: Props) => {
         type="symbol"
         minzoom={4.75}
         paint={{
-          "text-color": ["match", ["get", "type"], "statement", "white", ["get", "colour"]],
+          "text-color": ["match", ["get", "alertType"], "statement", "white", ["get", "colour"]],
           "text-halo-color": "black",
           "text-halo-width": 2,
         }}
         layout={{
           "symbol-placement": ["step", ["zoom"], "point", 8, "line"],
           "symbol-spacing": 250,
-          "text-field": ["get", "bannerText"],
+          "text-field": [
+            "concat",
+            ["get", "bannerText"],
+            // "\n\n",
+            // ["<=", ["get", "start_time"], ["to-number", displayTime]],
+          ],
           "text-size": 12,
           "text-allow-overlap": true,
           "text-offset": ["step", ["zoom"], ["literal", [0, 0]], 8, ["literal", [0, 1]]],

@@ -188,6 +188,35 @@ export const sigmets = snakeCase.table(
   (table) => [primaryKey({ columns: [table.header, table.issueTime, table.charCode, table.numberCode] })],
 );
 
+export const publicAlerts = snakeCase.table(
+  "public_alerts",
+  {
+    alertCode: varchar({ length: 3 }).notNull(),
+    type: text({ enum: ["watch", "warning", "advisory", "statement"] }).notNull(),
+    zoneType: text({ enum: ["fixed", "freeform"] }).notNull(),
+    alertName: text().notNull(),
+    alertNameShort: text().notNull(),
+    program: text().notNull(),
+    issueTime: timestamp({ mode: "date" }).notNull(),
+    expiry: timestamp({ mode: "date" }).notNull(),
+    timezone: varchar({ length: 3 }).notNull(),
+    issueTimeText: text().notNull(),
+    issuingOfficeTZ: varchar({ length: 3 }).notNull(),
+    id: text().notNull(),
+    text: text().notNull(),
+    bannerText: text().notNull(),
+    headerText: text().notNull(),
+    colour: text().notNull(),
+    impact: text(),
+    confidence: text(),
+    level: integer(),
+    direction: doublePrecision(),
+    speed: doublePrecision(),
+    coords: text(),
+  },
+  (table) => [primaryKey({ columns: [table.id, table.issueTime, table.expiry] })],
+);
+
 // export const pireps = snakeCase.table(
 //   "pireps",
 //   {

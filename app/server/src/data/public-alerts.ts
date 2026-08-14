@@ -1,11 +1,13 @@
 import "dotenv/config";
-import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
+import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { WxOAlertMetadataProperties, WxOAlertFeatureProperties, TextDirection } from "../lib/types.js";
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import * as turf from "@turf/turf";
-import { cacheClient } from "../services/redis.js";
-import { PUBLIC_ALERTS_CACHE_KEY } from "../config/cache-keys.config.js";
 import { cardinalToDegrees } from "../lib/utils.js";
+import { pgDb as db } from "../services/database.js";
+
+import { publicAlerts } from "../db/schemas.drizzle.js";
+import { and, gt, inArray, notInArray, type InferInsertModel } from "drizzle-orm";
 
 type AlertsGeoJsonResponse = {
   type: "FeatureCollection";
@@ -15,6 +17,10 @@ type AlertsGeoJsonResponse = {
 };
 
 export async function getPublicAlerts() {
+  if (!db) {
+    throw new Error("[METAR] Database connection failed.");
+  }
+
   const sourceUrl = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.en.geojson";
 
   try {
@@ -39,6 +45,9 @@ export async function getPublicAlerts() {
 
     const extractedFeatures: Feature<MultiPolygon, WxOAlertMetadataProperties>[] = [];
 
+    // we also need to keep track of which alerts are still 'active' so we can update the expiry time of the alerts in the database that are no longer active
+    const alertIdsInPayload = new Set<string>();
+
     // loop over every 'feature' in the feature collection
     alertsGeoJSON.features.forEach((feature) => {
       // get the alerts associated with this feature
@@ -48,6 +57,9 @@ export async function getPublicAlerts() {
       alertArray.forEach((alertObject) => {
         // extract the alert data from the alerts lookup by the alertRef (the key of the object in the json resposne)
         const alertData = alerts[alertObject.alertRef];
+
+        // add the alert id to the set of alert ids in the payload
+        alertIdsInPayload.add(alertData.id);
 
         // the new polygon text contains hex codes (\u00A0) in it (lmao wtf) so we need to remove them,
         // otherwise the client will throw an error when trying to render the text
@@ -59,21 +71,14 @@ export async function getPublicAlerts() {
         let speed: number | null = null;
 
         if (alertData.zoneType === "freeform") {
-          console.log(`[WXO] [ALERTS] Parsing motion vector from text: ${text}`);
-
           const motionVectorRegex = /moving\s+([a-z]+)\s+at\s+(\d{1,3})\s+km\/h/i;
           const match = text.match(motionVectorRegex);
           if (match) {
-            console.log(`[WXO] [ALERTS] Motion vector found: ${match[1]} at ${match[2]} km/h`);
             const directionStr = match[1].toUpperCase() as TextDirection;
             speed = Number(match[2]); // convert speed to number
 
             direction = cardinalToDegrees(directionStr);
-          } else {
-            console.log(`[WXO] [ALERTS] No motion vector found in text`);
           }
-
-          console.log("-------", direction, speed);
         }
 
         const newFeature: Feature<MultiPolygon, WxOAlertMetadataProperties> = {
@@ -81,8 +86,7 @@ export async function getPublicAlerts() {
           geometry: feature.geometry,
           properties: {
             ...alertData,
-            text: alertData.text.replace(/[\u00A0\u202F]/g, " "), // the new polygon text contains hex codes (\u00A0) in it (lmao wtf) so we need to remove them, otherwise the client will throw an error when trying to render the text
-            weighting: String(alertData.weighting),
+            text,
             direction,
             speed,
             dataType: "publicAlert",
@@ -168,16 +172,95 @@ export async function getPublicAlerts() {
     };
 
     // simplify the polygons to reduce complexity, improve client performance, and reduce payload size
-    const output = turf.simplify(dataCollection, {
+    const simplified = turf.simplify(dataCollection, {
       tolerance: 0.001,
       highQuality: false,
       mutate: true,
     });
 
-    // add to the cache
-    await cacheClient.setEx(PUBLIC_ALERTS_CACHE_KEY, 60 * 10, JSON.stringify(output));
+    const output: InferInsertModel<typeof publicAlerts>[] = simplified.features.map((feature) => ({
+      alertCode: feature.properties.alertCode,
+      type: feature.properties.type,
+      zoneType: feature.properties.zoneType,
+      alertName: feature.properties.alertName,
+      alertNameShort: feature.properties.alertNameShort,
+      program: feature.properties.program,
+      issueTime: new Date(feature.properties.issueTime),
+      expiry: new Date(feature.properties.expiry),
+      timezone: feature.properties.timezone,
+      issueTimeText: feature.properties.issueTimeText,
+      issuingOfficeTZ: feature.properties.issuingOfficeTZ,
+      id: String(feature.properties.id),
+      text: feature.properties.text,
+      bannerText: feature.properties.bannerText,
+      headerText: feature.properties.headerText,
+      colour: feature.properties.colour,
+      impact: feature.properties.impact,
+      confidence: feature.properties.confidence,
+      level: feature.properties.level,
+      direction: feature.properties.direction,
+      speed: feature.properties.speed,
+      coords: JSON.stringify(feature.geometry),
+    }));
+
+    const now = new Date();
+
+    // now that we have the simplified, compacted features, let's write them to the database
+    await db.transaction(async (tx) => {
+      if (output.length > 0) {
+        await tx
+          .insert(publicAlerts)
+          .values(output)
+          .onConflictDoUpdate({
+            target: [publicAlerts.id, publicAlerts.issueTime, publicAlerts.expiry],
+            set: {
+              alertCode: publicAlerts.alertCode,
+              type: publicAlerts.type,
+              zoneType: publicAlerts.zoneType,
+              alertName: publicAlerts.alertName,
+              alertNameShort: publicAlerts.alertNameShort,
+              program: publicAlerts.program,
+              issueTime: publicAlerts.issueTime,
+              expiry: publicAlerts.expiry,
+              timezone: publicAlerts.timezone,
+              issueTimeText: publicAlerts.issueTimeText,
+              issuingOfficeTZ: publicAlerts.issuingOfficeTZ,
+              text: publicAlerts.text,
+              bannerText: publicAlerts.bannerText,
+              headerText: publicAlerts.headerText,
+              colour: publicAlerts.colour,
+              impact: publicAlerts.impact,
+              confidence: publicAlerts.confidence,
+              level: publicAlerts.level,
+              direction: publicAlerts.direction,
+              speed: publicAlerts.speed,
+              coords: publicAlerts.coords,
+            },
+          });
+      }
+
+      // extract alert ids from the database that are no longer present in the payload and have not yet expired
+      // we will need to force-expire them so they are no longer displayed on the map
+      const staleAlerts = alertIdsInPayload.size
+        ? await tx
+            .select({ id: publicAlerts.id })
+            .from(publicAlerts)
+            .where(and(notInArray(publicAlerts.id, [...alertIdsInPayload]), gt(publicAlerts.expiry, now)))
+        : await tx.select({ id: publicAlerts.id }).from(publicAlerts).where(gt(publicAlerts.expiry, now));
+
+      const staleAlertIds = [...new Set(staleAlerts.map((alert) => alert.id))];
+
+      console.log(`[WXO] [ALERTS] Found ${staleAlertIds.length} stale alerts to update.`);
+
+      if (staleAlertIds.length === 0) return;
+
+      // end any stale alerts by updating their expiry time to now
+      await tx.update(publicAlerts).set({ expiry: now }).where(inArray(publicAlerts.id, staleAlertIds));
+
+      // finally, let's purge the database of alerts that are older than 24 hours
+      await tx.delete(publicAlerts).where(gt(publicAlerts.issueTime, new Date(now.getTime() - 24 * HOUR)));
+    });
   } catch (error) {
-    console.error(`[WXO] [ALERTS] Error fetching public alerts: ${error}`);
-    return;
+    throw new Error(`[WXO] [ALERTS] Error fetching public alerts: ${error}`);
   }
 }
