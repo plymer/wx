@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-import type { Map } from "maplibre-gl";
+import type { Map, LngLatBounds } from "maplibre-gl";
 import type { PaddingOptions, ViewState } from "react-map-gl/maplibre";
 import type { BaseMapType, MapProjections } from "../../lib/types";
 
@@ -15,7 +15,7 @@ interface MapStateStore extends ViewState {
   padding: PaddingOptions;
   projection: MapProjections;
   baseMap: BaseMapType;
-  viewportBounds?: [number, number, number, number];
+  viewportBounds?: LngLatBounds;
   layersLoading: string[];
   actions: {
     setMapRef: (ref: Map | null) => void;
@@ -26,7 +26,7 @@ interface MapStateStore extends ViewState {
     setZoom: (zoom: number) => void;
     setProjection: (proj: MapProjections) => void;
     setBaseMap: (basemap: BaseMapType) => void;
-    setViewportBounds: (bounds: [number, number, number, number]) => void;
+    setViewportBounds: (bounds: LngLatBounds) => void;
   };
 }
 

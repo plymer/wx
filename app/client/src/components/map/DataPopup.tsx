@@ -1,8 +1,9 @@
-import { useHighlightSigWx } from "@/hooks/useHighlightSigWx";
+import { SigWx } from "@/components/observations/SigWx";
 import type { ParsedTAF } from "@/lib/types";
-import { checkIfInBounds, formatSigWx } from "@/lib/utils";
+import { formatSigWx } from "@/lib/utils";
 import { usePopupData, useUIActions } from "@/stateStores/map/ui";
 import { useRef } from "react";
+import { LngLatBounds } from "maplibre-gl";
 import { Popup, type PopupInstance } from "react-map-gl/maplibre";
 import Button from "../ui/Button";
 import { AlertTriangle, CircleAlert, OctagonAlert, OctagonX, X } from "lucide-react";
@@ -20,14 +21,14 @@ export const DataPopup = () => {
     popupRef.current?.remove();
   };
 
-  const { highlightSigWx } = useHighlightSigWx();
-
   if (!viewport || !popupData || popupData.features.length === 0) return null;
 
   const { lng, lat } = popupData.lngLat;
 
+  const boundsToCheck = new LngLatBounds(viewport.getNorthEast(), viewport.getSouthWest());
+
   // if we move the map too far from the popup, close it
-  if (!checkIfInBounds([lng, lat], viewport)) handleClose();
+  if (!boundsToCheck.contains(popupData.lngLat)) handleClose();
 
   const featureList = popupData.features;
 
@@ -56,7 +57,7 @@ export const DataPopup = () => {
       className="md:w-100 max-md:w-60 max-w-3/4 text-white bg-transparent"
     >
       <div className="flex flex-col gap-2 justify-center items-center">
-        <div className="flex flex-col gap-2 max-h-[33dvh] w-full overflow-y-auto">
+        <div className="flex flex-col gap-2 max-h-[33dvh] w-full overflow-y-auto overflow-x-clip rounded-md bg-radial-[at_0%_0%] from-neutral-700 to-neutral-800 to-90%">
           {featureList
             .sort((a, b) => {
               if (a.properties.dataType === "publicAlert" && b.properties.dataType !== "publicAlert") {
@@ -112,17 +113,21 @@ export const DataPopup = () => {
                   const parsedTaf = taf ? (formatSigWx(taf, "taf") as ParsedTAF) : null;
 
                   return (
-                    <div key={siteId}>
+                    <div key={siteId} className="border border-neutral-600 rounded-md p-2">
                       <h1 className="font-bold mb-1 text-center">
                         {siteName}, {siteCountry === "US" || siteCountry === "CA" ? siteState : siteCountry}
                       </h1>
                       <div className="font-mono">
-                        {parsedMetar && <div className="-indent-2 ms-2">{highlightSigWx(parsedMetar)}</div>}
+                        {parsedMetar && (
+                          <div className="-indent-2 ms-2">
+                            <SigWx text={parsedMetar} />
+                          </div>
+                        )}
                         {!hasOtherFeatures && !hasOtherMetars && (
                           <>
                             {parsedTaf?.main && (
                               <div className="border-t mt-2 pt-2 max-md:hidden ms-2 -indent-2">
-                                {highlightSigWx(parsedTaf.main)}
+                                <SigWx text={parsedTaf.main} />
                               </div>
                             )}
                             {parsedTaf?.partPeriods?.map((p, i) => (
@@ -130,7 +135,7 @@ export const DataPopup = () => {
                                 className={`max-md:hidden ${p.startsWith("FM") ? "-indent-2 ms-4" : "-indent-4 ms-8"}`}
                                 key={i}
                               >
-                                {highlightSigWx(p)}
+                                <SigWx text={p} />
                               </div>
                             ))}
                             {parsedTaf?.rmk && <div className="max-md:hidden ms-4 -indent-2">{parsedTaf.rmk}</div>}
@@ -184,18 +189,21 @@ export const DataPopup = () => {
 
                   const headerColour =
                     alertProps.colour === "red"
-                      ? "bg-red-800"
+                      ? "bg-linear-to-r from-red-800 to-red-900"
                       : alertProps.colour === "yellow"
-                        ? "bg-yellow-400"
+                        ? "bg-linear-to-r from-yellow-400 to-yellow-300"
                         : alertProps.colour === "orange"
-                          ? "bg-orange-600"
-                          : "bg-neutral-400";
+                          ? "bg-linear-to-r from-orange-700 to-orange-600"
+                          : "bg-linear-to-r from-neutral-500 to-neutral-400";
                   const textColour = alertProps.colour === "yellow" ? "text-black" : "text-white";
 
                   return (
-                    <div key={new Date(alertProps.issueTime).getTime()} className="p-2">
+                    <div
+                      key={new Date(alertProps.issueTime).getTime()}
+                      className="border rounded-md border-neutral-600"
+                    >
                       <div
-                        className={`grid grid-cols-7 gap-2  items-center text-center ${headerColour} ${textColour} rounded-md p-2`}
+                        className={`grid grid-cols-7 gap-2 items-center text-center ${headerColour} ${textColour} rounded-t p-2`}
                       >
                         <div className="flex justify-center">
                           {alertProps.type !== "watch" && alertProps.type !== "warning" && <CircleAlert />}
@@ -215,9 +223,9 @@ export const DataPopup = () => {
             })}
         </div>
 
-        <Button className="max-w-40" variant={"default"} onClick={handleClose}>
+        <Button className="w-full" variant={"default"} onClick={handleClose}>
           <X />
-          Close Details
+          Close
         </Button>
         {/* <Button className="mt-2" variant={"default"} onClick={handleClose}>
           <Plus />

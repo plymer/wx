@@ -183,13 +183,6 @@ export function hasValidCoordinates(coords: Position) {
   return !isValidCoords;
 }
 
-export function checkIfInBounds(coords: Position, viewport: [number, number, number, number]) {
-  const isInBounds =
-    coords[0] >= viewport[0] && coords[0] <= viewport[2] && coords[1] >= viewport[1] && coords[1] <= viewport[3];
-
-  return isInBounds;
-}
-
 /**
  * Filters out points that are too close to each other
  * @param input A GeoJSON FeatureCollection of Points

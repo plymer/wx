@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useHighlightSigWx } from "@/hooks/useHighlightSigWx";
+import { SigWx } from "@/components/observations/SigWx";
 import { convertMetarWinds, formatSigWx } from "@/lib/utils";
 import { AlertOctagon } from "lucide-react";
 import { useUnits } from "@/stateStores/observations";
@@ -11,7 +11,6 @@ interface Props {
 const METARs = ({ data }: Props) => {
   const scrollTargetRef = useRef<null | HTMLDivElement>(null);
   const units = useUnits();
-  const { highlightSigWx } = useHighlightSigWx();
 
   useEffect(() => {
     scrollTargetRef.current?.scrollIntoView({ behavior: "instant" });
@@ -27,7 +26,7 @@ const METARs = ({ data }: Props) => {
       <div>
         {parsedMetars.map((m: string, i: number) => (
           <div className="font-mono px-6 odd:bg-muted even:bg-muted-foreground ps-10 -indent-8" key={i}>
-            {highlightSigWx(convertMetarWinds(m, units))}
+            <SigWx text={convertMetarWinds(m, units)} />
           </div>
         ))}
         <div ref={scrollTargetRef}></div>

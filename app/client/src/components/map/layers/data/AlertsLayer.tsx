@@ -52,6 +52,8 @@ export const AlertsLayer = ({ override }: Props) => {
     api.wxmap.wxmapPublicAlerts.queryOptions(undefined, { trpc: { context: { skipBatch: true } } }),
   );
 
+  console.log(data?.features.find((f) => f.properties.text.includes("funnel")));
+
   useMapLoadingState("alerts", isFetching);
 
   const filter: FilterSpecification =

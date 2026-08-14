@@ -31,15 +31,7 @@ export function useUpdateMapViewstate() {
       mapActions.setLatitude(viewState.latitude);
       mapActions.setZoom(viewState.zoom);
 
-      const bounds = map.getBounds();
-      const newViewport: [number, number, number, number] = [
-        bounds.getWest(),
-        bounds.getSouth(),
-        bounds.getEast(),
-        bounds.getNorth(),
-      ];
-
-      mapActions.setViewportBounds(newViewport);
+      mapActions.setViewportBounds(map.getBounds());
     },
     [mapActions],
   );
