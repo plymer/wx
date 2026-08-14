@@ -31,8 +31,6 @@ const applyMotionVector = (
   // direction is in degrees, or can be null for STNR Xmets
   const direction = feature.properties.direction ?? 0;
 
-  console.log(elapsedTime, spd, direction);
-
   // nautical miles traveled in the elapsed time
   const distance = spd * elapsedTime;
 
@@ -51,8 +49,6 @@ export const AlertsLayer = ({ override }: Props) => {
   const { data, isFetching } = useQuery(
     api.wxmap.wxmapPublicAlerts.queryOptions(undefined, { trpc: { context: { skipBatch: true } } }),
   );
-
-  console.log(data?.features.find((f) => f.properties.text.includes("funnel")));
 
   useMapLoadingState("alerts", isFetching);
 
