@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-import type { Map, LngLatBounds } from "maplibre-gl";
+import type { Map } from "maplibre-gl";
 import type { PaddingOptions, ViewState } from "react-map-gl/maplibre";
 import type { BaseMapType, MapProjections } from "../../lib/types";
 
@@ -15,7 +15,6 @@ interface MapStateStore extends ViewState {
   padding: PaddingOptions;
   projection: MapProjections;
   baseMap: BaseMapType;
-  viewportBounds?: LngLatBounds;
   layersLoading: string[];
   actions: {
     setMapRef: (ref: Map | null) => void;
@@ -26,7 +25,6 @@ interface MapStateStore extends ViewState {
     setZoom: (zoom: number) => void;
     setProjection: (proj: MapProjections) => void;
     setBaseMap: (basemap: BaseMapType) => void;
-    setViewportBounds: (bounds: LngLatBounds) => void;
   };
 }
 
@@ -43,7 +41,6 @@ const useMapViewState = create<MapStateStore>()(
       padding: { top: 0, left: 0, right: 0, bottom: 0 },
       projection: "mercator",
       baseMap: "hillshade",
-      viewportBounds: undefined,
       layersLoading: [],
       actions: {
         setMapRef: (newRef) => set(() => ({ mapRef: newRef })),
@@ -62,7 +59,6 @@ const useMapViewState = create<MapStateStore>()(
         setZoom: (newZoom) => set(() => ({ zoom: newZoom })),
         setProjection: (newProjection) => set(() => ({ projection: newProjection })),
         setBaseMap: (newBaseMap) => set(() => ({ baseMap: newBaseMap })),
-        setViewportBounds: (newBounds) => set(() => ({ viewportBounds: newBounds })),
       },
     }),
     {
@@ -73,7 +69,6 @@ const useMapViewState = create<MapStateStore>()(
           zoom: state.zoom,
           projection: state.projection,
           baseMap: state.baseMap,
-          viewportBounds: state.viewportBounds,
         }) as Partial<MapStateStore>,
       merge: (persistedState, currentState) => ({
         ...currentState,
@@ -95,6 +90,5 @@ export const usePitch = () => useMapViewState((state) => state.pitch);
 export const usePadding = () => useMapViewState((state) => state.padding);
 export const useProjection = () => useMapViewState((state) => state.projection);
 export const useBaseMap = () => useMapViewState((state) => state.baseMap);
-export const useViewportBounds = () => useMapViewState((state) => state.viewportBounds);
 export const useLayersLoading = () => useMapViewState((state) => state.layersLoading);
 export const useMapStateActions = () => useMapViewState((state) => state.actions);

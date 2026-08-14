@@ -27,7 +27,7 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
   useRegisterMaplibreWorker();
 
   // subscribe to our global state stores
-  const { setMapRef, setViewportBounds } = useMapStateActions();
+  const { setMapRef } = useMapStateActions();
   const { updateFromMapEvent } = useUpdateMapViewstate();
   const { setPopupData } = useUIActions();
 
@@ -62,9 +62,6 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
   const onMapLoad = (e: MapLibreEvent) => {
     // Store map reference in mapState
     setMapRef(e.target);
-
-    // initialize the map bounds
-    setViewportBounds(e.target.getBounds());
 
     // Set base layers
     setBaseMapLayers(e.target.getLayersOrder());

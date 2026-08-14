@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useMapStateActions, useViewportBounds } from "../stateStores/map/mapView";
+import { useMapStateActions } from "../stateStores/map/mapView";
+import { usePopupData, useUIActions } from "../stateStores/map/ui";
 // import { SiteMetaData } from "../lib/types";
 // import { checkIfInBounds } from "@/lib/utils";
 import { Map } from "maplibre-gl";
@@ -11,14 +12,15 @@ import type { ViewState } from "react-map-gl/maplibre";
  */
 export function useUpdateMapViewstate() {
   const mapActions = useMapStateActions();
-  const viewport = useViewportBounds();
 
-  const viewportRef = useRef(viewport);
+  const popupData = usePopupData();
+  const { setPopupData } = useUIActions();
 
-  // keep the viewport ref up to date between renders
+  const popupDataRef = useRef(popupData);
+
   useEffect(() => {
-    viewportRef.current = viewport;
-  }, [viewport]);
+    popupDataRef.current = popupData;
+  }, [popupData]);
 
   const updateFromMapEvent = useCallback(
     (map: Map, viewState: ViewState) => {
@@ -31,22 +33,15 @@ export function useUpdateMapViewstate() {
       mapActions.setLatitude(viewState.latitude);
       mapActions.setZoom(viewState.zoom);
 
-      mapActions.setViewportBounds(map.getBounds());
-    },
-    [mapActions],
-  );
+      const bounds = map.getBounds();
 
-  // const recomputeViewport = useCallback(() => {
-  //   requestAnimationFrame(() => {
-  //     if (mapRef) {
-  //       // request a frame to be rendered and then update our viewport bounds so that our viewport-filtered data renders correctly
-  //       const bounds = mapRef.getBounds();
-  //       if (bounds) {
-  //         mapActions.setViewportBounds([bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()]);
-  //       }
-  //     }
-  //   });
-  // }, []);
+      const currentPopupData = popupDataRef.current;
+      if (currentPopupData && !bounds.contains(currentPopupData.lngLat)) {
+        setPopupData(undefined);
+      }
+    },
+    [mapActions, setPopupData],
+  );
 
   // const centerOnSite = useCallback(
   //   (site: SiteMetaData[0]) => {

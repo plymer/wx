@@ -3,11 +3,10 @@ import type { ParsedTAF } from "@/lib/types";
 import { formatSigWx } from "@/lib/utils";
 import { usePopupData, useUIActions } from "@/stateStores/map/ui";
 import { useRef } from "react";
-import { LngLatBounds } from "maplibre-gl";
+
 import { Popup, type PopupInstance } from "react-map-gl/maplibre";
 import Button from "../ui/Button";
 import { AlertTriangle, CircleAlert, OctagonAlert, OctagonX, X } from "lucide-react";
-import { useViewportBounds } from "@/stateStores/map/mapView";
 import type { StationPlotPopupData, WxOAlertMetadataProperties } from "@shared/lib/types";
 import type { XmetEventData } from "@shared/lib/alphanumeric.types";
 
@@ -15,20 +14,13 @@ export const DataPopup = () => {
   const popupData = usePopupData();
   const { setPopupData } = useUIActions();
   const popupRef = useRef<PopupInstance>(null);
-  const viewport = useViewportBounds();
 
   const handleClose = () => {
     popupRef.current?.remove();
+    setPopupData(undefined);
   };
 
-  if (!viewport || !popupData || popupData.features.length === 0) return null;
-
-  const { lng, lat } = popupData.lngLat;
-
-  const boundsToCheck = new LngLatBounds(viewport.getNorthEast(), viewport.getSouthWest());
-
-  // if we move the map too far from the popup, close it
-  if (!boundsToCheck.contains(popupData.lngLat)) handleClose();
+  if (!popupData || popupData.features.length === 0) return null;
 
   const featureList = popupData.features;
 
@@ -47,11 +39,10 @@ export const DataPopup = () => {
   return (
     <Popup
       ref={popupRef}
-      latitude={lat}
-      longitude={lng}
+      latitude={popupData.lngLat.lat}
+      longitude={popupData.lngLat.lng}
       offset={10}
       maxWidth="inherit"
-      onClose={() => setPopupData(undefined)}
       closeButton={false}
       closeOnMove={false}
       className="md:w-100 max-md:w-60 max-w-3/4 text-white bg-transparent"
@@ -113,11 +104,11 @@ export const DataPopup = () => {
                   const parsedTaf = taf ? (formatSigWx(taf, "taf") as ParsedTAF) : null;
 
                   return (
-                    <div key={siteId} className="border border-neutral-600 rounded-md p-2">
-                      <h1 className="font-bold mb-1 text-center">
+                    <div key={siteId} className="border border-neutral-600 rounded-md ">
+                      <h1 className="font-bold mb-1 text-center bg-neutral-600 px-2 py-0.5">
                         {siteName}, {siteCountry === "US" || siteCountry === "CA" ? siteState : siteCountry}
                       </h1>
-                      <div className="font-mono">
+                      <div className="font-mono px-2">
                         {parsedMetar && (
                           <div className="-indent-2 ms-2">
                             <SigWx text={parsedMetar} />
@@ -156,7 +147,7 @@ export const DataPopup = () => {
                   return (
                     <div
                       key={sigmetProps.sequenceId}
-                      className={`text-[0.6rem] font-bold bg-red-800 rounded-md p-1
+                      className={`text-[0.6rem] font-bold bg-linear-to-r from-red-800 to-red-900 rounded-md p-1
                       `}
                     >
                       <div className="flex justify-around font-mono text-center place-items-center">
