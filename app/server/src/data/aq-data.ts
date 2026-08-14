@@ -91,8 +91,5 @@ export async function getAqData() {
     }),
   );
 
-  const holdHours = 4;
-  const cleanUpTime = new Date(now.getTime() - holdHours * HOUR);
-
-  await db.delete(aqData).where(lt(aqData.validTime, cleanUpTime));
+  await db.delete(aqData).where(lt(aqData.validTime, new Date(now.getTime() - 4 * HOUR)));
 }
