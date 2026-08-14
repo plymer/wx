@@ -10,6 +10,32 @@ import { limitResultsByKeys } from "../lib/utils.js";
 import { publicProcedure, router } from "../services/trpc.js";
 import { pgDb as db } from "../services/database.js";
 import { cacheClient } from "../services/redis.js";
+import { sql } from "drizzle-orm";
+
+type LeadAlertRow = {
+  id: string;
+  alertCode: string;
+  type: AlertType;
+  zoneType: "fixed" | "freeform";
+  alertName: string;
+  alertNameShort: string;
+  program: string;
+  startTime: number;
+  expiryTime: number;
+  timezone: string;
+  issueTimeText: string;
+  issuingOfficeTZ: string;
+  text: string;
+  bannerText: string;
+  headerText: string;
+  colour: AlertColour;
+  impact: string | null;
+  confidence: string | null;
+  level: number | null;
+  direction: number | null;
+  speed: number | null;
+  coords: string | null;
+};
 
 export const wxmapRouter = router({
   wxmapPopupData: publicProcedure.query(async (): Promise<FeatureCollection<Point, StationPlotPopupData>> => {
@@ -109,29 +135,78 @@ export const wxmapRouter = router({
       }
 
       try {
-        const alerts = await db.query.publicAlerts.findMany({
-          where: { issueTime: { gt: new Date(Date.now() - 12 * HOUR) } },
-        });
+        // const alerts = await db.query.publicAlerts.findMany({
+        //   where: { issueTime: { gt: new Date(Date.now() - 12 * HOUR) } },
+        // });
 
-        const features: Feature<MultiPolygon, WxOAlertMapProperties>[] = alerts
-          .filter((alert) => alert.coords !== null && alert.colour !== undefined)
+        const leadAlerts = await db
+          .execute(sql<LeadAlertRow>`
+          SELECT
+            id,
+            alert_code as "alertCode",
+            type,
+            zone_type as "zoneType",
+            alert_name as "alertName",
+            alert_name_short as "alertNameShort",
+            program,
+            (EXTRACT(EPOCH FROM issue_time) * 1000)::double precision as "startTime",
+            COALESCE(
+              LEAD((EXTRACT(EPOCH FROM issue_time) * 1000)::double precision)
+                OVER (
+                  PARTITION BY id
+                  ORDER BY issue_time
+                ),
+              (EXTRACT(EPOCH FROM expiry) * 1000)::double precision
+            ) as "expiryTime",
+            timezone,
+            issue_time_text as "issueTimeText",
+            issuing_office_tz as "issuingOfficeTZ",
+            text,
+            banner_text as "bannerText",
+            header_text as "headerText",
+            colour,
+            impact,
+            confidence,
+            level,
+            direction,
+            speed,
+            coords
+          FROM public_alerts
+          WHERE issue_time > NOW() - INTERVAL '12 hours'          
+          `)
+          .then((results) => results.rows);
+
+        const features: Feature<MultiPolygon, WxOAlertMapProperties>[] = leadAlerts
+          .filter((alert): alert is LeadAlertRow & { coords: string } => alert.coords !== null)
           .map((alert) => {
-            const { coords, ...properties } = alert;
-            const geometry = JSON.parse(coords!) as MultiPolygon;
+            const geometry = JSON.parse(alert.coords) as MultiPolygon;
 
             return {
               type: "Feature",
               geometry,
               properties: {
-                ...properties,
+                alertCode: alert.alertCode,
+                zoneType: alert.zoneType,
+                alertName: alert.alertName,
+                alertNameShort: alert.alertNameShort,
+                program: alert.program,
+                timezone: alert.timezone,
+                issueTimeText: alert.issueTimeText,
+                issuingOfficeTZ: alert.issuingOfficeTZ,
+                id: alert.id,
+                text: alert.text,
+                bannerText: alert.bannerText,
+                headerText: alert.headerText,
                 dataType: "publicAlert",
-                alertType: properties.type as AlertType,
-                startTime: new Date(properties.issueTime).getTime(),
-                expiryTime: new Date(properties.expiry).getTime(),
-                colour: properties.colour as AlertColour,
-                impact: properties.impact ?? "",
-                confidence: properties.confidence ?? "",
-                level: properties.level ?? 0,
+                alertType: alert.type,
+                startTime: alert.startTime,
+                expiryTime: alert.expiryTime,
+                colour: alert.colour,
+                impact: alert.impact ?? "",
+                confidence: alert.confidence ?? "",
+                direction: alert.direction,
+                speed: alert.speed,
+                level: alert.level ?? 0,
               },
             };
           });

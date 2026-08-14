@@ -165,12 +165,7 @@ export const AlertsLayer = ({ override }: Props) => {
         layout={{
           "symbol-placement": ["step", ["zoom"], "point", 8, "line"],
           "symbol-spacing": 250,
-          "text-field": [
-            "concat",
-            ["get", "bannerText"],
-            // "\n\n",
-            // ["<=", ["get", "start_time"], ["to-number", displayTime]],
-          ],
+          "text-field": ["get", "bannerText"],
           "text-size": 12,
           "text-allow-overlap": true,
           "text-offset": ["step", ["zoom"], ["literal", [0, 0]], 8, ["literal", [0, 1]]],
