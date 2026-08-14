@@ -29,7 +29,7 @@ export const SatelliteLayer = ({ domain }: Props) => {
 
   const { data: euData } = useQuery(
     api.wms.eumetsat.queryOptions(
-      { domain: "europe", product: "mtg_fd:rgb_fog" },
+      { domain: "europe", product: "msg_fes:rgb_ash" },
       {
         enabled: baseMap === "hillshade" && isVisible && showSatellite && domain === "europe",
         refetchInterval: MINUTE,
@@ -40,7 +40,7 @@ export const SatelliteLayer = ({ domain }: Props) => {
 
   const { data: iOData } = useQuery(
     api.wms.eumetsat.queryOptions(
-      { domain: "indianOcean", product: "msg_iodc:rgb_fog" },
+      { domain: "indianOcean", product: "msg_iodc:rgb_ash" },
       {
         enabled: baseMap === "hillshade" && isVisible && showSatellite && domain === "indianOcean",
         refetchInterval: MINUTE,

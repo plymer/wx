@@ -159,9 +159,14 @@ export const wmsRouter = router({
 
       const { parser } = new WMSXMLParser();
 
-      const xml = await fetch(EUMETSAT_GETCAPABILITIES, { headers: DEFAULT_REMOTE_HEADERS }).then(async (response) =>
-        parser.parse(await response.text()),
-      );
+      const xml = await fetch(EUMETSAT_GETCAPABILITIES, { headers: DEFAULT_REMOTE_HEADERS })
+        .then(async (response) => parser.parse(await response.text()))
+        .catch((error) => {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error instanceof Error ? error.message : "Unknown error",
+          });
+        });
 
       const allLayers: WMSLayer[] = xml.wmsCapabilities.capability.layer.layer
         .filter((layer: any) => layer.title.includes("- 0 degree") || layer.title.includes("- Indian Ocean"))
