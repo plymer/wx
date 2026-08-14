@@ -203,14 +203,26 @@ export async function getPublicAlerts() {
       coords: JSON.stringify(feature.geometry),
     }));
 
+    // dedupe by the same composite key used in onConflictDoUpdate to avoid
+    // "cannot affect row a second time" when multiple rows share one key in a single batch
+    const dedupedOutput = [
+      ...new Map(
+        output.map((row) => {
+          const issueTimeKey = row.issueTime instanceof Date ? row.issueTime.toISOString() : String(row.issueTime);
+          const expiryKey = row.expiry instanceof Date ? row.expiry.toISOString() : String(row.expiry);
+          return [`${String(row.id)}|${issueTimeKey}|${expiryKey}`, row] as const;
+        }),
+      ).values(),
+    ];
+
     const now = new Date();
 
     // now that we have the simplified, compacted features, let's write them to the database
     await db.transaction(async (tx) => {
-      if (output.length > 0) {
+      if (dedupedOutput.length > 0) {
         await tx
           .insert(publicAlerts)
-          .values(output)
+          .values(dedupedOutput)
           .onConflictDoUpdate({
             target: [publicAlerts.id, publicAlerts.issueTime, publicAlerts.expiry],
             set: {
@@ -256,10 +268,10 @@ export async function getPublicAlerts() {
 
       // end any stale alerts by updating their expiry time to now
       await tx.update(publicAlerts).set({ expiry: now }).where(inArray(publicAlerts.id, staleAlertIds));
-
-      // finally, let's purge the database of alerts that are older than 24 hours
-      await tx.delete(publicAlerts).where(lt(publicAlerts.issueTime, new Date(now.getTime() - 24 * HOUR)));
     });
+
+    // finally, let's purge the database of alerts that are older than 24 hours
+    await db.delete(publicAlerts).where(lt(publicAlerts.issueTime, new Date(now.getTime() - 24 * HOUR)));
   } catch (error) {
     throw new Error(`[WXO] [ALERTS] Error fetching public alerts: ${error}`);
   }
