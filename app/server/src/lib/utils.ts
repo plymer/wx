@@ -91,6 +91,17 @@ export function transformName(name: string): string {
 }
 
 /**
+ * Take a date object and format it into a string of the form "HH:MMZ"
+ * @param time The date we want to format
+ * @returns a string of the form "HH:MMZ" that represents the time in UTC
+ */
+function formatSunTime(time: Date) {
+  const hours = time.getUTCHours().toString().padStart(2, "0");
+  const minutes = time.getUTCMinutes().toString().padStart(2, "0");
+  return `${hours}:${minutes}Z`;
+}
+
+/**
  * Calculate the sunrise and sunset times for a given longitude-latitude tuple
  * @param [lon, lat] a longitude-latitude tuple for the point requested
  * @returns rise and set strings formatted as "HH:MMZ" or "Never Up"/"Never Down" if the sun does not rise or set
@@ -100,7 +111,7 @@ export function getSunTimes([lon, lat]: Position): SunTimes {
   const times = getTimes(new Date(), lat, lon);
 
   const riseString = times.sunrise
-    ? `${times.sunrise.getUTCHours().toString().padStart(2, "0")}:${times.sunrise.getUTCMinutes().toString().padStart(2, "0")}Z`
+    ? formatSunTime(times.sunrise)
     : times.alwaysUp
       ? "Never Down"
       : times.alwaysDown
@@ -108,7 +119,7 @@ export function getSunTimes([lon, lat]: Position): SunTimes {
         : "---";
 
   const setString = times.sunset
-    ? leadZero(times.sunset.getUTCHours(), 2) + ":" + leadZero(times.sunset.getUTCMinutes(), 2) + "Z"
+    ? formatSunTime(times.sunset)
     : times.alwaysUp
       ? "Never Down"
       : times.alwaysDown

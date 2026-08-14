@@ -132,7 +132,7 @@ export const alphanumericRouter = router({
         ? "https://tgftp.nws.noaa.gov/data/raw/fo/focn45.cwwg..txt"
         : `https://weather.gc.ca/forecast/public_bulletins_e.html?Bulletin=${bulletin}.${office}`;
 
-    console.log("requesting bulletin from:", searchUrl);
+    console.log(`[API] Requesting public bulletin for: ${bulletin.toUpperCase()} - ${office.toUpperCase()}`);
 
     try {
       const bulletinData: string = await fetch(searchUrl, { headers: DEFAULT_REMOTE_HEADERS }).then((bulletin) =>

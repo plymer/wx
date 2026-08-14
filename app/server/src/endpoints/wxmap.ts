@@ -11,6 +11,7 @@ import { publicProcedure, router } from "../services/trpc.js";
 import { pgDb as db } from "../services/database.js";
 import { cacheClient } from "../services/redis.js";
 import { sql } from "drizzle-orm";
+import { POPUP_DATA_CACHE_KEY, PUBLIC_ALERTS_CACHE_KEY } from "../config/cache-keys.config.js";
 
 type LeadAlertRow = {
   id: string;
@@ -46,7 +47,7 @@ export const wxmapRouter = router({
       });
     }
 
-    const cachedData = await cacheClient.get("wxmap:popupData");
+    const cachedData = await cacheClient.get(POPUP_DATA_CACHE_KEY);
 
     if (cachedData) {
       console.log("[API] Cache HIT for wxmap popup data");
@@ -63,7 +64,7 @@ export const wxmapRouter = router({
         },
         orderBy: { validTime: "asc" },
       })
-      .then((results) => limitResultsByKeys(results, 3, "siteId"));
+      .then((results) => limitResultsByKeys(results, 1, "siteId"));
 
     const metarList: Record<string, string[]> = {};
     metarsQuery.forEach((m) => {
@@ -120,7 +121,7 @@ export const wxmapRouter = router({
 
     const output = turf.featureCollection(popupData);
 
-    await cacheClient.setEx("wxmap:popupData", 60 * 10, JSON.stringify(output));
+    await cacheClient.setEx(POPUP_DATA_CACHE_KEY, 60 * 10, JSON.stringify(output));
 
     return output;
   }),
@@ -133,6 +134,15 @@ export const wxmapRouter = router({
           message: "No database connection available",
         });
       }
+
+      const cachedData = await cacheClient.get(PUBLIC_ALERTS_CACHE_KEY);
+
+      if (cachedData) {
+        console.log("[API] Cache HIT for Public Alerts data");
+        return JSON.parse(cachedData) as FeatureCollection<MultiPolygon, WxOAlertMapProperties>;
+      }
+
+      console.log("[API] Cache MISS for Public Alerts data. Fetching from source...");
 
       try {
         // const alerts = await db.query.publicAlerts.findMany({
@@ -215,6 +225,8 @@ export const wxmapRouter = router({
           type: "FeatureCollection",
           features,
         };
+
+        await cacheClient.setEx(PUBLIC_ALERTS_CACHE_KEY, 60 * 10, JSON.stringify(featureCollection));
 
         return featureCollection;
       } catch (error) {
