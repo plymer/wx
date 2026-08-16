@@ -182,7 +182,7 @@ export const wxmapRouter = router({
             speed,
             coords
           FROM public_alerts
-          WHERE issue_time > NOW() - INTERVAL '12 hours'          
+          WHERE issue_time > NOW() - INTERVAL '24 hours'          
           `)
           .then((results) => results.rows);
 

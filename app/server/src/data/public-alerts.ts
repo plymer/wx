@@ -24,7 +24,9 @@ export async function getPublicAlerts() {
   const sourceUrl = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.en.geojson";
 
   try {
-    const response = await fetch(sourceUrl, { headers: DEFAULT_REMOTE_HEADERS });
+    const response = await fetch(sourceUrl, {
+      headers: DEFAULT_REMOTE_HEADERS,
+    });
     if (!response.ok) {
       throw new Error(`[WXO] [ALERTS] Failed to fetch public alerts: ${response.statusText}`);
     }
@@ -141,7 +143,9 @@ export async function getPublicAlerts() {
       } else {
         // combine all polygons with the same alert code
         const featureCollection = turf.featureCollection(features);
-        const dissolved = turf.dissolve(featureCollection, { propertyName: "id" });
+        const dissolved = turf.dissolve(featureCollection, {
+          propertyName: "id",
+        });
 
         // convert dissolved Polygons back to MultiPolygons
         dissolved.features.forEach((dissolvedFeature) => {
@@ -220,35 +224,7 @@ export async function getPublicAlerts() {
     // now that we have the simplified, compacted features, let's write them to the database
     await db.transaction(async (tx) => {
       if (dedupedOutput.length > 0) {
-        await tx
-          .insert(publicAlerts)
-          .values(dedupedOutput)
-          .onConflictDoUpdate({
-            target: [publicAlerts.id, publicAlerts.issueTime, publicAlerts.expiry],
-            set: {
-              alertCode: publicAlerts.alertCode,
-              type: publicAlerts.type,
-              zoneType: publicAlerts.zoneType,
-              alertName: publicAlerts.alertName,
-              alertNameShort: publicAlerts.alertNameShort,
-              program: publicAlerts.program,
-              issueTime: publicAlerts.issueTime,
-              expiry: publicAlerts.expiry,
-              timezone: publicAlerts.timezone,
-              issueTimeText: publicAlerts.issueTimeText,
-              issuingOfficeTZ: publicAlerts.issuingOfficeTZ,
-              text: publicAlerts.text,
-              bannerText: publicAlerts.bannerText,
-              headerText: publicAlerts.headerText,
-              colour: publicAlerts.colour,
-              impact: publicAlerts.impact,
-              confidence: publicAlerts.confidence,
-              level: publicAlerts.level,
-              direction: publicAlerts.direction,
-              speed: publicAlerts.speed,
-              coords: publicAlerts.coords,
-            },
-          });
+        await tx.insert(publicAlerts).values(dedupedOutput).onConflictDoNothing();
       }
 
       // extract alert ids from the database that are no longer present in the payload and have not yet expired
