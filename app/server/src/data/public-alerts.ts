@@ -147,25 +147,26 @@ export async function getPublicAlerts() {
           propertyName: "id",
         });
 
-        // convert dissolved Polygons back to MultiPolygons
+        // dissolve only merges touching/overlapping polygons, so non-contiguous
+        // polygons come back as separate features; combine them all into a
+        // single MultiPolygon so each alert stays one feature
+        const coordinates: MultiPolygon["coordinates"] = [];
         dissolved.features.forEach((dissolvedFeature) => {
-          let geometry: MultiPolygon;
-
           if (dissolvedFeature.geometry.type === "Polygon") {
-            geometry = {
-              type: "MultiPolygon",
-              coordinates: [dissolvedFeature.geometry.coordinates],
-            };
+            coordinates.push(dissolvedFeature.geometry.coordinates);
           } else {
             // dissolve can sometimes return MultiPolygon if there are disjoint areas
-            geometry = dissolvedFeature.geometry as unknown as MultiPolygon;
+            coordinates.push(...(dissolvedFeature.geometry as unknown as MultiPolygon).coordinates);
           }
+        });
 
-          dissolvedFeatures.push({
-            type: "Feature",
-            geometry,
-            properties,
-          });
+        dissolvedFeatures.push({
+          type: "Feature",
+          geometry: {
+            type: "MultiPolygon",
+            coordinates,
+          },
+          properties,
         });
       }
     });
@@ -207,24 +208,12 @@ export async function getPublicAlerts() {
       coords: JSON.stringify(feature.geometry),
     }));
 
-    // dedupe by the same composite key used in onConflictDoUpdate to avoid
-    // "cannot affect row a second time" when multiple rows share one key in a single batch
-    const dedupedOutput = [
-      ...new Map(
-        output.map((row) => {
-          const issueTimeKey = row.issueTime instanceof Date ? row.issueTime.toISOString() : String(row.issueTime);
-          const expiryKey = row.expiry instanceof Date ? row.expiry.toISOString() : String(row.expiry);
-          return [`${String(row.id)}|${issueTimeKey}|${expiryKey}`, row] as const;
-        }),
-      ).values(),
-    ];
-
     const now = new Date();
 
     // now that we have the simplified, compacted features, let's write them to the database
     await db.transaction(async (tx) => {
-      if (dedupedOutput.length > 0) {
-        await tx.insert(publicAlerts).values(dedupedOutput).onConflictDoNothing();
+      if (output.length > 0) {
+        await tx.insert(publicAlerts).values(output).onConflictDoNothing();
       }
 
       // extract alert ids from the database that are no longer present in the payload and have not yet expired
