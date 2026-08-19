@@ -1,45 +1,15 @@
 import { useMapLoadingState } from "@/hooks/useMapLoadingState";
 import { api } from "@/lib/trpc";
 import { usePublicAlertsFilterLevel, useShowPublicAlerts } from "@/stateStores/map/vectorData";
-import { HOUR } from "@shared/lib/constants";
 import { useQuery } from "@tanstack/react-query";
 import type { FilterSpecification } from "maplibre-gl";
 import { Source, Layer } from "react-map-gl/maplibre";
-import * as turf from "@turf/turf";
-import type { Feature, MultiPolygon } from "geojson";
-import type { WxOAlertMapProperties } from "@shared/lib/types";
+
 import { useDisplayTime } from "@/hooks/useDisplayTime";
 
 interface Props {
   override?: boolean;
 }
-
-const applyMotionVector = (
-  displayTime: number,
-  startTime: number,
-  feature: Feature<MultiPolygon, WxOAlertMapProperties>,
-) => {
-  // if we have no motion vector, our object is stationary so bail out
-  if (!feature || !feature.properties || !feature.properties.speed || !feature.properties.direction) return feature;
-
-  // calculate the elapsed time in milliseconds
-  const elapsedTime = (displayTime - startTime) / HOUR;
-
-  // speed is in knots
-  const spd = feature.properties.speed;
-
-  // direction is in degrees, or can be null for STNR Xmets
-  const direction = feature.properties.direction ?? 0;
-
-  // nautical miles traveled in the elapsed time
-  const distance = spd * elapsedTime;
-
-  const translated = turf.transformTranslate(turf.multiPolygon(feature.geometry.coordinates), distance, direction, {
-    units: "kilometres",
-  });
-
-  return { ...translated, properties: feature.properties };
-};
 
 export const AlertsLayer = ({ override }: Props) => {
   const displayTime = useDisplayTime();
@@ -84,17 +54,8 @@ export const AlertsLayer = ({ override }: Props) => {
 
   if (!override && !enabled) return null;
 
-  const features = data?.features
-    .filter((f) => {
-      if (f.properties.zoneType === "freeform") {
-        return f.properties.startTime < displayTime;
-      }
-      return true;
-    })
-    .map((f) => applyMotionVector(displayTime, f.properties.startTime, f));
-
   return (
-    <Source id="wxo-alerts-source" type="geojson" data={{ type: "FeatureCollection", features: features ?? [] }}>
+    <Source id="wxo-alerts-source" type="geojson" data={{ type: "FeatureCollection", features: data?.features ?? [] }}>
       <Layer
         key="layer-wxo-alerts"
         id="layer-wxo-alerts"

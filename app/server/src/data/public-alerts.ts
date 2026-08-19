@@ -1,9 +1,8 @@
 import "dotenv/config";
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
-import type { WxOAlertMetadataProperties, WxOAlertFeatureProperties, TextDirection } from "../lib/types.js";
+import type { WxOAlertMetadataProperties, WxOAlertFeatureProperties } from "../lib/types.js";
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import * as turf from "@turf/turf";
-import { cardinalToDegrees } from "../lib/utils.js";
 import { pgDb as db } from "../services/database.js";
 
 import { publicAlerts } from "../db/schemas.drizzle.js";
@@ -63,34 +62,13 @@ export async function getPublicAlerts() {
         // add the alert id to the set of alert ids in the payload
         alertIdsInPayload.add(alertData.id);
 
-        // the new polygon text contains hex codes (\u00A0) in it (lmao wtf) so we need to remove them,
-        // otherwise the client will throw an error when trying to render the text
-        const text = alertData.text.replace(/[\u00A0\u202F]/g, " ");
-
         // we also need to parse the string to extract the motion vector from the text if the alert type is a 'freeform'
-
-        let direction: number | null = null;
-        let speed: number | null = null;
-
-        if (alertData.zoneType === "freeform") {
-          const motionVectorRegex = /moving\s+([a-z]+)\s+at\s+(\d{1,3})\s+km\/h/i;
-          const match = text.match(motionVectorRegex);
-          if (match) {
-            const directionStr = match[1].toUpperCase() as TextDirection;
-            speed = Number(match[2]); // convert speed to number
-
-            direction = cardinalToDegrees(directionStr);
-          }
-        }
 
         const newFeature: Feature<MultiPolygon, WxOAlertMetadataProperties> = {
           type: "Feature",
           geometry: feature.geometry,
           properties: {
             ...alertData,
-            text,
-            direction,
-            speed,
             dataType: "publicAlert",
           },
         };
@@ -203,8 +181,6 @@ export async function getPublicAlerts() {
       impact: feature.properties.impact,
       confidence: feature.properties.confidence,
       level: feature.properties.level,
-      direction: feature.properties.direction,
-      speed: feature.properties.speed,
       coords: JSON.stringify(feature.geometry),
     }));
 

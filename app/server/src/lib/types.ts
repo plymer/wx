@@ -393,8 +393,6 @@ export type WxOAlertMetadataProperties = {
   colour: AlertColour;
   impact: string;
   confidence: string;
-  direction: number | null;
-  speed: number | null;
   level: number;
   dataType: "publicAlert";
 };

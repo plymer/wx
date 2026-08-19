@@ -210,8 +210,6 @@ export const publicAlerts = snakeCase.table(
     impact: text(),
     confidence: text(),
     level: integer(),
-    direction: doublePrecision(),
-    speed: doublePrecision(),
     coords: text(),
   },
   (table) => [primaryKey({ columns: [table.id, table.issueTime, table.expiry] })],
