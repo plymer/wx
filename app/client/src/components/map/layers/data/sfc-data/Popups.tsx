@@ -38,11 +38,11 @@ export const Popups = ({ zoom }: Props) => {
             ["linear"],
             ["zoom"],
             ZOOM_THRESHOLDS.mini,
-            zoom * 3, // was 1.5
+            zoom * 2, // was 1.5
             ZOOM_THRESHOLDS.reduced,
-            12, // was 8
+            8, // was 8
             ZOOM_THRESHOLDS.maximum,
-            20, // was 10
+            11, // was 10
           ],
           "circle-opacity": 0,
         }}
