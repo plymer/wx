@@ -47,6 +47,8 @@ export const wxmapRouter = router({
       });
     }
 
+    const BLACKLIST = ["CXEG"]; // Exclude CXEG from tafs query
+
     const cachedData = await cacheClient.get(POPUP_DATA_CACHE_KEY);
 
     if (cachedData) {
@@ -58,7 +60,7 @@ export const wxmapRouter = router({
 
     const metarsQuery = await db.query.metars
       .findMany({
-        where: { validTime: { gt: new Date(Date.now() - 4 * HOUR) } },
+        where: { validTime: { gt: new Date(Date.now() - 4 * HOUR) }, siteId: { notIn: BLACKLIST } },
         with: {
           stations: { columns: { lat: true, lon: true, country: true, name: true, state: true } },
         },
@@ -79,7 +81,7 @@ export const wxmapRouter = router({
 
     const tafsQuery = await db.query.tafs
       .findMany({
-        where: { validTime: { gt: new Date(Date.now() - 8 * HOUR) } },
+        where: { validTime: { gt: new Date(Date.now() - 8 * HOUR) }, siteId: { notIn: BLACKLIST } },
         orderBy: { validTime: "asc" },
       })
       .then((results) => limitResultsByKeys(results, 1, "siteId"));
@@ -188,6 +190,10 @@ export const wxmapRouter = router({
           .filter((alert): alert is LeadAlertRow & { coords: string } => alert.coords !== null)
           .map((alert) => {
             const geometry = JSON.parse(alert.coords) as MultiPolygon;
+            const alertNameShort = alert.alertNameShort
+              .split(" ")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ");
 
             return {
               type: "Feature",
@@ -196,7 +202,7 @@ export const wxmapRouter = router({
                 alertCode: alert.alertCode,
                 zoneType: alert.zoneType,
                 alertName: alert.alertName,
-                alertNameShort: alert.alertNameShort,
+                alertNameShort,
                 program: alert.program,
                 timezone: alert.timezone,
                 issueTimeText: alert.issueTimeText,
