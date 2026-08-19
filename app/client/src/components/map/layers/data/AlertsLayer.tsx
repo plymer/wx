@@ -36,22 +36,6 @@ export const AlertsLayer = ({ override }: Props) => {
           [">", ["get", "expiryTime"], ["to-number", displayTime]],
         ];
 
-  const nonWarningCasingFilter: FilterSpecification =
-    filterAlertLevel === "convective"
-      ? [
-          "all",
-          ["in", ["get", "alertCode"], ["literal", ["STV", "STW", "TRW", "TRV"]]],
-          ["!=", ["get", "alertType"], "warning"],
-          ["<=", ["get", "startTime"], ["to-number", displayTime]],
-          [">", ["get", "expiryTime"], ["to-number", displayTime]],
-        ]
-      : [
-          "all",
-          ["!=", ["get", "alertType"], "warning"],
-          ["<=", ["get", "startTime"], ["to-number", displayTime]],
-          [">", ["get", "expiryTime"], ["to-number", displayTime]],
-        ];
-
   if (!override && !enabled) return null;
 
   return (
@@ -79,13 +63,21 @@ export const AlertsLayer = ({ override }: Props) => {
         key="layer-wxo-alerts-outline-casing"
         id="layer-wxo-alerts-outline-casing"
         beforeId="place_state"
-        filter={nonWarningCasingFilter}
+        filter={filter}
         type="line"
         paint={{
-          "line-color": "black",
-          "line-opacity": 1,
+          "line-color": ["case", ["!=", ["get", "alertType"], "warning"], "black", ["get", "colour"]],
+          "line-opacity": [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            5,
+            ["case", ["!=", ["get", "alertType"], "warning"], 1, 0],
+            7,
+            ["case", ["!=", ["get", "alertType"], "warning"], 1, 0.5],
+          ],
           "line-width": ["interpolate", ["linear"], ["zoom"], 2, 4, 8, 8],
-          "line-offset": 1,
+          "line-offset": ["case", ["!=", ["get", "alertType"], "warning"], 1, 5],
         }}
       />
       <Layer
@@ -117,7 +109,7 @@ export const AlertsLayer = ({ override }: Props) => {
         beforeId="place_state"
         filter={filter}
         type="symbol"
-        minzoom={4.75}
+        minzoom={3.8}
         paint={{
           "text-color": ["match", ["get", "alertType"], "statement", "white", ["get", "colour"]],
           "text-halo-color": "black",
@@ -126,11 +118,25 @@ export const AlertsLayer = ({ override }: Props) => {
         layout={{
           "symbol-placement": ["step", ["zoom"], "point", 8, "line"],
           "symbol-spacing": 250,
-          "text-field": ["get", "bannerText"],
+          "text-field": ["step", ["zoom"], ["get", "alertNameShort"], 6, ["get", "bannerText"]],
           "text-size": 12,
-          "text-allow-overlap": true,
-          "text-offset": ["step", ["zoom"], ["literal", [0, 0]], 8, ["literal", [0, 1]]],
+          "text-allow-overlap": ["step", ["zoom"], true, 8, false],
+          "text-variable-anchor": [
+            "top",
+            "bottom",
+            "center",
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+            "left",
+            "right",
+          ],
+          "text-justify": "auto",
+          "text-radial-offset": 0.5,
+          "text-padding": 1,
           "text-font": ["Open-Sans-Italic"],
+          "symbol-sort-key": ["get", "startTime"],
         }}
       />
     </Source>
