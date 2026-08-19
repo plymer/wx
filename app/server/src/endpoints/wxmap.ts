@@ -178,8 +178,6 @@ export const wxmapRouter = router({
             impact,
             confidence,
             level,
-            direction,
-            speed,
             coords
           FROM public_alerts
           WHERE issue_time > NOW() - INTERVAL '24 hours'          
@@ -214,8 +212,6 @@ export const wxmapRouter = router({
                 colour: alert.colour,
                 impact: alert.impact ?? "",
                 confidence: alert.confidence ?? "",
-                direction: alert.direction,
-                speed: alert.speed,
                 level: alert.level ?? 0,
               },
             };
