@@ -123,7 +123,7 @@ export const wxmapRouter = router({
 
     const output = turf.featureCollection(popupData);
 
-    await cacheClient.setEx(POPUP_DATA_CACHE_KEY, 60 * 10, JSON.stringify(output));
+    await cacheClient.setEx(POPUP_DATA_CACHE_KEY, 60 * 5, JSON.stringify(output));
 
     return output;
   }),
@@ -228,7 +228,7 @@ export const wxmapRouter = router({
           features,
         };
 
-        await cacheClient.setEx(PUBLIC_ALERTS_CACHE_KEY, 60 * 10, JSON.stringify(featureCollection));
+        await cacheClient.setEx(PUBLIC_ALERTS_CACHE_KEY, 60, JSON.stringify(featureCollection));
 
         return featureCollection;
       } catch (error) {
