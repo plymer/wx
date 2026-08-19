@@ -89,7 +89,6 @@ export const AirQualityLayer = ({ belowLayer, override }: Props) => {
             "text-font": ["Consolas-Regular"],
             "text-anchor": "center",
             "text-allow-overlap": true,
-            "symbol-sort-key": ["get", "validTime"],
           }}
           paint={{
             "text-color": ["step", ["get", "pm25"], "#000", 25, "#000", 50, "#fff", 75, "#fff", 100, "#fff"],

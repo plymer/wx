@@ -86,7 +86,6 @@ export const AQ_DISPLAY: CircleLayerSpecification = {
     "circle-radius": 10, // this will need some turf-ing for proper sizing based on lat/lon/zoom
     "circle-color": ["step", ["get", "pm25"], "#00ff00", 25, "#ffff00", 50, "#ff9900", 75, "#ff0000", 100, "#990000"],
   },
-  layout: { visibility: "visible", "circle-sort-key": ["get", "validTime"] },
   type: "circle",
   id: "aq-data",
   source: "aq-data",
@@ -103,7 +102,6 @@ export const AQ_VALUE_DISPLAY: SymbolLayerSpecification = {
     "text-offset": [0, 0],
     "text-anchor": "center",
     "text-allow-overlap": false,
-    "symbol-sort-key": ["get", "validTime"],
   },
   paint: {
     "text-color": "rgb(0,0,0)",
