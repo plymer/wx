@@ -9,11 +9,13 @@ import Button from "../ui/Button";
 import { AlertTriangle, CircleAlert, OctagonAlert, OctagonX, X } from "lucide-react";
 import type { StationPlotPopupData, WxOAlertMetadataProperties } from "@shared/lib/types";
 import type { XmetEventData } from "@shared/lib/alphanumeric.types";
+import { useStationDataForPopup } from "@/hooks/useStationDataForPopup";
 
 export const DataPopup = () => {
   const popupData = usePopupData();
   const { setPopupData } = useUIActions();
   const popupRef = useRef<PopupInstance>(null);
+  const { data: stationData } = useStationDataForPopup();
 
   const handleClose = () => {
     popupRef.current?.remove();
@@ -91,15 +93,18 @@ export const DataPopup = () => {
               }
             })
             .map((feature) => {
-              const dataType = feature.properties.dataType as string;
+              const dataType = (feature.properties.dataType as string) || (feature.properties.data_type as string);
 
               switch (dataType) {
                 case "site": {
-                  const { siteId, siteCountry, siteState, siteName, metars, taf } =
-                    feature.properties as StationPlotPopupData;
+                  // remember the MVT contains features in snake_case
+                  const { site_id: siteId } = feature.properties as { site_id: string };
+
+                  const { siteCountry, siteState, siteName, metars, taf } =
+                    (stationData?.[siteId] as StationPlotPopupData) || {};
 
                   const parsedMetar =
-                    metars.length > 0 ? (formatSigWx(metars[metars.length - 1], "metar") as string) : null;
+                    metars?.length > 0 ? (formatSigWx(metars[metars.length - 1], "metar") as string) : null;
 
                   const parsedTaf = taf ? (formatSigWx(taf, "taf") as ParsedTAF) : null;
 

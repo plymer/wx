@@ -112,7 +112,7 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
             <LightningDataLayer />
             <PublicRegionsOverlay override />
             <AirQualityLayer override />
-            <SurfaceDataLayer hidePopups />
+            <SurfaceDataLayer />
             <AlertsLayer override />
             <SelectedFxPoint data={currentLocationGeoJSON} />
 

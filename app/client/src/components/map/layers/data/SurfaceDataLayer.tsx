@@ -1,15 +1,13 @@
 import { useDisplayTime } from "@/hooks/useDisplayTime";
-
-import { useZoom } from "@/stateStores/map/mapView";
-
 import { Isobars } from "./sfc-data/Isobars";
-import { Popups } from "./sfc-data/Popups";
 import { Plots } from "./sfc-data/Plots";
 import { Isodrosotherms } from "./sfc-data/Isodrosotherms";
 import { Isotherms } from "./sfc-data/Isotherms";
+import { useStationDataForPopup } from "@/hooks/useStationDataForPopup";
 
-export const SurfaceDataLayer = ({ hidePopups = false }: { hidePopups?: boolean }) => {
-  const zoom = useZoom();
+export const SurfaceDataLayer = () => {
+  // ensure we have populated and are updating our station data for the popup
+  useStationDataForPopup();
 
   const displayTime = useDisplayTime();
 
@@ -19,7 +17,6 @@ export const SurfaceDataLayer = ({ hidePopups = false }: { hidePopups?: boolean 
       <Isotherms displayTime={displayTime} />
       <Isobars displayTime={displayTime} />
       <Plots displayTime={displayTime} />
-      {!hidePopups && <Popups zoom={zoom} />}
     </>
   );
 };

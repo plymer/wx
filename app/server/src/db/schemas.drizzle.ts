@@ -275,6 +275,7 @@ export const metarsTemporalView = snakeCase.view("metars_temporal").as((qb) =>
           partition by ${metars.siteId}
           order by ${metars.validTime}
         )`.as("expiry_time"),
+      dataType: sql`'site'`.as("data_type"),
     })
     .from(metars)
     .where(sql`${metars.validTime} >= NOW() - INTERVAL '4 hours'`),

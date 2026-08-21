@@ -56,6 +56,8 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
 
     if (type === "click" && features && features.length > 0) {
       setPopupData({ features, lngLat });
+    } else {
+      setPopupData(undefined);
     }
   };
 

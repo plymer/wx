@@ -1,7 +1,6 @@
-import type { Feature, FeatureCollection, MultiPolygon, Point } from "geojson";
+import type { Feature, FeatureCollection, MultiPolygon } from "geojson";
 import { TRPCError } from "@trpc/server";
 import "dotenv/config";
-import * as turf from "@turf/turf";
 
 import type { AlertColour, AlertType, StationPlotPopupData, WxOAlertMapProperties } from "../lib/types.js";
 import { HOUR } from "../lib/constants.js";
@@ -39,7 +38,7 @@ type LeadAlertRow = {
 };
 
 export const wxmapRouter = router({
-  wxmapPopupData: publicProcedure.query(async (): Promise<FeatureCollection<Point, StationPlotPopupData>> => {
+  wxmapPopupData: publicProcedure.query(async (): Promise<Record<string, StationPlotPopupData>> => {
     if (!db) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
@@ -47,20 +46,18 @@ export const wxmapRouter = router({
       });
     }
 
-    const BLACKLIST = ["CXEG"]; // Exclude CXEG from tafs query
-
     const cachedData = await cacheClient.get(POPUP_DATA_CACHE_KEY);
 
     if (cachedData) {
       console.log("[API] Cache HIT for wxmap popup data");
-      return JSON.parse(cachedData) as FeatureCollection<Point, StationPlotPopupData>;
+      return JSON.parse(cachedData) as Record<string, StationPlotPopupData>;
     }
 
     console.log("[API] Cache MISS for wxmap popup data. Fetching from source...");
 
     const metarsQuery = await db.query.metars
       .findMany({
-        where: { validTime: { gt: new Date(Date.now() - 4 * HOUR) }, siteId: { notIn: BLACKLIST } },
+        where: { validTime: { gt: new Date(Date.now() - 4 * HOUR) } },
         with: {
           stations: { columns: { lat: true, lon: true, country: true, name: true, state: true } },
         },
@@ -81,47 +78,36 @@ export const wxmapRouter = router({
 
     const tafsQuery = await db.query.tafs
       .findMany({
-        where: { validTime: { gt: new Date(Date.now() - 8 * HOUR) }, siteId: { notIn: BLACKLIST } },
+        where: { validTime: { gt: new Date(Date.now() - 8 * HOUR) } },
         orderBy: { validTime: "asc" },
       })
       .then((results) => limitResultsByKeys(results, 1, "siteId"));
 
-    const popupData = metarsQuery.reduce<Feature<Point, StationPlotPopupData>[]>((acc, m) => {
+    const output = metarsQuery.reduce<Record<string, StationPlotPopupData>>((acc, m) => {
       if (!m.rawText || !m.stations) return acc;
 
       const siteId = m.siteId;
 
-      const { lat, lon, name: siteName, country: siteCountry, state: siteState } = m.stations;
+      const { name: siteName, country: siteCountry, state: siteState } = m.stations;
 
       const currentTaf = tafsQuery.find((t) => t.siteId === siteId);
 
-      const existingFeature = acc.find((feature) => feature.properties.siteId === siteId);
+      const existingFeature = acc[siteId];
 
       if (existingFeature) {
         return acc;
       } else {
-        const newFeature: Feature<Point, StationPlotPopupData> = {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [lon, lat],
-          },
-          properties: {
-            siteId,
-            siteName,
-            siteCountry,
-            siteState,
-            metars: metarList[siteId] || [],
-            taf: currentTaf ? currentTaf.rawText : null,
-            dataType: "site",
-          },
+        acc[siteId] = {
+          siteName,
+          siteCountry,
+          siteState,
+          metars: metarList[siteId] || [],
+          taf: currentTaf ? currentTaf.rawText : null,
         };
-        acc.push(newFeature);
+
         return acc;
       }
-    }, []);
-
-    const output = turf.featureCollection(popupData);
+    }, {});
 
     await cacheClient.setEx(POPUP_DATA_CACHE_KEY, 60 * 5, JSON.stringify(output));
 

@@ -196,13 +196,11 @@ export type MetarWithStation = Prettify<
 >;
 
 export type StationPlotPopupData = {
-  siteId: string;
   siteName: string | null;
   siteCountry: string | null;
   siteState: string | null;
   metars: string[];
   taf: string | null;
-  dataType: "site";
 };
 
 // used for the rendering and filtering of station plots on the map

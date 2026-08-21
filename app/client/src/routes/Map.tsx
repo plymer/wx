@@ -66,8 +66,7 @@ export default function WxMap() {
 
   const mapStyle = baseMap === "aerial" || baseMap === "hillshade" ? positronWxMap : libertyWxMap;
 
-  // const interactiveLayers = ["layer-pirep", "layer-sigmet", "layer-airmet", "layer-sfc-obs-target"]
-  const interactiveLayers = ["layer-sfc-obs-target", "layer-sigmet", "layer-wxo-alerts"];
+  const interactiveLayers = ["layer-sfc-obs-dot", "layer-sigmet", "layer-wxo-alerts"];
 
   return (
     <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height) text-sm">
