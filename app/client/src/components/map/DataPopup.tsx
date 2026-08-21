@@ -122,19 +122,16 @@ export const DataPopup = () => {
                         {!hasOtherFeatures && !hasOtherMetars && (
                           <>
                             {parsedTaf?.main && (
-                              <div className="border-t mt-2 pt-2 max-md:hidden ms-2 -indent-2">
+                              <div className="border-t mt-2 pt-2 ms-2 -indent-2">
                                 <SigWx text={parsedTaf.main} />
                               </div>
                             )}
                             {parsedTaf?.partPeriods?.map((p, i) => (
-                              <div
-                                className={`max-md:hidden ${p.startsWith("FM") ? "-indent-2 ms-4" : "-indent-4 ms-8"}`}
-                                key={i}
-                              >
+                              <div className={`${p.startsWith("FM") ? "-indent-2 ms-4" : "-indent-4 ms-8"}`} key={i}>
                                 <SigWx text={p} />
                               </div>
                             ))}
-                            {parsedTaf?.rmk && <div className="max-md:hidden ms-4 -indent-2">{parsedTaf.rmk}</div>}
+                            {parsedTaf?.rmk && <div className="ms-4 -indent-2">{parsedTaf.rmk}</div>}
                           </>
                         )}
                       </div>
