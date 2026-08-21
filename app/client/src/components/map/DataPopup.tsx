@@ -7,7 +7,7 @@ import { useRef } from "react";
 import { Popup, type PopupInstance } from "react-map-gl/maplibre";
 import Button from "../ui/Button";
 import { AlertTriangle, CircleAlert, OctagonAlert, OctagonX, X } from "lucide-react";
-import type { StationPlotPopupData, WxOAlertMetadataProperties } from "@shared/lib/types";
+import type { WxOAlertMetadataProperties } from "@shared/lib/types";
 import type { XmetEventData } from "@shared/lib/alphanumeric.types";
 import { useStationDataForPopup } from "@/hooks/useStationDataForPopup";
 
@@ -100,8 +100,11 @@ export const DataPopup = () => {
                   // remember the MVT contains features in snake_case
                   const { site_id: siteId } = feature.properties as { site_id: string };
 
-                  const { siteCountry, siteState, siteName, metars, taf } =
-                    (stationData?.[siteId] as StationPlotPopupData) || {};
+                  const popupData = stationData?.[siteId];
+
+                  if (!popupData) return null;
+
+                  const { siteCountry, siteState, siteName, metars, taf } = popupData;
 
                   const parsedMetar =
                     metars?.length > 0 ? (formatSigWx(metars[metars.length - 1], "metar") as string) : null;
