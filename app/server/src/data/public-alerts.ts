@@ -1,6 +1,10 @@
 import "dotenv/config";
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
-import type { WxOAlertMetadataProperties, WxOAlertFeatureProperties } from "../lib/types.js";
+import type {
+  WxOAlertMetadataProperties,
+  WxOAlertFeatureProperties,
+  WxOAlertVisualGeometryProperties,
+} from "../lib/types.js";
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import * as turf from "@turf/turf";
 import { pgDb as db } from "../services/database.js";
@@ -8,11 +12,18 @@ import { pgDb as db } from "../services/database.js";
 import { publicAlerts } from "../db/schemas.drizzle.js";
 import { and, gt, inArray, lt, notInArray, type InferInsertModel } from "drizzle-orm";
 
-type AlertsGeoJsonResponse = {
+type AlertsPropertiesResponse = {
   type: "FeatureCollection";
   uuid: string;
   alerts: Record<string, WxOAlertMetadataProperties>;
   features: Feature<MultiPolygon, WxOAlertFeatureProperties>[];
+};
+
+type AlertsGeometriesResponse = {
+  type: "FeatureCollection";
+  uuid: string;
+  generatedAt: string;
+  features: Feature<MultiPolygon, WxOAlertVisualGeometryProperties>[];
 };
 
 export async function getPublicAlerts() {
@@ -20,44 +31,82 @@ export async function getPublicAlerts() {
     throw new Error("[METAR] Database connection failed.");
   }
 
-  const sourceUrl = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.en.geojson";
+  const alertPropertiesSource = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.en.geojson";
+  const freeFormAlertGeometriesSource = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.visual.geojson";
 
   try {
-    const response = await fetch(sourceUrl, {
+    const alertsPropertiesGeoJson = await fetch(alertPropertiesSource, {
       headers: DEFAULT_REMOTE_HEADERS,
+    }).then(async (res) => {
+      if (!res.ok) {
+        throw new Error(`[WXO] [ALERTS] Failed to fetch public alert properties: ${res.statusText}`);
+      }
+      return (await res.json()) as AlertsPropertiesResponse;
     });
-    if (!response.ok) {
-      throw new Error(`[WXO] [ALERTS] Failed to fetch public alerts: ${response.statusText}`);
-    }
 
-    // extract the GeoJSON from the response
-    const alertsGeoJSON = (await response.json()) as AlertsGeoJsonResponse;
+    const freeFormAlertGeometriesGeoJson = await fetch(freeFormAlertGeometriesSource, {
+      headers: DEFAULT_REMOTE_HEADERS,
+    }).then(async (res) => {
+      if (!res.ok) {
+        throw new Error(`[WXO] [ALERTS] Failed to fetch public alert geometries: ${res.statusText}`);
+      }
+      return (await res.json()) as AlertsGeometriesResponse;
+    });
 
-    const alerts = Object.entries(alertsGeoJSON.alerts).reduce<Record<string, WxOAlertMetadataProperties>>(
-      (acc, [alertRef, alert]) => {
-        acc[alertRef] = alert;
-        return acc;
-      },
-      {},
+    const alerts: Map<string, WxOAlertMetadataProperties> = new Map(
+      Object.entries(alertsPropertiesGeoJson.alerts).map(([alertRef, alert]) => [alertRef, alert]),
+    );
+
+    const freeFormGeometries: Map<string, MultiPolygon> = new Map(
+      freeFormAlertGeometriesGeoJson.features
+        .filter((feature) => feature.properties.zoneType === "freeform")
+        .map((feature) => [feature.properties.alertId, feature.geometry]),
     );
 
     // create new features based on the alerts that are presently active
     // each feature may have multiple alerts associated with it, so we need to create multiple features (with the same geometry) for each alert
 
-    const extractedFeatures: Feature<MultiPolygon, WxOAlertMetadataProperties>[] = [];
+    const alertFeatures: Feature<MultiPolygon, WxOAlertMetadataProperties>[] = [];
 
     // we also need to keep track of which alerts are still 'active' so we can update the expiry time of the alerts in the database that are no longer active
     const alertIdsInPayload = new Set<string>();
 
+    // 'alerts' has all of the properies now
+    // 'freeFormGeometries' has all of the geometries now
+    // we need to match the alert properties to their geometries
+    // by linking the alert's id to the geometry map
+    [...alerts].forEach(([_, alertProperties]) => {
+      const geometry = freeFormGeometries.get(alertProperties.id);
+
+      if (!geometry) return;
+
+      alertIdsInPayload.add(alertProperties.id);
+
+      // create a new feature with the geometry and properties of the alert
+      const newFeature: Feature<MultiPolygon, WxOAlertMetadataProperties> = {
+        type: "Feature",
+        geometry,
+        properties: {
+          ...alertProperties,
+          dataType: "publicAlert",
+        },
+      };
+
+      alertFeatures.push(newFeature);
+    });
+
     // loop over every 'feature' in the feature collection
-    alertsGeoJSON.features.forEach((feature) => {
+    alertsPropertiesGeoJson.features.forEach((feature) => {
       // get the alerts associated with this feature
       const alertArray = feature.properties.alerts;
 
       // for every active alert in the current feature, create a new feature with the same geometry but with the properties of the alert
       alertArray.forEach((alertObject) => {
         // extract the alert data from the alerts lookup by the alertRef (the key of the object in the json resposne)
-        const alertData = alerts[alertObject.alertRef];
+        const alertData = alerts.get(alertObject.alertRef)!;
+
+        // we already handled freeform alerts above, so we can skip them here
+        if (alertData.zoneType === "freeform") return;
 
         // add the alert id to the set of alert ids in the payload
         alertIdsInPayload.add(alertData.id);
@@ -73,13 +122,13 @@ export async function getPublicAlerts() {
           },
         };
 
-        extractedFeatures.push(newFeature);
+        alertFeatures.push(newFeature);
       });
     });
 
     // now we want to dissolve all feature polygons of the same alert code into single features
     // group features by alertCode and flatten MultiPolygons to Polygons
-    const groupedAlerts = extractedFeatures.reduce<Record<string, Feature<Polygon, WxOAlertMetadataProperties>[]>>(
+    const groupedAlerts = alertFeatures.reduce<Record<string, Feature<Polygon, WxOAlertMetadataProperties>[]>>(
       (acc, feature) => {
         const alertId = feature.properties.id;
 

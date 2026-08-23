@@ -372,6 +372,17 @@ export type WxOAlertFeatureProperties = {
   }[];
 };
 
+export type WxOAlertVisualGeometryProperties = {
+  index: string;
+  class: AlertType;
+  riskColour: AlertColour;
+  level: number;
+  weighting: number;
+  program: string;
+  zoneType: "freeform" | "fixed";
+  alertId: string; // this maps to the WxOAlertMetadataProperties.id field
+};
+
 export type WxOAlertMetadataProperties = {
   alertCode: string;
   type: AlertType;
