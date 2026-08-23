@@ -222,7 +222,22 @@ function stationPlotQuery(z: number) {
             extent => ${VECTOR_TILE_EXTENT},
             buffer => ${VECTOR_TILE_BUFFER}
           ) AS geometry,
-          *,
+          metars_temporal.site_id,
+          metars_temporal.station_priority,
+          metars_temporal.wind_dir,
+          metars_temporal.wind_spd,
+          metars_temporal.wind_gst,
+          metars_temporal.station_type,
+          metars_temporal.ob_type,
+          metars_temporal.ceiling,
+          metars_temporal.raw_text,
+          metars_temporal.vis,
+          metars_temporal.wx_string,
+          metars_temporal.tt,
+          metars_temporal.td,
+          metars_temporal.mslp,
+          metars_temporal.category,
+          metars_temporal.time_string,
           (EXTRACT(EPOCH FROM metars_temporal.valid_time) * 1000)::bigint AS start_time,
           (EXTRACT(EPOCH FROM metars_temporal.expiry_time) * 1000)::bigint AS expiry_time
         FROM metars_temporal

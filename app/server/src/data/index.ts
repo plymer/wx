@@ -37,6 +37,12 @@ async function main() {
     await updateStationVisTable();
   }
 
+  // materialized views can't declare indexes through drizzle's schema/push flow,
+  // so ensure they exist here; a plain (non-unique) index survives the periodic
+  // non-concurrent REFRESH MATERIALIZED VIEW below
+  await db.execute(sql`CREATE INDEX IF NOT EXISTS metars_temporal_spatial_index ON metars_temporal USING gist (geometry);`);
+  await db.execute(sql`CREATE INDEX IF NOT EXISTS metars_temporal_site_id_index ON metars_temporal USING btree (site_id);`);
+
   const currentTime = new Date();
   const currentMinute = currentTime.getUTCMinutes();
   const currentHour = currentTime.getUTCHours();

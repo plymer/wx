@@ -54,7 +54,9 @@ export class DatabaseConnection {
   }
 
   public async connect() {
-    const client = new Pool({ ...credentials });
+    // capped to match pgbouncer's MAX_DB_CONNECTIONS so the app never queues more
+    // concurrent queries than the DB tier can actually serve
+    const client = new Pool({ ...credentials, max: 5 });
     this._dbClient = client;
     this._db = createDb(client);
 

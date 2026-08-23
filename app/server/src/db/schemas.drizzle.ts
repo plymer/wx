@@ -111,14 +111,21 @@ export const isolines = snakeCase.table(
   ],
 );
 
-export const mslpExtrema = snakeCase.table("mslp_extrema", {
-  id: bigserial({ mode: "number" }).primaryKey(),
-  value: doublePrecision().notNull(),
-  kind: text({ enum: ["max", "min"] }).notNull(),
-  startTime: timestamp({ mode: "date" }).notNull(),
-  expiryTime: timestamp({ mode: "date" }).notNull(),
-  geometry: geometry({ srid: 3857, type: "point" }).notNull(),
-});
+export const mslpExtrema = snakeCase.table(
+  "mslp_extrema",
+  {
+    id: bigserial({ mode: "number" }).primaryKey(),
+    value: doublePrecision().notNull(),
+    kind: text({ enum: ["max", "min"] }).notNull(),
+    startTime: timestamp({ mode: "date" }).notNull(),
+    expiryTime: timestamp({ mode: "date" }).notNull(),
+    geometry: geometry({ srid: 3857, type: "point" }).notNull(),
+  },
+  (t) => [
+    index("mslp_extrema_spatial_index").using("gist", t.geometry),
+    index("mslp_extrema_start_time_index").using("btree", t.startTime),
+  ],
+);
 
 export const lightning = snakeCase.table(
   "lightning",
