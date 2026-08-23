@@ -12,6 +12,7 @@ import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
 import { pgDb as db, pgConnection } from "../services/database.js";
 import { stations } from "../db/schemas.drizzle.js";
 import { createIsolines } from "./isolines.js";
+import { sql } from "drizzle-orm";
 
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
@@ -22,6 +23,10 @@ async function main() {
   if (!db) {
     throw new Error("Database connection failed, exiting...");
   }
+
+  const refreshView = async () => {
+    await db!.execute(sql`REFRESH MATERIALIZED VIEW metars_temporal;`);
+  };
 
   // we need to check to see if we have a valid station catalog and station-visibility table
 
@@ -40,6 +45,7 @@ async function main() {
   const tasks: DataTask[] = [
     { name: "TAFs", run: () => getTafs(), schedule: "*/5 * * * *" },
     { name: "METARs", run: () => getMetars(), schedule: "* * * * *" },
+    { name: "Refresh-View", run: () => refreshView(), schedule: "* * * * *" },
     { name: "Lightning", run: () => getLightning(), schedule: "* * * * *" },
     // { name: "PIREPs", run: () => getPireps(), schedule: "* * * * *" },
     { name: "SIGMETs", run: () => getSigmets(), schedule: "* * * * *" },

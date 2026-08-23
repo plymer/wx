@@ -242,7 +242,7 @@ export const publicAlerts = snakeCase.table(
 //   ],
 // );
 
-export const metarsTemporalView = snakeCase.view("metars_temporal").as((qb) =>
+export const metarsTemporalView = snakeCase.materializedView("metars_temporal").as((qb) =>
   qb
     .select({
       geometry: sql`${metars.geometry}`.as("geometry"),
