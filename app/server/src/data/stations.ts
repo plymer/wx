@@ -2,7 +2,7 @@
 // stations update once per day
 
 import "dotenv/config";
-import { readGzipFile } from "../lib/utils.js";
+import { readGzipFile } from "./read-gzip.js";
 import { stations } from "../db/schemas.drizzle.js";
 import { FEET_PER_METRE } from "../lib/constants.js";
 import type { CacheStationData, StationData } from "../lib/types.js";
@@ -17,9 +17,14 @@ export async function buildStationCatalog() {
     throw new Error("[STATIONS] Database connection failed.");
   }
 
-  const data = await readGzipFile(RESOURCE_URL, "station");
-
   try {
+    const data = await readGzipFile(RESOURCE_URL, "station");
+
+    if (data === null) {
+      console.log("[STATION] Station catalog is up to date, skipping fetch.");
+      return;
+    }
+
     // parse the JSON data
     const stationData: CacheStationData[] = JSON.parse(data);
 

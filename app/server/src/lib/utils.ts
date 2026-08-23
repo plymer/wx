@@ -1,7 +1,6 @@
 import { existsSync, readdirSync, statSync } from "fs";
 import path from "path";
 
-import { createGunzip } from "zlib";
 import * as turf from "@turf/turf";
 import { XMLParser } from "fast-xml-parser";
 import type { Position } from "geojson";
@@ -10,7 +9,7 @@ import "dotenv/config";
 
 import type { SunTimes } from "./common.types.js";
 import type { XmetShapes } from "./alphanumeric.types.js";
-import { DEFAULT_REMOTE_HEADERS, MINUTE } from "./constants.js";
+import { MINUTE } from "./constants.js";
 
 import type { OutlookData, Panel, RegionData, TextDirection, WmoDirection } from "./types.js";
 import { OFFICE_REGION_MAP } from "../config/charts.config.js";
@@ -280,41 +279,6 @@ export function firstAndLastAreSame(coords: Position[]) {
 
 export function isConvectiveSigmet(header: string): boolean {
   return header.includes("WSUS3");
-}
-
-export async function readGzipFile(url: string, dataType: string) {
-  try {
-    // fetch the compressed data
-    const arrayBuffer = await fetch(url, { headers: DEFAULT_REMOTE_HEADERS }).then((res) => {
-      if (!res.ok) {
-        throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
-      }
-      return res.arrayBuffer();
-    });
-    const compressedData = Buffer.from(arrayBuffer);
-
-    // decompress the data
-    const decompressedData = await new Promise((resolve, reject) => {
-      const gunzip = createGunzip();
-      const chunks: Buffer[] = [];
-
-      gunzip.on("data", (chunk) => chunks.push(chunk));
-      gunzip.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
-      gunzip.on("error", (err) => reject(err));
-
-      gunzip.write(compressedData);
-      gunzip.end();
-    });
-
-    if (typeof decompressedData !== "string") {
-      throw new Error(`[${dataType.toUpperCase()}] Decompressed data is not a string`);
-    }
-
-    return decompressedData;
-  } catch (error) {
-    console.error(`[${dataType.toUpperCase()}] Error reading gzip file:`, error);
-    throw error;
-  }
 }
 
 /**

@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { lt } from "drizzle-orm";
-import { lonLatToWebMercator, readGzipFile } from "../lib/utils.js";
+import { lonLatToWebMercator } from "../lib/utils.js";
+import { readGzipFile } from "./read-gzip.js";
 import { xmlParser } from "../lib/utils.js";
 import { metars } from "../db/schemas.drizzle.js";
 import type { CacheMetarData, MetarData, XMLCacheFile } from "../lib/types.js";
@@ -16,6 +17,8 @@ export async function getMetars() {
   }
 
   const xml = await readGzipFile(RESOURCE_URL, "metar");
+
+  if (xml === null) return;
 
   const { parser } = xmlParser();
 

@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { lt } from "drizzle-orm";
-import { readGzipFile } from "../lib/utils.js";
+import { readGzipFile } from "./read-gzip.js";
 import { xmlParser } from "../lib/utils.js";
 import { tafs } from "../db/schemas.drizzle.js";
 import type { CacheTafData, TafData, XMLCacheFile } from "../lib/types.js";
@@ -17,6 +17,8 @@ export async function getTafs() {
   }
 
   const xml = await readGzipFile(RESOURCE_URL, "taf");
+
+  if (xml === null) return;
 
   const { parser } = xmlParser();
 

@@ -252,8 +252,6 @@ export async function getPublicAlerts() {
 
       const staleAlertIds = [...new Set(staleAlerts.map((alert) => alert.id))];
 
-      console.log(`[WXO] [ALERTS] Found ${staleAlertIds.length} stale alerts to update.`);
-
       if (staleAlertIds.length === 0) return;
 
       // end any stale alerts by updating their expiry time to now

@@ -3,9 +3,10 @@ import { gt, lt } from "drizzle-orm";
 import { sigmets } from "../db/schemas.drizzle.js";
 import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../lib/types.js";
-import { cardinalToDegrees, readGzipFile, xmlParser } from "../lib/utils.js";
+import { cardinalToDegrees, xmlParser } from "../lib/utils.js";
 import { airSigmetsSchema } from "../lib/validation.js";
 import { pgDb as db } from "../services/database.js";
+import { readGzipFile } from "./read-gzip.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
@@ -37,6 +38,8 @@ export async function getSigmets() {
   }
 
   const xml = await readGzipFile(RESOURCE_URL, "sigmet");
+
+  if (xml === null) return;
 
   const { parser } = xmlParser();
 
