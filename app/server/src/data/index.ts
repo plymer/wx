@@ -25,7 +25,18 @@ async function main() {
   }
 
   const refreshView = async () => {
-    await db!.execute(sql`REFRESH MATERIALIZED VIEW metars_temporal;`);
+    if (!db) {
+      throw new Error("Database connection failed, exiting...");
+    }
+    // refresh the materialized view and then make sure the indexes exist - we can't do this via `push` from the schema
+    // because the view is not a table and doesn't have a schema to attach indexes to
+    await db.execute(sql`REFRESH MATERIALIZED VIEW metars_temporal;`);
+    await db.execute(
+      sql`CREATE INDEX IF NOT EXISTS metars_temporal_spatial_index ON metars_temporal USING gist (geometry);`,
+    );
+    await db.execute(
+      sql`CREATE INDEX IF NOT EXISTS metars_temporal_site_id_index ON metars_temporal USING btree (site_id);`,
+    );
   };
 
   // we need to check to see if we have a valid station catalog and station-visibility table
@@ -36,12 +47,6 @@ async function main() {
     await buildStationCatalog();
     await updateStationVisTable();
   }
-
-  // materialized views can't declare indexes through drizzle's schema/push flow,
-  // so ensure they exist here; a plain (non-unique) index survives the periodic
-  // non-concurrent REFRESH MATERIALIZED VIEW below
-  await db.execute(sql`CREATE INDEX IF NOT EXISTS metars_temporal_spatial_index ON metars_temporal USING gist (geometry);`);
-  await db.execute(sql`CREATE INDEX IF NOT EXISTS metars_temporal_site_id_index ON metars_temporal USING btree (site_id);`);
 
   const currentTime = new Date();
   const currentMinute = currentTime.getUTCMinutes();
