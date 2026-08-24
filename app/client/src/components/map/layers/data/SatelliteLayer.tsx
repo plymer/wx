@@ -71,9 +71,25 @@ export const SatelliteLayer = ({ domain }: Props) => {
     ),
   );
 
+  const { data: nowcoastData } = useQuery(
+    api.wms.nowcoast.queryOptions(
+      { product: "goes_longwave_imagery" },
+      {
+        enabled: baseMap === "hillshade" && isVisible && showSatellite && domain === "nowcoast",
+        refetchInterval: MINUTE,
+        trpc: { context: { skipBatch: true } },
+      },
+    ),
+  );
+
+  console.log(nowcoastData?.domain);
+
   let data;
 
   switch (domain) {
+    case "nowcoast":
+      data = nowcoastData;
+      break;
     case "europe":
       data = euData;
       break;

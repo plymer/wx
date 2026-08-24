@@ -74,7 +74,7 @@ export type XmetAPIData = {
 export type XmetGeoJSON = FeatureCollection<MultiPolygon, XmetAPIData>;
 
 export type RadarDomains = "national";
-export type SatelliteDomains = "east" | "west" | "europe" | "indianOcean" | "himawari";
+export type SatelliteDomains = "east" | "west" | "europe" | "indianOcean" | "himawari" | "nowcoast";
 export type WMSDomains = Prettify<RadarDomains | SatelliteDomains>;
 export type WMSLayerTypes = "radar" | "satellite";
 export type WMSLayer = {

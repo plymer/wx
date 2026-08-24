@@ -34,6 +34,8 @@ export async function getPublicAlerts() {
   const alertPropertiesSource = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.en.geojson";
   const freeFormAlertGeometriesSource = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.visual.geojson";
 
+  // TODO :: implement ETag caching
+
   try {
     const alertsPropertiesGeoJson = await fetch(alertPropertiesSource, {
       headers: DEFAULT_REMOTE_HEADERS,

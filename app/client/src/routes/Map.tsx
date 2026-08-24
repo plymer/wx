@@ -101,6 +101,8 @@ export default function WxMap() {
         <SatelliteLayer domain="europe" />
         <SatelliteLayer domain="indianOcean" />
         <SatelliteLayer domain="himawari" />
+
+        {/* <SatelliteLayer domain="nowcoast" /> */}
         <RadarLayer />
 
         <AirQualityLayer />

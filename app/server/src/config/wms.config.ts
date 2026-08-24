@@ -6,6 +6,9 @@ export const GEOMET_GETCAPABILITIES =
 export const EUMETSAT_GETCAPABILITIES =
   "https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetCapabilities";
 
+export const NOWCOAST_GETCAPABILITIES =
+  "https://nowcoast.noaa.gov/geoserver/observations/satellite/ows?request=GetCapabilities&service=WMS&version=1.3.0";
+
 export const DATA_CUTOFF = 4 * HOUR; // hours
 
 export const RADAR_PRODUCTS = ["RADAR_1KM_RRAI", "RADAR_1KM_RSNO"] as const;

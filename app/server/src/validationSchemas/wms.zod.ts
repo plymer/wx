@@ -19,6 +19,15 @@ export const eumetsatProductSchema = z.strictObject({
   product: z.enum(["mtg_fd:rgb_fog", "msg_iodc:rgb_fog", "msg_fes:rgb_ash", "msg_iodc:rgb_ash"]),
 });
 
+export const nowcoastProductSchema = z.strictObject({
+  product: z.enum([
+    "goes_longwave_imagery",
+    "goes_shortwave_imagery",
+    "goes_visible_imagery",
+    "goes_water_vapor_imagery",
+  ]),
+});
+
 export const realtimeLayersSchema = z.strictObject({
   layer: z.string().trim(),
 });

@@ -11,6 +11,8 @@ export async function getAqData() {
     throw new Error("[AQ-DATA] Failed to connect to the database.");
   }
 
+  // TODO :: implement ETag caching
+
   const now = new Date();
 
   const cacheBuster = Math.floor(now.getTime() / 1000);

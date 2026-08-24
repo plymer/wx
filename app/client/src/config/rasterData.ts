@@ -3,6 +3,9 @@ import type { LngLatBoundsLike } from "maplibre-gl";
 
 export const RASTER_DATA_TYPES = ["satellite", "radar"] as const;
 
+export const NOWCOAST_GETMAP =
+  "https://nowcoast.noaa.gov/geoserver/observations/satellite/ows?request=GetMap&format=image/png&service=WMS&version=1.3.0&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=512&height=512&layers=";
+
 export const GEOMET_GETMAP =
   "https://geo.weather.gc.ca/geomet?service=WMS&version=1.3.0&request=GetMap&format=image/webp&bbox={bbox-epsg-3857}&crs=EPSG:3857&width=256&height=256&LAYERS_REFRESH_RATE=PT1M&TRANSPARENT=true&TILED=true&layers=";
 
@@ -106,4 +109,5 @@ export const SATELLITE_DOMAINS: Record<SatelliteDomains, [number, number, number
   himawari: HIMAWARI_BOUNDS,
   europe: EUMETSAT_BOUNDS,
   indianOcean: IODC_BOUNDS,
+  nowcoast: [MAX_WEST, MAX_SOUTH, MAX_EAST, MAX_NORTH],
 };
