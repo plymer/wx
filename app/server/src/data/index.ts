@@ -10,12 +10,9 @@ import { updateStationVisTable } from "./station-visibility.js";
 
 import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
 import { pgDb as db, pgConnection } from "../services/database.js";
-import { redisClient } from "../services/redis.js";
 import { stations } from "../db/schemas.drizzle.js";
 import { createIsolines } from "./isolines.js";
 import { sql } from "drizzle-orm";
-
-export const dataRedisClient = await redisClient("data");
 
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
