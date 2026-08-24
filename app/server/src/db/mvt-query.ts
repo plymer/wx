@@ -239,7 +239,8 @@ function stationPlotQuery(z: number) {
           metars_temporal.category,
           metars_temporal.time_string,
           (EXTRACT(EPOCH FROM metars_temporal.valid_time) * 1000)::bigint AS start_time,
-          (EXTRACT(EPOCH FROM metars_temporal.expiry_time) * 1000)::bigint AS expiry_time
+          (EXTRACT(EPOCH FROM metars_temporal.expiry_time) * 1000)::bigint AS expiry_time,
+          'site' as "dataType"
         FROM metars_temporal
         CROSS JOIN bounds
         JOIN stations st

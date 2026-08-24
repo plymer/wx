@@ -82,8 +82,6 @@ export const SatelliteLayer = ({ domain }: Props) => {
     ),
   );
 
-  console.log(nowcoastData?.domain);
-
   let data;
 
   switch (domain) {
