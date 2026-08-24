@@ -7,6 +7,8 @@ import { cardinalToDegrees, xmlParser } from "../lib/utils.js";
 import { airSigmetsSchema } from "../lib/validation.js";
 import { pgDb as db } from "../services/database.js";
 import { readGzipFile } from "./read-gzip.js";
+import { ETAG_CACHE_KEY } from "../config/cache-keys.config.js";
+import { cacheClient } from "../services/redis.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
@@ -130,7 +132,35 @@ export async function getSigmets() {
 
   const avwxApi = "https://aviationweather.gov/api/data/";
 
+  const intlSigmetUrl = `${avwxApi}isigmet?format=json`;
+
   const now = new Date();
+
+  if (!cacheClient) {
+    console.warn(`[SIGMET] Redis client not available, continuing naively.`);
+  }
+
+  const intlKey = `${ETAG_CACHE_KEY}:sigmet:intl`;
+
+  const previousCacheKey = cacheClient ? await cacheClient.get(intlKey) : null;
+
+  // do preflight check with HEAD request to get the ETag
+  const headResponse = await fetch(intlSigmetUrl, { method: "HEAD", headers: DEFAULT_REMOTE_HEADERS });
+  if (!headResponse.ok) {
+    throw new Error(`Failed to fetch HEAD: ${headResponse.status} ${headResponse.statusText}`);
+  }
+
+  const remoteETag = headResponse.headers.get("ETag");
+  if (remoteETag) {
+    if (previousCacheKey === remoteETag) {
+      console.log(`[SIGMET] ETag matches previous cache key, skipping fetch.`);
+      return;
+    } else {
+      if (cacheClient) {
+        await cacheClient.set(intlKey, remoteETag);
+      }
+    }
+  }
 
   // get SIGMET events from the last 6 hours in the AK/PN/NT domains that were NOT issued by CWAO (CONUS) - we only want int'l SIGMETs from this feed
   const recentSigmets = await db
@@ -141,7 +171,7 @@ export async function getSigmets() {
   // find which SIGMETs are still active in the DB so we can diff the AWC API response against them
   const activeInDb = recentSigmets.filter((s) => s.endTime > now);
 
-  const intlData = await fetch(`${avwxApi}isigmet?format=json`, { headers: DEFAULT_REMOTE_HEADERS })
+  const intlData = await fetch(intlSigmetUrl, { headers: DEFAULT_REMOTE_HEADERS })
     .then((response) => {
       if (!response.ok) {
         throw new Error(
