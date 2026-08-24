@@ -16,6 +16,10 @@ export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
 };
 
+export type DataProcessResult = {
+  result: "success" | "error" | "skipped";
+};
+
 export type GFAData = {
   domain: string;
   cldwx: string[];

@@ -13,6 +13,7 @@ import { pgDb as db, pgConnection } from "../services/database.js";
 import { stations } from "../db/schemas.drizzle.js";
 import { createIsolines } from "./isolines.js";
 import { sql } from "drizzle-orm";
+import type { DataProcessResult } from "../lib/types.js";
 
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
@@ -24,19 +25,24 @@ async function main() {
     throw new Error("Database connection failed, exiting...");
   }
 
-  const refreshView = async () => {
+  const refreshView = async (): Promise<DataProcessResult> => {
     if (!db) {
       throw new Error("Database connection failed, exiting...");
     }
-    // refresh the materialized view and then make sure the indexes exist - we can't do this via `push` from the schema
-    // because the view is not a table and doesn't have a schema to attach indexes to
-    await db.execute(sql`REFRESH MATERIALIZED VIEW metars_temporal;`);
-    await db.execute(
-      sql`CREATE INDEX IF NOT EXISTS metars_temporal_spatial_index ON metars_temporal USING gist (geometry);`,
-    );
-    await db.execute(
-      sql`CREATE INDEX IF NOT EXISTS metars_temporal_site_id_index ON metars_temporal USING btree (site_id);`,
-    );
+
+    await db.transaction(async (tx) => {
+      // refresh the materialized view and then make sure the indexes exist - we can't do this via `push` from the schema
+      // because the view is not a table and doesn't have a schema to attach indexes to
+      await tx.execute(sql`REFRESH MATERIALIZED VIEW metars_temporal;`);
+      await tx.execute(
+        sql`CREATE INDEX IF NOT EXISTS metars_temporal_spatial_index ON metars_temporal USING gist (geometry);`,
+      );
+      await tx.execute(
+        sql`CREATE INDEX IF NOT EXISTS metars_temporal_site_id_index ON metars_temporal USING btree (site_id);`,
+      );
+    });
+
+    return { result: "success" };
   };
 
   // we need to check to see if we have a valid station catalog and station-visibility table
@@ -73,11 +79,14 @@ async function main() {
   const startedAt = performance.now();
 
   const results = await Promise.allSettled(tasks.map((task) => queue.push(task.name, task.run)));
-  const failures = results.filter((result) => result.status === "rejected");
+  const skipped = results.filter((result) => result.status === "fulfilled" && result.value.result === "skipped");
+  const failures = results.filter(
+    (result) => result.status === "rejected" || (result.status === "fulfilled" && result.value.result === "error"),
+  );
   const elapsedMs = Math.round(performance.now() - startedAt);
 
   console.log(
-    `[DATA] Summary: total=${tasks.length} succeeded=${tasks.length - failures.length} failed=${failures.length} elapsed=${elapsedMs}ms`,
+    `[DATA] Summary: total=${tasks.length} succeeded=${tasks.length - failures.length - skipped.length} skipped=${skipped.length} failed=${failures.length} elapsed=${elapsedMs}ms`,
   );
 
   if (failures.length > 0) {

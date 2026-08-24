@@ -1,13 +1,15 @@
+import type { DataProcessResult } from "../lib/types.js";
+
 export type DataTask = {
   name: string;
-  run: () => Promise<void>;
+  run: () => Promise<DataProcessResult>;
   schedule: string;
 };
 
 type QueuedTask = {
   id: number;
   name: string;
-  run: () => Promise<void>;
+  run: () => Promise<DataProcessResult>;
 };
 
 export class TaskQueue {
@@ -23,8 +25,8 @@ export class TaskQueue {
     this.nextTaskId = 1;
   }
 
-  push(name: string, task: () => Promise<void>) {
-    return new Promise<void>((resolve, reject) => {
+  push(name: string, task: () => Promise<DataProcessResult>): Promise<DataProcessResult> {
+    return new Promise<DataProcessResult>((resolve) => {
       const taskId = this.nextTaskId++;
 
       this.queue.push({
@@ -34,12 +36,15 @@ export class TaskQueue {
           const startedAt = Date.now();
 
           try {
-            await task();
-            resolve();
+            const result = await task();
+            resolve(result);
+            return result;
           } catch (error) {
             const elapsedMs = Date.now() - startedAt;
             console.error(`[QUEUE] FAIL  #${taskId} ${name} | ${elapsedMs}ms | ${(error as Error).message}`);
-            reject(error);
+            const errorResult: DataProcessResult = { result: "error" };
+            resolve(errorResult);
+            return errorResult;
           }
         },
       });

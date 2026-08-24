@@ -1,6 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { pgDb as db } from "../services/database.js";
 import { stations as stationsSchema } from "../db/schemas.drizzle.js";
+import type { DataProcessResult } from "../lib/types.js";
 
 // prettier-ignore
 const BC_WINDS = ["CWAS","CWFG","CWRU","CWRO","CWEK","CWME","CWRO","CWQS","CWQK"]
@@ -91,7 +92,7 @@ function withinRadius(lat1: number, lon1: number, lat2: number, lon2: number, ra
   return (x * x + y * y) * R * R < radius * radius;
 }
 
-export async function updateStationVisTable() {
+export async function updateStationVisTable(): Promise<DataProcessResult> {
   if (!db) {
     throw new Error("[STATION-VISIBILITY] Database connection failed.");
   }
@@ -153,7 +154,9 @@ export async function updateStationVisTable() {
         await tx.update(stationsSchema).set({ minZoom }).where(eq(stationsSchema.siteId, siteId));
       }
     });
+    return { result: "success" };
   } catch (error) {
     console.error("[STATION-VISIBILITY] Error updating station visibility table:", (error as Error).message);
+    return { result: "error" };
   }
 }

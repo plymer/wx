@@ -3,7 +3,7 @@ import { lt } from "drizzle-orm";
 import { readGzipFile } from "./read-gzip.js";
 import { xmlParser } from "../lib/utils.js";
 import { tafs } from "../db/schemas.drizzle.js";
-import type { CacheTafData, TafData, XMLCacheFile } from "../lib/types.js";
+import type { CacheTafData, DataProcessResult, TafData, XMLCacheFile } from "../lib/types.js";
 import { tafSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
 
@@ -11,14 +11,14 @@ import { pgDb as db } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/tafs.cache.xml.gz";
 
-export async function getTafs() {
+export async function getTafs(): Promise<DataProcessResult> {
   if (!db) {
     throw new Error("[TAF] Database connection failed.");
   }
 
   const xml = await readGzipFile(RESOURCE_URL, "taf");
 
-  if (xml === null) return;
+  if (xml === null) return { result: "skipped" };
 
   const { parser } = xmlParser();
 
@@ -65,7 +65,9 @@ export async function getTafs() {
 
     // now clean up the database and remove any tafs older than 24 hours
     await db.delete(tafs).where(lt(tafs.validTime, new Date(Date.now() - 24 * HOUR)));
+    return { result: "success" };
   } catch (error) {
-    throw new Error(`[TAF] Error processing TAF cache file: ${(error as Error).message}`);
+    console.log(`[TAF] Error processing TAF cache file: ${(error as Error).message}`);
+    return { result: "error" };
   }
 }

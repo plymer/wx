@@ -4,6 +4,7 @@ import type {
   WxOAlertMetadataProperties,
   WxOAlertFeatureProperties,
   WxOAlertVisualGeometryProperties,
+  DataProcessResult,
 } from "../lib/types.js";
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import * as turf from "@turf/turf";
@@ -11,6 +12,7 @@ import { pgDb as db } from "../services/database.js";
 
 import { publicAlerts } from "../db/schemas.drizzle.js";
 import { and, gt, inArray, lt, notInArray, type InferInsertModel } from "drizzle-orm";
+import { etagCheckin } from "../lib/etag.js";
 
 type AlertsPropertiesResponse = {
   type: "FeatureCollection";
@@ -26,7 +28,7 @@ type AlertsGeometriesResponse = {
   features: Feature<MultiPolygon, WxOAlertVisualGeometryProperties>[];
 };
 
-export async function getPublicAlerts() {
+export async function getPublicAlerts(): Promise<DataProcessResult> {
   if (!db) {
     throw new Error("[METAR] Database connection failed.");
   }
@@ -34,9 +36,13 @@ export async function getPublicAlerts() {
   const alertPropertiesSource = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.en.geojson";
   const freeFormAlertGeometriesSource = "https://weather.gc.ca/data/dms/alert_geojson_2_0/alerts.public.visual.geojson";
 
-  // TODO :: implement ETag caching
-
   try {
+    const propertiesCheckin = await etagCheckin(alertPropertiesSource, "publicAlertProperties");
+    const geometriesCheckin = await etagCheckin(freeFormAlertGeometriesSource, "publicAlertGeometries");
+
+    // if both the properties and geometries have not changed, we can skip fetching the data and return early
+    if (!propertiesCheckin && !geometriesCheckin) return { result: "skipped" };
+
     const alertsPropertiesGeoJson = await fetch(alertPropertiesSource, {
       headers: DEFAULT_REMOTE_HEADERS,
     }).then(async (res) => {
@@ -262,7 +268,9 @@ export async function getPublicAlerts() {
 
     // finally, let's purge the database of alerts that are older than 24 hours
     await db.delete(publicAlerts).where(lt(publicAlerts.issueTime, new Date(now.getTime() - 24 * HOUR)));
+    return { result: "success" };
   } catch (error) {
-    throw new Error(`[WXO] [ALERTS] Error fetching public alerts: ${error}`);
+    console.error(`[WXO] [ALERTS] Error fetching public alerts: ${(error as Error).message}`);
+    return { result: "error" };
   }
 }

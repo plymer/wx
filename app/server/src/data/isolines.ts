@@ -11,15 +11,12 @@ import { isolines, mslpExtrema } from "../db/schemas.drizzle.js";
 import { lonLatToWebMercator } from "../lib/utils.js";
 import { HOUR, MINUTE } from "../lib/constants.js";
 import { pgDb as db } from "../services/database.js";
+import type { DataProcessResult } from "../lib/types.js";
 
 // export const DATA_TYPES = ["mslp", "tt", "td"] as const;
 export const DATA_TYPES = ["mslp", "tt"] as const;
 
-export async function createIsolines() {
-  if (!db) {
-    throw new Error("[ISOLINES] Database connection failed.");
-  }
-
+export async function createIsolines(): Promise<DataProcessResult> {
   // const DATA_TYPES = ["mslp", "tt"] as const;
   const BASE_RESOLUTION = 2048;
 
@@ -49,11 +46,15 @@ export async function createIsolines() {
   await Promise.allSettled(
     DATA_TYPES.map(async (dataType) => {
       try {
+        if (!db) {
+          throw new Error("[ISOLINES] Database connection failed.");
+        }
+
         const now = new Date().getTime();
 
         // clear out old isolines and mslp extrema data from the database
-        await db!.delete(isolines).where(lt(isolines.startTime, new Date(now - 3.5 * HOUR)));
-        await db!.delete(mslpExtrema).where(lt(mslpExtrema.startTime, new Date(now - 3.5 * HOUR)));
+        await db.delete(isolines).where(lt(isolines.startTime, new Date(now - 3.5 * HOUR)));
+        await db.delete(mslpExtrema).where(lt(mslpExtrema.startTime, new Date(now - 3.5 * HOUR)));
 
         const northernHemisphereQuery = sql`
           SELECT DISTINCT ON (site_id)
@@ -83,7 +84,7 @@ export async function createIsolines() {
           ORDER BY site_id, valid_time DESC
         `;
 
-        const queryResult = await db!.execute(dataType === "mslp" ? northernHemisphereQuery : northAmericaQuery);
+        const queryResult = await db.execute(dataType === "mslp" ? northernHemisphereQuery : northAmericaQuery);
 
         const rows = queryResult.rows as Array<{
           value: number | null;
@@ -162,8 +163,9 @@ export async function createIsolines() {
         console.log(`[ISOLINES] '${dataType}' processing completed and results were stored.`);
       } catch (error) {
         console.error("[ISOLINES] Error during isoline processing:", (error as Error).stack);
-        throw error;
+        return { result: "error" };
       }
     }),
   );
+  return { result: "success" };
 }

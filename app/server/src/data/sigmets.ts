@@ -2,13 +2,18 @@ import "dotenv/config";
 import { gt, lt } from "drizzle-orm";
 import { sigmets } from "../db/schemas.drizzle.js";
 import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
-import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../lib/types.js";
+import type {
+  CacheAirSigmetsData,
+  Coords,
+  DataProcessResult,
+  RawIntlSigmetData,
+  SigmetData,
+  XMLCacheFile,
+} from "../lib/types.js";
 import { cardinalToDegrees, xmlParser } from "../lib/utils.js";
 import { airSigmetsSchema } from "../lib/validation.js";
 import { pgDb as db } from "../services/database.js";
 import { readGzipFile } from "./read-gzip.js";
-import { ETAG_CACHE_KEY } from "../config/cache-keys.config.js";
-import { cacheClient } from "../services/redis.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
@@ -34,14 +39,19 @@ const extractEventName = (text: string): string | null => {
   }
 };
 
-export async function getSigmets() {
+export async function getSigmets(): Promise<DataProcessResult> {
   if (!db) {
     throw new Error("[SIGMET] Database connection failed.");
   }
 
-  const xml = await readGzipFile(RESOURCE_URL, "sigmet");
+  let wasError = false;
 
-  if (xml === null) return;
+  const xml = await readGzipFile(RESOURCE_URL, "sigmet", true);
+
+  if (xml === null) {
+    console.error("[SIGMET] Error - data was null");
+    return { result: "error" };
+  }
 
   const { parser } = xmlParser();
 
@@ -127,7 +137,8 @@ export async function getSigmets() {
 
     conusOutput.push(...output);
   } catch (error) {
-    throw new Error(`[SIGMET] Could not parse SIGMETs from the AWC XML: ${(error as Error).message}`);
+    console.error(`[SIGMET] Could not parse SIGMETs from the AWC XML: ${(error as Error).message}`);
+    wasError = true;
   }
 
   const avwxApi = "https://aviationweather.gov/api/data/";
@@ -135,32 +146,6 @@ export async function getSigmets() {
   const intlSigmetUrl = `${avwxApi}isigmet?format=json`;
 
   const now = new Date();
-
-  if (!cacheClient) {
-    console.warn(`[SIGMET] Redis client not available, continuing naively.`);
-  }
-
-  const intlKey = `${ETAG_CACHE_KEY}:sigmet:intl`;
-
-  const previousCacheKey = cacheClient ? await cacheClient.get(intlKey) : null;
-
-  // do preflight check with HEAD request to get the ETag
-  const headResponse = await fetch(intlSigmetUrl, { method: "HEAD", headers: DEFAULT_REMOTE_HEADERS });
-  if (!headResponse.ok) {
-    throw new Error(`Failed to fetch HEAD: ${headResponse.status} ${headResponse.statusText}`);
-  }
-
-  const remoteETag = headResponse.headers.get("ETag");
-  if (remoteETag) {
-    if (previousCacheKey === remoteETag) {
-      console.log(`[SIGMET] ETag matches previous cache key, skipping fetch.`);
-      return;
-    } else {
-      if (cacheClient) {
-        await cacheClient.set(intlKey, remoteETag);
-      }
-    }
-  }
 
   // get SIGMET events from the last 6 hours in the AK/PN/NT domains that were NOT issued by CWAO (CONUS) - we only want int'l SIGMETs from this feed
   const recentSigmets = await db
@@ -350,7 +335,8 @@ export async function getSigmets() {
     );
     // console.log(`[SIGMET] Inserted/updated ${data.length} SIGMETs.`);
   } catch (error) {
-    throw new Error(`[SIGMET] Could not insert SIGMETs into the database: ${(error as Error).message}`);
+    console.error(`[SIGMET] Could not insert SIGMETs into the database: ${(error as Error).message}`);
+    wasError = true;
   }
 
   // console.log(`[SIGMET] Cleaning up old data...`);
@@ -359,6 +345,13 @@ export async function getSigmets() {
     await db.delete(sigmets).where(lt(sigmets.endTime, new Date(Date.now() - 12 * HOUR)));
     // console.log(`[SIGMET] Old data cleanup complete.`);
   } catch (error) {
-    throw new Error(`[SIGMET] Could not clean up old SIGMETs in the database: ${(error as Error).message}`);
+    console.error(`[SIGMET] Could not clean up old SIGMETs in the database: ${(error as Error).message}`);
+    wasError = true;
+  }
+
+  if (wasError) {
+    return { result: "error" };
+  } else {
+    return { result: "success" };
   }
 }

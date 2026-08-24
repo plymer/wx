@@ -1,33 +1,11 @@
 import { createGunzip } from "zlib";
 import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
-import { ETAG_CACHE_KEY } from "../config/cache-keys.config.js";
-import { cacheClient } from "../services/redis.js";
 
-export async function readGzipFile(url: string, dataType: string) {
-  if (!cacheClient) {
-    console.warn(`[${dataType.toUpperCase()}] Redis client not available, continuing naively.`);
-  }
+import { etagCheckin } from "../lib/etag.js";
 
-  const previousCacheKey = cacheClient ? await cacheClient.get(`${ETAG_CACHE_KEY}:${dataType}`) : null;
-
+export async function readGzipFile(url: string, dataType: string, skipCheckin: boolean = false) {
   try {
-    // do preflight check with HEAD request to get the ETag
-    const headResponse = await fetch(url, { method: "HEAD", headers: DEFAULT_REMOTE_HEADERS });
-    if (!headResponse.ok) {
-      throw new Error(`Failed to fetch HEAD: ${headResponse.status} ${headResponse.statusText}`);
-    }
-
-    const remoteETag = headResponse.headers.get("ETag");
-    if (remoteETag) {
-      if (previousCacheKey === remoteETag) {
-        console.log(`[${dataType.toUpperCase()}] ETag matches previous cache key, skipping fetch.`);
-        return null;
-      } else {
-        if (cacheClient) {
-          await cacheClient.set(`${ETAG_CACHE_KEY}:${dataType}`, remoteETag);
-        }
-      }
-    }
+    if (!skipCheckin && !(await etagCheckin(url, dataType))) return null;
 
     // fetch the compressed data
     const arrayBuffer = await fetch(url, { headers: DEFAULT_REMOTE_HEADERS }).then((res) => {
