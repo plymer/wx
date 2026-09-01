@@ -11,6 +11,8 @@ import { pgDb as db } from "../services/database.js";
 import { cacheClient } from "../services/redis.js";
 import { sql } from "drizzle-orm";
 import { POPUP_DATA_CACHE_KEY, PUBLIC_ALERTS_CACHE_KEY } from "../config/cache-keys.config.js";
+import path from "path";
+import * as fs from "fs/promises";
 
 type LeadAlertRow = {
   id: string;
@@ -226,4 +228,34 @@ export const wxmapRouter = router({
       }
     },
   ),
+  hurricanes: publicProcedure.query(async () => {
+    if (!process.env.STATIC_DATA_DIR) {
+      throw new Error("STATIC_DATA_DIR environment variable is not set");
+    }
+
+    console.log("[API] Fetching Hurricane data from directory:", process.env.STATIC_DATA_DIR);
+
+    const hurricanesDir = path.join(process.env.STATIC_DATA_DIR, "hurricanes");
+    const messageFiles = await fs.readdir(hurricanesDir);
+
+    const featureCollections: FeatureCollection[] = [];
+    for (const file of messageFiles) {
+      const filePath = path.join(hurricanesDir, file);
+      const content = await fs.readFile(filePath, "utf-8");
+      try {
+        const featureCollection = JSON.parse(content) as FeatureCollection;
+        featureCollections.push(featureCollection);
+      } catch (e) {
+        console.error(`Error parsing hurricane file ${file}:`, e);
+      }
+    }
+
+    // Merge all feature collections into one
+    const mergedFeatureCollection: FeatureCollection = {
+      type: "FeatureCollection",
+      features: featureCollections.flatMap((fc) => fc.features),
+    };
+
+    return mergedFeatureCollection;
+  }),
 });
