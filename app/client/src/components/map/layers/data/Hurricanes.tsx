@@ -4,6 +4,8 @@ import { Source, Layer } from "react-map-gl/maplibre";
 export const Hurricanes = () => {
   const data = useQuery(api.wxmap.hurricanes.queryOptions());
 
+  console.log("Hurricane data:", data.data);
+
   // types:
 
   // track
