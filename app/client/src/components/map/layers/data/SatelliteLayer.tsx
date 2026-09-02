@@ -4,6 +4,9 @@ import { useSatelliteProduct, useShowSatellite } from "@/stateStores/map/rasterD
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";
 import { MINUTE } from "@shared/lib/constants";
+import { SATELLITE_DOMAINS } from "@/config/rasterData";
+import { useIsVisible } from "@/hooks/useIsVisible";
+import { useBaseMap } from "@/stateStores/map/mapView";
 
 interface Props {
   belowLayer?: string;
@@ -13,6 +16,9 @@ interface Props {
 export const SatelliteLayer = ({ domain }: Props) => {
   const showSatellite = useShowSatellite();
   const satelliteProduct = useSatelliteProduct();
+  const baseMap = useBaseMap();
+
+  const isVisible = useIsVisible(SATELLITE_DOMAINS[domain]);
 
   const belowLayerId = "satellite-target";
 
@@ -23,9 +29,9 @@ export const SatelliteLayer = ({ domain }: Props) => {
 
   const { data: euData } = useQuery(
     api.wms.eumetsat.queryOptions(
-      { domain: "europe", product: "mtg_fd:rgb_fog" },
+      { domain: "europe", product: "msg_fes:rgb_ash" },
       {
-        enabled: showSatellite && domain === "europe",
+        enabled: baseMap === "hillshade" && isVisible && showSatellite && domain === "europe",
         refetchInterval: MINUTE,
         trpc: { context: { skipBatch: true } },
       },
@@ -34,9 +40,9 @@ export const SatelliteLayer = ({ domain }: Props) => {
 
   const { data: iOData } = useQuery(
     api.wms.eumetsat.queryOptions(
-      { domain: "indianOcean", product: "msg_iodc:rgb_fog" },
+      { domain: "indianOcean", product: "msg_iodc:rgb_ash" },
       {
-        enabled: showSatellite && domain === "indianOcean",
+        enabled: baseMap === "hillshade" && isVisible && showSatellite && domain === "indianOcean",
         refetchInterval: MINUTE,
         trpc: { context: { skipBatch: true } },
       },
@@ -47,7 +53,7 @@ export const SatelliteLayer = ({ domain }: Props) => {
     api.wms.goes.queryOptions(
       { domain: domain as "east" | "west", product: satelliteProduct },
       {
-        enabled: showSatellite && domain !== "europe" && domain !== "indianOcean",
+        enabled: baseMap === "hillshade" && isVisible && showSatellite && (domain === "east" || domain === "west"),
         refetchInterval: MINUTE,
         trpc: { context: { skipBatch: true } },
       },
@@ -58,7 +64,18 @@ export const SatelliteLayer = ({ domain }: Props) => {
     api.wms.himawari.queryOptions(
       { product: "2km_Ash" },
       {
-        enabled: showSatellite && domain === "himawari",
+        enabled: baseMap === "hillshade" && isVisible && showSatellite && domain === "himawari",
+        refetchInterval: MINUTE,
+        trpc: { context: { skipBatch: true } },
+      },
+    ),
+  );
+
+  const { data: nowcoastData } = useQuery(
+    api.wms.nowcoast.queryOptions(
+      { product: "goes_longwave_imagery" },
+      {
+        enabled: baseMap === "hillshade" && isVisible && showSatellite && domain === "nowcoast",
         refetchInterval: MINUTE,
         trpc: { context: { skipBatch: true } },
       },
@@ -68,6 +85,9 @@ export const SatelliteLayer = ({ domain }: Props) => {
   let data;
 
   switch (domain) {
+    case "nowcoast":
+      data = nowcoastData;
+      break;
     case "europe":
       data = euData;
       break;
@@ -83,7 +103,7 @@ export const SatelliteLayer = ({ domain }: Props) => {
       break;
   }
 
-  if (!showSatellite || !data) return;
+  if (baseMap !== "hillshade" || !isVisible || !showSatellite || !data) return;
 
   return <RasterDataLayer apiData={data} belowLayer={belowLayerId} />;
 };

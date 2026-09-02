@@ -1,9 +1,10 @@
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import type { LightningFC } from "../lib/lightning.types.js";
 import { lt, sql, desc } from "drizzle-orm";
-import { lightning } from "../db/schemas.drizzle.js";
+import { lightning, lightningClustered } from "../db/schemas.drizzle.js";
 import { pgDb as db } from "../services/database.js";
 import { lonLatToWebMercator } from "../lib/utils.js";
+import type { DataProcessResult } from "../lib/types.js";
 
 const formatDateToUrlDate = (date: Date) => {
   return date
@@ -13,10 +14,12 @@ const formatDateToUrlDate = (date: Date) => {
     .replace(/:/g, "");
 };
 
-export async function getLightning() {
+export async function getLightning(): Promise<DataProcessResult> {
   if (!db) {
     throw new Error("[LIGHTNING] Database connection failed.");
   }
+
+  let errorCount = 0;
 
   // we want to check the 'current time' of the roundedMinutes (closest 6-minute bin) and then the previous 6-minute bin to catch any 'strays' or update with a new 'slice' after a new timestamp is generated
   // its a strange way that they serve the data, but it is what it is
@@ -48,6 +51,7 @@ export async function getLightning() {
                 `[LIGHTNING] Error when fetching data from ${`https://weather.gc.ca/api/app/v2/Lightning/1/${ts}`}:`,
                 err.message,
               );
+              errorCount++;
               return null;
             }),
         ),
@@ -163,14 +167,18 @@ export async function getLightning() {
     }
 
     await db.delete(lightning).where(lt(lightning.startTime, new Date(new Date().getTime() - 4 * HOUR)));
-  } catch (error) {
-    if (error instanceof Error) {
-      const causeMessage = (error as { cause?: { message?: string } }).cause?.message;
-      throw new Error(`[LIGHTNING] Error: ${error.message}${causeMessage ? ` | cause: ${causeMessage}` : ""}`, {
-        cause: error,
-      });
-    }
+    await db
+      .delete(lightningClustered)
+      .where(lt(lightningClustered.startTime, new Date(new Date().getTime() - 4 * HOUR)));
 
-    throw new Error(`[LIGHTNING] Error: Unknown failure`, { cause: error });
+    if (errorCount > 1) {
+      return { result: "error" };
+    } else {
+      return { result: "success" };
+    }
+  } catch (error) {
+    console.error(`[LIGHTNING] Error:`, (error as Error).message);
+
+    return { result: "error" };
   }
 }

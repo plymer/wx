@@ -1,21 +1,24 @@
 import "dotenv/config";
 import { lt } from "drizzle-orm";
-import { lonLatToWebMercator, readGzipFile } from "../lib/utils.js";
+import { lonLatToWebMercator } from "../lib/utils.js";
+import { readGzipFile } from "./read-gzip.js";
 import { xmlParser } from "../lib/utils.js";
 import { metars } from "../db/schemas.drizzle.js";
-import type { CacheMetarData, MetarData, XMLCacheFile } from "../lib/types.js";
+import type { CacheMetarData, DataProcessResult, MetarData, XMLCacheFile } from "../lib/types.js";
 import { metarSchema } from "../lib/validation.js";
 import { HOUR } from "../lib/constants.js";
 import { pgDb as db } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/metars.cache.xml.gz";
 
-export async function getMetars() {
+export async function getMetars(): Promise<DataProcessResult> {
   if (!db) {
     throw new Error("[METAR] Database connection failed.");
   }
 
   const xml = await readGzipFile(RESOURCE_URL, "metar");
+
+  if (xml === null) return { result: "skipped" };
 
   const { parser } = xmlParser();
 
@@ -126,11 +129,13 @@ export async function getMetars() {
     // console.log(`[METAR] Cleaning up old data...`);
     // now clean up the database and remove any metars older than 96 hours
     await db.delete(metars).where(lt(metars.validTime, new Date(Date.now() - 96 * HOUR)));
+    return { result: "success" };
 
     // console.log(`[METAR] Cleanup complete.`);
 
     // console.log(`[METAR] Cache file processing complete.`);
   } catch (error) {
-    throw new Error(`[METAR] Error processing cache file: ${(error as Error).message}`);
+    console.error(`[METAR] Error processing cache file: ${(error as Error).message}`);
+    return { result: "error" };
   }
 }

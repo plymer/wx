@@ -3,19 +3,19 @@ import { useBulletin, useCoords, useMode, useOffice, usePublicActions } from "@/
 import { PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { api } from "@/lib/trpc";
 import { Activity, useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/Select";
 import { useQuery } from "@tanstack/react-query";
 import { MINUTE } from "@shared/lib/constants";
-import Button from "./ui/Button";
-import { Label } from "./ui/Label";
+import Button from "@/components/ui/Button";
+import { Label } from "@/components/ui/Label";
 import { Calendar, Info, OctagonX } from "lucide-react";
-import { PointForecastMap } from "./public/PointForecastMap";
+import { PointForecastMap } from "@/components/public/PointForecastMap";
 import type { Position } from "geojson";
-import { AlertsModal } from "./public/AlertsModal";
-import { NormalsContainer } from "./public/NormalsContainer";
-import { WxIcon } from "./public/WxIcon";
-import { CurrentConditions } from "./public/CurrentConditions";
-import { ForecastTrendChart } from "./public/ForecastTrendChart";
+import { AlertsModal } from "@/components/public/AlertsModal";
+import { NormalsContainer } from "@/components/public/NormalsContainer";
+import { WxIcon } from "@/components/public/WxIcon";
+import { CurrentConditions } from "@/components/public/CurrentConditions";
+import { ForecastTrendChart } from "@/components/public/ForecastTrendChart";
 import type { PointForecastData } from "@shared/lib/types";
 
 export default function Public() {

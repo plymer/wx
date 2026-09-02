@@ -1,11 +1,17 @@
 import { TRPCError } from "@trpc/server";
 import type { WMSLayer } from "../lib/types.js";
 import { processDimensionString } from "../lib/utils.js";
-import { DATA_CUTOFF, EUMETSAT_GETCAPABILITIES, GEOMET_GETCAPABILITIES } from "../config/wms.config.js";
+import {
+  DATA_CUTOFF,
+  EUMETSAT_GETCAPABILITIES,
+  GEOMET_GETCAPABILITIES,
+  NOWCOAST_GETCAPABILITIES,
+} from "../config/wms.config.js";
 import {
   eumetsatProductSchema,
   goesProductSchema,
   himawariProductSchema,
+  nowcoastProductSchema,
   radarProductSchema,
 } from "../validationSchemas/wms.zod.js";
 import { WMSXMLParser } from "../services/xml-parser.js";
@@ -159,9 +165,14 @@ export const wmsRouter = router({
 
       const { parser } = new WMSXMLParser();
 
-      const xml = await fetch(EUMETSAT_GETCAPABILITIES, { headers: DEFAULT_REMOTE_HEADERS }).then(async (response) =>
-        parser.parse(await response.text()),
-      );
+      const xml = await fetch(EUMETSAT_GETCAPABILITIES, { headers: DEFAULT_REMOTE_HEADERS })
+        .then(async (response) => parser.parse(await response.text()))
+        .catch((error) => {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error instanceof Error ? error.message : "Unknown error",
+          });
+        });
 
       const allLayers: WMSLayer[] = xml.wmsCapabilities.capability.layer.layer
         .filter((layer: any) => layer.title.includes("- 0 degree") || layer.title.includes("- Indian Ocean"))
@@ -192,6 +203,78 @@ export const wmsRouter = router({
       };
 
       await cacheClient.setEx(`wms:eumetsat:${domain}:${product}`, 60 * 10, JSON.stringify(output));
+
+      return output;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }),
+
+  nowcoast: publicProcedure.input(nowcoastProductSchema).query(async ({ input }) => {
+    const { product } = input;
+
+    try {
+      const cachedData = await cacheClient.get(`wms:nowcoast:${product}`);
+
+      if (cachedData) {
+        console.log(`[API] Cache HIT for WMS nowcoast product: ${product}.`);
+        return JSON.parse(cachedData) as WMSLayer;
+      }
+
+      console.log(`[API] Cache MISS for WMS nowcoast product: ${product}. Fetching from source...`);
+
+      const { parser } = new WMSXMLParser();
+
+      const xml = await fetch(NOWCOAST_GETCAPABILITIES, { headers: DEFAULT_REMOTE_HEADERS })
+        .then(async (response) => parser.parse(await response.text()))
+        .catch((error) => {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error instanceof Error ? error.message : "Unknown error",
+          });
+        });
+
+      const allLayers: WMSLayer[] = xml.wmsCapabilities.capability.layer.layer.map((layer: any) => {
+        return {
+          name: layer.name,
+          title: layer.title,
+          domain: "nowcoast",
+          dimension: layer.dimension.value, // this is a string of ISO timesteps separated by commas
+          type: "satellite",
+        } as WMSLayer;
+      });
+
+      const dataCutoff = Date.now() - DATA_CUTOFF;
+
+      const foundLayer = allLayers.find((l) => l.name === product);
+
+      if (!foundLayer) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Product ${product} not found`,
+        });
+      }
+
+      const { domain, name, title, type } = foundLayer;
+
+      console.log(`[API] Found WMS nowcoast product: ${product} with domain: ${domain}.`);
+
+      const output = {
+        domain,
+        name,
+        title,
+        type,
+        dimension: "",
+        timeSteps: foundLayer.dimension
+          .split(",")
+          .filter((time) => new Date(time).getTime() >= dataCutoff)
+          .map((time) => ({ validTime: new Date(time).getTime() })),
+      };
+
+      await cacheClient.setEx(`wms:nowcoast:${product}`, 60 * 10, JSON.stringify(output));
 
       return output;
     } catch (error) {

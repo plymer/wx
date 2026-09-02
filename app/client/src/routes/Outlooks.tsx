@@ -1,9 +1,9 @@
 import { api } from "@/lib/trpc";
 import { useOutlookActions, useOutlookProduct } from "@/stateStores/outlook";
 import { useQuery } from "@tanstack/react-query";
-import Button from "./ui/Button";
+import Button from "@/components/ui/Button";
 
-import OutlookContainer from "./outlook/OutlookContainer";
+import OutlookContainer from "@/components/outlook/OutlookContainer";
 import { CloudLightning, Wind } from "lucide-react";
 
 export default function Outlooks() {

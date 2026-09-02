@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 
-import AnimationControls from "./map/controls/AnimationControls";
-import WeatherMap from "./map/WeatherMap";
+import AnimationControls from "@/components/map/controls/AnimationControls";
+import WeatherMap from "@/components/map/WeatherMap";
 
 import { positronWxMap } from "@/assets/map-styles/positron-wxmap.js";
 
 import { AttributionControl, ScaleControl, type ViewState } from "react-map-gl/maplibre";
-import MapLoadingIndicator from "./ui/MapLoadingIndicator";
-import { GeoLocation } from "./map/controls/GeoLocation";
+import MapLoadingIndicator from "@/components/map/MapLoadingIndicator";
+import { GeoLocation } from "@/components/map/controls/GeoLocation";
 import {
   useProjection,
   useLatitude,
@@ -16,34 +16,39 @@ import {
   useBearing,
   usePitch,
   useLayersLoading,
+  useBaseMap,
 } from "@/stateStores/map/mapView";
 import { useAnimationActions } from "@/stateStores/map/animation";
 
-import MapOptions from "./map/controls/MapOptions";
-import { SatelliteLayer } from "./map/layers/data/SatelliteLayer";
-import { RadarLayer } from "./map/layers/data/RadarLayer";
-import { TAFOverlay } from "./map/layers/overlays/TAFOverlay";
-import { BedpostOverlay } from "./map/layers/overlays/BedpostOverlay";
-import { FIROverlay } from "./map/layers/overlays/FIROverlay";
-import { GFAOverlay } from "./map/layers/overlays/GFAOverlay";
-import { LGFOverlay } from "./map/layers/overlays/LGFOverlay";
-import { PublicRegionsOverlay } from "./map/layers/overlays/PublicRegionsOverlay";
-import { MarineRegionsOverlay } from "./map/layers/overlays/MarineRegionsOverlay";
-import { LightningDataLayer } from "./map/layers/data/LightningDataLayer";
-import { SurfaceDataLayer } from "./map/layers/data/SurfaceDataLayer";
-import { DataPopup } from "./map/DataPopup";
-import { AirQualityLayer } from "./map/layers/data/AirQualityLayer";
-import { SigmetLayer } from "./map/layers/data/SigmetLayer";
-import { AlertsLayer } from "./map/layers/data/AlertsLayer";
-import { VectorTileSource } from "./map/layers/data/VectorTileSource";
-import { SiteSearch } from "./map/controls/SiteSearch";
-import { HillshadeLayer } from "./map/layers/base/Hillshade";
+import MapOptions from "@/components/map/controls/MapOptions";
+import { SatelliteLayer } from "@/components/map/layers/data/SatelliteLayer";
+import { RadarLayer } from "@/components/map/layers/data/RadarLayer";
+import { TAFOverlay } from "@/components/map/layers/overlays/TAFOverlay";
+import { BedpostOverlay } from "@/components/map/layers/overlays/BedpostOverlay";
+import { FIROverlay } from "@/components/map/layers/overlays/FIROverlay";
+import { GFAOverlay } from "@/components/map/layers/overlays/GFAOverlay";
+import { LGFOverlay } from "@/components/map/layers/overlays/LGFOverlay";
+import { PublicRegionsOverlay } from "@/components/map/layers/overlays/PublicRegionsOverlay";
+import { MarineRegionsOverlay } from "@/components/map/layers/overlays/MarineRegionsOverlay";
+import { LightningDataLayer } from "@/components/map/layers/data/LightningDataLayer";
+import { SurfaceDataLayer } from "@/components/map/layers/data/SurfaceDataLayer";
+import { DataPopup } from "@/components/map/DataPopup";
+import { AirQualityLayer } from "@/components/map/layers/data/AirQualityLayer";
+import { SigmetLayer } from "@/components/map/layers/data/SigmetLayer";
+import { AlertsLayer } from "@/components/map/layers/data/AlertsLayer";
+import { VectorTileSource } from "@/components/map/layers/data/VectorTileSource";
+// import { SiteSearch } from "@/components/map/controls/SiteSearch";
+import { HillshadeLayer } from "@/components/map/layers/base/Hillshade";
+import { AerialImageryLayer } from "@/components/map/layers/base/Aerial";
+import { libertyWxMap } from "@/assets/map-styles/liberty-wxmap";
+import { Hurricanes } from "@/components/map/layers/data/Hurricanes";
 
 export default function WxMap() {
   // global state store subscriptions
   const loadingState = useLayersLoading().length > 0;
   const projection = useProjection();
   const animation = useAnimationActions();
+  const baseMap = useBaseMap();
 
   const viewState: Partial<ViewState> = {
     latitude: useLatitude(),
@@ -60,11 +65,9 @@ export default function WxMap() {
     animation.pause();
   }, []);
 
-  // import the map style - this may need to change to allow different map styles in the future
-  const mapStyle = positronWxMap;
+  const mapStyle = baseMap === "aerial" || baseMap === "hillshade" ? positronWxMap : libertyWxMap;
 
-  // const interactiveLayers = ["layer-pirep", "layer-sigmet", "layer-airmet", "layer-sfc-obs-target"]
-  const interactiveLayers = ["layer-sfc-obs-target", "layer-sigmet", "layer-wxo-alerts"];
+  const interactiveLayers = ["layer-sfc-obs-dot", "layer-sigmet", "layer-wxo-alerts"];
 
   return (
     <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height) text-sm">
@@ -92,12 +95,15 @@ export default function WxMap() {
 
         <VectorTileSource />
         <HillshadeLayer />
+        <AerialImageryLayer />
 
         <SatelliteLayer domain="west" />
         <SatelliteLayer domain="east" />
         <SatelliteLayer domain="europe" />
         <SatelliteLayer domain="indianOcean" />
         <SatelliteLayer domain="himawari" />
+
+        {/* <SatelliteLayer domain="nowcoast" /> */}
         <RadarLayer />
 
         <AirQualityLayer />
@@ -118,12 +124,14 @@ export default function WxMap() {
 
         <LightningDataLayer />
 
+        <Hurricanes />
+
         <DataPopup />
 
         <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
           <MapOptions />
           <GeoLocation />
-          <SiteSearch />
+          {/* <SiteSearch /> */}
         </div>
         <MapLoadingIndicator show={loadingState} />
       </WeatherMap>

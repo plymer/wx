@@ -1,7 +1,6 @@
 import { existsSync, readdirSync, statSync } from "fs";
 import path from "path";
 
-import { createGunzip } from "zlib";
 import * as turf from "@turf/turf";
 import { XMLParser } from "fast-xml-parser";
 import type { Position } from "geojson";
@@ -10,12 +9,13 @@ import "dotenv/config";
 
 import type { SunTimes } from "./common.types.js";
 import type { XmetShapes } from "./alphanumeric.types.js";
-import { DEFAULT_REMOTE_HEADERS, MINUTE } from "./constants.js";
+import { MINUTE } from "./constants.js";
 
-import type { OutlookData, Panel, RegionData, WmoDirection } from "./types.js";
+import type { OutlookData, Panel, RegionData, TextDirection, WmoDirection } from "./types.js";
 import { OFFICE_REGION_MAP } from "../config/charts.config.js";
 import { outlookOfficeSchema, outlookRegionSchema } from "./validation.js";
 import { getTimes } from "suncalc";
+import type { HurricaneData, HurricaneDataResponse, HurricaneDataType } from "./hurricanes.types.js";
 
 /**
  *
@@ -91,6 +91,17 @@ export function transformName(name: string): string {
 }
 
 /**
+ * Take a date object and format it into a string of the form "HH:MMZ"
+ * @param time The date we want to format
+ * @returns a string of the form "HH:MMZ" that represents the time in UTC
+ */
+function formatSunTime(time: Date) {
+  const hours = time.getUTCHours().toString().padStart(2, "0");
+  const minutes = time.getUTCMinutes().toString().padStart(2, "0");
+  return `${hours}:${minutes}Z`;
+}
+
+/**
  * Calculate the sunrise and sunset times for a given longitude-latitude tuple
  * @param [lon, lat] a longitude-latitude tuple for the point requested
  * @returns rise and set strings formatted as "HH:MMZ" or "Never Up"/"Never Down" if the sun does not rise or set
@@ -100,7 +111,7 @@ export function getSunTimes([lon, lat]: Position): SunTimes {
   const times = getTimes(new Date(), lat, lon);
 
   const riseString = times.sunrise
-    ? `${times.sunrise.getUTCHours().toString().padStart(2, "0")}:${times.sunrise.getUTCMinutes().toString().padStart(2, "0")}Z`
+    ? formatSunTime(times.sunrise)
     : times.alwaysUp
       ? "Never Down"
       : times.alwaysDown
@@ -108,7 +119,7 @@ export function getSunTimes([lon, lat]: Position): SunTimes {
         : "---";
 
   const setString = times.sunset
-    ? leadZero(times.sunset.getUTCHours(), 2) + ":" + leadZero(times.sunset.getUTCMinutes(), 2) + "Z"
+    ? formatSunTime(times.sunset)
     : times.alwaysUp
       ? "Never Down"
       : times.alwaysDown
@@ -271,41 +282,6 @@ export function isConvectiveSigmet(header: string): boolean {
   return header.includes("WSUS3");
 }
 
-export async function readGzipFile(url: string, dataType: string) {
-  try {
-    // fetch the compressed data
-    const arrayBuffer = await fetch(url, { headers: DEFAULT_REMOTE_HEADERS }).then((res) => {
-      if (!res.ok) {
-        throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
-      }
-      return res.arrayBuffer();
-    });
-    const compressedData = Buffer.from(arrayBuffer);
-
-    // decompress the data
-    const decompressedData = await new Promise((resolve, reject) => {
-      const gunzip = createGunzip();
-      const chunks: Buffer[] = [];
-
-      gunzip.on("data", (chunk) => chunks.push(chunk));
-      gunzip.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
-      gunzip.on("error", (err) => reject(err));
-
-      gunzip.write(compressedData);
-      gunzip.end();
-    });
-
-    if (typeof decompressedData !== "string") {
-      throw new Error(`[${dataType.toUpperCase()}] Decompressed data is not a string`);
-    }
-
-    return decompressedData;
-  } catch (error) {
-    console.error(`[${dataType.toUpperCase()}] Error reading gzip file:`, error);
-    throw error;
-  }
-}
-
 /**
  * create a new XMLParser instance configured with JSON-friendly options
  * @returns a new XMLParser that replaces all namespace prefixes and converts all tags and attributes to camelCase
@@ -327,23 +303,39 @@ export function xmlParser() {
  * @param dir - a string representing a cardinal direction, such as "N" or "SSW", or a "-"" for no direction
  * @returns a number representing the direction in degrees, such as 0 or 202.5
  */
-export function cardinalToDegrees(dir: WmoDirection): number {
+export function cardinalToDegrees(dir: WmoDirection | TextDirection): number {
   const directionMap: { [key: string]: number } = {
+    NORTH: 0,
     N: 0,
+    NORTHNORTHEAST: 22.5,
     NNE: 22.5,
+    NORTHEAST: 45,
     NE: 45,
+    EASTNORTHEAST: 67.5,
     ENE: 67.5,
+    EAST: 90,
     E: 90,
+    EASTSOUTHEAST: 112.5,
     ESE: 112.5,
+    SOUTHEAST: 135,
     SE: 135,
+    SOUTHSOUTHEAST: 157.5,
     SSE: 157.5,
+    SOUTH: 180,
     S: 180,
+    SOUTHSOUTHWEST: 202.5,
     SSW: 202.5,
+    SOUTHWEST: 225,
     SW: 225,
+    WESTSOUTHWEST: 247.5,
     WSW: 247.5,
+    WEST: 270,
     W: 270,
+    WESTNORTHWEST: 292.5,
     WNW: 292.5,
+    NORTHWEST: 315,
     NW: 315,
+    NORTHNORTHWEST: 337.5,
     NNW: 337.5,
     "-": 0,
   };
@@ -479,4 +471,146 @@ export function outlookHandler(product: string) {
 
   // add an explicit check to see if we have valid date, otherwise return explicitly undefined
   return Object.keys(result).length > 0 ? result : null;
+}
+
+export function transformHurricaneMetobject<TData extends HurricaneDataType>(
+  type: TData,
+  features: HurricaneDataResponse[TData]["features"],
+): HurricaneData[TData]["features"] {
+  return features.map((f) => {
+    switch (type) {
+      case "track":
+        // nothing to transform here
+        return f as HurricaneData["track"]["features"][number];
+      case "error_cone": {
+        const { properties: props, ...feature } = f as HurricaneDataResponse["error_cone"]["features"][number];
+
+        const newProps = {
+          type: "error_cone",
+          active: props.active,
+          amendment: props.amendment,
+          basin: props.basin,
+          metobject: {
+            cyclone_0: {
+              along_track_error: props["metobject.cyclone_0.along_track_error"],
+              cross_track_error: props["metobject.cyclone_0.cross_track_error"],
+            },
+            cyclone_1: {
+              along_track_error: props["metobject.cyclone_1.along_track_error"],
+              cross_track_error: props["metobject.cyclone_1.cross_track_error"],
+            },
+            cyclone_2: {
+              along_track_error: props["metobject.cyclone_2.along_track_error"],
+              cross_track_error: props["metobject.cyclone_2.cross_track_error"],
+            },
+          },
+          domain: props.domain,
+          file_name: props.file_name,
+          forecast_datetime: props.forecast_datetime,
+          id: props.id,
+          latest_publication: props.latest_publication,
+          product_class: props.product_class,
+          product_sub_type: props.product_sub_type,
+          product_type: props.product_type,
+          publication_datetime: props.publication_datetime,
+          responsible_center: props.responsible_center,
+          storm_name: props.storm_name,
+          storm_number: props.storm_number,
+          storm_origin_year: props.storm_origin_year,
+          status: props.status,
+          validity_datetime: props.validity_datetime,
+        };
+
+        return { ...feature, properties: newProps } as HurricaneData["error_cone"]["features"][number];
+      }
+
+      case "cyclone": {
+        const { properties: props, ...feature } = f as HurricaneDataResponse["cyclone"]["features"][number];
+
+        const newProps = {
+          type: "cyclone",
+          active: props.active,
+          amendment: props.amendment,
+          basin: props.basin,
+          metobject: {
+            classification: props["metobject.classification"],
+            max_wind: {
+              value: props["metobject.max_wind.value"],
+              unit: props["metobject.max_wind.unit"],
+            },
+            motion: {
+              direction: props["metobject.motion.direction"],
+              intensity: props["metobject.motion.intensity"],
+            },
+            pressure: {
+              value: props["metobject.pressure.value"],
+              unit: props["metobject.pressure.unit"],
+            },
+            sub_type: props["metobject.sub_type"],
+            wind_gust: {
+              value: props["metobject.wind_gust.value"],
+              unit: props["metobject.wind_gust.unit"],
+            },
+          },
+          domain: props.domain,
+          file_name: props.file_name,
+          forecast_datetime: props.forecast_datetime,
+          id: props.id,
+          latest_publication: props.latest_publication,
+          product_class: props.product_class,
+          product_sub_type: props.product_sub_type,
+          product_type: props.product_type,
+          publication_datetime: props.publication_datetime,
+          responsible_center: props.responsible_center,
+          storm_name: props.storm_name,
+          storm_number: props.storm_number,
+          storm_origin_year: props.storm_origin_year,
+          status: props.status,
+          validity_datetime: props.validity_datetime,
+        };
+
+        console.log("Cyclone properties transformed:", newProps);
+
+        return { ...feature, properties: newProps } as HurricaneData["cyclone"]["features"][number];
+      }
+      case "wind_radii": {
+        const { properties: props, ...feature } = f as HurricaneDataResponse["wind_radii"]["features"][number];
+
+        const newProps = {
+          type: "wind_radii",
+          active: props.active,
+          amendment: props.amendment,
+          basin: props.basin,
+          metobject: {
+            cyclone: props["metobject.cyclone"],
+            quadrants: {
+              n_e: props["metobject.quadrants.n_e"],
+              n_w: props["metobject.quadrants.n_w"],
+              s_e: props["metobject.quadrants.s_e"],
+              s_w: props["metobject.quadrants.s_w"],
+            },
+          },
+          domain: props.domain,
+          file_name: props.file_name,
+          forecast_datetime: props.forecast_datetime,
+          id: props.id,
+          latest_publication: props.latest_publication,
+          product_class: props.product_class,
+          product_sub_type: props.product_sub_type,
+          product_type: props.product_type,
+          publication_datetime: props.publication_datetime,
+          responsible_center: props.responsible_center,
+          storm_name: props.storm_name,
+          storm_number: props.storm_number,
+          storm_origin_year: props.storm_origin_year,
+          status: props.status,
+          validity_datetime: props.validity_datetime,
+        };
+
+        return { ...feature, properties: newProps } as HurricaneData["wind_radii"]["features"][number];
+      }
+      default:
+        throw new Error(`Unknown hurricane data type: ${type}`);
+    }
+  }) as HurricaneData[TData]["features"];
 }

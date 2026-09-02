@@ -22,6 +22,10 @@ import { SurfaceDataLayer } from "../map/layers/data/SurfaceDataLayer";
 import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
 import { AlertsLayer } from "../map/layers/data/AlertsLayer";
 import { SelectedFxPoint } from "../map/layers/overlays/SelectedFxPoint";
+import { useRegisterMaplibreWorker } from "@/hooks/useRegisterMaplibreWorker";
+import { AirQualityLayer } from "../map/layers/data/AirQualityLayer";
+import { VectorTileSource } from "../map/layers/data/VectorTileSource";
+import { HillshadeLayer } from "../map/layers/base/Hillshade";
 
 interface Props {
   searchCoords: Position | null;
@@ -30,6 +34,7 @@ interface Props {
 }
 
 export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }: Props) => {
+  useRegisterMaplibreWorker();
   const mapState = useMapStateActions();
   const displayTime = useDisplayTime();
   const coords = useCoords();
@@ -99,13 +104,16 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
       >
         {isMapInitialized && baseMapLayers ? (
           <>
+            <VectorTileSource />
+            <HillshadeLayer />
             <SatelliteLayer domain="west" />
             <SatelliteLayer domain="east" />
             <RadarLayer />
             <LightningDataLayer />
             <PublicRegionsOverlay override />
+            <AirQualityLayer override />
             <SurfaceDataLayer />
-            <AlertsLayer />
+            <AlertsLayer override />
             <SelectedFxPoint data={currentLocationGeoJSON} />
 
             <div className="absolute font-mono top-0 left-1/2 -translate-x-1/2 m-2 bg-primary text-primary-foreground border-neutral-400 border px-2 py-1 rounded-md text-xs">

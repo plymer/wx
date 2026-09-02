@@ -1,7 +1,7 @@
 import { Layer, Source } from "react-map-gl/maplibre";
 import type { FeatureCollection } from "geojson";
 
-import { AQ_ATTRIBUTION, AQ_DISPLAY } from "@/config/vectorData";
+import { AQ_ATTRIBUTION, AQ_BOUNDS, AQ_DISPLAY } from "@/config/vectorData";
 
 import { MINUTE } from "@shared/lib/constants";
 import { useShowAQ } from "@/stateStores/map/vectorData";
@@ -9,19 +9,25 @@ import { useDisplayTime } from "@/hooks/useDisplayTime";
 import { api } from "@/lib/trpc";
 import { useQuery } from "@tanstack/react-query";
 import { useMapLoadingState } from "@/hooks/useMapLoadingState";
+import { useIsVisible } from "@/hooks/useIsVisible";
 
 interface Props {
   belowLayer?: string;
+  override?: boolean;
 }
 
-export const AirQualityLayer = ({ belowLayer }: Props) => {
+export const AirQualityLayer = ({ belowLayer, override }: Props) => {
   const enabled = useShowAQ();
+
+  const isVisible = useIsVisible(AQ_BOUNDS);
 
   const displayTime = useDisplayTime();
 
+  const shouldLoad = (override && isVisible) || (enabled && isVisible);
+
   const { data, isFetching } = useQuery(
     api.aq.aq.queryOptions(undefined, {
-      enabled,
+      enabled: shouldLoad,
       refetchInterval: 10 * MINUTE,
       trpc: { context: { skipBatch: true } },
     }),
@@ -29,7 +35,7 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
 
   useMapLoadingState("aqData", isFetching);
 
-  if (!enabled || !data) return;
+  if (!shouldLoad || !data) return;
 
   const filteredData: FeatureCollection = {
     type: "FeatureCollection",
@@ -83,7 +89,6 @@ export const AirQualityLayer = ({ belowLayer }: Props) => {
             "text-font": ["Consolas-Regular"],
             "text-anchor": "center",
             "text-allow-overlap": true,
-            "symbol-sort-key": ["get", "validTime"],
           }}
           paint={{
             "text-color": ["step", ["get", "pm25"], "#000", 25, "#000", 50, "#fff", 75, "#fff", 100, "#fff"],

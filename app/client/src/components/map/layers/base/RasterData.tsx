@@ -20,10 +20,12 @@ import {
   GEOMET_ATTRIBUTION,
   IODC_BOUNDS,
   HIMAWARI_BOUNDS,
+  NOWCOAST_GETMAP,
 } from "@/config/rasterData";
 import type { WMSDomains, WMSLayer } from "@shared/lib/types";
 import type { TransitionSpecification } from "maplibre-gl";
 import { useMemo } from "react";
+import { AWC_ATTRIBUTION } from "@/config/vectorData";
 
 interface Props {
   belowLayer?: string;
@@ -33,6 +35,9 @@ interface Props {
 const makeTileRequestString = (domain: WMSDomains, layerName: string, validTime: number) => {
   let baseUrl;
   switch (domain) {
+    case "nowcoast":
+      baseUrl = NOWCOAST_GETMAP;
+      break;
     case "europe":
     case "indianOcean":
       baseUrl = EUMETSAT_GETMAP;
@@ -73,6 +78,10 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
 
   if (apiData?.type === "satellite") {
     switch (apiData.domain) {
+      case "nowcoast":
+        bounds = MAP_BOUNDS;
+        attribution = AWC_ATTRIBUTION;
+        break;
       case "europe":
         bounds = EUMETSAT_BOUNDS;
         attribution = EUMETSAT_ATTRIBUTION;

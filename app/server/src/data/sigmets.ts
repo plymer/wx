@@ -2,10 +2,18 @@ import "dotenv/config";
 import { gt, lt } from "drizzle-orm";
 import { sigmets } from "../db/schemas.drizzle.js";
 import { DEFAULT_LETTER_ID, DEFAULT_NUMBER_ID, DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
-import type { CacheAirSigmetsData, Coords, RawIntlSigmetData, SigmetData, XMLCacheFile } from "../lib/types.js";
-import { cardinalToDegrees, readGzipFile, xmlParser } from "../lib/utils.js";
+import type {
+  CacheAirSigmetsData,
+  Coords,
+  DataProcessResult,
+  RawIntlSigmetData,
+  SigmetData,
+  XMLCacheFile,
+} from "../lib/types.js";
+import { cardinalToDegrees, xmlParser } from "../lib/utils.js";
 import { airSigmetsSchema } from "../lib/validation.js";
 import { pgDb as db } from "../services/database.js";
+import { readGzipFile } from "./read-gzip.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/airsigmets.cache.xml.gz";
 
@@ -31,12 +39,19 @@ const extractEventName = (text: string): string | null => {
   }
 };
 
-export async function getSigmets() {
+export async function getSigmets(): Promise<DataProcessResult> {
   if (!db) {
     throw new Error("[SIGMET] Database connection failed.");
   }
 
-  const xml = await readGzipFile(RESOURCE_URL, "sigmet");
+  let wasError = false;
+
+  const xml = await readGzipFile(RESOURCE_URL, "sigmet", true);
+
+  if (xml === null) {
+    console.error("[SIGMET] Error - data was null");
+    return { result: "error" };
+  }
 
   const { parser } = xmlParser();
 
@@ -122,10 +137,13 @@ export async function getSigmets() {
 
     conusOutput.push(...output);
   } catch (error) {
-    throw new Error(`[SIGMET] Could not parse SIGMETs from the AWC XML: ${(error as Error).message}`);
+    console.error(`[SIGMET] Could not parse SIGMETs from the AWC XML: ${(error as Error).message}`);
+    wasError = true;
   }
 
   const avwxApi = "https://aviationweather.gov/api/data/";
+
+  const intlSigmetUrl = `${avwxApi}isigmet?format=json`;
 
   const now = new Date();
 
@@ -138,7 +156,7 @@ export async function getSigmets() {
   // find which SIGMETs are still active in the DB so we can diff the AWC API response against them
   const activeInDb = recentSigmets.filter((s) => s.endTime > now);
 
-  const intlData = await fetch(`${avwxApi}isigmet?format=json`, { headers: DEFAULT_REMOTE_HEADERS })
+  const intlData = await fetch(intlSigmetUrl, { headers: DEFAULT_REMOTE_HEADERS })
     .then((response) => {
       if (!response.ok) {
         throw new Error(
@@ -317,7 +335,8 @@ export async function getSigmets() {
     );
     // console.log(`[SIGMET] Inserted/updated ${data.length} SIGMETs.`);
   } catch (error) {
-    throw new Error(`[SIGMET] Could not insert SIGMETs into the database: ${(error as Error).message}`);
+    console.error(`[SIGMET] Could not insert SIGMETs into the database: ${(error as Error).message}`);
+    wasError = true;
   }
 
   // console.log(`[SIGMET] Cleaning up old data...`);
@@ -326,6 +345,13 @@ export async function getSigmets() {
     await db.delete(sigmets).where(lt(sigmets.endTime, new Date(Date.now() - 12 * HOUR)));
     // console.log(`[SIGMET] Old data cleanup complete.`);
   } catch (error) {
-    throw new Error(`[SIGMET] Could not clean up old SIGMETs in the database: ${(error as Error).message}`);
+    console.error(`[SIGMET] Could not clean up old SIGMETs in the database: ${(error as Error).message}`);
+    wasError = true;
+  }
+
+  if (wasError) {
+    return { result: "error" };
+  } else {
+    return { result: "success" };
   }
 }

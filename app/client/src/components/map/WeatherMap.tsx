@@ -27,7 +27,7 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
   useRegisterMaplibreWorker();
 
   // subscribe to our global state stores
-  const mapState = useMapStateActions();
+  const { setMapRef } = useMapStateActions();
   const { updateFromMapEvent } = useUpdateMapViewstate();
   const { setPopupData } = useUIActions();
 
@@ -56,12 +56,14 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
 
     if (type === "click" && features && features.length > 0) {
       setPopupData({ features, lngLat });
+    } else {
+      setPopupData(undefined);
     }
   };
 
   const onMapLoad = (e: MapLibreEvent) => {
     // Store map reference in mapState
-    mapState.setMapRef(e.target);
+    setMapRef(e.target);
 
     // Set base layers
     setBaseMapLayers(e.target.getLayersOrder());
@@ -76,6 +78,7 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
     <Map
       maxTileCacheSize={512}
       maxTileCacheZoomLevels={10}
+      maxZoom={13}
       fadeDuration={0}
       latitude={viewState.latitude}
       longitude={viewState.longitude}

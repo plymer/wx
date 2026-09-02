@@ -132,7 +132,7 @@ export const alphanumericRouter = router({
         ? "https://tgftp.nws.noaa.gov/data/raw/fo/focn45.cwwg..txt"
         : `https://weather.gc.ca/forecast/public_bulletins_e.html?Bulletin=${bulletin}.${office}`;
 
-    console.log("requesting bulletin from:", searchUrl);
+    console.log(`[API] Requesting public bulletin for: ${bulletin.toUpperCase()} - ${office.toUpperCase()}`);
 
     try {
       const bulletinData: string = await fetch(searchUrl, { headers: DEFAULT_REMOTE_HEADERS }).then((bulletin) =>
@@ -287,6 +287,7 @@ export const alphanumericRouter = router({
 
       const xmetEvents: XmetEventData[] = xmetList
         .map((xmet) => {
+          const firRegion = xmet.firRegion;
           const issuer = xmet.issuer;
           const text = xmet.rawText;
           const domain = xmet.domain;
@@ -315,6 +316,7 @@ export const alphanumericRouter = router({
           const sequenceId = !isConvectiveSigmet(header) ? `${domain}${charCode}` : `conv`;
 
           return {
+            firRegion,
             issuer,
             text,
             domain,
@@ -335,6 +337,7 @@ export const alphanumericRouter = router({
       const output: Feature<MultiPolygon, XmetEventData>[] | undefined = xmetEvents
         .map((xmet) => {
           const {
+            firRegion,
             issuer,
             text,
             domain,
@@ -359,6 +362,7 @@ export const alphanumericRouter = router({
               type: "MultiPolygon",
             },
             properties: {
+              firRegion,
               issuer,
               header,
               domain,

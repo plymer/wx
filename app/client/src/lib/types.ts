@@ -3,7 +3,7 @@
 import { ANIM_CONTROLS, ANIMATION_STATES } from "../config/animation";
 import { API_CONFIG } from "../config/api";
 import { AVIATION_PRODUCTS } from "../config/aviationProducts";
-import { LAYER_TABS, MAP_LINES, MAP_PROJECTIONS, ZOOM_THRESHOLDS } from "../config/map";
+import { BASEMAP_TYPES, LAYER_TABS, MAP_LINES, MAP_PROJECTIONS, ZOOM_THRESHOLDS } from "../config/map";
 import { APP_MODES_LIST } from "../config/modes";
 import { OUTLOOK_CONFIG, PUBLIC_FORECAST_CONFIG } from "../config/public";
 import { RADAR_PRODUCTS, RASTER_DATA_TYPES, SATELLITE_CHANNELS, SATELLITES } from "../config/rasterData";
@@ -68,6 +68,7 @@ export type XmetAPIData = {
   alphaCode?: string;
   charCode: string;
   numberCode: number;
+  firRegion: string;
   sequenceId: string;
   startTime: number;
   endTime: number;
@@ -87,8 +88,10 @@ export type SiteData = {
   siteId: string;
   lat: string;
   lon: string;
-  elev_f: number | null;
-  elev_m: number | null;
+  rawLat: number;
+  rawLon: number;
+  elevF: number | null;
+  elevM: number | null;
   country: string | null;
   state: string | null;
   sunrise: string;
@@ -191,6 +194,7 @@ export type RadarProducts = typeof RADAR_PRODUCTS;
 export type RadarProductsWMSName = RadarProducts[keyof RadarProducts]["wms"];
 export type RadarProductsMenuName = RadarProducts[keyof RadarProducts]["menuName"];
 export type MapProjections = (typeof MAP_PROJECTIONS)[number];
+export type BaseMapType = (typeof BASEMAP_TYPES)[number];
 export type LayerTabs = (typeof LAYER_TABS)[number];
 export type MapLines = (typeof MAP_LINES)[number];
 export type ZoomThresholds = keyof typeof ZOOM_THRESHOLDS;

@@ -111,14 +111,21 @@ export const isolines = snakeCase.table(
   ],
 );
 
-export const mslpExtrema = snakeCase.table("mslp_extrema", {
-  id: bigserial({ mode: "number" }).primaryKey(),
-  value: doublePrecision().notNull(),
-  kind: text({ enum: ["max", "min"] }).notNull(),
-  startTime: timestamp({ mode: "date" }).notNull(),
-  expiryTime: timestamp({ mode: "date" }).notNull(),
-  geometry: geometry({ srid: 3857, type: "point" }).notNull(),
-});
+export const mslpExtrema = snakeCase.table(
+  "mslp_extrema",
+  {
+    id: bigserial({ mode: "number" }).primaryKey(),
+    value: doublePrecision().notNull(),
+    kind: text({ enum: ["max", "min"] }).notNull(),
+    startTime: timestamp({ mode: "date" }).notNull(),
+    expiryTime: timestamp({ mode: "date" }).notNull(),
+    geometry: geometry({ srid: 3857, type: "point" }).notNull(),
+  },
+  (t) => [
+    index("mslp_extrema_spatial_index").using("gist", t.geometry),
+    index("mslp_extrema_start_time_index").using("btree", t.startTime),
+  ],
+);
 
 export const lightning = snakeCase.table(
   "lightning",
@@ -188,6 +195,33 @@ export const sigmets = snakeCase.table(
   (table) => [primaryKey({ columns: [table.header, table.issueTime, table.charCode, table.numberCode] })],
 );
 
+export const publicAlerts = snakeCase.table(
+  "public_alerts",
+  {
+    alertCode: varchar({ length: 3 }).notNull(),
+    type: text({ enum: ["watch", "warning", "advisory", "statement"] }).notNull(),
+    zoneType: text({ enum: ["fixed", "freeform"] }).notNull(),
+    alertName: text().notNull(),
+    alertNameShort: text().notNull(),
+    program: text().notNull(),
+    issueTime: timestamp({ mode: "date" }).notNull(),
+    expiry: timestamp({ mode: "date" }).notNull(),
+    timezone: varchar({ length: 3 }).notNull(),
+    issueTimeText: text().notNull(),
+    issuingOfficeTZ: varchar({ length: 3 }).notNull(),
+    id: text().notNull(),
+    text: text().notNull(),
+    bannerText: text().notNull(),
+    headerText: text().notNull(),
+    colour: text().notNull(),
+    impact: text(),
+    confidence: text(),
+    level: integer(),
+    coords: text(),
+  },
+  (table) => [primaryKey({ columns: [table.id, table.issueTime, table.expiry] })],
+);
+
 // export const pireps = snakeCase.table(
 //   "pireps",
 //   {
@@ -215,7 +249,7 @@ export const sigmets = snakeCase.table(
 //   ],
 // );
 
-export const metarsTemporalView = snakeCase.view("metars_temporal").as((qb) =>
+export const metarsTemporalView = snakeCase.materializedView("metars_temporal").as((qb) =>
   qb
     .select({
       geometry: sql`${metars.geometry}`.as("geometry"),
@@ -238,10 +272,18 @@ export const metarsTemporalView = snakeCase.view("metars_temporal").as((qb) =>
       createdAt: sql`${metars.createdAt}`.as("created_at"),
       validTime: sql`${metars.validTime}`.as("valid_time"),
       startTime: sql<Date>`${metars.validTime}`.as("start_time"),
-      expiryTime:
-        sql<Date>`lead(${metars.validTime}, 1, ${metars.validTime} + interval '90 minutes') over (partition by ${metars.siteId} order by ${metars.validTime})`.as(
-          "expiry_time",
-        ),
+      expiryTime: sql<Date>`
+        lead(
+          ${metars.validTime},
+          1,
+          ${metars.validTime} + interval '90 minutes'
+        )
+        over (
+          partition by ${metars.siteId}
+          order by ${metars.validTime}
+        )`.as("expiry_time"),
+      dataType: sql`'site'`.as("data_type"),
     })
-    .from(metars),
+    .from(metars)
+    .where(sql`${metars.validTime} >= NOW() - INTERVAL '4 hours'`),
 );

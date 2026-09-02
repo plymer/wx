@@ -9,9 +9,12 @@ import { buildStationCatalog } from "./stations.js";
 import { updateStationVisTable } from "./station-visibility.js";
 
 import { runFromCron, TaskQueue, type DataTask } from "../services/queue.js";
-import { pgDb as db } from "../services/database.js";
+import { pgDb as db, pgConnection } from "../services/database.js";
 import { stations } from "../db/schemas.drizzle.js";
 import { createIsolines } from "./isolines.js";
+import { sql } from "drizzle-orm";
+import type { DataProcessResult } from "../lib/types.js";
+import { getHurricaneData } from "./hurricanes.js";
 
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
@@ -22,6 +25,26 @@ async function main() {
   if (!db) {
     throw new Error("Database connection failed, exiting...");
   }
+
+  const refreshView = async (): Promise<DataProcessResult> => {
+    if (!db) {
+      throw new Error("Database connection failed, exiting...");
+    }
+
+    await db.transaction(async (tx) => {
+      // refresh the materialized view and then make sure the indexes exist - we can't do this via `push` from the schema
+      // because the view is not a table and doesn't have a schema to attach indexes to
+      await tx.execute(sql`REFRESH MATERIALIZED VIEW metars_temporal;`);
+      await tx.execute(
+        sql`CREATE INDEX IF NOT EXISTS metars_temporal_spatial_index ON metars_temporal USING gist (geometry);`,
+      );
+      await tx.execute(
+        sql`CREATE INDEX IF NOT EXISTS metars_temporal_site_id_index ON metars_temporal USING btree (site_id);`,
+      );
+    });
+
+    return { result: "success" };
+  };
 
   // we need to check to see if we have a valid station catalog and station-visibility table
 
@@ -40,12 +63,14 @@ async function main() {
   const tasks: DataTask[] = [
     { name: "TAFs", run: () => getTafs(), schedule: "*/5 * * * *" },
     { name: "METARs", run: () => getMetars(), schedule: "* * * * *" },
+    { name: "Refresh-View", run: () => refreshView(), schedule: "* * * * *" },
     { name: "Lightning", run: () => getLightning(), schedule: "* * * * *" },
     // { name: "PIREPs", run: () => getPireps(), schedule: "* * * * *" },
     { name: "SIGMETs", run: () => getSigmets(), schedule: "* * * * *" },
     { name: "Public-Alerts", run: () => getPublicAlerts(), schedule: "* * * * *" },
     { name: "AQ-Data", run: () => getAqData(), schedule: "*/10 * * * *" },
     { name: "Isolines", run: () => createIsolines(), schedule: "*/10 * * * *" },
+    { name: "Hurricane-Data", run: () => getHurricaneData(), schedule: "*/30 * * * *" },
     { name: "Station-Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
     { name: "Station-Visibility", run: () => updateStationVisTable(), schedule: "0 0 * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
@@ -56,17 +81,23 @@ async function main() {
   const startedAt = performance.now();
 
   const results = await Promise.allSettled(tasks.map((task) => queue.push(task.name, task.run)));
-  const failures = results.filter((result) => result.status === "rejected");
+  const skipped = results.filter((result) => result.status === "fulfilled" && result.value.result === "skipped");
+  const failures = results.filter(
+    (result) => result.status === "rejected" || (result.status === "fulfilled" && result.value.result === "error"),
+  );
   const elapsedMs = Math.round(performance.now() - startedAt);
 
   console.log(
-    `[DATA] Summary: total=${tasks.length} succeeded=${tasks.length - failures.length} failed=${failures.length} elapsed=${elapsedMs}ms`,
+    `[DATA] Summary: total=${tasks.length} succeeded=${tasks.length - failures.length - skipped.length} skipped=${skipped.length} failed=${failures.length} elapsed=${elapsedMs}ms`,
   );
 
   if (failures.length > 0) {
     console.error(`[DATA] Completed with ${failures.length} task failure(s).`);
     process.exit(1);
   }
+
+  // disconnect from the database
+  await pgConnection.disconnect();
 
   process.exit(0);
 }

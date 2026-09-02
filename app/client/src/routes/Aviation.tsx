@@ -1,8 +1,8 @@
 import { useAviationActions, useAvProduct, useTimeStep } from "@/stateStores/aviation";
-import AvChartsGFA from "./aviation/AvChartsGFA";
-import AvChartsOther from "./aviation/AvChartsOther";
+import AvChartsGFA from "@/components/aviation/AvChartsGFA";
+import AvChartsOther from "@/components/aviation/AvChartsOther";
 
-import Button from "./ui/Button";
+import Button from "@/components/ui/Button";
 import { AVIATION_PRODUCTS, GFA_PLACEHOLDER_DATA, PRODUCTS } from "@/config/aviationProducts";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/trpc";

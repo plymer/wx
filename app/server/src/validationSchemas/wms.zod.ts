@@ -16,7 +16,16 @@ export const himawariProductSchema = z.strictObject({
 
 export const eumetsatProductSchema = z.strictObject({
   domain: z.enum(["europe", "indianOcean"]),
-  product: z.enum(["mtg_fd:rgb_fog", "msg_iodc:rgb_fog"]),
+  product: z.enum(["mtg_fd:rgb_fog", "msg_iodc:rgb_fog", "msg_fes:rgb_ash", "msg_iodc:rgb_ash"]),
+});
+
+export const nowcoastProductSchema = z.strictObject({
+  product: z.enum([
+    "goes_longwave_imagery",
+    "goes_shortwave_imagery",
+    "goes_visible_imagery",
+    "goes_water_vapor_imagery",
+  ]),
 });
 
 export const realtimeLayersSchema = z.strictObject({

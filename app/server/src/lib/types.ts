@@ -16,6 +16,10 @@ export type Nullable<T> = {
   [K in keyof T]: T[K] | null;
 };
 
+export type DataProcessResult = {
+  result: "success" | "error" | "skipped";
+};
+
 export type GFAData = {
   domain: string;
   cldwx: string[];
@@ -52,6 +56,7 @@ export type Panel = {
 export type XmetTypes = (typeof XMET_TYPES)[number];
 
 export type XmetAPIData = {
+  firRegion: string;
   issuer: string;
   header: string;
   domain: string;
@@ -73,7 +78,7 @@ export type XmetAPIData = {
 export type XmetGeoJSON = FeatureCollection<MultiPolygon, XmetAPIData>;
 
 export type RadarDomains = "national";
-export type SatelliteDomains = "east" | "west" | "europe" | "indianOcean" | "himawari";
+export type SatelliteDomains = "east" | "west" | "europe" | "indianOcean" | "himawari" | "nowcoast";
 export type WMSDomains = Prettify<RadarDomains | SatelliteDomains>;
 export type WMSLayerTypes = "radar" | "satellite";
 export type WMSLayer = {
@@ -136,6 +141,24 @@ export type WmoDirection =
   | "NNW"
   | "-";
 
+export type TextDirection =
+  | "NORTH"
+  | "NORTHNORTHEAST"
+  | "NORTHEAST"
+  | "EASTNORTHEAST"
+  | "EAST"
+  | "EASTSOUTHEAST"
+  | "SOUTHEAST"
+  | "SOUTHSOUTHEAST"
+  | "SOUTH"
+  | "SOUTH-SOUTHWEST"
+  | "SOUTHWEST"
+  | "WEST-SOUTHWEST"
+  | "WEST"
+  | "WEST-NORTHWEST"
+  | "NORTHWEST"
+  | "NORTH-NORTHWEST";
+
 export type AirQualityData = Prettify<Nullable<Omit<AQData, "lat" | "lon" | "validTime"> & { validTime: Date }>>;
 
 export type RawIntlSigmetData = {
@@ -177,13 +200,11 @@ export type MetarWithStation = Prettify<
 >;
 
 export type StationPlotPopupData = {
-  siteId: string;
   siteName: string | null;
   siteCountry: string | null;
   siteState: string | null;
   metars: string[];
   taf: string | null;
-  dataType: "site";
 };
 
 // used for the rendering and filtering of station plots on the map
@@ -338,7 +359,7 @@ export type WxOAPIResponse = {
   tc2Id: string;
 };
 
-export type WxOPolygonProperties = {
+export type WxOAlertFeatureProperties = {
   index: string;
   name: string;
   prov: string;
@@ -355,21 +376,45 @@ export type WxOPolygonProperties = {
   }[];
 };
 
-export type WarningProperties = Prettify<
-  Pick<
-    WxOAlert,
-    | "alertCode"
-    | "type"
-    | "issueTime"
-    | "alertNameShort"
-    | "colour"
-    | "impact"
-    | "confidence"
-    | "bannerText"
-    | "eventEndTime"
-    | "eventOnsetTime"
-  > & {
-    dataType: "publicAlert";
+export type WxOAlertVisualGeometryProperties = {
+  index: string;
+  class: AlertType;
+  riskColour: AlertColour;
+  level: number;
+  weighting: number;
+  program: string;
+  zoneType: "freeform" | "fixed";
+  alertId: string; // this maps to the WxOAlertMetadataProperties.id field
+};
+
+export type WxOAlertMetadataProperties = {
+  alertCode: string;
+  type: AlertType;
+  zoneType: "freeform" | "fixed";
+  alertName: string;
+  alertNameShort: string;
+  program: string;
+  issueTime: string;
+  timezone: string;
+  issueTimeText: string;
+  issuingOfficeTZ: string;
+  id: string;
+  expiry: string;
+  text: string;
+  bannerText: string;
+  headerText: string;
+  colour: AlertColour;
+  impact: string;
+  confidence: string;
+  level: number;
+  dataType: "publicAlert";
+};
+
+export type WxOAlertMapProperties = Prettify<
+  Omit<WxOAlertMetadataProperties, "type" | "issueTime" | "expiry"> & {
+    alertType: AlertType;
+    startTime: number;
+    expiryTime: number;
   }
 >;
 
@@ -426,14 +471,4 @@ export type PointForecastData = {
     rise: string;
     set: string;
   };
-};
-
-export type WxmapIsolineSlotMetadata = {
-  slot: number;
-  generatedAt: number;
-  generatedAtIso: string;
-  layers: string[];
-  emittedTiles: number;
-  minZoom: number;
-  maxZoom: number;
 };

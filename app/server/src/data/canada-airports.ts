@@ -139,7 +139,9 @@ function parseAirportTable(
 async function scrapeProvince(code: string, name: string): Promise<StationData[]> {
   const url = `${baseUrl}${name}&format=json`;
 
-  const json = (await fetch(url, { headers: DEFAULT_REMOTE_HEADERS }).then((res) => res.json())) as WikiParseResponse;
+  const json = (await fetch(url, { headers: DEFAULT_REMOTE_HEADERS })
+    .then((res) => res.json())
+    .catch((err) => console.error(err))) as WikiParseResponse;
   const pageHtml = String(json?.parse?.text?.["*"] || "");
   const parseHtml = load(pageHtml);
 

@@ -45,15 +45,14 @@ export const Isobars = ({ displayTime }: Props) => {
           "symbol-spacing": 600,
           "text-field": ["to-string", ["round", ["get", "value"]]],
           "text-font": ["Metropolis-Regular"],
-
-          "text-size": 16,
+          "text-size": 14,
           "text-rotation-alignment": "viewport",
           "text-allow-overlap": true,
         }}
         paint={{
-          "text-color": "#000",
-          "text-halo-color": "#fff",
-          "text-halo-width": 1.5,
+          "text-color": "#fff",
+          "text-halo-color": "#000",
+          "text-halo-width": 12,
         }}
       />
       <Layer

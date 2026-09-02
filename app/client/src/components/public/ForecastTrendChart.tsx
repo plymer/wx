@@ -54,7 +54,7 @@ export const ForecastTrendChart = ({ forecastData }: Props) => {
       className="w-full h-auto bg-neutral-800"
     >
       {COLOUR_BANDS.map((band, i) => (
-        <ColourBand key={i} {...band} yScale={yScale} />
+        <ColourBand key={`${band}-${i}`} {...band} yScale={yScale} />
       ))}
 
       <ZeroLine />
@@ -144,8 +144,8 @@ const TemperatureTrendLine = ({ points }: TemperaturePlotProps) => {
 };
 
 const TemperaturePoints = ({ points }: TemperaturePlotProps) => {
-  return points.map((p) => (
-    <g>
+  return points.map((p, idx) => (
+    <g key={`${p.period}-${p.type}-${idx}`}>
       <circle
         cx={p.x}
         cy={p.y}
@@ -177,7 +177,7 @@ const DayLabels = ({ points, maxBound, minBound, yScale }: DayLabelsProps) => {
     const labelXStart = p.x - labelWidth / 2;
 
     return (
-      <g>
+      <g key={`${p.period}-${p.type}-${i}`}>
         <line
           x1={p.x}
           x2={p.x}
