@@ -167,7 +167,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
 
   const SIGWX_DATA_OPTIONS: ToggleDataOption[] = [
     {
-      icon: <TropicalCycloneIcon className="shrink-0" />,
+      icon: <TropicalCycloneIcon className="shrink-0 fill-black" />,
       type: "hurricanes",
       name: "Atlantic Basin TCs",
       state: vector.showHurricanes,
