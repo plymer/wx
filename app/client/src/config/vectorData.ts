@@ -20,6 +20,7 @@ export const VECTOR_DATA_TYPES = [
   "sigmet",
   "aq",
   "publicAlerts",
+  "hurricanes",
 ] as const;
 
 export const XMET_TYPES = ["airmet", "sigmet"] as const;

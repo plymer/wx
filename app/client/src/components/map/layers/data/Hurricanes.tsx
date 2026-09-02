@@ -1,17 +1,14 @@
 import { api } from "@/lib/trpc";
+import { useShowHurricanes } from "@/stateStores/map/vectorData";
+import { MINUTE } from "@shared/lib/constants";
 import { useQuery } from "@tanstack/react-query";
 import { Source, Layer } from "react-map-gl/maplibre";
 export const Hurricanes = () => {
-  const data = useQuery(api.wxmap.hurricanes.queryOptions());
+  const enabled = useShowHurricanes();
+  // types: track, error_cone, cyclone, wind_radii
+  const data = useQuery(api.wxmap.hurricanes.queryOptions(undefined, { enabled, refetchInterval: 10 * MINUTE }));
 
-  console.log("Hurricane data:", data.data);
-
-  // types:
-
-  // track
-  // error_cone
-  // cyclone
-  // wind_radii
+  if (!enabled) return null;
 
   return (
     <Source

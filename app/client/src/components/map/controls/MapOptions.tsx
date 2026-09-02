@@ -43,6 +43,7 @@ import {
   useShowIsotherms,
   useShowIsodrosotherms,
   usePublicAlertsFilterLevel,
+  useShowHurricanes,
 } from "@/stateStores/map/vectorData";
 import type { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
@@ -80,6 +81,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
     showSIGMETs: useShowSIGMETs(),
     showAIRMETs: useShowAIRMETs(),
     showPublicAlerts: useShowPublicAlerts(),
+    showHurricanes: useShowHurricanes(),
     alertsFilterLevel: usePublicAlertsFilterLevel(),
   };
 
@@ -162,14 +164,13 @@ export default function MapOptions({ ...props }: ButtonProps) {
     // },
   ] as const;
 
-  const ALERTS_DATA_OPTIONS: ToggleDataOption[] = [
+  const SIGWX_DATA_OPTIONS: ToggleDataOption[] = [
     {
       icon: <Plane className="shrink-0" />,
-      type: "airmet",
-      name: "AIRMETs",
-      // state: vector.showAIRMETs,
-      state: false,
-      toggle: vectorActions.toggleAIRMETs,
+      type: "hurricanes",
+      name: "Hurricanes",
+      state: vector.showHurricanes,
+      toggle: vectorActions.toggleHurricanes,
     },
     {
       icon: <Plane className="shrink-0" />,
@@ -372,11 +373,11 @@ export default function MapOptions({ ...props }: ButtonProps) {
               value="alerts"
               className={`flex justify-center gap-2 font-bold text-lg bg-accent/80 hover:bg-accent text-white ${tab === "alerts" && "bg-accent rounded-b-none"}`}
             >
-              <AlertTriangle className="shrink-0  size-6" /> Alerts
+              <AlertTriangle className="shrink-0  size-6" /> SigWx and Alerts
             </AccordionTrigger>
             <AccordionContent className="border border-accent rounded-b-md p-2 h-fit">
               <div className="grid lg:grid-cols-2 max-lg:grid-cols-1 gap-2">
-                {ALERTS_DATA_OPTIONS.map((item, i) => {
+                {SIGWX_DATA_OPTIONS.map((item, i) => {
                   if (item.type === "publicAlerts") {
                     return (
                       <div key={i} className="lg:col-span-2 grid lg:grid-cols-2 max-lg:grid-cols-1 gap-2">
