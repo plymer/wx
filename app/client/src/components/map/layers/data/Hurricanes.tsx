@@ -10,8 +10,6 @@ export const Hurricanes = () => {
 
   if (!enabled || !data.data) return null;
 
-  console.log(data.data.features.filter((f) => f.properties?.type === "cyclone").map((f) => f.properties));
-
   return (
     <Source id="hurricanes" key="hurricanes" type="geojson" data={data.data}>
       <Layer

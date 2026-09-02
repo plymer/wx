@@ -64,6 +64,7 @@ import {
   useVectorOverlayActions,
 } from "@/stateStores/map/overlays";
 import { BASEMAP_TYPES } from "@/config/map";
+import { TropicalCycloneIcon } from "@/components/ui/TropicalCycloneIcon";
 
 export default function MapOptions({ ...props }: ButtonProps) {
   // local state
@@ -166,9 +167,9 @@ export default function MapOptions({ ...props }: ButtonProps) {
 
   const SIGWX_DATA_OPTIONS: ToggleDataOption[] = [
     {
-      icon: <Plane className="shrink-0" />,
+      icon: <TropicalCycloneIcon className="shrink-0" />,
       type: "hurricanes",
-      name: "Hurricanes",
+      name: "Atlantic Basin TCs",
       state: vector.showHurricanes,
       toggle: vectorActions.toggleHurricanes,
     },
