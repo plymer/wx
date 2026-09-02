@@ -27,7 +27,7 @@ export type ValueWithUnit = {
   unit: string;
 };
 
-export type CycloneProperties = Prettify<
+export type IncomingCycloneProperties = Prettify<
   BaseProperties & {
     type: "cyclone";
     "metobject.classification": string;
@@ -43,7 +43,24 @@ export type CycloneProperties = Prettify<
   }
 >;
 
-export type WindRadiiProperties = Prettify<
+export type CycloneProperties = Prettify<
+  BaseProperties & {
+    type: "cyclone";
+    metobject: {
+      classification: string;
+      max_wind: ValueWithUnit;
+      motion: {
+        direction: ValueWithUnit;
+        intensity: ValueWithUnit;
+      };
+      pressure: ValueWithUnit;
+      sub_type: string | undefined;
+      wind_gust: ValueWithUnit;
+    };
+  }
+>;
+
+export type IncomingWindRadiiProperties = Prettify<
   BaseProperties & {
     type: "wind_radii";
     "metobject.cyclone": string;
@@ -62,7 +79,30 @@ export type WindRadiiProperties = Prettify<
   }
 >;
 
-export type ErrorConeProperties = Prettify<
+export type WindRadiiProperties = Prettify<
+  BaseProperties & {
+    type: "wind_radii";
+    metobject: {
+      cyclone: string;
+      quadrants: {
+        n_e: {
+          distance: ValueWithUnit;
+        };
+        n_w: {
+          distance: ValueWithUnit;
+        };
+        s_e: {
+          distance: ValueWithUnit;
+        };
+        s_w: {
+          distance: ValueWithUnit;
+        };
+      };
+    };
+  }
+>;
+
+export type IncomingErrorConeProperties = Prettify<
   BaseProperties & {
     type: "error_cone";
     "metobject.cyclone_0.along_track_error": ValueWithUnit;
@@ -74,15 +114,48 @@ export type ErrorConeProperties = Prettify<
   }
 >;
 
+export type ErrorConeProperties = Prettify<
+  BaseProperties & {
+    type: "error_cone";
+    metobject: {
+      cyclone_0: {
+        along_track_error: ValueWithUnit;
+        cross_track_error: ValueWithUnit;
+      };
+      cyclone_1: {
+        along_track_error: ValueWithUnit;
+        cross_track_error: ValueWithUnit;
+      };
+      cyclone_2: {
+        along_track_error: ValueWithUnit;
+        cross_track_error: ValueWithUnit;
+      };
+    };
+  }
+>;
+
+export type IncomingTrackProperties = Prettify<
+  BaseProperties & {
+    type: "track";
+  }
+>;
+
 export type TrackProperties = Prettify<
   BaseProperties & {
     type: "track";
   }
 >;
 
-export type DataTypes = "track" | "error_cone" | "cyclone" | "wind_radii";
+export type HurricaneDataType = "track" | "error_cone" | "cyclone" | "wind_radii";
 
 export type HurricaneDataResponse = {
+  track: FeatureCollection<LineString, IncomingTrackProperties>;
+  error_cone: FeatureCollection<Polygon, IncomingErrorConeProperties>;
+  cyclone: FeatureCollection<Point, IncomingCycloneProperties>;
+  wind_radii: FeatureCollection<Polygon, IncomingWindRadiiProperties>;
+};
+
+export type HurricaneData = {
   track: FeatureCollection<LineString, TrackProperties>;
   error_cone: FeatureCollection<Polygon, ErrorConeProperties>;
   cyclone: FeatureCollection<Point, CycloneProperties>;

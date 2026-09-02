@@ -8,15 +8,12 @@ export const Hurricanes = () => {
   // types: track, error_cone, cyclone, wind_radii
   const data = useQuery(api.wxmap.hurricanes.queryOptions(undefined, { enabled, refetchInterval: 10 * MINUTE }));
 
-  if (!enabled) return null;
+  if (!enabled || !data.data) return null;
+
+  console.log(data.data.features.filter((f) => f.properties?.type === "cyclone").map((f) => f.properties));
 
   return (
-    <Source
-      id="hurricanes"
-      key="hurricanes"
-      type="geojson"
-      data={data.data ?? { type: "FeatureCollection", features: [] }}
-    >
+    <Source id="hurricanes" key="hurricanes" type="geojson" data={data.data}>
       <Layer
         id="layer-hurricanes-track"
         key="layer-hurricanes-track"

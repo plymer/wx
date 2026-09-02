@@ -15,6 +15,7 @@ import type { OutlookData, Panel, RegionData, TextDirection, WmoDirection } from
 import { OFFICE_REGION_MAP } from "../config/charts.config.js";
 import { outlookOfficeSchema, outlookRegionSchema } from "./validation.js";
 import { getTimes } from "suncalc";
+import type { HurricaneData, HurricaneDataResponse, HurricaneDataType } from "./hurricanes.types.js";
 
 /**
  *
@@ -470,4 +471,146 @@ export function outlookHandler(product: string) {
 
   // add an explicit check to see if we have valid date, otherwise return explicitly undefined
   return Object.keys(result).length > 0 ? result : null;
+}
+
+export function transformHurricaneMetobject<TData extends HurricaneDataType>(
+  type: TData,
+  features: HurricaneDataResponse[TData]["features"],
+): HurricaneData[TData]["features"] {
+  return features.map((f) => {
+    switch (type) {
+      case "track":
+        // nothing to transform here
+        return f as HurricaneData["track"]["features"][number];
+      case "error_cone": {
+        const { properties: props, ...feature } = f as HurricaneDataResponse["error_cone"]["features"][number];
+
+        const newProps = {
+          type: "error_cone",
+          active: props.active,
+          amendment: props.amendment,
+          basin: props.basin,
+          metobject: {
+            cyclone_0: {
+              along_track_error: props["metobject.cyclone_0.along_track_error"],
+              cross_track_error: props["metobject.cyclone_0.cross_track_error"],
+            },
+            cyclone_1: {
+              along_track_error: props["metobject.cyclone_1.along_track_error"],
+              cross_track_error: props["metobject.cyclone_1.cross_track_error"],
+            },
+            cyclone_2: {
+              along_track_error: props["metobject.cyclone_2.along_track_error"],
+              cross_track_error: props["metobject.cyclone_2.cross_track_error"],
+            },
+          },
+          domain: props.domain,
+          file_name: props.file_name,
+          forecast_datetime: props.forecast_datetime,
+          id: props.id,
+          latest_publication: props.latest_publication,
+          product_class: props.product_class,
+          product_sub_type: props.product_sub_type,
+          product_type: props.product_type,
+          publication_datetime: props.publication_datetime,
+          responsible_center: props.responsible_center,
+          storm_name: props.storm_name,
+          storm_number: props.storm_number,
+          storm_origin_year: props.storm_origin_year,
+          status: props.status,
+          validity_datetime: props.validity_datetime,
+        };
+
+        return { ...feature, properties: newProps } as HurricaneData["error_cone"]["features"][number];
+      }
+
+      case "cyclone": {
+        const { properties: props, ...feature } = f as HurricaneDataResponse["cyclone"]["features"][number];
+
+        const newProps = {
+          type: "cyclone",
+          active: props.active,
+          amendment: props.amendment,
+          basin: props.basin,
+          metobject: {
+            classification: props["metobject.classification"],
+            max_wind: {
+              value: props["metobject.max_wind.value"],
+              unit: props["metobject.max_wind.unit"],
+            },
+            motion: {
+              direction: props["metobject.motion.direction"],
+              intensity: props["metobject.motion.intensity"],
+            },
+            pressure: {
+              value: props["metobject.pressure.value"],
+              unit: props["metobject.pressure.unit"],
+            },
+            sub_type: props["metobject.sub_type"],
+            wind_gust: {
+              value: props["metobject.wind_gust.value"],
+              unit: props["metobject.wind_gust.unit"],
+            },
+          },
+          domain: props.domain,
+          file_name: props.file_name,
+          forecast_datetime: props.forecast_datetime,
+          id: props.id,
+          latest_publication: props.latest_publication,
+          product_class: props.product_class,
+          product_sub_type: props.product_sub_type,
+          product_type: props.product_type,
+          publication_datetime: props.publication_datetime,
+          responsible_center: props.responsible_center,
+          storm_name: props.storm_name,
+          storm_number: props.storm_number,
+          storm_origin_year: props.storm_origin_year,
+          status: props.status,
+          validity_datetime: props.validity_datetime,
+        };
+
+        console.log("Cyclone properties transformed:", newProps);
+
+        return { ...feature, properties: newProps } as HurricaneData["cyclone"]["features"][number];
+      }
+      case "wind_radii": {
+        const { properties: props, ...feature } = f as HurricaneDataResponse["wind_radii"]["features"][number];
+
+        const newProps = {
+          type: "wind_radii",
+          active: props.active,
+          amendment: props.amendment,
+          basin: props.basin,
+          metobject: {
+            cyclone: props["metobject.cyclone"],
+            quadrants: {
+              n_e: props["metobject.quadrants.n_e"],
+              n_w: props["metobject.quadrants.n_w"],
+              s_e: props["metobject.quadrants.s_e"],
+              s_w: props["metobject.quadrants.s_w"],
+            },
+          },
+          domain: props.domain,
+          file_name: props.file_name,
+          forecast_datetime: props.forecast_datetime,
+          id: props.id,
+          latest_publication: props.latest_publication,
+          product_class: props.product_class,
+          product_sub_type: props.product_sub_type,
+          product_type: props.product_type,
+          publication_datetime: props.publication_datetime,
+          responsible_center: props.responsible_center,
+          storm_name: props.storm_name,
+          storm_number: props.storm_number,
+          storm_origin_year: props.storm_origin_year,
+          status: props.status,
+          validity_datetime: props.validity_datetime,
+        };
+
+        return { ...feature, properties: newProps } as HurricaneData["wind_radii"]["features"][number];
+      }
+      default:
+        throw new Error(`Unknown hurricane data type: ${type}`);
+    }
+  }) as HurricaneData[TData]["features"];
 }
