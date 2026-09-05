@@ -9,6 +9,8 @@ export async function getHurricaneData(): Promise<DataProcessResult> {
     throw new Error("Cache client is not initialized");
   }
 
+  const now = new Date().getTime();
+
   let wasError = false;
   const DATA_TYPES: HurricaneDataType[] = ["track", "error_cone", "cyclone", "wind_radii"];
 
@@ -21,16 +23,25 @@ export async function getHurricaneData(): Promise<DataProcessResult> {
         console.error(`No features found for hurricane data type: ${type}`);
         continue;
       }
-
-      // extract our features and store them in the cache
       const cacheKey = `${HURRICANE_CACHE_KEY}:${type}`;
       const expiryTime = 60 * 60 * 6; // 6 hours
 
-      await cacheClient.setEx(
-        cacheKey,
-        expiryTime,
-        JSON.stringify(transformHurricaneMetobject(type, response.features)),
-      );
+      const featureCount = response.features.length;
+      const expiredFeatures = response.features.filter(
+        (f) =>
+          new Date(f.properties.forecast_datetime).getTime() < now &&
+          new Date(f.properties.validity_datetime).getTime() < now,
+      ).length;
+
+      if (featureCount === expiredFeatures) {
+        await cacheClient.setEx(cacheKey, expiryTime, JSON.stringify(transformHurricaneMetobject(type, [])));
+      } else {
+        await cacheClient.setEx(
+          cacheKey,
+          expiryTime,
+          JSON.stringify(transformHurricaneMetobject(type, response.features)),
+        );
+      }
     } catch (error) {
       console.error(`Error fetching hurricane data for type ${type}:`, (error as Error).message);
       wasError = true;

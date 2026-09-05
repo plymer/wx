@@ -250,12 +250,24 @@ export const wxmapRouter = router({
           }
 
           const expiryTime = 60 * 60 * 6; // 6 hours
+          const now = new Date().getTime();
 
-          await cacheClient.setEx(
-            cacheKey,
-            expiryTime,
-            JSON.stringify(transformHurricaneMetobject(type, response.features)),
-          );
+          const featureCount = response.features.length;
+          const expiredFeatures = response.features.filter(
+            (f) =>
+              new Date(f.properties.forecast_datetime).getTime() < now &&
+              new Date(f.properties.validity_datetime).getTime() < now,
+          ).length;
+
+          if (featureCount === expiredFeatures) {
+            await cacheClient.setEx(cacheKey, expiryTime, JSON.stringify(transformHurricaneMetobject(type, [])));
+          } else {
+            await cacheClient.setEx(
+              cacheKey,
+              expiryTime,
+              JSON.stringify(transformHurricaneMetobject(type, response.features)),
+            );
+          }
           return response.features as Feature[];
         }
       }),
