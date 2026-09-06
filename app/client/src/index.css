@@ -139,6 +139,11 @@
   color: white !important;
 }
 
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  margin: 0.5rem;
+  max-width: calc(100dvw - 6.5rem);
+}
+
 .maplibregl-popup-anchor-top .maplibregl-popup-tip,
 .maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
 .maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
