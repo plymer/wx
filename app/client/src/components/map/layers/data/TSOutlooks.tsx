@@ -12,7 +12,7 @@ export const TSOutlooks = () => {
 
   const { data } = useQuery(api.wxmap.tso.queryOptions(undefined, { enabled }));
 
-  if (!data) return null;
+  if (!data || !enabled) return null;
 
   const tsoData: FeatureCollection = {
     type: "FeatureCollection",
