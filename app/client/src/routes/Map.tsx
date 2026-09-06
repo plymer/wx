@@ -79,7 +79,7 @@ export default function WxMap() {
         interactiveLayers={interactiveLayers}
       >
         <ScaleControl
-          position="bottom-right"
+          position="bottom-left"
           unit="nautical"
           style={{
             backgroundColor: "rgba(0,0,0,0.25)",
@@ -90,7 +90,7 @@ export default function WxMap() {
         />
         <AttributionControl
           compact
-          position="bottom-right"
+          position="bottom-left"
           style={{ backgroundColor: "var(--accent)", color: "var(--secondary)", border: "1px solid var(--primary)" }}
         />
 
@@ -130,7 +130,7 @@ export default function WxMap() {
 
         <DataPopup />
 
-        <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
+        <div key="map-options" className="absolute bottom-0 right-0 m-2 gap-2 flex flex-col">
           <MapOptions />
           <GeoLocation />
           {/* <SiteSearch /> */}
