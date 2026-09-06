@@ -19,6 +19,7 @@ import {
   AlertTriangle,
   Plane,
   Grid3X3,
+  Tornado,
 } from "lucide-react";
 
 import { SATELLITE_CHANNELS } from "@/config/rasterData";
@@ -44,6 +45,7 @@ import {
   useShowIsodrosotherms,
   usePublicAlertsFilterLevel,
   useShowHurricanes,
+  useShowTSOutlooks,
 } from "@/stateStores/map/vectorData";
 import type { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
@@ -83,6 +85,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
     showAIRMETs: useShowAIRMETs(),
     showPublicAlerts: useShowPublicAlerts(),
     showHurricanes: useShowHurricanes(),
+    showTSOutlooks: useShowTSOutlooks(),
     alertsFilterLevel: usePublicAlertsFilterLevel(),
   };
 
@@ -167,19 +170,27 @@ export default function MapOptions({ ...props }: ButtonProps) {
 
   const SIGWX_DATA_OPTIONS: ToggleDataOption[] = [
     {
-      icon: <TropicalCycloneIcon className="shrink-0 fill-black" />,
-      type: "hurricanes",
-      name: "Atlantic Basin TCs",
-      state: vector.showHurricanes,
-      toggle: vectorActions.toggleHurricanes,
-    },
-    {
       icon: <Plane className="shrink-0" />,
       type: "sigmet",
       name: "SIGMETs",
       state: vector.showSIGMETs,
       toggle: vectorActions.toggleSIGMETs,
     },
+    {
+      icon: <Tornado className="shrink-0" />,
+      type: "tsOutlooks",
+      name: "Thunderstorm Outlooks",
+      state: vector.showTSOutlooks,
+      toggle: vectorActions.toggleTSOutlooks,
+    },
+    {
+      icon: <TropicalCycloneIcon className="shrink-0 fill-black" />,
+      type: "hurricanes",
+      name: "Atlantic Basin TCs",
+      state: vector.showHurricanes,
+      toggle: vectorActions.toggleHurricanes,
+    },
+
     {
       icon: <TriangleAlert className="shrink-0" />,
       type: "publicAlerts",

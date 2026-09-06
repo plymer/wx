@@ -11,23 +11,55 @@
     "height": 30,
     "pixelRatio": 1,
     "width": 30,
+    "x": 0,
+    "y": 30,
+    "sdf": true
+  },
+  "hail": {
+    "height": 30,
+    "pixelRatio": 1,
+    "width": 30,
     "x": 30,
     "y": 0,
+    "sdf": true
+  },
+  "rain": {
+    "height": 30,
+    "pixelRatio": 1,
+    "width": 30,
+    "x": 30,
+    "y": 30,
     "sdf": true
   },
   "stn-auto": {
     "height": 30,
     "pixelRatio": 1,
     "width": 30,
-    "x": 0,
-    "y": 30,
+    "x": 60,
+    "y": 0,
     "sdf": true
   },
   "stn-hwos": {
     "height": 30,
     "pixelRatio": 1,
     "width": 30,
-    "x": 30,
+    "x": 60,
+    "y": 30,
+    "sdf": true
+  },
+  "tornado": {
+    "height": 30,
+    "pixelRatio": 1,
+    "width": 30,
+    "x": 90,
+    "y": 0,
+    "sdf": true
+  },
+  "wind": {
+    "height": 30,
+    "pixelRatio": 1,
+    "width": 30,
+    "x": 90,
     "y": 30,
     "sdf": true
   }

@@ -42,6 +42,7 @@ import { HillshadeLayer } from "@/components/map/layers/base/Hillshade";
 import { AerialImageryLayer } from "@/components/map/layers/base/Aerial";
 import { libertyWxMap } from "@/assets/map-styles/liberty-wxmap";
 import { Hurricanes } from "@/components/map/layers/data/Hurricanes";
+import { TSOutlooks } from "@/components/map/layers/data/TSOutlooks";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -125,6 +126,7 @@ export default function WxMap() {
         <LightningDataLayer />
 
         <Hurricanes />
+        <TSOutlooks />
 
         <DataPopup />
 

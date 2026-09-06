@@ -214,6 +214,13 @@ export const libertyWxMap: StyleSpecification = {
       paint: { "line-color": WATER_OUTLINE },
     },
     {
+      id: "outlooks-target",
+      type: "line",
+      source: "openmaptiles",
+      "source-layer": "water",
+      layout: { visibility: "none" },
+    },
+    {
       id: "waterway_tunnel",
       type: "line",
       source: "openmaptiles",

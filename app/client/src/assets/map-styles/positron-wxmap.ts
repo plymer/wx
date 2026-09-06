@@ -48,6 +48,7 @@ export const positronWxMap: StyleSpecification = {
       "source-layer": "water",
       layout: { visibility: "none" },
     },
+
     {
       id: "wateroutline-casing",
       type: "line",
@@ -62,6 +63,13 @@ export const positronWxMap: StyleSpecification = {
       source: "openmaptiles",
       "source-layer": "water",
       paint: { "line-color": WATER_OUTLINE, "line-width": 1 },
+    },
+    {
+      id: "outlooks-target",
+      type: "line",
+      source: "openmaptiles",
+      "source-layer": "water",
+      layout: { visibility: "none" },
     },
     {
       id: "tunnel_motorway_casing",

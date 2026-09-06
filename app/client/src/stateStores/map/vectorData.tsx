@@ -13,6 +13,7 @@ interface VectorStateStore {
   showAIRMETs: boolean;
   showPublicAlerts: boolean;
   showHurricanes: boolean;
+  showTSOutlooks: boolean;
   publicAlertsFilterLevel: "all" | "convective";
   actions: {
     toggleAQ: () => void;
@@ -25,6 +26,7 @@ interface VectorStateStore {
     toggleSIGMETs: () => void;
     toggleAIRMETs: () => void;
     toggleHurricanes: () => void;
+    toggleTSOutlooks: () => void;
     togglePublicAlerts: () => void;
     togglePublicAlertsFilterLevel: () => void;
   };
@@ -45,6 +47,7 @@ const useVectorData = create<VectorStateStore>()(
       showAIRMETs: true,
       showPublicAlerts: true,
       showHurricanes: true,
+      showTSOutlooks: true,
       publicAlertsFilterLevel: "all",
       actions: {
         toggleAQ: () => set((state) => ({ showAQ: !state.showAQ })),
@@ -58,6 +61,7 @@ const useVectorData = create<VectorStateStore>()(
         toggleAIRMETs: () => set((state) => ({ showAIRMETs: !state.showAIRMETs })),
         togglePublicAlerts: () => set((state) => ({ showPublicAlerts: !state.showPublicAlerts })),
         toggleHurricanes: () => set((state) => ({ showHurricanes: !state.showHurricanes })),
+        toggleTSOutlooks: () => set((state) => ({ showTSOutlooks: !state.showTSOutlooks })),
         togglePublicAlertsFilterLevel: () =>
           set((state) => ({
             publicAlertsFilterLevel: state.publicAlertsFilterLevel === "all" ? "convective" : "all",
@@ -78,6 +82,7 @@ const useVectorData = create<VectorStateStore>()(
           showSIGMETs: state.showSIGMETs,
           showPublicAlerts: state.showPublicAlerts,
           showHurricanes: state.showHurricanes,
+          showTSOutlooks: state.showTSOutlooks,
           publicAlertsFilterLevel: state.publicAlertsFilterLevel,
         }) as Partial<VectorStateStore>,
       merge: (persistedState, currentState) => ({ ...currentState, ...(persistedState as VectorStateStore) }),
@@ -98,5 +103,6 @@ export const useShowSIGMETs = () => useVectorData((state) => state.showSIGMETs);
 export const useShowAIRMETs = () => useVectorData((state) => state.showAIRMETs);
 export const useShowPublicAlerts = () => useVectorData((state) => state.showPublicAlerts);
 export const useShowHurricanes = () => useVectorData((state) => state.showHurricanes);
+export const useShowTSOutlooks = () => useVectorData((state) => state.showTSOutlooks);
 export const usePublicAlertsFilterLevel = () => useVectorData((state) => state.publicAlertsFilterLevel);
 export const useVectorActions = () => useVectorData((state) => state.actions);

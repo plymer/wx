@@ -1,4 +1,4 @@
-import type { Feature, FeatureCollection, MultiPolygon } from "geojson";
+import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { TRPCError } from "@trpc/server";
 import "dotenv/config";
 
@@ -10,8 +10,14 @@ import { publicProcedure, router } from "../services/trpc.js";
 import { pgDb as db } from "../services/database.js";
 import { cacheClient } from "../services/redis.js";
 import { sql } from "drizzle-orm";
-import { HURRICANE_CACHE_KEY, POPUP_DATA_CACHE_KEY, PUBLIC_ALERTS_CACHE_KEY } from "../config/cache-keys.config.js";
+import {
+  HURRICANE_CACHE_KEY,
+  POPUP_DATA_CACHE_KEY,
+  PUBLIC_ALERTS_CACHE_KEY,
+  TSO_CACHE_KEY,
+} from "../config/cache-keys.config.js";
 import type { HurricaneDataResponse, HurricaneDataType } from "../lib/hurricanes.types.js";
+import type { TSOutlookFeatureProps } from "../lib/tso.types.js";
 
 type LeadAlertRow = {
   id: string;
@@ -280,5 +286,32 @@ export const wxmapRouter = router({
     };
 
     return mergedFeatureCollection;
+  }),
+
+  tso: publicProcedure.query(async () => {
+    const cacheKey = `${TSO_CACHE_KEY}`;
+    const cachedData = await cacheClient.get(cacheKey);
+
+    if (cachedData) {
+      console.log(`[API] Cache HIT for TSO data`);
+      return JSON.parse(cachedData) as FeatureCollection<Polygon, TSOutlookFeatureProps>;
+    } else {
+      console.log(`[API] Cache MISS for TSO data. Fetching from source...`);
+      const url = `https://api.weather.gc.ca/collections/thunderstorm_outlook/items?lang=en&f=json`;
+      const response = (await fetch(url).then((res) => res.json())) as FeatureCollection<
+        Polygon,
+        TSOutlookFeatureProps
+      >;
+
+      if (!response || !response.features) {
+        console.error(`No features found for TSO data`);
+        return { type: "FeatureCollection", features: [] } as FeatureCollection<Polygon, TSOutlookFeatureProps>;
+      }
+
+      const expiryTime = 60 * 60 * 6; // 6 hours
+      await cacheClient.setEx(cacheKey, expiryTime, JSON.stringify(response));
+
+      return response;
+    }
   }),
 });
