@@ -256,7 +256,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
         </Button>
       </SheetTrigger>
       <SheetContent
-        side="left"
+        side="right"
         className="bg-transparent border-none text-white p-2 overflow-y-auto"
         showCloseButton={false}
         onClick={(e) => {
