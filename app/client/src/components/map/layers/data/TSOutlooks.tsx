@@ -227,6 +227,31 @@ export const TSOutlooks = () => {
           "symbol-sort-key": ["get", "metobject.risk_swo.value"],
         }}
       />
+      <Layer
+        type="symbol"
+        id="tso-non-severe-layer"
+        key="tso-non-severe-layer"
+        beforeId="outlooks-target"
+        filter={[
+          "all",
+          ["==", ["get", "metobject.tornado_risk.value"], false],
+          ["==", ["get", "metobject.rain.value"], 0],
+          ["==", ["get", "metobject.hail.value"], 0],
+          ["==", ["get", "metobject.gust.value"], 0],
+        ]}
+        paint={{
+          "icon-color": "black",
+          "icon-halo-color": "white",
+          "icon-halo-width": 1,
+          "text-color": "black",
+          "text-halo-color": "white",
+          "text-halo-width": 1.5,
+        }}
+        layout={{
+          "text-field": "Non-severe\nThunderstorms",
+          "symbol-sort-key": ["get", "metobject.risk_swo.value"],
+        }}
+      />
     </Source>
   );
 };
