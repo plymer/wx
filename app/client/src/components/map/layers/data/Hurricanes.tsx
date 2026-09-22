@@ -24,6 +24,7 @@ export const Hurricanes = () => {
           "line-width": 2,
         }}
       />
+
       <Layer
         id="layer-hurricanes-error-outline"
         key="layer-hurricanes-error-outline"
@@ -45,6 +46,24 @@ export const Hurricanes = () => {
         paint={{
           "fill-color": "white",
           "fill-opacity": 0.2,
+        }}
+      />
+      <Layer
+        id="layer-hurricanes-name"
+        key="layer-hurricanes-name"
+        type="symbol"
+        source="hurricanes"
+        filter={["==", ["get", "type"], "error_cone"]}
+        paint={{
+          "text-color": "black",
+          "text-halo-color": "white",
+          "text-halo-width": 12,
+        }}
+        layout={{
+          "symbol-placement": "line",
+          "text-field": ["get", "storm_name"],
+          "text-allow-overlap": true,
+          "symbol-spacing": ["interpolate", ["linear"], ["zoom"], 0, 200, 2, 1600, 10, 600],
         }}
       />
       <Layer
@@ -102,40 +121,38 @@ export const Hurricanes = () => {
         paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
         layout={{
           "text-size": 12,
+          "text-anchor": "top",
+          "text-offset": [0, 0.5],
           "text-field": [
             "step",
             ["zoom"],
             [
               "concat",
-              '"',
-              ["get", "storm_name"],
-              '"\n',
+              ["at", 2, ["split", ["at", 0, ["split", ["get", "forecast_datetime"], "T"]], "-"]],
+              "/",
               ["at", 0, ["split", ["at", 1, ["split", ["get", "forecast_datetime"], "T"]], ":"]],
               ":",
               ["at", 1, ["split", ["at", 1, ["split", ["get", "forecast_datetime"], "T"]], ":"]],
               "Z",
             ],
-            8,
+            7,
             [
               "let",
-              "class",
-              ["get", "classification", ["get", "metobject"]],
+              "subType",
+              ["get", "sub_type", ["get", "metobject"]],
               [
                 "concat",
                 [
                   "case",
-                  ["!=", ["var", "class"], "POST_TROPICAL"],
-                  ["join", ["split", ["var", "class"], "_"], "\n"],
-                  "",
+                  ["!=", ["var", "subType"], "STORM"],
+                  ["join", ["split", ["var", "subType"], "_"], " "],
+                  "TROPICAL STORM",
                 ],
                 " ",
-                ["join", ["split", ["get", "sub_type", ["get", "metobject"]], "_"], " "],
-                '\n"',
-
-                ["get", "storm_name"],
-                '"\nMAX ',
                 ["concat", ["get", "value", ["get", "max_wind", ["get", "metobject"]]], "KT"],
-                "\n",
+                " @ ",
+                ["at", 2, ["split", ["at", 0, ["split", ["get", "forecast_datetime"], "T"]], "-"]],
+                "/",
                 ["at", 0, ["split", ["at", 1, ["split", ["get", "forecast_datetime"], "T"]], ":"]],
                 ":",
                 ["at", 1, ["split", ["at", 1, ["split", ["get", "forecast_datetime"], "T"]], ":"]],
