@@ -49,24 +49,6 @@ export const Hurricanes = () => {
         }}
       />
       <Layer
-        id="layer-hurricanes-name"
-        key="layer-hurricanes-name"
-        type="symbol"
-        source="hurricanes"
-        filter={["==", ["get", "type"], "error_cone"]}
-        paint={{
-          "text-color": "black",
-          "text-halo-color": "white",
-          "text-halo-width": 12,
-        }}
-        layout={{
-          "symbol-placement": "line",
-          "text-field": ["get", "storm_name"],
-          "text-allow-overlap": true,
-          "symbol-spacing": ["interpolate", ["linear"], ["zoom"], 0, 200, 2, 1600, 10, 600],
-        }}
-      />
-      <Layer
         id="layer-hurricanes-radii"
         key="layer-hurricanes-radii"
         type="line"
@@ -99,16 +81,46 @@ export const Hurricanes = () => {
         }}
       />
       <Layer
+        id="layer-hurricanes-name"
+        key="layer-hurricanes-name"
+        type="symbol"
+        source="hurricanes"
+        filter={["==", ["get", "type"], "error_cone"]}
+        paint={{
+          "text-color": "black",
+          "text-halo-color": "white",
+          "text-halo-width": 12,
+        }}
+        layout={{
+          "symbol-placement": "line",
+          "text-field": ["get", "storm_name"],
+          "text-allow-overlap": true,
+          "symbol-spacing": ["interpolate", ["linear"], ["zoom"], 0, 200, 2, 1600, 10, 600],
+        }}
+      />
+      <Layer
         id="layer-hurricanes-position"
         key="layer-hurricanes-position"
-        type="circle"
+        type="symbol"
         source="hurricanes"
         filter={["==", ["get", "type"], "cyclone"]}
         paint={{
-          "circle-radius": 6,
-          "circle-color": "red",
-          "circle-stroke-color": "black",
-          "circle-stroke-width": 2,
+          "icon-color": "red",
+          "icon-halo-color": "black",
+          "icon-halo-width": 1,
+        }}
+        layout={{
+          "icon-image": [
+            "match",
+            ["get", "sub_type", ["get", "metobject"]],
+            "HURRICANE",
+            "icons:hurricane",
+            "STORM",
+            "icons:tropical-storm",
+            "icons:pressure-centre",
+          ],
+          "icon-size": ["case", ["==", ["get", "sub_type", ["get", "metobject"]], "POST_TROPICAL_STORM"], 1.5, 0.5],
+          "icon-allow-overlap": true,
         }}
       />
       <Layer
@@ -122,7 +134,7 @@ export const Hurricanes = () => {
         layout={{
           "text-size": 12,
           "text-anchor": "top",
-          "text-offset": [0, 0.5],
+          "text-offset": [0, 1.25],
           "text-field": [
             "step",
             ["zoom"],
