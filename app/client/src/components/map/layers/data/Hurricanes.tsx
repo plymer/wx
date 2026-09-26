@@ -13,6 +13,17 @@ export const Hurricanes = () => {
   return (
     <Source id="hurricanes" key="hurricanes" type="geojson" data={data.data}>
       <Layer
+        id="layer-hurricanes-error-fill"
+        key="layer-hurricanes-error-fill"
+        type="fill"
+        source="hurricanes"
+        filter={["==", ["get", "type"], "error_cone"]}
+        paint={{
+          "fill-color": "white",
+          "fill-opacity": 0.2,
+        }}
+      />
+      <Layer
         id="layer-hurricanes-track"
         key="layer-hurricanes-track"
         type="line"
@@ -24,7 +35,18 @@ export const Hurricanes = () => {
           "line-width": 2,
         }}
       />
-
+      <Layer
+        id="layer-hurricanes-error-outline-underlay"
+        key="layer-hurricanes-error-outline-underlay"
+        type="line"
+        source="hurricanes"
+        filter={["==", ["get", "type"], "error_cone"]}
+        paint={{
+          "line-color": "black",
+          "line-width": 6,
+          "line-opacity": 0.5,
+        }}
+      />
       <Layer
         id="layer-hurricanes-error-outline"
         key="layer-hurricanes-error-outline"
@@ -37,15 +59,16 @@ export const Hurricanes = () => {
           "line-width": 2,
         }}
       />
+
       <Layer
-        id="layer-hurricanes-error-fill"
-        key="layer-hurricanes-error-fill"
-        type="fill"
+        id="layer-hurricanes-radii-underlay"
+        key="layer-hurricanes-radii-underlay"
+        type="line"
         source="hurricanes"
-        filter={["==", ["get", "type"], "error_cone"]}
+        filter={["==", ["get", "type"], "wind_radii"]}
         paint={{
-          "fill-color": "white",
-          "fill-opacity": 0.2,
+          "line-color": "black",
+          "line-width": 6,
         }}
       />
       <Layer
@@ -65,8 +88,8 @@ export const Hurricanes = () => {
         }}
       />
       <Layer
-        id="layer-hurricanes-radii-label"
-        key="layer-hurricanes-radii-label"
+        id="layer-hurricanes-radii-fill"
+        key="layer-hurricanes-radii-fill"
         type="fill"
         source="hurricanes"
         filter={["==", ["get", "type"], "wind_radii"]}
@@ -85,17 +108,16 @@ export const Hurricanes = () => {
         key="layer-hurricanes-name"
         type="symbol"
         source="hurricanes"
-        filter={["==", ["get", "type"], "error_cone"]}
+        filter={["==", ["get", "type"], "name_point"]}
         paint={{
           "text-color": "black",
           "text-halo-color": "white",
           "text-halo-width": 12,
         }}
         layout={{
-          "symbol-placement": "line",
           "text-field": ["get", "storm_name"],
-          "text-allow-overlap": true,
-          "symbol-spacing": ["interpolate", ["linear"], ["zoom"], 0, 200, 2, 1600, 10, 600],
+          "text-variable-anchor": ["bottom-left", "top-left", "top-right", "bottom-right"],
+          "text-radial-offset": ["interpolate", ["linear"], ["zoom"], 2, 1.5, 4, 2, 5, 4],
         }}
       />
       <Layer
@@ -119,7 +141,16 @@ export const Hurricanes = () => {
             "icons:tropical-storm",
             "icons:pressure-centre",
           ],
-          "icon-size": ["case", ["==", ["get", "sub_type", ["get", "metobject"]], "POST_TROPICAL_STORM"], 1.5, 0.5],
+          "icon-size": [
+            "case",
+            [
+              "all",
+              ["!=", ["get", "sub_type", ["get", "metobject"]], "STORM"],
+              ["!=", ["get", "sub_type", ["get", "metobject"]], "HURRICANE"],
+            ],
+            0.3,
+            0.5,
+          ],
           "icon-allow-overlap": true,
         }}
       />

@@ -3,7 +3,7 @@ import path from "path";
 
 import * as turf from "@turf/turf";
 import { XMLParser } from "fast-xml-parser";
-import type { Position } from "geojson";
+import type { Feature, Position } from "geojson";
 
 import "dotenv/config";
 
@@ -569,8 +569,6 @@ export function transformHurricaneMetobject<TData extends HurricaneDataType>(
           validity_datetime: props.validity_datetime,
         };
 
-        console.log("Cyclone properties transformed:", newProps);
-
         return { ...feature, properties: newProps } as HurricaneData["cyclone"]["features"][number];
       }
       case "wind_radii": {
@@ -613,4 +611,15 @@ export function transformHurricaneMetobject<TData extends HurricaneDataType>(
         throw new Error(`Unknown hurricane data type: ${type}`);
     }
   }) as HurricaneData[TData]["features"];
+}
+
+export function generateStormNamePoint(trackData: HurricaneData["track"]["features"][number]): Feature {
+  const { storm_name, validity_datetime } = trackData.properties;
+
+  const coords = turf.centerOfMass(trackData);
+  return turf.point([...coords.geometry.coordinates], {
+    type: "name_point",
+    storm_name,
+    validity_datetime,
+  });
 }

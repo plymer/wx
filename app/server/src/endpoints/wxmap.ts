@@ -4,7 +4,7 @@ import "dotenv/config";
 
 import type { AlertColour, AlertType, StationPlotPopupData, WxOAlertMapProperties } from "../lib/types.js";
 import { HOUR } from "../lib/constants.js";
-import { limitResultsByKeys, transformHurricaneMetobject } from "../lib/utils.js";
+import { generateStormNamePoint, limitResultsByKeys, transformHurricaneMetobject } from "../lib/utils.js";
 
 import { publicProcedure, router } from "../services/trpc.js";
 import { pgDb as db } from "../services/database.js";
@@ -16,7 +16,7 @@ import {
   PUBLIC_ALERTS_CACHE_KEY,
   TSO_CACHE_KEY,
 } from "../config/cache-keys.config.js";
-import type { HurricaneDataResponse, HurricaneDataType } from "../lib/hurricanes.types.js";
+import type { HurricaneData, HurricaneDataResponse, HurricaneDataType } from "../lib/hurricanes.types.js";
 import type { TSOutlookFeatureProps } from "../lib/tso.types.js";
 
 type LeadAlertRow = {
@@ -145,7 +145,8 @@ export const wxmapRouter = router({
         // });
 
         const leadAlerts = await db
-          .execute(sql<LeadAlertRow>`
+          .execute(
+            sql<LeadAlertRow>`
           SELECT
             id,
             alert_code as "alertCode",
@@ -175,8 +176,9 @@ export const wxmapRouter = router({
             level,
             coords
           FROM public_alerts
-          WHERE issue_time > NOW() - INTERVAL '24 hours'          
-          `)
+          WHERE issue_time > NOW() - INTERVAL '24 hours'
+          `,
+          )
           .then((results) => results.rows);
 
         const features: Feature<MultiPolygon, WxOAlertMapProperties>[] = leadAlerts
@@ -255,7 +257,7 @@ export const wxmapRouter = router({
             return [] as Feature[];
           }
 
-          const expiryTime = 60 * 60 * 6; // 6 hours
+          const expiryTime = 60 * 30; // 30 minutes
           const now = new Date().getTime();
 
           const featureCount = response.features.length;
@@ -265,16 +267,21 @@ export const wxmapRouter = router({
               new Date(f.properties.validity_datetime).getTime() < now,
           ).length;
 
+          const baseFeatures = transformHurricaneMetobject(type, response.features);
+          const computedFeatures: Feature[] = [];
+
           if (featureCount === expiredFeatures) {
             await cacheClient.setEx(cacheKey, expiryTime, JSON.stringify(transformHurricaneMetobject(type, [])));
           } else {
-            await cacheClient.setEx(
-              cacheKey,
-              expiryTime,
-              JSON.stringify(transformHurricaneMetobject(type, response.features)),
-            );
+            if (type === "track") {
+              baseFeatures.forEach((bF) =>
+                computedFeatures.push(generateStormNamePoint(bF as HurricaneData["track"]["features"][number])),
+              );
+            }
+
+            await cacheClient.setEx(cacheKey, expiryTime, JSON.stringify([...baseFeatures, ...computedFeatures]));
           }
-          return response.features as Feature[];
+          return [...baseFeatures, ...computedFeatures] as Feature[];
         }
       }),
     );
