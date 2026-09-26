@@ -170,8 +170,15 @@ const XmetLayer = ({ dataType, jsonData, belowLayer }: Props) => {
 
   return (
     <Source type="geojson" id={`${dataType}-data`} data={{ ...processedData, features: validFeatures }}>
-      <Layer {...outlineStyle} key={`layer-${dataType}-outline`} beforeId={belowLayer} />
       <Layer {...fillStyle} key={`layer-${dataType}`} beforeId={belowLayer} />
+      <Layer
+        {...outlineStyle}
+        id={`layer-${dataType}-outline-underlay`}
+        paint={{ ...outlineStyle.paint, "line-color": "black", "line-width": 5 }}
+        key={`layer-${dataType}-outline-underlay`}
+        beforeId={belowLayer}
+      />
+      <Layer {...outlineStyle} key={`layer-${dataType}-outline`} beforeId={belowLayer} />
       <Layer
         beforeId={belowLayer}
         key={`layer-${dataType}-text`}

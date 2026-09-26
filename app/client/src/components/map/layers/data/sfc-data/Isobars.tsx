@@ -20,6 +20,21 @@ export const Isobars = ({ displayTime }: Props) => {
   return (
     <>
       <Layer
+        id={`layer-sfc-obs-isobars-casing`}
+        source="vector-tile-source"
+        source-layer="mslp"
+        filter={filter}
+        type="line"
+        layout={{
+          "line-join": "round",
+          "line-cap": "round",
+        }}
+        paint={{
+          "line-color": "#fff",
+          "line-width": ["case", ["==", ["%", ["-", ["to-number", ["get", "value"]], 1000], 24], 0], 5, 3],
+        }}
+      />
+      <Layer
         id={`layer-sfc-obs-isobars`}
         source="vector-tile-source"
         source-layer="mslp"
@@ -31,7 +46,7 @@ export const Isobars = ({ displayTime }: Props) => {
         }}
         paint={{
           "line-color": "#111",
-          "line-width": ["case", ["==", ["%", ["-", ["to-number", ["get", "value"]], 1000], 24], 0], 6, 3],
+          "line-width": ["case", ["==", ["%", ["-", ["to-number", ["get", "value"]], 1000], 24], 0], 4, 2],
         }}
       />
       <Layer
