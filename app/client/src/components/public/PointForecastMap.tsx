@@ -61,6 +61,7 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
       mapState.setMapRef(null);
       setIsStatic(false);
     };
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onMapLoad = (e: MapLibreEvent) => {

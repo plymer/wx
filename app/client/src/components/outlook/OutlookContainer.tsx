@@ -16,11 +16,16 @@ const OutlookContainer = ({ data }: Props) => {
   const validPeriod = useOutlookValidPeriod();
   const actions = useOutlookActions();
 
-  const officesInData = data ? Object.keys(data) : [];
-  const regionsInOffice = office && data && data[office] ? Object.keys(data[office]) : [];
+  const officesInData = useMemo(() => {
+    return data ? Object.keys(data) : [];
+  }, [data]);
+  const regionsInOffice = useMemo(() => {
+    return office && data && data[office] ? Object.keys(data[office]) : [];
+  }, [office, data]);
   const onlyOneRegion = regionsInOffice.length === 1;
 
-  // select the office and region stored in state, unless those choices don't exist in the current API data; then we default back to the 0th office and it's 0th region in the data (if they exist)
+  // select the office and region stored in state, unless those choices don't exist in the current API data;
+  // then we default back to the 0th office and it's 0th region in the data (if they exist)
   const selectedOffice: OutlookOffice | null = useMemo(() => {
     if (office && officesInData.includes(office)) {
       return office;
@@ -30,7 +35,7 @@ const OutlookContainer = ({ data }: Props) => {
     } else {
       return null;
     }
-  }, [office, officesInData]);
+  }, [office, officesInData, actions]);
 
   const selectedRegion = useMemo(() => {
     if (region && regionsInOffice.includes(region)) {

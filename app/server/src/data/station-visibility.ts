@@ -4,7 +4,7 @@ import { stations as stationsSchema } from "../db/schemas.drizzle.js";
 import type { DataProcessResult } from "../lib/types.js";
 
 // prettier-ignore
-const BC_WINDS = ["CWAS","CWFG","CWRU","CWRO","CWEK","CWME","CWRO","CWQS","CWQK"]
+const BC_WINDS = ["CWAS","CWFG","CWRU","CWRO","CWEK","CWME","CWRO","CWQS","CWQK"];
 
 // prettier-ignore
 const OTHER_LOCAL_EFFECTS = ["CWRR","CWGM","CWNR","CZPC","CWRT","CYJF"];

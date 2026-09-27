@@ -69,6 +69,7 @@ export default function WxMap() {
       animation.firstFrame();
       animation.pause();
     };
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const mapStyle = baseMap === "aerial" || baseMap === "hillshade" ? positronWxMap : libertyWxMap;

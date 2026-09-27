@@ -92,7 +92,8 @@ const AnimationControls = ({ ...props }: Props) => {
     }
 
     return () => clearTimeout(animation.loopId);
-  }, [animation.state, animation.frame]);
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [animation.state, animation.frame, animation.frameRate, animationActions, maxFrame]);
 
   return (
     <div {...props}>

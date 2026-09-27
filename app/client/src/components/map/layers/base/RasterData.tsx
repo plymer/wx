@@ -116,7 +116,9 @@ const RasterDataLayer = ({ belowLayer, apiData }: Props) => {
   };
 
   // filter all the time steps that are within our validity period
-  const filteredTimesteps = apiData?.timeSteps?.filter((time) => time.validTime > animation.startTime) ?? [];
+  const filteredTimesteps = useMemo(() => {
+    return apiData?.timeSteps?.filter((time) => time.validTime > animation.startTime) ?? [];
+  }, [apiData, animation.startTime]);
 
   const mappedTimesteps = useMemo(() => {
     const timesteps: number[] = [];

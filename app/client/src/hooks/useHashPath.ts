@@ -56,6 +56,7 @@ const useHashPath = () => {
     } else if (!hashMode && appMode) {
       navigate(`/${appMode}`, { replace: true });
     }
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 };
 

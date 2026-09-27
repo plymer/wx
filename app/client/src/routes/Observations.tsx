@@ -31,7 +31,8 @@ export default function Observations() {
     return () => {
       siteId.current = "";
     };
-  }, []); // this needs to only run on mount/unmount
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // hours that are available as options in the dropdown list
   const HOURS: number[] = [6, 12, 18, 24, 36, 48, 96];
