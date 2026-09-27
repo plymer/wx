@@ -1,3 +1,4 @@
+import { GEOMET_ATTRIBUTION } from "@/config/rasterData";
 import { api } from "@/lib/trpc";
 import { useShowHurricanes } from "@/stateStores/map/vectorData";
 import { MINUTE } from "@shared/lib/constants";
@@ -6,12 +7,12 @@ import { Source, Layer } from "react-map-gl/maplibre";
 export const Hurricanes = () => {
   const enabled = useShowHurricanes();
   // types: track, error_cone, cyclone, wind_radii
-  const data = useQuery(api.wxmap.hurricanes.queryOptions(undefined, { enabled, refetchInterval: 10 * MINUTE }));
+  const { data } = useQuery(api.wxmap.hurricanes.queryOptions(undefined, { enabled, refetchInterval: 10 * MINUTE }));
 
-  if (!enabled || !data.data) return null;
+  if (!enabled || !data) return null;
 
   return (
-    <Source id="hurricanes" key="hurricanes" type="geojson" data={data.data}>
+    <Source id="hurricanes" key="hurricanes" type="geojson" data={data} attribution={GEOMET_ATTRIBUTION}>
       <Layer
         id="layer-hurricanes-error-fill"
         key="layer-hurricanes-error-fill"
