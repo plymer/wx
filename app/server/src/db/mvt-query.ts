@@ -66,9 +66,6 @@ const TABLES = [
 
 /*
 function pirepQuery(t: number, z: number) {
-  
-
-  
 
   if (z > CLUSTER_MAX_ZOOM) {
     return sql`
@@ -99,7 +96,7 @@ function pirepQuery(t: number, z: number) {
   }
 
   return sql`
-       
+
       `;
 }
 */
@@ -141,7 +138,6 @@ function isolinesQuery(z: number) {
 
 function lightningQuery(z: number) {
   return sql`
-  
         -- for zooms 2-8 use the pre-clustered strikes we created
         clustered_strikes AS (
           SELECT
@@ -171,7 +167,6 @@ function lightningQuery(z: number) {
             AND (dumped).geom && bounds.query_geom
             AND l.start_time >= NOW() - INTERVAL '4 hours'
         ),
-        
 
         -- combine the clustered and raw strikes into a single set of features for the requested tile
         lightning_features AS (
@@ -183,7 +178,7 @@ function lightningQuery(z: number) {
 
           UNION ALL
 
-          SELECT 
+          SELECT
             raw_strikes.geometry,
             raw_strikes.start_time,
             raw_strikes.expiry_time
@@ -261,16 +256,16 @@ export async function getTile(t: number, z: number, x: number, y: number) {
 
     switch (name) {
       case "isolines":
+        // uses pre-computed isoline geometries and simplifies them based on zoom level
         return isolinesQuery(z);
       // case "pireps":
       //   // special case that requires clustering of PIREPs at low zoom levels
       //   return pirepQuery(t, z);
       case "metars":
-        // special case that requires doing a LEAD window function to
-        // compute expiry_time on the fly for each observation
+        // uses the materialized view "metars_temporal" as its data source
         return stationPlotQuery(z);
       case "lightning":
-        // special case that requires clustering of lightning strikes at low zoom levels
+        // uses the pre-clustered lightning data for low zoom levels, or raw strikes for high zooms
         return lightningQuery(z);
       default:
         // if any other tables we don't have a special case for
