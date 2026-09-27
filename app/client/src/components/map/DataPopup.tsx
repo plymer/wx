@@ -26,8 +26,8 @@ export const DataPopup = () => {
 
   const featureList = popupData.features;
 
-  const hasOtherFeatures = featureList.some((feature) => {
-    const dataType = feature.properties.dataType as string;
+  const showArealFeatures = featureList.every((feature) => {
+    const dataType = (feature.properties.dataType as string) || (feature.properties.data_type as string);
     return dataType !== "site";
   });
 
@@ -50,11 +50,16 @@ export const DataPopup = () => {
       className="md:w-100 max-md:w-60 max-w-3/4 text-white bg-transparent"
     >
       <div className="flex flex-col gap-2 justify-center items-center">
-        <div className="flex flex-col gap-2 max-h-[33dvh] w-full overflow-y-auto overflow-x-clip rounded-md bg-radial-[at_0%_0%] from-neutral-700 to-neutral-800 to-90%">
+        <div className="flex flex-col gap-2 max-h-[33dvh] w-full overflow-y-auto overflow-x-clip rounded-md ">
           {featureList
             .sort((a, b) => {
               if (a.properties.dataType === "publicAlert" && b.properties.dataType !== "publicAlert") {
-                return -1;
+                // sigmets are visually small, put them at the top
+                if (b.properties.dataType === "sigmet") {
+                  return 1;
+                } else {
+                  return -1;
+                }
               } else if (a.properties.dataType !== "publicAlert" && b.properties.dataType === "publicAlert") {
                 return 1;
               } else if (a.properties.dataType === "publicAlert" && b.properties.dataType === "publicAlert") {
@@ -85,9 +90,9 @@ export const DataPopup = () => {
                 }
               }
               if (a.properties.dataType === "sigmet" && b.properties.dataType !== "sigmet") {
-                return -1;
-              } else if (a.properties.dataType !== "sigmet" && b.properties.dataType === "sigmet") {
                 return 1;
+              } else if (a.properties.dataType !== "sigmet" && b.properties.dataType === "sigmet") {
+                return -1;
               } else {
                 return 0;
               }
@@ -112,7 +117,10 @@ export const DataPopup = () => {
                   const parsedTaf = taf ? (formatSigWx(taf, "taf") as ParsedTAF) : null;
 
                   return (
-                    <div key={siteId} className="border border-neutral-600 rounded-md ">
+                    <div
+                      key={siteId}
+                      className="border border-neutral-600 rounded-md bg-radial-[at_0%_0%] from-neutral-700 to-neutral-800 to-90%"
+                    >
                       <h1 className="font-bold mb-1 text-center bg-neutral-600 px-2 py-0.5">
                         {siteName}, {siteCountry === "US" || siteCountry === "CA" ? siteState : siteCountry}
                       </h1>
@@ -122,7 +130,7 @@ export const DataPopup = () => {
                             <SigWx text={parsedMetar} />
                           </div>
                         )}
-                        {!hasOtherFeatures && !hasOtherMetars && (
+                        {!showArealFeatures && !hasOtherMetars && (
                           <>
                             {parsedTaf?.main && (
                               <div className="border-t mt-2 pt-2 ms-2 -indent-2">
@@ -142,6 +150,7 @@ export const DataPopup = () => {
                   );
                 }
                 case "sigmet": {
+                  if (!showArealFeatures) return null;
                   const sigmetProps = feature.properties as XmetEventData;
 
                   const hazard = sigmetProps.hazard;
@@ -180,7 +189,8 @@ export const DataPopup = () => {
                     </div>
                   );
                 }
-                case "publicAlert":
+                case "publicAlert": {
+                  if (!showArealFeatures) return null;
                   const alertProps = feature.properties as WxOAlertMetadataProperties;
 
                   const headerColour =
@@ -213,9 +223,10 @@ export const DataPopup = () => {
                       <div className="p-2 whitespace-pre-wrap">{alertProps.text}</div>
                     </div>
                   );
+                }
+                default:
+                  return null;
               }
-
-              return null;
             })}
         </div>
 
