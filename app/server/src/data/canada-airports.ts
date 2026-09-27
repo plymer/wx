@@ -1,208 +1,208 @@
-import "dotenv/config";
-import { load } from "cheerio";
-import type { StationData } from "../lib/types.js";
-import { stations } from "../db/schemas.drizzle.js";
-import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
-import { pgDb as db } from "../services/database.js";
+// import "dotenv/config";
+// import { fromURL } from "cheerio";
+// import type { StationData } from "../lib/types.js";
+// import { stations } from "../db/schemas.drizzle.js";
+// import { DEFAULT_REMOTE_HEADERS } from "../lib/constants.js";
+// import { pgDb as db } from "../services/database.js";
 
-const PROVINCES = {
-  AB: "Alberta",
-  BC: "British_Columbia",
-  MB: "Manitoba",
-  SK: "Saskatchewan",
-  ON: "Ontario",
-  QC: "Quebec",
-  NB: "New_Brunswick",
-  PE: "Prince_Edward_Island",
-  NS: "Nova_Scotia",
-  NL: "Newfoundland_and_Labrador",
-  YT: "Yukon",
-  NT: "the_Northwest_Territories",
-  NU: "Nunavut",
-};
+// const PROVINCES = {
+//   AB: "Alberta",
+//   BC: "British_Columbia",
+//   MB: "Manitoba",
+//   SK: "Saskatchewan",
+//   ON: "Ontario",
+//   QC: "Quebec",
+//   NB: "New_Brunswick",
+//   PE: "Prince_Edward_Island",
+//   NS: "Nova_Scotia",
+//   NL: "Newfoundland_and_Labrador",
+//   YT: "Yukon",
+//   NT: "the_Northwest_Territories",
+//   NU: "Nunavut",
+// };
 
-const baseUrl = "https://en.wikipedia.org/w/api.php?action=parse&page=List_of_airports_in_";
+// const baseUrl = "https://en.wikipedia.org/w/api.php?action=parse&page=List_of_airports_in_";
 
-type WikiParseResponse = {
-  parse?: {
-    text?: {
-      "*"?: string;
-    };
-  };
-};
+// type WikiParseResponse = {
+//   parse?: {
+//     text?: {
+//       "*"?: string;
+//     };
+//   };
+// };
 
-function normalizeCellText(value: string): string {
-  return value
-    .replace(/\[[^\]]+\]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+// function normalizeCellText(value: string): string {
+//   return value
+//     .replace(/\[[^\]]+\]/g, "")
+//     .replace(/\s+/g, " ")
+//     .trim();
+// }
 
-function normalizeHeader(value: string): string {
-  return normalizeCellText(value)
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "");
-}
+// function normalizeHeader(value: string): string {
+//   return normalizeCellText(value)
+//     .toLowerCase()
+//     .replace(/[^a-z0-9]/g, "");
+// }
 
-function findHeaderIndex(headers: string[], candidates: string[]): number {
-  const normalizedCandidates = candidates.map((candidate) => candidate.toLowerCase().replace(/[^a-z0-9]/g, ""));
-  return headers.findIndex((header) => normalizedCandidates.includes(header));
-}
+// function findHeaderIndex(headers: string[], candidates: string[]): number {
+//   const normalizedCandidates = candidates.map((candidate) => candidate.toLowerCase().replace(/[^a-z0-9]/g, ""));
+//   return headers.findIndex((header) => normalizedCandidates.includes(header));
+// }
 
-function parseCoordinates(value: string): { lat: number; lon: number } | null {
-  const normalized = value.replace(/[−–—]/g, "-");
-  const directMatch = normalized.match(/(-?\d+(?:\.\d+)?)\s*;\s*(-?\d+(?:\.\d+)?)/);
+// function parseCoordinates(value: string): { lat: number; lon: number } | null {
+//   const normalized = value.replace(/[−–—]/g, "-");
+//   const directMatch = normalized.match(/(-?\d+(?:\.\d+)?)\s*;\s*(-?\d+(?:\.\d+)?)/);
 
-  if (!directMatch) {
-    return null;
-  }
+//   if (!directMatch) {
+//     return null;
+//   }
 
-  const lat = Number.parseFloat(directMatch[1]);
-  const lon = Number.parseFloat(directMatch[2]);
+//   const lat = Number.parseFloat(directMatch[1]);
+//   const lon = Number.parseFloat(directMatch[2]);
 
-  if (Number.isNaN(lat) || Number.isNaN(lon)) {
-    return null;
-  }
+//   if (Number.isNaN(lat) || Number.isNaN(lon)) {
+//     return null;
+//   }
 
-  return { lat, lon };
-}
+//   return { lat, lon };
+// }
 
-function parseAirportTable(
-  code: string,
-  parseHtml: ReturnType<typeof load>,
-  table: Parameters<ReturnType<typeof load>>[0],
-): StationData[] {
-  const rows = parseHtml(table).find("tr");
-  if (rows.length < 2) {
-    return [];
-  }
+// function parseAirportTable(
+//   code: string,
+//   parseHtml: Awaited<ReturnType<typeof fromURL>>,
+//   table: Parameters<Awaited<ReturnType<typeof fromURL>>>[0],
+// ): StationData[] {
+//   const rows = parseHtml(table).find("tr");
+//   if (rows.length < 2) {
+//     return [];
+//   }
 
-  const headerCells = parseHtml(rows[0]).find("th");
-  const headers = headerCells.map((_, cell) => normalizeHeader(parseHtml(cell).text())).get();
+//   const headerCells = parseHtml(rows[0]).find("th");
+//   const headers = headerCells.map((_, cell) => normalizeHeader(parseHtml(cell).text())).get();
 
-  const airportIdx = findHeaderIndex(headers, ["airport", "airportname", "name", "aerodrome"]);
-  const icaoIdx = findHeaderIndex(headers, ["icao", "icaoidentifier"]);
-  const tcIdx = findHeaderIndex(headers, ["tc", "transportcanada", "tcidentifier", "tcid"]);
-  const iataIdx = findHeaderIndex(headers, ["iata", "iataidentifier"]);
-  const coordIdx = findHeaderIndex(headers, ["coordinates", "coord"]);
+//   const airportIdx = findHeaderIndex(headers, ["airport", "airportname", "name", "aerodrome"]);
+//   const icaoIdx = findHeaderIndex(headers, ["icao", "icaoidentifier"]);
+//   const tcIdx = findHeaderIndex(headers, ["tc", "transportcanada", "tcidentifier", "tcid"]);
+//   const iataIdx = findHeaderIndex(headers, ["iata", "iataidentifier"]);
+//   const coordIdx = findHeaderIndex(headers, ["coordinates", "coord"]);
 
-  if (airportIdx === -1 || coordIdx === -1) {
-    return [];
-  }
+//   if (airportIdx === -1 || coordIdx === -1) {
+//     return [];
+//   }
 
-  const output: StationData[] = [];
+//   const output: StationData[] = [];
 
-  rows.slice(1).each((_, row) => {
-    const cells = parseHtml(row).find("td");
-    if (!cells.length) {
-      return;
-    }
+//   rows.slice(1).each((_, row) => {
+//     const cells = parseHtml(row).find("td");
+//     if (!cells.length) {
+//       return;
+//     }
 
-    const airportName = normalizeCellText(parseHtml(cells[airportIdx]).text());
-    if (!airportName) {
-      return;
-    }
+//     const airportName = normalizeCellText(parseHtml(cells[airportIdx]).text());
+//     if (!airportName) {
+//       return;
+//     }
 
-    const maybeIds = [icaoIdx, tcIdx, iataIdx]
-      .filter((idx) => idx >= 0)
-      .map((idx) => normalizeCellText(parseHtml(cells[idx]).text()))
-      .filter(Boolean);
+//     const maybeIds = [icaoIdx, tcIdx, iataIdx]
+//       .filter((idx) => idx >= 0)
+//       .map((idx) => normalizeCellText(parseHtml(cells[idx]).text()))
+//       .filter(Boolean);
 
-    const siteId = maybeIds[0];
-    if (!siteId) {
-      return;
-    }
+//     const siteId = maybeIds[0];
+//     if (!siteId) {
+//       return;
+//     }
 
-    const coordinateCellText = normalizeCellText(parseHtml(cells[coordIdx]).text());
-    const coordinates = parseCoordinates(coordinateCellText);
+//     const coordinateCellText = normalizeCellText(parseHtml(cells[coordIdx]).text());
+//     const coordinates = parseCoordinates(coordinateCellText);
 
-    if (!coordinates) {
-      return;
-    }
+//     if (!coordinates) {
+//       return;
+//     }
 
-    output.push({
-      name: airportName,
-      siteId,
-      lat: coordinates.lat,
-      lon: coordinates.lon,
-      elevF: null,
-      elevM: null,
-      country: "CA",
-      state: code,
-      minZoom: 7.5, // default value, will be updated later
-    });
-  });
+//     output.push({
+//       name: airportName,
+//       siteId,
+//       lat: coordinates.lat,
+//       lon: coordinates.lon,
+//       elevF: null,
+//       elevM: null,
+//       country: "CA",
+//       state: code,
+//       minZoom: 7.5, // default value, will be updated later
+//     });
+//   });
 
-  return output;
-}
+//   return output;
+// }
 
-async function scrapeProvince(code: string, name: string): Promise<StationData[]> {
-  const url = `${baseUrl}${name}&format=json`;
+// async function scrapeProvince(code: string, name: string): Promise<StationData[]> {
+//   const url = `${baseUrl}${name}&format=json`;
 
-  const json = (await fetch(url, { headers: DEFAULT_REMOTE_HEADERS })
-    .then((res) => res.json())
-    .catch((err) => console.error(err))) as WikiParseResponse;
-  const pageHtml = String(json?.parse?.text?.["*"] || "");
-  const parseHtml = load(pageHtml);
+//   const pageHtml = await fromURL(url, {});
 
-  const tableResults: StationData[][] = [];
+//   // const pageHtml = String(json?.parse?.text?.["*"] || "");
 
-  parseHtml("table.wikitable").each((_, table) => {
-    tableResults.push(parseAirportTable(code, parseHtml, table));
-  });
+//   // const parseHtml = load(pageHtml, );
 
-  const deduped = new Map<string, StationData>();
+//   const tableResults: StationData[][] = [];
 
-  for (const list of tableResults) {
-    for (const station of list) {
-      deduped.set(`${station.state}:${station.siteId}`, station);
-    }
-  }
+//   pageHtml("table.wikitable").each((_, table) => {
+//     tableResults.push(parseAirportTable(code, pageHtml, table));
+//   });
 
-  return Array.from(deduped.values());
-}
+//   const deduped = new Map<string, StationData>();
 
-export async function scrapeWiki() {
-  if (!db) {
-    throw new Error("[STATIONS] Database connection failed.");
-  }
+//   for (const list of tableResults) {
+//     for (const station of list) {
+//       deduped.set(`${station.state}:${station.siteId}`, station);
+//     }
+//   }
 
-  const results = await Promise.allSettled(
-    Array.from(Object.entries(PROVINCES)).map(async (p) => {
-      const [code, name] = p;
-      try {
-        const features = await scrapeProvince(code, name);
+//   return Array.from(deduped.values());
+// }
 
-        return features;
-      } catch (err) {
-        console.error(`Failed to scrape ${name}: ${baseUrl}${name}&format=json\n\n${err}`);
-        return [];
-      }
-    }),
-  );
+// export async function scrapeWiki() {
+//   if (!db) {
+//     throw new Error("[STATIONS] Database connection failed.");
+//   }
 
-  // Process results sequentially to ensure all insertions complete
-  for (const provinceList of results) {
-    if (provinceList.status === "fulfilled") {
-      const values = provinceList.value;
+//   const results = await Promise.allSettled(
+//     Array.from(Object.entries(PROVINCES)).map(async (p) => {
+//       const [code, name] = p;
+//       try {
+//         const features = await scrapeProvince(code, name);
 
-      // insert the station data, or update each station if it already exists
-      await Promise.allSettled(
-        values.map(async (station) => {
-          await db!
-            .insert(stations)
-            .values(station)
-            .onConflictDoUpdate({
-              target: stations.siteId,
-              set: {
-                lat: station.lat,
-                lon: station.lon,
-                country: station.country,
-                state: station.state,
-              },
-            });
-        }),
-      );
-    }
-  }
-}
+//         return features;
+//       } catch (err) {
+//         console.error(`Failed to scrape ${name}: ${baseUrl}${name}&format=json\n\n${err}`);
+//         return [];
+//       }
+//     }),
+//   );
+
+//   // Process results sequentially to ensure all insertions complete
+//   for (const provinceList of results) {
+//     if (provinceList.status === "fulfilled") {
+//       const values = provinceList.value;
+
+//       // insert the station data, or update each station if it already exists
+//       await Promise.allSettled(
+//         values.map(async (station) => {
+//           await db!
+//             .insert(stations)
+//             .values(station)
+//             .onConflictDoUpdate({
+//               target: stations.siteId,
+//               set: {
+//                 lat: station.lat,
+//                 lon: station.lon,
+//                 country: station.country,
+//                 state: station.state,
+//               },
+//             });
+//         }),
+//       );
+//     }
+//   }
+// }
