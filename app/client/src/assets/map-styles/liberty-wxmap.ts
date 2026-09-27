@@ -1,16 +1,16 @@
 import type { StyleSpecification } from "maplibre-gl";
-import { PUBLIC_URL } from "./positron-wxmap";
+import { PUBLIC_URL, ATTRIBUTION } from "./common";
 
 const WATER_OUTLINE = "rgb(158,189,255)";
 const WATER_CASING = "rgb(25, 25, 25)";
 
 export const libertyWxMap: StyleSpecification = {
   version: 8,
-  metadata: { "maputnik:renderer": "mlgljs" },
   sources: {
     openmaptiles: {
       type: "vector",
       url: "https://tiles.openfreemap.org/planet",
+      attribution: ATTRIBUTION,
     },
   },
   sprite: [

@@ -1,6 +1,5 @@
 import type { StyleSpecification } from "react-map-gl/maplibre";
-
-export const PUBLIC_URL = new URL(import.meta.url).origin;
+import { PUBLIC_URL, ATTRIBUTION } from "./common";
 
 const ROAD_COLOUR_FAR = "rgb(160,160,160)";
 const ROAD_COLOUR_CLOSE = "rgb(40,40,40)";
@@ -18,6 +17,7 @@ export const positronWxMap: StyleSpecification = {
     openmaptiles: {
       type: "vector",
       url: "https://tiles.openfreemap.org/planet",
+      attribution: ATTRIBUTION,
     },
   },
   sprite: [
