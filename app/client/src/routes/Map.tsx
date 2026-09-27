@@ -64,6 +64,11 @@ export default function WxMap() {
     // and set to the first frame
     animation.firstFrame();
     animation.pause();
+
+    return () => {
+      animation.firstFrame();
+      animation.pause();
+    };
   }, []);
 
   const mapStyle = baseMap === "aerial" || baseMap === "hillshade" ? positronWxMap : libertyWxMap;
