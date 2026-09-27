@@ -9,9 +9,7 @@ import { RADAR_PRODUCTS, RASTER_DATA_TYPES, SATELLITE_CHANNELS, SATELLITES } fro
 import { VECTOR_DATA_TYPES, XMET_TYPES } from "../config/vectorData";
 
 import type { FeatureCollection, MultiPoint, MultiPolygon } from "geojson";
-
 import type { InferSelectModel } from "drizzle-orm";
-
 import { LngLat, type MapGeoJSONFeature } from "maplibre-gl";
 import { aqData } from "@shared/db/schemas.drizzle";
 
@@ -136,15 +134,6 @@ export type PublicForecastOffice = keyof typeof PUBLIC_FORECAST_CONFIG;
 export type OutlookOffice = keyof typeof OUTLOOK_CONFIG;
 
 export type VectorDataTypes = (typeof VECTOR_DATA_TYPES)[number];
-
-export type VectorConfig = {
-  paint: object;
-  type: "circle" | "fill";
-};
-
-export type VectorDisplayConfig = {
-  [K in VectorDataTypes]: VectorConfig;
-};
 
 export type RasterDataTypes = (typeof RASTER_DATA_TYPES)[number];
 
