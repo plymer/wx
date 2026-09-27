@@ -260,17 +260,18 @@ export const wxmapRouter = router({
           const expiryTime = 60 * 30; // 30 minutes
           const now = new Date().getTime();
 
-          const featureCount = response.features.length;
-          const expiredFeatures = response.features.filter(
-            (f) =>
-              new Date(f.properties.forecast_datetime).getTime() < now &&
-              new Date(f.properties.validity_datetime).getTime() < now,
-          ).length;
+          // filter out features that were published more than 12 hours ago
+          const filteredFeatures = response.features.filter(
+            (f) => new Date(f.properties.publication_datetime).getTime() + 12 * HOUR < now,
+          );
 
-          const baseFeatures = transformHurricaneMetobject(type, response.features);
+          const baseFeatures = transformHurricaneMetobject(
+            type,
+            filteredFeatures as HurricaneDataResponse[typeof type]["features"],
+          );
           const computedFeatures: Feature[] = [];
 
-          if (featureCount === expiredFeatures) {
+          if (filteredFeatures.length === 0) {
             await cacheClient.setEx(cacheKey, expiryTime, JSON.stringify(transformHurricaneMetobject(type, [])));
           } else {
             if (type === "track") {
