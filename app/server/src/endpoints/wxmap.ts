@@ -260,18 +260,35 @@ export const wxmapRouter = router({
           const expiryTime = 60 * 30; // 30 minutes
           const now = new Date().getTime();
 
-          // filter out features that were published more than 12 hours ago
-          const filteredFeatures = response.features.filter(
-            (f) => new Date(f.properties.publication_datetime).getTime() + 12 * HOUR < now,
-          );
+          const activeStorms = new Map<string, number>();
+
+          response.features.forEach((f) => {
+            const isExpired = new Date(f.properties.publication_datetime).getTime() < now - 24 * HOUR;
+
+            if (!isExpired) {
+              if (activeStorms.has(f.properties.storm_name)) {
+                const maxAmend = activeStorms.get(f.properties.storm_name);
+                if (maxAmend === undefined || f.properties.amendment > maxAmend) {
+                  activeStorms.set(f.properties.storm_name, f.properties.amendment);
+                }
+              } else {
+                activeStorms.set(f.properties.storm_name, f.properties.amendment);
+              }
+            }
+          });
+
+          const validFeatures = response.features.filter((f) => {
+            activeStorms.has(f.properties.storm_name) &&
+              f.properties.amendment === activeStorms.get(f.properties.storm_name);
+          });
 
           const baseFeatures = transformHurricaneMetobject(
             type,
-            filteredFeatures as HurricaneDataResponse[typeof type]["features"],
+            validFeatures as HurricaneDataResponse[typeof type]["features"],
           );
           const computedFeatures: Feature[] = [];
 
-          if (filteredFeatures.length === 0) {
+          if (validFeatures.length === 0) {
             await cacheClient.setEx(cacheKey, expiryTime, JSON.stringify(transformHurricaneMetobject(type, [])));
           } else {
             if (type === "track") {
