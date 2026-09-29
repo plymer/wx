@@ -260,15 +260,17 @@ export const wxmapRouter = router({
           const expiryTime = 60 * 30; // 30 minutes
           const now = new Date().getTime();
 
+          // track the storms that have recently been updated and the current datatype's highest amendment value
           const activeStorms = new Map<string, number>();
 
           response.features.forEach((f) => {
-            const isExpired = new Date(f.properties.publication_datetime).getTime() < now - 24 * HOUR;
+            const isExpired = new Date(f.properties.publication_datetime).getTime() < now - 6 * HOUR;
 
             if (!isExpired) {
+              // if we have the storm being tracked already, make sure we're using the highest value of amendment
               if (activeStorms.has(f.properties.storm_name)) {
-                const maxAmend = activeStorms.get(f.properties.storm_name);
-                if (maxAmend === undefined || f.properties.amendment > maxAmend) {
+                const maxAmendment = activeStorms.get(f.properties.storm_name);
+                if (maxAmendment === undefined || f.properties.amendment > maxAmendment) {
                   activeStorms.set(f.properties.storm_name, f.properties.amendment);
                 }
               } else {
@@ -277,15 +279,13 @@ export const wxmapRouter = router({
             }
           });
 
-          const validFeatures = response.features.filter((f) => {
-            activeStorms.has(f.properties.storm_name) &&
-              f.properties.amendment === activeStorms.get(f.properties.storm_name);
-          });
+          const validFeatures = response.features.filter(
+            (f) =>
+              activeStorms.has(f.properties.storm_name) &&
+              f.properties.amendment === activeStorms.get(f.properties.storm_name),
+          ) as HurricaneDataResponse[typeof type]["features"];
 
-          const baseFeatures = transformHurricaneMetobject(
-            type,
-            validFeatures as HurricaneDataResponse[typeof type]["features"],
-          );
+          const baseFeatures = transformHurricaneMetobject(type, validFeatures);
           const computedFeatures: Feature[] = [];
 
           if (validFeatures.length === 0) {
