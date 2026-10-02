@@ -48276,58 +48276,54 @@
       }
     },
     {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              92,
-              6
-            ],
-            [
-              82,
-              10
-            ],
-            [
-              80,
-              10
-            ],
-            [
-              78.5,
-              7
-            ],
-            [
-              77.95,
-              6.7333
-            ],
-            [
-              76.5,
-              6
-            ],
-            [
-              78,
-              6
-            ],
-            [
-              78,
-              -2
-            ],
-            [
-              92,
-              -2
-            ],
-            [
-              92,
-              6
+          "type": "Feature",
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [
+                  92,
+                  6
+                ],
+                [
+                  82,
+                  10
+                ],
+                [
+                  80,
+                  10
+                ],
+                [
+                  79.4824,
+                  8.9649
+                ],
+                [
+                  76,
+                  6
+                ],
+                [
+                  78,
+                  6
+                ],
+                [
+                  78,
+                  -2
+                ],
+                [
+                  92,
+                  -2
+                ],
+                [
+                  92,
+                  6
+                ]
+              ]
             ]
-          ]
-        ]
-      },
-      "properties": {
-        "FIRname": "FIR COLOMBO"
-      }
-    },
+          },
+          "properties": {
+            "FIRname": "FIR COLOMBO"
+          }
+        },
     {
       "type": "Feature",
       "geometry": {
@@ -178802,39 +178798,6 @@
       },
       "properties": {
         "FIRname": "FIR ODESA"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              76.5,
-              6
-            ],
-            [
-              78.5,
-              7
-            ],
-            [
-              79.4824,
-              8.9649
-            ],
-            [
-              76,
-              6
-            ],
-            [
-              76.5,
-              6
-            ]
-          ]
-        ]
-      },
-      "properties": {
-        "FIRname": "FIR COLOMBO"
       }
     },
     {
