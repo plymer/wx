@@ -64,6 +64,7 @@ import {
   usePublicRegionsOverlay,
   useMarineRegionsOverlay,
   useVectorOverlayActions,
+  useVAACOverlay,
 } from "@/stateStores/map/overlays";
 import { BASEMAP_TYPES } from "@/config/map";
 import { TropicalCycloneIcon } from "@/components/ui/TropicalCycloneIcon";
@@ -100,6 +101,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
     showGFA: useGFAOverlay(),
     showLGF: useLGFOverlay(),
     showFIR: useFIROverlay(),
+    showVAAC: useVAACOverlay(),
     showTAFs: useTAFsOverlay(),
     showBedposts: useBedpostsOverlay(),
     showPublicRegions: usePublicRegionsOverlay(),
@@ -231,6 +233,12 @@ export default function MapOptions({ ...props }: ButtonProps) {
       name: "Hub Bedposts",
       state: overlays.showBedposts,
       toggle: overlayActions.toggleBedposts,
+    },
+    {
+      type: "vaac",
+      name: "VAAC Boundaries",
+      state: overlays.showVAAC,
+      toggle: overlayActions.toggleVaac,
     },
     {
       type: "publicRegions",

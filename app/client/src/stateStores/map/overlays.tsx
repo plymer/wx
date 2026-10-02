@@ -5,6 +5,7 @@ interface OverlaysStore {
   gfa: boolean;
   lgf: boolean;
   fir: boolean;
+  vaac: boolean;
   tafs: boolean;
   bedposts: boolean;
   publicRegions: boolean;
@@ -13,6 +14,7 @@ interface OverlaysStore {
     toggleGfa: () => void;
     toggleLgf: () => void;
     toggleFir: () => void;
+    toggleVaac: () => void;
     toggleTafs: () => void;
     toggleBedposts: () => void;
     togglePublicRegions: () => void;
@@ -26,6 +28,7 @@ const useMapOverlays = create<OverlaysStore>()(
       gfa: true,
       lgf: true,
       fir: true,
+      vaac: false,
       tafs: true,
       bedposts: true,
       publicRegions: false,
@@ -34,6 +37,7 @@ const useMapOverlays = create<OverlaysStore>()(
         toggleGfa: () => set((state) => ({ gfa: !state.gfa })),
         toggleLgf: () => set((state) => ({ lgf: !state.lgf })),
         toggleFir: () => set((state) => ({ fir: !state.fir })),
+        toggleVaac: () => set((state) => ({ vaac: !state.vaac })),
         toggleTafs: () => set((state) => ({ tafs: !state.tafs })),
         toggleBedposts: () => set((state) => ({ bedposts: !state.bedposts })),
         togglePublicRegions: () => set((state) => ({ publicRegions: !state.publicRegions })),
@@ -45,6 +49,7 @@ const useMapOverlays = create<OverlaysStore>()(
         gfa: state.gfa,
         lgf: state.lgf,
         fir: state.fir,
+        vaac: state.vaac,
         tafs: state.tafs,
         bedposts: state.bedposts,
         publicRegions: state.publicRegions,
@@ -60,6 +65,7 @@ const useMapOverlays = create<OverlaysStore>()(
 export const useGFAOverlay = () => useMapOverlays((state) => state.gfa);
 export const useLGFOverlay = () => useMapOverlays((state) => state.lgf);
 export const useFIROverlay = () => useMapOverlays((state) => state.fir);
+export const useVAACOverlay = () => useMapOverlays((state) => state.vaac);
 export const useTAFsOverlay = () => useMapOverlays((state) => state.tafs);
 export const useBedpostsOverlay = () => useMapOverlays((state) => state.bedposts);
 export const usePublicRegionsOverlay = () => useMapOverlays((state) => state.publicRegions);

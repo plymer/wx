@@ -26,6 +26,7 @@ import { RadarLayer } from "@/components/map/layers/data/RadarLayer";
 import { TAFOverlay } from "@/components/map/layers/overlays/TAFOverlay";
 import { BedpostOverlay } from "@/components/map/layers/overlays/BedpostOverlay";
 import { FIROverlay } from "@/components/map/layers/overlays/FIROverlay";
+import { VAACOverlay } from "@/components/map/layers/overlays/VAACOverlay";
 import { GFAOverlay } from "@/components/map/layers/overlays/GFAOverlay";
 import { LGFOverlay } from "@/components/map/layers/overlays/LGFOverlay";
 import { PublicRegionsOverlay } from "@/components/map/layers/overlays/PublicRegionsOverlay";
@@ -121,6 +122,7 @@ export default function WxMap() {
 
         <TAFOverlay />
         <BedpostOverlay />
+        <VAACOverlay />
         <FIROverlay />
         <GFAOverlay />
         <LGFOverlay />
