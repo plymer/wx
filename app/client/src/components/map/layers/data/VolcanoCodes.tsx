@@ -1,6 +1,11 @@
+import { useShowVolcanoes } from "@/stateStores/map/vectorData";
 import { Layer } from "react-map-gl/maplibre";
 
 export const VolcanoCodes = () => {
+  const enabled = useShowVolcanoes();
+
+  if (!enabled) return null;
+
   return (
     <Layer
       source="vector-tile-source"

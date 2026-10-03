@@ -20,6 +20,7 @@ import {
   Plane,
   Grid3X3,
   Tornado,
+  Mountain,
 } from "lucide-react";
 
 import { SATELLITE_CHANNELS } from "@/config/rasterData";
@@ -46,6 +47,7 @@ import {
   usePublicAlertsFilterLevel,
   useShowHurricanes,
   useShowTSOutlooks,
+  useShowVolcanoes,
 } from "@/stateStores/map/vectorData";
 import type { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
@@ -88,6 +90,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
     showHurricanes: useShowHurricanes(),
     showTSOutlooks: useShowTSOutlooks(),
     alertsFilterLevel: usePublicAlertsFilterLevel(),
+    showVolcanoes: useShowVolcanoes(),
   };
 
   const raster = {
@@ -154,6 +157,13 @@ export default function MapOptions({ ...props }: ButtonProps) {
       name: "Isotherms",
       state: vector.showIsotherms,
       toggle: vectorActions.toggleIsotherms,
+    },
+    {
+      icon: <Mountain className="shrink-0" />,
+      type: "volcanoes",
+      name: "Volcanoes",
+      state: vector.showVolcanoes,
+      toggle: vectorActions.toggleVolcanoes,
     },
     // {
     //   icon: <Rss className="shrink-0" />,
