@@ -44,6 +44,7 @@ import { AerialImageryLayer } from "@/components/map/layers/base/Aerial";
 import { libertyWxMap } from "@/assets/map-styles/liberty-wxmap";
 import { Hurricanes } from "@/components/map/layers/data/Hurricanes";
 import { TSOutlooks } from "@/components/map/layers/data/TSOutlooks";
+import { VolcanoCodes } from "@/components/map/layers/data/VolcanoCodes";
 
 export default function WxMap() {
   // global state store subscriptions
@@ -132,6 +133,7 @@ export default function WxMap() {
         <AlertsLayer />
 
         <LightningDataLayer />
+        <VolcanoCodes />
 
         <Hurricanes />
         <TSOutlooks />

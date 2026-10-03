@@ -61,6 +61,7 @@ const TABLES = [
     name: "lightning",
     columns: ["start_time", "expiry_time"],
   },
+  { name: "volcano_codes", columns: ["name", "alert_level", "colour"] },
   // { name: "pireps", columns: [valid_time, "rawText"] },
 ] as const;
 

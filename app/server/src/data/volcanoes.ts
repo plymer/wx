@@ -3,6 +3,7 @@ import { type InferInsertModel, sql } from "drizzle-orm";
 import { pgDb } from "../services/database.js";
 import { volcanoCodes } from "../db/schemas.drizzle.js";
 import type { DataProcessResult } from "../lib/types.js";
+import { lonLatToWebMercator } from "../lib/utils.js";
 
 type VolcanoColorCodes = "UNASSIGNED" | "GREEN" | "YELLOW" | "ORANGE" | "RED";
 type VolcanoAlertCodes = "UNASSIGNED" | "NORMAL" | "ADVISORY" | "WATCH" | "WARNING";
@@ -58,19 +59,24 @@ export async function getVolcanoStatus(): Promise<DataProcessResult> {
         .forEach((v) => {
           if (Object.hasOwn(v, "ft")) {
             const volc = v as DomesticVolcano;
+            const { lng, lat, name, alert, color } = volc;
+            const { x, y } = lonLatToWebMercator(parseFloat(lng), parseFloat(lat));
+
             data.push({
-              name: volc.name,
-              alertLevel: volc.alert.toLowerCase() as Lowercase<VolcanoAlertCodes>,
-              geometry: `POINT(${volc.lng} ${volc.lat})`,
-              colour: volc.color.toLowerCase() as Lowercase<VolcanoColorCodes>,
+              name: name,
+              alertLevel: alert.toLowerCase() as Lowercase<VolcanoAlertCodes>,
+              geometry: `POINT(${x} ${y})`,
+              colour: color.toLowerCase() as Lowercase<VolcanoColorCodes>,
             });
           } else {
             const volc = v as InternationalVolcano;
+            const { lng, lat, name, color } = volc;
+            const { x, y } = lonLatToWebMercator(parseFloat(lng), parseFloat(lat));
             data.push({
-              name: volc.name,
+              name: name,
               alertLevel: undefined,
-              geometry: `POINT(${volc.lng} ${volc.lat})`,
-              colour: volc.color.toLowerCase() as Lowercase<VolcanoColorCodes>,
+              geometry: `POINT(${x} ${y})`,
+              colour: color.toLowerCase() as Lowercase<VolcanoColorCodes>,
             });
           }
         });
