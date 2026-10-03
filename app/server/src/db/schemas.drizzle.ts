@@ -249,6 +249,17 @@ export const publicAlerts = snakeCase.table(
 //   ],
 // );
 
+export const volcanoCodes = snakeCase.table(
+  "volcano_codes",
+  {
+    name: text(),
+    geometry: geometry({ srid: 3857, type: "point" }).notNull(),
+    colour: text({ enum: ["unassigned", "green", "yellow", "orange", "red"] }),
+    alertLevel: text({ enum: ["unassigned", "normal", "advisory", "watch", "warning"] }),
+  },
+  (t) => [primaryKey(t.name), index("volcano_codes_spatial_index").using("gist", t.geometry)],
+);
+
 export const metarsTemporalView = snakeCase.materializedView("metars_temporal").as((qb) =>
   qb
     .select({

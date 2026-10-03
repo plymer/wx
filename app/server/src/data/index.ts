@@ -16,6 +16,7 @@ import { sql } from "drizzle-orm";
 import type { DataProcessResult } from "../lib/types.js";
 import { cacheClient } from "../services/redis.js";
 import { ETAG_CACHE_KEY } from "../config/cache-keys.config.js";
+import { getVolcanoStatus } from "./volcanoes.js";
 
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
@@ -75,6 +76,7 @@ async function main() {
     { name: "Isolines", run: () => createIsolines(), schedule: "*/10 * * * *" },
     { name: "Station-Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
     { name: "Station-Visibility", run: () => updateStationVisTable(), schedule: "0 0 * * *" },
+    { name: "Volcano-Codes", run: () => getVolcanoStatus(), schedule: "0 * * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
 
   console.log(

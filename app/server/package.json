@@ -16,6 +16,7 @@
     "dev:data:stations": "tsx watch src/data/canada-airports.ts",
     "dev:data:isolines": "tsx watch src/data/isolines.ts",
     "dev:data:hurricanes": "tsx watch src/data/hurricanes.ts",
+    "dev:data:volc": "tsx watch src/data/volcanoes.ts",
     "lint": "oxlint --fix",
     "format": "oxfmt",
     "start": "node ../../dist/server/main.js"

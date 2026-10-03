@@ -83,13 +83,15 @@ export function runFromCron(cron: string, currentMinute: number, currentHour: nu
 
   if (min === "*" && hour === "*") {
     return true; // every minute
+  } else if (Number(min) === 0 && hour === "*") {
+    return currentMinute === 0; // run every hour on the hour
   } else if (min.startsWith("*/") && hour === "*") {
     const interval = parseInt(min.substring(2));
     if (isNaN(interval) || interval <= 0) throw new Error(`Invalid minute interval in cron schedule: ${cron}`);
     return currentMinute % interval === 0; // every N minutes
   } else if (Number(min) === 0 && hour.startsWith("*/")) {
     const interval = parseInt(hour.substring(2));
-    if (isNaN(interval) || interval <= 0) throw new Error(`Invalid minute interval in cron schedule: ${cron}`);
+    if (isNaN(interval) || interval <= 0) throw new Error(`Invalid hour interval in cron schedule: ${cron}`);
     return currentHour % interval === 0; // every N hours
   } else if (Number(min) === 0 && Number(hour) === 0) {
     return currentHour === 0 && currentMinute === 0; // every day at midnight
