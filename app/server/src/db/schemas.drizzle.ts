@@ -12,7 +12,6 @@ import {
   snakeCase,
   smallint,
   bigint,
-  date,
 } from "drizzle-orm/pg-core";
 
 type GeometryType = "point" | "MultiPoint" | "LineString" | "MultiLineString" | "polygon" | "MultiPolygon";
@@ -266,7 +265,7 @@ export const volcanoFVMessageGeometries = snakeCase.table(
   "volcano_fv_message_geometries",
   {
     id: text().notNull(),
-    datetime: date({ mode: "date" }).notNull(),
+    datetime: timestamp({ mode: "date" }).notNull(),
     volcanoName: text().notNull(),
     volcanoNumber: bigint({ mode: "number" }).notNull(),
     validTimeString: varchar({ length: 8 }),
@@ -286,7 +285,7 @@ export const volcanoFVMessages = snakeCase.table(
   "volcano_fv_messages",
   {
     id: text().notNull(),
-    datetime: date({ mode: "date" }).notNull(),
+    datetime: timestamp({ mode: "date" }).notNull(),
     volcanoName: text().notNull(),
     volcanoNumber: bigint({ mode: "number" }).notNull(),
     bulletin: varchar({ length: 6 }).notNull(),

@@ -41,7 +41,7 @@ import { sql } from "drizzle-orm";
 import { pgDb as db } from "../services/database.js";
 import { DATA_TYPES as ISOLINE_FIELDS } from "../data/isolines.js";
 
-const DATETIME_COLUMNS = new Set<string>(["valid_time", "start_time", "expiry_time"]);
+const DATETIME_COLUMNS = new Set<string>(["valid_time", "start_time", "expiry_time", "datetime"]);
 const VECTOR_TILE_EXTENT = 4096;
 const VECTOR_TILE_BUFFER = 64;
 const MIN_ZOOM = 2;
@@ -62,6 +62,7 @@ const TABLES = [
     columns: ["start_time", "expiry_time"],
   },
   { name: "volcano_codes", columns: ["name", "alert_level", "colour"] },
+  { name: "volcano_fv_message_geometries", columns: ["volcano_name", "valid_time_string"] },
   // { name: "pireps", columns: [valid_time, "rawText"] },
 ] as const;
 
@@ -101,6 +102,28 @@ function pirepQuery(t: number, z: number) {
       `;
 }
 */
+
+function volcanicAshAreaQuery() {
+  return sql`
+    volcano_fv_message_geometries_layer AS (
+      SELECT
+        ST_AsMVTGeom(
+          fv.geometry,
+          bounds.geom,
+          extent => ${VECTOR_TILE_EXTENT},
+          buffer => ${VECTOR_TILE_BUFFER}
+        ) AS geometry,
+       fv.volcano_name,
+       fv.valid_time_string,
+
+       (EXTRACT(EPOCH FROM fv.datetime) * 1000)::bigint AS start_time,
+       (EXTRACT(EPOCH FROM LEAD (fv.datetime, 1, fv.datetime + INTERVAL '12 hours') OVER (PARTITION BY fv.volcano_name ORDER BY fv.datetime)) * 1000)::bigint AS expiry_time
+      FROM volcano_fv_message_geometries as fv
+      CROSS JOIN bounds
+      WHERE fv.geometry && bounds.query_geom
+    )
+    `;
+}
 
 function isolinesQuery(z: number) {
   const dataTypes = ["mslp", "tt", "td"];
@@ -262,6 +285,8 @@ export async function getTile(t: number, z: number, x: number, y: number) {
       // case "pireps":
       //   // special case that requires clustering of PIREPs at low zoom levels
       //   return pirepQuery(t, z);
+      case "volcano_fv_message_geometries":
+        return volcanicAshAreaQuery();
       case "metars":
         // uses the materialized view "metars_temporal" as its data source
         return stationPlotQuery(z);
