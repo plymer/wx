@@ -623,3 +623,19 @@ export function generateStormNamePoint(trackData: HurricaneData["track"]["featur
     validity_datetime,
   });
 }
+
+export function fixAntimeridianCrossings(coordinates: [number, number][]) {
+  const hasWestCoords = coordinates.some((p) => p[0] < 0);
+  const hasEastCoords = coordinates.some((p) => p[0] >= 0);
+
+  // need to normalize the coordinates into the sign of one side of the antimeridian (west)
+  if (hasWestCoords && hasEastCoords) {
+    return coordinates.map((p) => {
+      const lat = p[1];
+      const lng = p[0] >= 0 ? -180 - (-1 * p[0] + 180) : p[0];
+      return [lng, lat];
+    });
+  } else {
+    return coordinates;
+  }
+}

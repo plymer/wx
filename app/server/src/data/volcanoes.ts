@@ -3,7 +3,7 @@ import { type InferInsertModel, sql } from "drizzle-orm";
 import { pgDb } from "../services/database.js";
 import { volcanoCodes, volcanoFVMessageGeometries, volcanoFVMessages } from "../db/schemas.drizzle.js";
 import type { DataProcessResult } from "../lib/types.js";
-import { lonLatToWebMercator } from "../lib/utils.js";
+import { fixAntimeridianCrossings, lonLatToWebMercator } from "../lib/utils.js";
 import type { FeatureCollection } from "geojson";
 
 type VolcanoColorCodes = "UNASSIGNED" | "GREEN" | "YELLOW" | "ORANGE" | "RED";
@@ -73,7 +73,7 @@ function parseCloudText(text: string | undefined) {
 
   if (!points) return undefined;
 
-  const coordinates = points
+  const decimalDegreeCoords = points
     .map((p) => {
       const [latString, lngString] = p
         .replace(/[\n\\n]/g, " ")
@@ -85,17 +85,25 @@ function parseCloudText(text: string | undefined) {
       const lngDecimal = parseInt(lngString.slice(1, 4)) + parseInt(lngString.slice(4)) / 60;
       const latDecimal = parseInt(latString.slice(1, 3)) + parseInt(latString.slice(3)) / 60;
 
-      const { x, y } = lonLatToWebMercator(
-        lngString[0] === "E" ? lngDecimal : -1 * lngDecimal,
-        latString[0] === "N" ? latDecimal : -1 * latDecimal,
-      );
+      const lng = lngString[0] === "E" ? lngDecimal : -1 * lngDecimal;
+      const lat = latString[0] === "N" ? latDecimal : -1 * latDecimal;
 
-      return `${x} ${y}`;
+      return [lng, lat];
     })
-    .filter((coordinate): coordinate is string => coordinate !== undefined);
+    .filter((coord): coord is [number, number] => coord !== undefined);
+
+  const coordinates = fixAntimeridianCrossings(decimalDegreeCoords).map((p) => {
+    const [lng, lat] = p;
+
+    const { x, y } = lonLatToWebMercator(lng, lat);
+
+    return `${x} ${y}`;
+  });
 
   if (coordinates.length < 3) return undefined;
   if (coordinates[0] !== coordinates[coordinates.length - 1]) coordinates.push(coordinates[0]);
+
+  // we need to ensure that any antimeridian-crossing is handled by making things 'superwest' (making their east-coords become west aka less than -180)
 
   const pointsWkt = `POLYGON((${coordinates.join(", ")}))`;
 
