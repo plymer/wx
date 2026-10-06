@@ -12,6 +12,7 @@ import {
   snakeCase,
   smallint,
 } from "drizzle-orm/pg-core";
+import { date } from "drizzle-orm/pg-core/index";
 
 type GeometryType = "point" | "MultiPoint" | "LineString" | "MultiLineString" | "polygon" | "MultiPolygon";
 
@@ -257,7 +258,48 @@ export const volcanoCodes = snakeCase.table(
     colour: text({ enum: ["unassigned", "green", "yellow", "orange", "red"] }),
     alertLevel: text({ enum: ["unassigned", "normal", "advisory", "watch", "warning"] }),
   },
-  (t) => [primaryKey(t.name), index("volcano_codes_spatial_index").using("gist", t.geometry)],
+  (t) => [primaryKey({ columns: [t.name] }), index("volcano_codes_spatial_index").using("gist", t.geometry)],
+);
+
+export const volcanoFVMessageGeometries = snakeCase.table(
+  "volcano_fv_message_geometries",
+  {
+    id: text().notNull(),
+    datetime: date({ mode: "date" }).notNull(),
+    volcanoName: text().notNull(),
+    volcanoNumber: smallint().notNull(),
+    validTimeString: text(),
+    flBase: text(),
+    flTop: text(),
+    geometry: geometry({ type: "polygon" }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.id, t.validTimeString] }),
+    index("volcano_fv_message_geometries_time_index").using("btree", t.datetime),
+    index("volcano_fv_message_geometries_volcname_index").using("btree", t.volcanoName),
+    index("volcano_fv_message_geometries_spatial_index").using("gist", t.geometry),
+  ],
+);
+
+export const volcanoFVMessages = snakeCase.table(
+  "volcano_fv_messages",
+  {
+    id: text().notNull(),
+    datetime: date({ mode: "date" }).notNull(),
+    volcanoName: text().notNull(),
+    volcanoNumber: smallint().notNull(),
+    bulletin: varchar({ length: 6 }).notNull(),
+    vaac: text(),
+    area: text(),
+    eruptionDetails: text(),
+    rmk: text(),
+    nextAdvisory: text(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.id] }),
+    index("volcano_fv_message_volcname_index").using("btree", t.volcanoName),
+    index("volcano_fv_message_time_index").using("btree", t.datetime),
+  ],
 );
 
 export const metarsTemporalView = snakeCase.materializedView("metars_temporal").as((qb) =>
