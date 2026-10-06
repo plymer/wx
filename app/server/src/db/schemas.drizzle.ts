@@ -271,6 +271,7 @@ export const volcanoFVMessageGeometries = snakeCase.table(
     validTimeString: varchar({ length: 8 }),
     flBase: text(),
     flTop: text(),
+    geoIndex: smallint(),
     geometry: geometry({ type: "polygon" }),
   },
   (t) => [

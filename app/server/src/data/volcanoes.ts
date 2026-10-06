@@ -122,10 +122,10 @@ function parseClouds({
   t18Cld: string | undefined;
 }) {
   return {
-    obs: parseCloudText(obsCld),
-    t6: parseCloudText(t6Cld),
-    t12: parseCloudText(t12Cld),
-    t18: parseCloudText(t18Cld),
+    obs: { ...parseCloudText(obsCld), geoIndex: 0 },
+    t6: { ...parseCloudText(t6Cld), geoIndex: 1 },
+    t12: { ...parseCloudText(t12Cld), geoIndex: 2 },
+    t18: { ...parseCloudText(t18Cld), geoIndex: 3 },
   };
 }
 
@@ -336,6 +336,7 @@ export async function getFVMessages(): Promise<DataProcessResult> {
           flTop: data?.top,
           geometry: data?.pointsWkt,
           validTimeString: data?.timeString ? data.timeString : obsDate,
+          geoIndex: data?.geoIndex,
         }),
       );
     }

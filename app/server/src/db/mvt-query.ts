@@ -105,6 +105,28 @@ function pirepQuery(t: number, z: number) {
 
 function volcanicAshAreaQuery() {
   return sql`
+    volcano_fv_message_times AS (
+      SELECT
+        message_times.id,
+        message_times.volcano_name,
+        message_times.datetime,
+        LEAD(
+          message_times.datetime,
+          1,
+          message_times.datetime + INTERVAL '12 hours'
+        ) OVER (
+          PARTITION BY message_times.volcano_name
+          ORDER BY message_times.datetime
+        ) AS expiry_time
+      FROM (
+        SELECT DISTINCT
+          fv.id,
+          fv.volcano_name,
+          fv.datetime
+        FROM volcano_fv_message_geometries AS fv
+      ) AS message_times
+    ),
+
     volcano_fv_message_geometries_layer AS (
       SELECT
         ST_AsMVTGeom(
@@ -115,10 +137,16 @@ function volcanicAshAreaQuery() {
         ) AS geometry,
        fv.volcano_name,
        fv.valid_time_string,
-
+       fv.fl_base,
+       fv.fl_top,
+       fv.geo_index,
        (EXTRACT(EPOCH FROM fv.datetime) * 1000)::bigint AS start_time,
-       (EXTRACT(EPOCH FROM LEAD (fv.datetime, 1, fv.datetime + INTERVAL '12 hours') OVER (PARTITION BY fv.volcano_name ORDER BY fv.datetime)) * 1000)::bigint AS expiry_time
-      FROM volcano_fv_message_geometries as fv
+       (EXTRACT(EPOCH FROM message_times.expiry_time) * 1000)::bigint AS expiry_time
+      FROM volcano_fv_message_geometries AS fv
+      JOIN volcano_fv_message_times AS message_times
+        ON message_times.id = fv.id
+       AND message_times.volcano_name = fv.volcano_name
+       AND message_times.datetime = fv.datetime
       CROSS JOIN bounds
       WHERE fv.geometry && bounds.query_geom
     )
