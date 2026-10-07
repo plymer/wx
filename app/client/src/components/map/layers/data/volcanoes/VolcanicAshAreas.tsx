@@ -16,56 +16,6 @@ export const VolcanicAshAreas = () => {
       <Layer
         source="vector-tile-source"
         source-layer="volcano_fv_message_geometries"
-        key="volcano-fv-message-fill-t18"
-        filter={[...filter, ["==", ["get", "geo_index"], 3]]}
-        type="fill"
-        id="volcano-fv-message-fill-t18"
-        paint={{
-          "fill-color": "blue",
-          "fill-layer-opacity": 0.3,
-        }}
-      />
-      <Layer
-        source="vector-tile-source"
-        source-layer="volcano_fv_message_geometries"
-        key="volcano-fv-message-outline-t18"
-        filter={[...filter, ["==", ["get", "geo_index"], 3]]}
-        type="line"
-        id="volcano-fv-message-outline-t18"
-        paint={{
-          "line-color": "blue",
-          "line-opacity": 0.6,
-          "line-width": 4,
-        }}
-      />
-      <Layer
-        source="vector-tile-source"
-        source-layer="volcano_fv_message_geometries"
-        key="volcano-fv-message-fill-t12"
-        filter={[...filter, ["==", ["get", "geo_index"], 2]]}
-        type="fill"
-        id="volcano-fv-message-fill-t12"
-        paint={{
-          "fill-color": "green",
-          "fill-layer-opacity": 0.4,
-        }}
-      />
-      <Layer
-        source="vector-tile-source"
-        source-layer="volcano_fv_message_geometries"
-        key="volcano-fv-message-outline-t12"
-        filter={[...filter, ["==", ["get", "geo_index"], 2]]}
-        type="line"
-        id="volcano-fv-message-outline-t12"
-        paint={{
-          "line-color": "green",
-          "line-opacity": 0.7,
-          "line-width": 4,
-        }}
-      />
-      <Layer
-        source="vector-tile-source"
-        source-layer="volcano_fv_message_geometries"
         key="volcano-fv-message-fill-t6"
         filter={[...filter, ["==", ["get", "geo_index"], 1]]}
         type="fill"
@@ -100,7 +50,6 @@ export const VolcanicAshAreas = () => {
           "fill-layer-opacity": 0.8,
         }}
       />
-
       <Layer
         source="vector-tile-source"
         source-layer="volcano_fv_message_geometries"
@@ -118,17 +67,26 @@ export const VolcanicAshAreas = () => {
         source="vector-tile-source"
         source-layer="volcano_fv_message_geometries"
         key="volcano-fv-message-times"
-        filter={filter}
+        filter={[...filter, ["!=", ["get", "geo_index"], 2], ["!=", ["get", "geo_index"], 3]]}
         type="symbol"
         id="volcano-fv-message-times"
         layout={{
+          "symbol-placement": "point",
+          "symbol-spacing": 2400,
           "text-field": [
-            "concat",
-            ["get", "volcano_name"],
-            "\n",
-            ["get", "valid_time_string"],
-            "\n",
-            ["get", "geo_index"],
+            "step",
+            ["zoom"],
+            "",
+            6,
+            [
+              "concat",
+              ["get", "volcano_name"],
+              "\n",
+              ["get", "valid_time_string"],
+              " (T+",
+              ["*", ["get", "geo_index"], 6],
+              ")",
+            ],
           ],
         }}
         paint={{
