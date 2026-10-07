@@ -1,6 +1,9 @@
-import type { Feature, FeatureCollection, LineString, Point } from "geojson";
+import type { Feature, FeatureCollection, LineString, Point, Polygon, Position } from "geojson";
+import * as turf from "@turf/turf";
 import { DEFAULT_REMOTE_HEADERS, HOUR } from "../lib/constants.js";
 import { etagCheckin } from "../lib/etag.js";
+
+type NhcBasin = "EP" | "AL" | "CP";
 
 type NhcTrackLineProps = {
   stylstyleUrl: string;
@@ -12,8 +15,8 @@ type NhcTrackLineProps = {
   fill: string;
   "fill-opacity": number;
   timezone: string;
-  stormType: string;
-  basin: string;
+  stormType: Uppercase<StormType>;
+  basin: NhcBasin;
   fcstpd: string;
   storm: string;
   atcfid: string;
@@ -37,6 +40,26 @@ type NhcTrackPointProps = {
   description: string;
 };
 
+type NhcConePolygonProps = {
+  styleUrl: string;
+  styleHash: string;
+  stroke: string;
+  "stroke-opacity": number;
+  "stroke-width": number;
+  fill: string;
+  "fill-opacity": number;
+  timezone: string;
+  stormType: Uppercase<StormType>;
+  advisoryDate: string;
+  basin: NhcBasin;
+  fcstpd: string;
+  storm: string;
+  atcfid: string;
+  advisoryNum: string;
+  stormNum: string;
+  stormName: string;
+};
+
 type StormType = "ptc" | "td" | "ts" | "hu";
 
 type ParsedTrackPointProps = { name: string; type: StormType; validTime: Date; maxWindKt: number };
@@ -54,6 +77,10 @@ function getStormClass(stormCode: string, text: string): { name: string; type: S
     return { name: text.replace("Tropical Storm", "").replace(`(${stormCode})`, "").trim(), type: "ts" };
 
   return { name: "", type: undefined };
+}
+
+function ensure2DPosition(coordinates: Position) {
+  return [coordinates[0], coordinates[1]];
 }
 
 export async function getHurricaneData() {
@@ -98,7 +125,7 @@ export async function getHurricaneData() {
 
   const filesToGet = {
     track: "_TRACK_latest.geojson",
-    error_cone: "_CONE_90th_latest.geojson",
+    error_cone: "_CONE_latest.geojson",
     wind_radii: "_initialradii_latest.geojson",
   };
 
@@ -107,12 +134,17 @@ export async function getHurricaneData() {
   const DEVING = true;
 
   for (const row of rows) {
+    // for atlantic storms (AT) we're going to continue to use the ECCC API as the source since
+    // idk how the NHC handles Canadian-lead storms
+
+    if (row.storm.includes("AT")) continue;
+
     const stormNumber = row.storm.includes("AT") ? row.storm.replace("T", "L") : row.storm;
     const year = row.updated.getUTCFullYear();
     const stormCode = `${stormNumber}${year}`;
     const trackUrl = `${baseUrl}/${row.storm}/${stormCode}${filesToGet.track}`;
     const coneUrl = `${baseUrl}/${row.storm}/${stormCode}${filesToGet.error_cone}`;
-    const windUrl = `${baseUrl} /${row.storm}/${stormCode}${filesToGet.wind_radii}`;
+    const windUrl = `${baseUrl}/${row.storm}/${stormCode}${filesToGet.wind_radii}`;
 
     const shouldUpdateTrack = DEVING ?? (await etagCheckin(trackUrl, `${stormCode}-track`));
     const shouldUpdateCone = DEVING ?? (await etagCheckin(coneUrl, `${stormCode}-cone`));
@@ -135,6 +167,12 @@ export async function getHurricaneData() {
         >[]
       ).find((f) => f.properties.fcstpd === "120");
 
+      if (trackLine) {
+        trackLine.geometry.coordinates = trackLine.geometry.coordinates
+          .map(ensure2DPosition)
+          .filter((p): p is number[] => p !== null || p !== undefined);
+      }
+
       const trackPoints: Feature<Point, ParsedTrackPointProps>[] = (
         trackFeatures.features.filter((f) => f.geometry.type === "Point") as Feature<Point, NhcTrackPointProps>[]
       )
@@ -153,7 +191,14 @@ export async function getHurricaneData() {
           const validTime = new Date(baseDescription[6].split("Valid at:")[1].trim());
           const maxWindKt = parseInt(baseDescription[8].split("Maximum Wind:")[1].trim().split(" ")[0]);
 
-          return { ...feature, properties: { name, type, validTime, maxWindKt } };
+          return {
+            ...feature,
+            properties: { name, type, validTime, maxWindKt },
+            geometry: {
+              ...feature.geometry,
+              coordinates: [feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
+            },
+          };
         })
         .filter(
           (f): f is Feature<Point, ParsedTrackPointProps> =>
@@ -162,7 +207,31 @@ export async function getHurricaneData() {
 
       if (trackLine) trackData.features.push(...[...trackPoints, trackLine]);
     }
-    console.log({ trackData, coneData, windData });
+
+    if (shouldUpdateCone) {
+      const coneFeatures = (await fetch(coneUrl, { headers: DEFAULT_REMOTE_HEADERS }).then((res) =>
+        res.json(),
+      )) as FeatureCollection<Polygon, NhcConePolygonProps>;
+
+      // each feature has a 3D position tuple for some reason so let's remove the z-coordinate
+      const cone120HourPolygon = coneFeatures.features.find((f) => f.properties.fcstpd === "120");
+
+      const conePolygon: Feature<Polygon> | undefined = cone120HourPolygon
+        ? {
+            ...cone120HourPolygon,
+            geometry: {
+              ...cone120HourPolygon.geometry,
+              coordinates: [cone120HourPolygon.geometry.coordinates[0].map(ensure2DPosition)],
+            },
+          }
+        : undefined;
+
+      if (conePolygon) coneData.features.push(conePolygon);
+    }
+
+    turf.simplify(coneData, { tolerance: 0.005, mutate: true });
+    turf.simplify(trackData, { tolerance: 0.005, mutate: true });
+    console.log(JSON.stringify({ trackData, coneData, windData }, null, 2));
   }
 }
 
