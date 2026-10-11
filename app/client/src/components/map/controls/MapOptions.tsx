@@ -198,7 +198,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
     {
       icon: <TropicalCycloneIcon className="shrink-0 fill-black" />,
       type: "hurricanes",
-      name: "Atlantic Basin TCs",
+      name: "Pacific/Atlantic TCs",
       state: vector.showHurricanes,
       toggle: vectorActions.toggleHurricanes,
     },
