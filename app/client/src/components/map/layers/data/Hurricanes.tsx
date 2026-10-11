@@ -3,18 +3,36 @@ import { api } from "@/lib/trpc";
 import { useShowHurricanes } from "@/stateStores/map/vectorData";
 import { MINUTE } from "@shared/lib/constants";
 import { useQuery } from "@tanstack/react-query";
+import type { FeatureCollection } from "geojson";
+import { useMemo } from "react";
 import { Source, Layer } from "react-map-gl/maplibre";
 export const Hurricanes = () => {
   const enabled = useShowHurricanes();
   // types: track, error_cone, cyclone, wind_radii
-  const { data } = useQuery(
+  const { data: atlanticData } = useQuery(
     api.wxmap.hurricanesAtlantic.queryOptions(undefined, { enabled, refetchInterval: 10 * MINUTE }),
   );
 
-  if (!enabled || !data) return null;
+  const { data: pacificData } = useQuery(
+    api.wxmap.hurricanesPacific.queryOptions(undefined, { enabled, refetchInterval: 10 * MINUTE }),
+  );
+
+  const data = useMemo(
+    () => [...(atlanticData ? atlanticData.features : []), ...(pacificData ? pacificData.features : [])],
+    [atlanticData, pacificData],
+  );
+
+  const fc: FeatureCollection = { type: "FeatureCollection", features: data };
+  if (!enabled || data.length === 0) return null;
 
   return (
-    <Source id="hurricanes" key="hurricanes" type="geojson" data={data} attribution={GEOMET_ATTRIBUTION}>
+    <Source
+      id="hurricanes"
+      key="hurricanes"
+      type="geojson"
+      data={fc}
+      attribution={"<a href='https://nhc.noaa.gov'>NOAA NHC</a>"}
+    >
       <Layer
         id="layer-hurricanes-error-fill"
         key="layer-hurricanes-error-fill"
@@ -133,8 +151,14 @@ export const Hurricanes = () => {
           "icon-color": "red",
           "icon-halo-color": "black",
           "icon-halo-width": 1,
+
+          "text-color": "black",
+          "text-halo-color": "white",
+          "text-halo-width": 1,
         }}
         layout={{
+          "text-field": ["get", "category"],
+          "text-size": 14,
           "icon-image": [
             "match",
             ["get", "sub_type", ["get", "metobject"]],
@@ -155,6 +179,7 @@ export const Hurricanes = () => {
             0.5,
           ],
           "icon-allow-overlap": true,
+          "text-allow-overlap": true,
         }}
       />
       <Layer
@@ -162,7 +187,7 @@ export const Hurricanes = () => {
         key="layer-hurricanes-pos-label"
         type="symbol"
         source="hurricanes"
-        minzoom={4}
+        minzoom={5}
         filter={["==", ["get", "type"], "cyclone"]}
         paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
         layout={{

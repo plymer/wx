@@ -63,30 +63,48 @@ type NhcConePolygonProps = {
   stormName: string;
 };
 
-type StormType = "ptc" | "td" | "ts" | "hu";
+type StormType = "POST-TROPICAL" | "DEPRESSION" | "STORM" | "HURRICANE" | "REMNANT";
 
 type ParsedTrackPointProps = {
+  metobject: { sub_type: StormType; max_wind: { value: number } };
   storm_name: string;
-  storm_type: StormType;
-  valid_time: Date;
-  valid_time_string: string;
-  speed: number;
+  category: number | undefined;
+  forecast_datetime: Date;
   type: "cyclone";
 };
 
-function getStormClass(stormCode: string, text: string): { name: string; stormType: StormType | undefined } {
-  if (text.includes("Tropical Depression")) {
-    return { name: text.replace("Tropical Depression", "").replace(`(${stormCode})`, "").trim(), stormType: "td" };
-  }
-  if (text.includes("Hurricane")) {
-    return { name: text.replace("Hurricane", "").replace(`(${stormCode})`, "").trim(), stormType: "hu" };
-  }
-  if (text.includes("Post-Tropical Cyclone"))
-    return { name: text.replace("Post-Tropical Cyclone", "").replace(`(${stormCode})`, "").trim(), stormType: "ptc" };
-  if (text.includes("Tropical Storm"))
-    return { name: text.replace("Tropical Storm", "").replace(`(${stormCode})`, "").trim(), stormType: "ts" };
+function getStormClass(
+  stormCode: string,
+  text: string,
+  windSpeed: number,
+): { name: string | undefined; stormType: StormType | undefined; category: number | undefined } {
+  const name = text.replace(`(${stormCode})`, "").trim().split(" ").pop()?.toUpperCase();
 
-  return { name: "", stormType: undefined };
+  if (!name) return { name: undefined, stormType: undefined, category: undefined };
+
+  if (windSpeed < 35) {
+    return {
+      name,
+      stormType: "DEPRESSION",
+      category: undefined,
+    };
+  }
+  if (windSpeed >= 35 && windSpeed < 64) {
+    return {
+      name,
+      stormType: text.includes("Post-Tropical Cyclone") ? "POST-TROPICAL" : "STORM",
+      category: undefined,
+    };
+  }
+
+  if (windSpeed >= 64)
+    return {
+      name,
+      stormType: "HURRICANE",
+      category: windSpeed < 82 ? 1 : windSpeed < 95 ? 2 : windSpeed < 112 ? 3 : windSpeed < 136 ? 4 : 5,
+    };
+
+  return { name, stormType: "REMNANT", category: undefined };
 }
 
 function ensure2DPosition(coordinates: Position) {
@@ -170,10 +188,9 @@ export async function getHurricaneData(): Promise<DataProcessResult> {
 
         // we want the 120-hour forecast track
         const trackLine = (
-          trackFeatures.features.filter((f) => f.geometry.type === "LineString") as Feature<
-            LineString,
-            NhcTrackLineProps
-          >[]
+          trackFeatures.features.filter(
+            (f) => f.geometry.type === "LineString" && f.geometry.coordinates.length > 1,
+          ) as Feature<LineString, NhcTrackLineProps>[]
         ).find((f) => f.properties.fcstpd === "120") as
           Feature<LineString, { type: "track"; storm_name: string }> | undefined; // we're going to overwrite the properties
 
@@ -195,25 +212,25 @@ export async function getHurricaneData(): Promise<DataProcessResult> {
               .split("\n");
 
             // i hate how fragile this is, but all of the metadata is stored in an html string
-            const { name, stormType } = getStormClass(
+            const speed = parseInt(baseDescription[8].split("Maximum Wind:")[1].trim().split(" ")[0]);
+            const { name, stormType, category } = getStormClass(
               stormCode,
               baseDescription[2].replace("</b></font>", "").split("<b>")[1].trim(),
+              speed,
             );
 
-            if (trackLine) trackLine.properties.storm_name = name;
+            if (trackLine && name !== undefined) trackLine.properties.storm_name = name;
 
             const validTime = new Date(baseDescription[6].split("Valid at:")[1].trim());
-            const validTimeString = `${validTime.getUTCDate().toString().padStart(2, "0")}/${validTime.getUTCHours().toString().padStart(2, "0")}${validTime.getUTCMinutes().toString().padStart(2, "0")}`;
-            const speed = parseInt(baseDescription[8].split("Maximum Wind:")[1].trim().split(" ")[0]);
 
             return {
               ...feature,
               properties: {
+                type: "cyclone",
+                metobject: { sub_type: stormType || "DEPRESSION", max_wind: { value: speed } },
                 storm_name: name,
-                storm_type: stormType,
-                valid_time: validTime,
-                speed,
-                valid_time_string: validTimeString,
+                category,
+                forecast_datetime: validTime,
               },
               geometry: {
                 ...feature.geometry,
@@ -223,7 +240,7 @@ export async function getHurricaneData(): Promise<DataProcessResult> {
           })
           .filter(
             (f): f is Feature<Point, ParsedTrackPointProps> =>
-              f.properties.storm_name !== "" && f.properties.valid_time.toString() !== "Invalid Date",
+              f.properties.storm_name !== "" && f.properties.forecast_datetime.toString() !== "Invalid Date",
           );
 
         const stormNamePoint = trackLine ? turf.centerOfMass(trackLine) : undefined;
@@ -253,7 +270,7 @@ export async function getHurricaneData(): Promise<DataProcessResult> {
             }
           : undefined;
 
-        if (conePolygon) outputData.features.push(conePolygon);
+        if (trackLine && conePolygon) outputData.features.push(conePolygon);
       } else {
         return { result: "skipped" };
       }
