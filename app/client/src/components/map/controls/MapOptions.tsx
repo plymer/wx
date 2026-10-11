@@ -158,13 +158,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
       state: vector.showIsotherms,
       toggle: vectorActions.toggleIsotherms,
     },
-    {
-      icon: <Mountain className="shrink-0" />,
-      type: "volcanoes",
-      name: "Volcanoes",
-      state: vector.showVolcanoes,
-      toggle: vectorActions.toggleVolcanoes,
-    },
+
     // {
     //   icon: <Rss className="shrink-0" />,
     //   type: "isodrosotherms",
@@ -202,7 +196,13 @@ export default function MapOptions({ ...props }: ButtonProps) {
       state: vector.showHurricanes,
       toggle: vectorActions.toggleHurricanes,
     },
-
+    {
+      icon: <Mountain className="shrink-0" />,
+      type: "volcanoes",
+      name: "Volcanoes",
+      state: vector.showVolcanoes,
+      toggle: vectorActions.toggleVolcanoes,
+    },
     {
       icon: <TriangleAlert className="shrink-0" />,
       type: "publicAlerts",
