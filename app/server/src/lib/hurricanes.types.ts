@@ -57,6 +57,7 @@ export type CycloneProperties = Prettify<
       sub_type: string | undefined;
       wind_gust: ValueWithUnit;
     };
+    category: number | undefined;
   }
 >;
 

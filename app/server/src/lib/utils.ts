@@ -567,6 +567,7 @@ export function transformHurricaneMetobject<TData extends HurricaneDataType>(
           storm_origin_year: props.storm_origin_year,
           status: props.status,
           validity_datetime: props.validity_datetime,
+          category: computeHurricaneCategory(props["metobject.max_wind.value"]),
         };
 
         return { ...feature, properties: newProps } as HurricaneData["cyclone"]["features"][number];
@@ -622,6 +623,12 @@ export function generateStormNamePoint(trackData: HurricaneData["track"]["featur
     storm_name,
     validity_datetime,
   });
+}
+
+export function computeHurricaneCategory(windSpeed: number) {
+  if (windSpeed < 64) return undefined;
+
+  return windSpeed < 82 ? 1 : windSpeed < 95 ? 2 : windSpeed < 112 ? 3 : windSpeed < 136 ? 4 : 5;
 }
 
 export function fixAntimeridianCrossings(coordinates: [number, number][]) {
