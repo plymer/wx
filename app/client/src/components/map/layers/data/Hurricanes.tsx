@@ -7,7 +7,9 @@ import { Source, Layer } from "react-map-gl/maplibre";
 export const Hurricanes = () => {
   const enabled = useShowHurricanes();
   // types: track, error_cone, cyclone, wind_radii
-  const { data } = useQuery(api.wxmap.hurricanes.queryOptions(undefined, { enabled, refetchInterval: 10 * MINUTE }));
+  const { data } = useQuery(
+    api.wxmap.hurricanesAtlantic.queryOptions(undefined, { enabled, refetchInterval: 10 * MINUTE }),
+  );
 
   if (!enabled || !data) return null;
 

@@ -353,8 +353,6 @@ export async function getFVMessages(): Promise<DataProcessResult> {
           .onConflictDoNothing();
     });
 
-    console.log("finished FV checkin");
-
     return { result: "success" };
   } catch (error) {
     const dbError = error as Error & {

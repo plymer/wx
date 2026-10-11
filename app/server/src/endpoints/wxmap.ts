@@ -235,12 +235,12 @@ export const wxmapRouter = router({
       }
     },
   ),
-  hurricanes: publicProcedure.query(async () => {
+  hurricanesAtlantic: publicProcedure.query(async () => {
     const DATA_TYPES: HurricaneDataType[] = ["track", "error_cone", "cyclone", "wind_radii"];
 
     const featureSets = await Promise.all(
       DATA_TYPES.map(async (type) => {
-        const cacheKey = `${HURRICANE_CACHE_KEY}:${type}`;
+        const cacheKey = `${HURRICANE_CACHE_KEY}:atlantic:${type}`;
         const cachedData = await cacheClient.get(cacheKey);
 
         if (cachedData) {
@@ -311,6 +311,14 @@ export const wxmapRouter = router({
     };
 
     return mergedFeatureCollection;
+  }),
+
+  hurricanesPacific: publicProcedure.query(async () => {
+    const cacheKey = `${HURRICANE_CACHE_KEY}:pacific:all`;
+
+    const cachedData = await cacheClient.get(cacheKey);
+
+    if (cachedData) return JSON.parse(cachedData) as FeatureCollection;
   }),
 
   tso: publicProcedure.query(async () => {
