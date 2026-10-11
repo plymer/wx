@@ -346,11 +346,11 @@ export async function getFVMessages(): Promise<DataProcessResult> {
     await pgDb.transaction(async (tx) => {
       if (payload.messages.length > 0)
         await tx.insert(volcanoFVMessages).values(payload.messages).onConflictDoNothing();
-      if (payload.geometries.length > 0)
-        await tx
-          .insert(volcanoFVMessageGeometries)
-          .values(payload.geometries.filter((g) => g.geometry))
-          .onConflictDoNothing();
+      if (payload.geometries.length > 0) {
+        const values = payload.geometries.filter((g) => g.geometry);
+
+        if (values.length > 0) await tx.insert(volcanoFVMessageGeometries).values(values).onConflictDoNothing();
+      }
     });
 
     return { result: "success" };
