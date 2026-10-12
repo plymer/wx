@@ -81,7 +81,7 @@ export default function WxMap() {
     "layer-sigmet",
     "layer-wxo-alerts",
     "layer-hurricanes-position",
-    "layer-volcano-codes-data-icon",
+    // "layer-volcano-codes-data-icon",
   ];
 
   return (

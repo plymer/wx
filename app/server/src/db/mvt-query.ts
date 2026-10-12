@@ -350,8 +350,7 @@ export async function getTile(t: number, z: number, x: number, y: number) {
             extent => ${VECTOR_TILE_EXTENT},
             buffer => ${VECTOR_TILE_BUFFER}
           ) AS geometry,
-          ${columnSql},
-          ${name} as "dataType"
+          ${columnSql}
         FROM ${sql.identifier(name)}
         CROSS JOIN bounds
         WHERE ${sql.identifier(name)}.geometry && bounds.query_geom
