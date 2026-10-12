@@ -162,3 +162,72 @@ export type HurricaneData = {
   cyclone: FeatureCollection<Point, CycloneProperties>;
   wind_radii: FeatureCollection<Polygon, WindRadiiProperties>;
 };
+
+// NHC-related types
+
+export type NhcBasin = "EP" | "AL" | "CP";
+
+export type NhcTrackLineProps = {
+  stylstyleUrl: string;
+  styleHash: string;
+  description: string;
+  stroke: string;
+  "stroke-opacity": number;
+  "stroke-width": number;
+  fill: string;
+  "fill-opacity": number;
+  timezone: string;
+  stormType: Uppercase<StormType>;
+  basin: NhcBasin;
+  fcstpd: string;
+  storm: string;
+  atcfid: string;
+  advisoryNum: string;
+  stormNum: string;
+  stormName: string;
+  pubAdvTime: string;
+  TCInitLocation: string;
+  maxWindKnots: string;
+  maxWindMPH: string;
+  maxGustKnots: string;
+  maxGustMPH: string;
+  stormMovement: string;
+  minimumPressure: string;
+};
+
+export type NhcTrackPointProps = {
+  styleUrl: string;
+  styleHash: string;
+  icon: string;
+  description: string;
+};
+
+export type NhcConePolygonProps = {
+  styleUrl: string;
+  styleHash: string;
+  stroke: string;
+  "stroke-opacity": number;
+  "stroke-width": number;
+  fill: string;
+  "fill-opacity": number;
+  timezone: string;
+  stormType: Uppercase<StormType>;
+  advisoryDate: string;
+  basin: NhcBasin;
+  fcstpd: string;
+  storm: string;
+  atcfid: string;
+  advisoryNum: string;
+  stormNum: string;
+  stormName: string;
+};
+
+export type StormType = "POST-TROPICAL" | "DEPRESSION" | "STORM" | "HURRICANE" | "REMNANT";
+
+export type ParsedTrackPointProps = {
+  metobject: { sub_type: StormType; max_wind: { value: number } };
+  storm_name: string;
+  category: number | undefined;
+  forecast_datetime: Date;
+  type: "cyclone";
+};

@@ -15,7 +15,7 @@ import type { OutlookData, Panel, RegionData, TextDirection, WmoDirection } from
 import { OFFICE_REGION_MAP } from "../config/charts.config.js";
 import { outlookOfficeSchema, outlookRegionSchema } from "./validation.js";
 import { getTimes } from "suncalc";
-import type { HurricaneData, HurricaneDataResponse, HurricaneDataType } from "./hurricanes.types.js";
+import type { HurricaneData, HurricaneDataResponse, HurricaneDataType, StormType } from "./hurricanes.types.js";
 
 /**
  *
@@ -623,6 +623,44 @@ export function generateStormNamePoint(trackData: HurricaneData["track"]["featur
     storm_name,
     validity_datetime,
   });
+}
+
+export function getStormClass(
+  stormCode: string,
+  text: string,
+  windSpeed: number,
+): { name: string | undefined; stormType: StormType | undefined; category: number | undefined } {
+  const name = text.replace(`(${stormCode})`, "").trim().split(" ").pop()?.toUpperCase();
+
+  if (!name) return { name: undefined, stormType: undefined, category: undefined };
+
+  if (windSpeed < 35) {
+    return {
+      name,
+      stormType: "DEPRESSION",
+      category: undefined,
+    };
+  }
+  if (windSpeed >= 35 && windSpeed < 64) {
+    return {
+      name,
+      stormType: text.includes("Post-Tropical Cyclone") ? "POST-TROPICAL" : "STORM",
+      category: undefined,
+    };
+  }
+
+  if (windSpeed >= 64)
+    return {
+      name,
+      stormType: "HURRICANE",
+      category: windSpeed < 82 ? 1 : windSpeed < 95 ? 2 : windSpeed < 112 ? 3 : windSpeed < 136 ? 4 : 5,
+    };
+
+  return { name, stormType: "REMNANT", category: undefined };
+}
+
+export function ensure2DPosition(coordinates: Position) {
+  return [coordinates[0], coordinates[1]];
 }
 
 export function computeHurricaneCategory(windSpeed: number) {
