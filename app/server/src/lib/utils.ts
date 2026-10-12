@@ -24,14 +24,7 @@ import type { HurricaneData, HurricaneDataResponse, HurricaneDataType, StormType
  * @returns a string of the minimum length that represents the input prepended with a number of zeroes
  */
 export function leadZero(input: number, minLength: number): string {
-  const inputString: string = input.toString();
-  let leader: string = "";
-
-  for (let i = 0; i < minLength - inputString.length; i++) {
-    leader += "0";
-  }
-
-  return leader + inputString;
+  return input.toString().padStart(minLength, "0");
 }
 
 export function makeISOTimeStamp(time: number, mode: "display" | "data" = "data") {
