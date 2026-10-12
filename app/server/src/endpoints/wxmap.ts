@@ -373,7 +373,6 @@ export const wxmapRouter = router({
                       return { storm: storm[0], updated: new Date(`${updated[0].replace(" ", "T")}:00.000Z`) };
                   }
                 }
-                6;
               })
               .filter(
                 (r): r is { storm: string; updated: Date } =>
@@ -414,7 +413,8 @@ export const wxmapRouter = router({
               (f) => f.geometry.type === "LineString" && f.geometry.coordinates.length > 1,
             ) as Feature<LineString, NhcTrackLineProps>[]
           ).find((f) => f.properties.fcstpd === "120") as
-            Feature<LineString, { type: "track"; storm_name: string }> | undefined; // we're going to overwrite the properties
+            | Feature<LineString, { type: "track"; storm_name: string }>
+            | undefined; // we're going to overwrite the properties
 
           if (trackLine) {
             trackLine.geometry.coordinates = trackLine.geometry.coordinates
