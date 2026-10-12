@@ -6,10 +6,10 @@ export const VolcanoCodes = () => {
       <Layer
         source="vector-tile-source"
         source-layer="volcano_codes"
-        key="volcano-codes-data-icon"
+        key="layer-volcano-codes-data-icon"
         filter={["all", ["!=", ["get", "colour"], "green"], ["!=", ["get", "colour"], "unassigned"]]}
         type="symbol"
-        id="volcano-codes-data-icon"
+        id="layer-volcano-codes-data-icon"
         layout={{
           "icon-image": "icons:volcano",
           "icon-size": ["interpolate", ["linear"], ["zoom"], 0, 0.4, 6, 0.8],
@@ -24,11 +24,11 @@ export const VolcanoCodes = () => {
       <Layer
         source="vector-tile-source"
         source-layer="volcano_codes"
-        key="volcano-codes-data-label"
+        key="layer-volcano-codes-data-label"
         filter={["all", ["!=", ["get", "colour"], "green"], ["!=", ["get", "colour"], "unassigned"]]}
         type="symbol"
         minzoom={4}
-        id="volcano-codes-data-label"
+        id="layer-volcano-codes-data-label"
         layout={{
           "text-field": ["get", "name"],
           "text-allow-overlap": true,

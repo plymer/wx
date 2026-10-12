@@ -265,6 +265,17 @@ export const DataPopup = () => {
                     </div>
                   );
                 }
+                case "volcano_codes": {
+                  const volcProps = feature.properties as { name: string; alert_level: string; colour: string };
+
+                  return (
+                    <div>
+                      {volcProps.name}{" "}
+                      {volcProps.alert_level && ` - Alert Level: ${volcProps.alert_level.toUpperCase()}`} - Aviation
+                      Code: {volcProps.colour.toUpperCase()}
+                    </div>
+                  );
+                }
                 default:
                   return null;
               }
