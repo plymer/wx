@@ -263,15 +263,16 @@ export const libertyWxMap: StyleSpecification = {
       type: "line",
       source: "openmaptiles",
       "source-layer": "aeroway",
-      minzoom: 11,
+      minzoom: 8,
       filter: [
         "all",
         ["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false],
         ["==", ["get", "class"], "runway"],
       ],
+      layout: { "line-cap": "square" },
       paint: {
-        "line-color": "#f0ede9",
-        "line-width": ["interpolate", ["exponential", 1.2], ["zoom"], 11, 3, 20, 16],
+        "line-color": "#333",
+        "line-width": ["interpolate", ["exponential", 1.2], ["zoom"], 8, 3, 20, 16],
       },
     },
     {
@@ -286,8 +287,28 @@ export const libertyWxMap: StyleSpecification = {
         ["==", ["get", "class"], "taxiway"],
       ],
       paint: {
-        "line-color": "#f0ede9",
+        "line-color": "#333",
         "line-width": ["interpolate", ["exponential", 1.2], ["zoom"], 11, 0.5, 20, 6],
+      },
+    },
+    {
+      id: "aeroway-runway-numbers",
+      type: "symbol",
+      source: "openmaptiles",
+      "source-layer": "aeroway",
+      minzoom: 9,
+      filter: ["all", ["in", "class", "runway"], ["==", "$type", "LineString"]],
+      layout: {
+        "text-field": ["get", "ref"],
+        "symbol-placement": "line-center",
+        "text-offset": [1, 0],
+        "text-allow-overlap": true,
+        "text-size": 12,
+      },
+      paint: {
+        "text-color": "black",
+        "text-halo-color": "white",
+        "text-halo-width": 2,
       },
     },
     {
