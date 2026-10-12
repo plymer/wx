@@ -6,10 +6,11 @@ import { useRef } from "react";
 
 import { Popup, type PopupInstance } from "react-map-gl/maplibre";
 import Button from "../ui/Button";
-import { AlertTriangle, CircleAlert, OctagonAlert, OctagonX, X } from "lucide-react";
+import { AlertTriangle, CircleAlert, Clock, OctagonAlert, OctagonX, Wind, X } from "lucide-react";
 import type { WxOAlertMetadataProperties } from "@shared/lib/types";
 import type { XmetEventData } from "@shared/lib/alphanumeric.types";
 import { useStationDataForPopup } from "@/hooks/useStationDataForPopup";
+import type { ParsedTrackPointProps } from "@shared/lib/hurricanes.types";
 
 export const DataPopup = () => {
   const popupData = usePopupData();
@@ -44,10 +45,10 @@ export const DataPopup = () => {
       latitude={popupData.lngLat.lat}
       longitude={popupData.lngLat.lng}
       offset={10}
-      maxWidth="inherit"
+      maxWidth={undefined}
       closeButton={false}
       closeOnMove={false}
-      className="md:w-100 max-md:w-60 max-w-3/4 text-white bg-transparent"
+      className="w-fit max-w-1/2 min-w-60 text-white bg-transparent"
     >
       <div className="flex flex-col gap-2 justify-center items-center">
         <div className="flex flex-col gap-2 max-h-[33dvh] w-full overflow-y-auto overflow-x-clip rounded-md ">
@@ -221,6 +222,46 @@ export const DataPopup = () => {
                         </h1>
                       </div>
                       <div className="p-2 whitespace-pre-wrap">{alertProps.text}</div>
+                    </div>
+                  );
+                }
+                case "hurricane": {
+                  const hurricaneProps = feature.properties as ParsedTrackPointProps;
+
+                  const subType = hurricaneProps.metobject.sub_type;
+                  const stormType =
+                    subType === "STORM"
+                      ? "Tropical Storm"
+                      : subType === "POST-TROPICAL"
+                        ? "Post-Tropical Storm"
+                        : `${subType.slice(0, 1)}${subType.slice(1).toLowerCase()}`;
+
+                  return (
+                    <div className="flex flex-col gap-2 items-center border-neutral-950 border rounded-lg">
+                      <h1 className="w-full font-bold text-base text-center p-2 border-b border-neutral-950 rounded-t-lg bg-linear-to-r from-red-800 to-red-900">
+                        {stormType} {hurricaneProps.storm_name}
+                        {hurricaneProps.category && ` (Cat ${hurricaneProps.category})`}
+                      </h1>
+
+                      <div className="p-1">
+                        <div className="flex gap-2 items-center">
+                          <Clock />
+                          {new Date(hurricaneProps.forecast_datetime).toLocaleString("en-CA", {
+                            hour12: false,
+                            month: "short",
+                            day: "numeric",
+
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            timeZone: "UTC",
+                            timeZoneName: "short",
+                          })}
+                        </div>
+                        <div className="flex gap-2 items-center">
+                          <Wind />
+                          Max Wind: {hurricaneProps.metobject.max_wind.value}KT
+                        </div>
+                      </div>
                     </div>
                   );
                 }

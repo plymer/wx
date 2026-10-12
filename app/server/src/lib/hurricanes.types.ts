@@ -46,6 +46,7 @@ export type IncomingCycloneProperties = Prettify<
 export type CycloneProperties = Prettify<
   BaseProperties & {
     type: "cyclone";
+    dataType: "hurricane";
     metobject: {
       classification: string;
       max_wind: ValueWithUnit;
@@ -230,4 +231,5 @@ export type ParsedTrackPointProps = {
   category: number | undefined;
   forecast_datetime: Date;
   type: "cyclone";
+  dataType: "hurricane";
 };

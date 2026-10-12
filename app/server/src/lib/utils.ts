@@ -522,6 +522,7 @@ export function transformHurricaneMetobject<TData extends HurricaneDataType>(
 
         const newProps = {
           type: "cyclone",
+          dataType: "hurricane",
           active: props.active,
           amendment: props.amendment,
           basin: props.basin,
