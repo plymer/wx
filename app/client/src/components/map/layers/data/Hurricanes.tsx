@@ -43,6 +43,23 @@ export const Hurricanes = () => {
           "fill-opacity": 0.2,
         }}
       />
+
+      <Layer
+        id="layer-hurricanes-radii-fill"
+        key="layer-hurricanes-radii-fill"
+        type="fill"
+        source="hurricanes"
+        filter={["==", ["get", "type"], "wind_radii"]}
+        paint={{
+          "fill-color": [
+            "let",
+            "speed",
+            ["at", 3, ["split", ["get", "id"], "_"]],
+            ["match", ["var", "speed"], "34", "yellow", "50", "orange", "red"],
+          ],
+          "fill-layer-opacity": 0.15,
+        }}
+      />
       <Layer
         id="layer-hurricanes-track"
         key="layer-hurricanes-track"
@@ -79,7 +96,6 @@ export const Hurricanes = () => {
           "line-width": 2,
         }}
       />
-
       <Layer
         id="layer-hurricanes-radii-underlay"
         key="layer-hurricanes-radii-underlay"
@@ -102,25 +118,27 @@ export const Hurricanes = () => {
             "let",
             "speed",
             ["at", 3, ["split", ["get", "id"], "_"]],
-            ["match", ["var", "speed"], "34", "yellow", "48", "orange", "red"],
+            ["match", ["var", "speed"], "34", "yellow", "50", "orange", "red"],
           ],
           "line-width": 2,
         }}
       />
       <Layer
-        id="layer-hurricanes-radii-fill"
-        key="layer-hurricanes-radii-fill"
-        type="fill"
+        id="layer-hurricanes-radii-speed"
+        key="layer-hurricanes-radii-speed"
+        type="symbol"
         source="hurricanes"
         filter={["==", ["get", "type"], "wind_radii"]}
         paint={{
-          "fill-color": [
-            "let",
-            "speed",
-            ["at", 3, ["split", ["get", "id"], "_"]],
-            ["match", ["var", "speed"], "34", "yellow", "48", "orange", "red"],
-          ],
-          "fill-opacity": 0.2,
+          "text-color": "black",
+          "text-halo-color": "white",
+          "text-halo-width": 2,
+        }}
+        layout={{
+          "text-size": 10,
+          "text-field": ["concat", ["to-string", ["at", 3, ["split", ["get", "id"], "_"]]], " KT"],
+          "symbol-placement": "line",
+          "symbol-spacing": 500,
         }}
       />
       <Layer
@@ -156,7 +174,12 @@ export const Hurricanes = () => {
           "text-halo-width": 1,
         }}
         layout={{
-          "text-field": ["get", "category"],
+          "text-field": [
+            "case",
+            ["==", ["get", "sub_type", ["get", "metobject"]], "HURRICANE"],
+            ["get", "category"],
+            "",
+          ],
           "text-size": 14,
           "icon-image": [
             "match",
@@ -165,6 +188,8 @@ export const Hurricanes = () => {
             "icons:hurricane",
             "STORM",
             "icons:tropical-storm",
+            "POST_TROPICAL_STORM",
+            "icons:post-tropical-storm",
             "icons:pressure-centre",
           ],
           "icon-size": [
@@ -173,6 +198,7 @@ export const Hurricanes = () => {
               "all",
               ["!=", ["get", "sub_type", ["get", "metobject"]], "STORM"],
               ["!=", ["get", "sub_type", ["get", "metobject"]], "HURRICANE"],
+              ["!=", ["get", "sub_type", ["get", "metobject"]], "POST_TROPICAL_STORM"],
             ],
             0.3,
             0.5,

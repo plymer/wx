@@ -232,7 +232,7 @@ export const DataPopup = () => {
                   const stormType =
                     subType === "STORM"
                       ? "Tropical Storm"
-                      : subType === "POST-TROPICAL"
+                      : subType === "POST_TROPICAL_STORM" || subType === "POST-TROPICAL"
                         ? "Post-Tropical Storm"
                         : `${subType.slice(0, 1)}${subType.slice(1).toLowerCase()}`;
 

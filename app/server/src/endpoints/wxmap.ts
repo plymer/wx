@@ -336,7 +336,7 @@ export const wxmapRouter = router({
     if (cachedData) {
       console.log(`[API] Cache HIT for Pacific hurricane data`);
 
-      return JSON.parse(cachedData) as Feature[];
+      return JSON.parse(cachedData) as FeatureCollection;
     } else {
       console.log(`[API] Cache MISS for Pacific hurricane data. Fetching from source...`);
 

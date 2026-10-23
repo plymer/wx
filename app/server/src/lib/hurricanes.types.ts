@@ -223,7 +223,7 @@ export type NhcConePolygonProps = {
   stormName: string;
 };
 
-export type StormType = "POST-TROPICAL" | "DEPRESSION" | "STORM" | "HURRICANE" | "REMNANT";
+export type StormType = "POST-TROPICAL" | "DEPRESSION" | "STORM" | "HURRICANE" | "REMNANT" | "POST_TROPICAL_STORM";
 
 export type ParsedTrackPointProps = {
   metobject: { sub_type: StormType; max_wind: { value: number } };

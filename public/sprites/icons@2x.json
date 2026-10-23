@@ -4,7 +4,7 @@
     "pixelRatio": 2,
     "width": 60,
     "x": 244,
-    "y": 0,
+    "y": 122,
     "sdf": true
   },
   "bedpost": {
@@ -12,15 +12,15 @@
     "pixelRatio": 2,
     "width": 60,
     "x": 244,
-    "y": 60,
+    "y": 182,
     "sdf": true
   },
   "hail": {
     "height": 60,
     "pixelRatio": 2,
     "width": 60,
-    "x": 244,
-    "y": 120,
+    "x": 304,
+    "y": 122,
     "sdf": true
   },
   "hurricane": {
@@ -31,7 +31,7 @@
     "y": 0,
     "sdf": true
   },
-  "pressure-centre": {
+  "post-tropical-storm": {
     "height": 122,
     "pixelRatio": 2,
     "width": 122,
@@ -39,20 +39,28 @@
     "y": 122,
     "sdf": true
   },
+  "pressure-centre": {
+    "height": 122,
+    "pixelRatio": 2,
+    "width": 122,
+    "x": 122,
+    "y": 0,
+    "sdf": true
+  },
   "rain": {
     "height": 60,
     "pixelRatio": 2,
     "width": 60,
-    "x": 244,
-    "y": 180,
+    "x": 304,
+    "y": 182,
     "sdf": true
   },
   "stn-auto": {
     "height": 60,
     "pixelRatio": 2,
     "width": 60,
-    "x": 304,
-    "y": 0,
+    "x": 364,
+    "y": 122,
     "sdf": true
   },
   "stn-hwos": {
@@ -60,14 +68,14 @@
     "pixelRatio": 2,
     "width": 60,
     "x": 364,
-    "y": 0,
+    "y": 182,
     "sdf": true
   },
   "tornado": {
     "height": 60,
     "pixelRatio": 2,
     "width": 60,
-    "x": 424,
+    "x": 366,
     "y": 0,
     "sdf": true
   },
@@ -76,22 +84,22 @@
     "pixelRatio": 2,
     "width": 122,
     "x": 122,
-    "y": 0,
+    "y": 122,
     "sdf": true
   },
   "volcano": {
     "height": 122,
     "pixelRatio": 2,
     "width": 122,
-    "x": 122,
-    "y": 122,
+    "x": 244,
+    "y": 0,
     "sdf": true
   },
   "wind": {
     "height": 60,
     "pixelRatio": 2,
     "width": 60,
-    "x": 304,
+    "x": 366,
     "y": 60,
     "sdf": true
   }
