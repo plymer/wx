@@ -2,17 +2,13 @@ import { useShowIsobars } from "@/stateStores/map/vectorData";
 import { Layer } from "react-map-gl/maplibre";
 import type { FilterSpecification } from "maplibre-gl";
 
-interface Props {
-  displayTime: number;
-}
-
-export const Isobars = ({ displayTime }: Props) => {
+export const Isobars = () => {
   const enabled = useShowIsobars();
 
   const filter: FilterSpecification = [
     "all",
-    ["<=", ["get", "start_time"], ["to-number", displayTime]],
-    [">", ["get", "expiry_time"], ["to-number", displayTime]],
+    ["<=", ["get", "start_time"], ["global-state", "time"]],
+    [">", ["get", "expiry_time"], ["global-state", "time"]],
   ];
 
   if (!enabled) return null;

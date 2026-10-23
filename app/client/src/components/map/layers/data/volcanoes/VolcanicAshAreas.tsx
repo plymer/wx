@@ -1,14 +1,11 @@
-import { useDisplayTime } from "@/hooks/useDisplayTime";
 import type { FilterSpecification } from "maplibre-gl";
 import { Layer } from "react-map-gl/maplibre";
 
 export const VolcanicAshAreas = () => {
-  const displayTime = useDisplayTime();
-
   const filter: FilterSpecification = [
     "all",
-    ["<=", ["get", "start_time"], ["to-number", displayTime]],
-    [">", ["get", "expiry_time"], ["to-number", displayTime]],
+    ["<=", ["get", "start_time"], ["global-state", "time"]],
+    [">", ["get", "expiry_time"], ["global-state", "time"]],
   ];
 
   return (

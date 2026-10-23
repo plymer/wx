@@ -98,7 +98,7 @@ export const DataPopup = () => {
                 return 0;
               }
             })
-            .map((feature) => {
+            .map((feature, idx) => {
               const dataType = (feature.properties.dataType as string) || (feature.properties.data_type as string);
 
               switch (dataType) {
@@ -237,7 +237,10 @@ export const DataPopup = () => {
                         : `${subType.slice(0, 1)}${subType.slice(1).toLowerCase()}`;
 
                   return (
-                    <div className="flex flex-col gap-2 items-center border-neutral-950 border rounded-lg">
+                    <div
+                      key={`${hurricaneProps.storm_name}-${hurricaneProps.metobject.max_wind}-${idx}`}
+                      className="flex flex-col gap-2 items-center border-neutral-950 border rounded-lg"
+                    >
                       <h1 className="w-full font-bold text-base text-center p-2 border-b border-neutral-950 rounded-t-lg bg-linear-to-r from-red-800 to-red-900">
                         {stormType} {hurricaneProps.storm_name}
                         {hurricaneProps.category && ` (Cat ${hurricaneProps.category})`}
@@ -269,7 +272,7 @@ export const DataPopup = () => {
                   const volcProps = feature.properties as { name: string; alert_level: string; colour: string };
 
                   return (
-                    <div>
+                    <div key={`${volcProps.name}-${volcProps.alert_level}-${idx}`}>
                       {volcProps.name}{" "}
                       {volcProps.alert_level && ` - Alert Level: ${volcProps.alert_level.toUpperCase()}`} - Aviation
                       Code: {volcProps.colour.toUpperCase()}

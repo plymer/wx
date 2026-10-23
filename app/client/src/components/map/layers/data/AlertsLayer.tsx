@@ -5,14 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import type { FilterSpecification } from "maplibre-gl";
 import { Source, Layer } from "react-map-gl/maplibre";
 
-import { useDisplayTime } from "@/hooks/useDisplayTime";
-
 interface Props {
   override?: boolean;
 }
 
 export const AlertsLayer = ({ override }: Props) => {
-  const displayTime = useDisplayTime();
   const enabled = useShowPublicAlerts();
   const filterAlertLevel = usePublicAlertsFilterLevel();
 
@@ -27,13 +24,13 @@ export const AlertsLayer = ({ override }: Props) => {
       ? [
           "all",
           ["in", ["get", "alertCode"], ["literal", ["STV", "STW", "TRW", "TRV"]]],
-          ["<=", ["get", "startTime"], ["to-number", displayTime]],
-          [">", ["get", "expiryTime"], ["to-number", displayTime]],
+          ["<=", ["get", "startTime"], ["global-state", "time"]],
+          [">", ["get", "expiryTime"], ["global-state", "time"]],
         ]
       : [
           "all",
-          ["<=", ["get", "startTime"], ["to-number", displayTime]],
-          [">", ["get", "expiryTime"], ["to-number", displayTime]],
+          ["<=", ["get", "startTime"], ["global-state", "time"]],
+          [">", ["get", "expiryTime"], ["global-state", "time"]],
         ];
 
   if (!override && !enabled) return null;

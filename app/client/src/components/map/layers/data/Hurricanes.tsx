@@ -244,7 +244,7 @@ export const Hurricanes = () => {
                   ["join", ["split", ["var", "subType"], "_"], " "],
                   "TROPICAL STORM",
                 ],
-                " ",
+                "\n",
                 ["concat", ["get", "value", ["get", "max_wind", ["get", "metobject"]]], "KT"],
                 " @ ",
                 ["at", 2, ["split", ["at", 0, ["split", ["get", "forecast_datetime"], "T"]], "-"]],

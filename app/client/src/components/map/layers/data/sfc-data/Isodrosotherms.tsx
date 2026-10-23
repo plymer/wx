@@ -2,17 +2,13 @@ import { useShowIsodrosotherms } from "@/stateStores/map/vectorData";
 import type { FilterSpecification } from "maplibre-gl";
 import { Layer } from "react-map-gl/maplibre";
 
-interface Props {
-  displayTime: number;
-}
-
-export const Isodrosotherms = ({ displayTime }: Props) => {
+export const Isodrosotherms = () => {
   const enabled = useShowIsodrosotherms();
 
   const filter: FilterSpecification = [
     "all",
-    ["<=", ["get", "start_time"], ["to-number", displayTime]],
-    [">", ["get", "expiry_time"], ["to-number", displayTime]],
+    ["<=", ["get", "start_time"], ["global-state", "time"]],
+    [">", ["get", "expiry_time"], ["global-state", "time"]],
     [">", ["get", "value"], 0],
   ];
 

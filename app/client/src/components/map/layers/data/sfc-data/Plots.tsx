@@ -5,17 +5,13 @@ import { useShowObs } from "@/stateStores/map/vectorData";
 import type { FilterSpecification } from "maplibre-gl";
 import { Layer } from "react-map-gl/maplibre";
 
-interface Props {
-  displayTime: number;
-}
-
-export const Plots = ({ displayTime }: Props) => {
+export const Plots = () => {
   const enabled = useShowObs();
 
   const filter: FilterSpecification = [
     "all",
-    ["<=", ["get", "start_time"], ["to-number", displayTime]],
-    [">", ["get", "expiry_time"], ["to-number", displayTime]],
+    ["<=", ["get", "start_time"], ["global-state", "time"]],
+    [">", ["get", "expiry_time"], ["global-state", "time"]],
   ];
 
   if (!enabled) return null;
