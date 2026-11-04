@@ -1,9 +1,8 @@
 const path = require("path");
-const dotenv = require("dotenv/config");
+require("dotenv/config");
 
 const ENV_VARS = {
   NODE_ENV: "production",
-  SQLITE_PATH: process.env.SQLITE_PATH,
   DB_USER: process.env.DB_USER,
   DB_PASSWORD: process.env.DB_PASSWORD,
   DB_NAME: process.env.DB_NAME,
