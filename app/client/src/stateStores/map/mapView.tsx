@@ -1,28 +1,18 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-
-import type { Map } from "maplibre-gl";
-import type { PaddingOptions, ViewState } from "react-map-gl/maplibre";
+import type { ViewState } from "react-map-gl/maplibre";
 import type { BaseMapType, MapProjections } from "../../lib/types";
+import { useMap } from "react-map-gl/maplibre";
 
-interface MapStateStore extends ViewState {
-  mapRef: Map | null;
-  latitude: number;
-  longitude: number;
-  zoom: number;
-  bearing: number;
-  pitch: number;
-  padding: PaddingOptions;
+interface MapStateStore {
+  viewState: ViewState;
   projection: MapProjections;
   baseMap: BaseMapType;
   layersLoading: string[];
   actions: {
-    setMapRef: (ref: Map | null) => void;
     addLayerLoading: (layerName: string) => void;
     removeLayerLoading: (layerName: string) => void;
-    setLatitude: (lat: number) => void;
-    setLongitude: (lon: number) => void;
-    setZoom: (zoom: number) => void;
+    setViewState: (viewState: ViewState) => void;
     setProjection: (proj: MapProjections) => void;
     setBaseMap: (basemap: BaseMapType) => void;
   };
@@ -32,31 +22,27 @@ const useMapViewState = create<MapStateStore>()(
   persist(
     (set) => ({
       // initial values
-      mapRef: null,
-      latitude: 53,
-      longitude: -95,
-      zoom: 3.25,
-      bearing: 0,
-      pitch: 0,
-      padding: { top: 0, left: 0, right: 0, bottom: 0 },
+      viewState: {
+        latitude: 53,
+        longitude: -95,
+        zoom: 3.25,
+        bearing: 0,
+        pitch: 0,
+        padding: { top: 0, left: 0, right: 0, bottom: 0 },
+      },
       projection: "mercator",
       baseMap: "hillshade",
       layersLoading: [],
       actions: {
-        setMapRef: (newRef) => set(() => ({ mapRef: newRef })),
         addLayerLoading: (layerName: string) =>
-          set((state) => ({
-            layersLoading: state.layersLoading.includes(layerName)
-              ? state.layersLoading
-              : [...state.layersLoading, layerName],
+          set(({ layersLoading }) => ({
+            layersLoading: layersLoading.includes(layerName) ? layersLoading : [...layersLoading, layerName],
           })),
         removeLayerLoading: (layerName: string) =>
-          set((state) => ({
-            layersLoading: state.layersLoading.filter((name) => name !== layerName),
+          set(({ layersLoading }) => ({
+            layersLoading: layersLoading.filter((name) => name !== layerName),
           })),
-        setLatitude: (newLatitude) => set(() => ({ latitude: newLatitude })),
-        setLongitude: (newLongitude) => set(() => ({ longitude: newLongitude })),
-        setZoom: (newZoom) => set(() => ({ zoom: newZoom })),
+        setViewState: (newViewState) => set(({ viewState }) => ({ viewState: { ...viewState, ...newViewState } })),
         setProjection: (newProjection) => set(() => ({ projection: newProjection })),
         setBaseMap: (newBaseMap) => set(() => ({ baseMap: newBaseMap })),
       },
@@ -64,9 +50,7 @@ const useMapViewState = create<MapStateStore>()(
     {
       partialize: (state) =>
         ({
-          latitude: state.latitude,
-          longitude: state.longitude,
-          zoom: state.zoom,
+          viewState: state.viewState,
           projection: state.projection,
           baseMap: state.baseMap,
         }) as Partial<MapStateStore>,
@@ -81,13 +65,12 @@ const useMapViewState = create<MapStateStore>()(
 );
 
 // export hooks for state and actions
-export const useMapRef = () => useMapViewState((state) => state.mapRef);
-export const useLatitude = () => useMapViewState((state) => state.latitude);
-export const useLongitude = () => useMapViewState((state) => state.longitude);
-export const useZoom = () => useMapViewState((state) => state.zoom);
-export const useBearing = () => useMapViewState((state) => state.bearing);
-export const usePitch = () => useMapViewState((state) => state.pitch);
-export const usePadding = () => useMapViewState((state) => state.padding);
+
+export const useMapRef = () => {
+  const mapRef = useMap();
+  return mapRef.current?.getMap();
+};
+export const useViewState = () => useMapViewState((state) => state.viewState);
 export const useProjection = () => useMapViewState((state) => state.projection);
 export const useBaseMap = () => useMapViewState((state) => state.baseMap);
 export const useLayersLoading = () => useMapViewState((state) => state.layersLoading);

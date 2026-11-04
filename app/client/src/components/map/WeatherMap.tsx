@@ -1,35 +1,36 @@
 // third-party libraries
 import { type ReactElement, useState } from "react";
-import Map, { type ViewState, type ViewStateChangeEvent } from "react-map-gl/maplibre";
+import Map, { type ViewStateChangeEvent } from "react-map-gl/maplibre";
 import type { MapLayerMouseEvent, MapLibreEvent, StyleSpecification } from "maplibre-gl";
 import { Loader2 } from "lucide-react";
 
 // helpers
 
 // global state stores
-import { useMapStateActions } from "@/stateStores/map/mapView";
-import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
-import type { MapProjections } from "@/lib/types";
+import { useMapStateActions, useProjection, useViewState } from "@/stateStores/map/mapView";
+
 import useMapClock from "@/hooks/useClock";
-import { useUIActions } from "@/stateStores/map/ui";
+import { usePopupData, useUIActions } from "@/stateStores/map/ui";
 import { useMapLoadingState } from "@/hooks/useMapLoadingState";
 import { useRegisterMaplibreWorker } from "@/hooks/useRegisterMaplibreWorker";
 
 interface Props {
-  viewState: Partial<ViewState>;
-  mapProjection: MapProjections;
   basemap: StyleSpecification;
   interactiveLayers?: string[];
   children?: ReactElement<any, any>[] | ReactElement<any, any>;
 }
 
-const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLayers }: Props) => {
+const WeatherMap = ({ children, basemap, interactiveLayers }: Props) => {
   useRegisterMaplibreWorker();
 
   // subscribe to our global state stores
-  const { setMapRef } = useMapStateActions();
-  const { updateFromMapEvent } = useUpdateMapViewstate();
+  const { setViewState } = useMapStateActions();
+  const viewState = useViewState();
+
   const { setPopupData } = useUIActions();
+  const popupData = usePopupData();
+
+  const projection = useProjection();
 
   const [isSatelliteLoading, setIsSatelliteLoading] = useState(false);
   const [isRadarLoading, setIsRadarLoading] = useState(false);
@@ -62,30 +63,25 @@ const WeatherMap = ({ viewState, mapProjection, children, basemap, interactiveLa
   };
 
   const onMapLoad = (e: MapLibreEvent) => {
-    // Store map reference in mapState
-    setMapRef(e.target);
-
     // Set base layers
     setBaseMapLayers(e.target.getLayersOrder());
     setIsMapInitialized(true);
   };
 
   const onMove = (e: ViewStateChangeEvent) => {
-    updateFromMapEvent(e.target, e.viewState);
+    setViewState(e.viewState);
+    const bounds = e.target.getBounds();
+    if (popupData && !bounds.contains(popupData.lngLat)) setPopupData(undefined);
   };
 
   return (
     <Map
+      {...viewState}
       maxTileCacheSize={512}
       maxTileCacheZoomLevels={10}
       maxZoom={13}
       fadeDuration={0}
-      latitude={viewState.latitude}
-      longitude={viewState.longitude}
-      zoom={viewState.zoom}
-      bearing={viewState.bearing}
-      pitch={viewState.pitch}
-      projection={mapProjection}
+      projection={projection}
       attributionControl={false}
       dragRotate={false}
       pitchWithRotate={false}

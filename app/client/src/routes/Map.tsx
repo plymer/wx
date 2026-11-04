@@ -5,19 +5,10 @@ import WeatherMap from "@/components/map/WeatherMap";
 
 import { positronWxMap } from "@/assets/map-styles/positron-wxmap.js";
 
-import { AttributionControl, ScaleControl, type ViewState } from "react-map-gl/maplibre";
+import { AttributionControl, ScaleControl } from "react-map-gl/maplibre";
 import MapLoadingIndicator from "@/components/map/MapLoadingIndicator";
 import { GeoLocation } from "@/components/map/controls/GeoLocation";
-import {
-  useProjection,
-  useLatitude,
-  useLongitude,
-  useZoom,
-  useBearing,
-  usePitch,
-  useLayersLoading,
-  useBaseMap,
-} from "@/stateStores/map/mapView";
+import { useLayersLoading, useBaseMap } from "@/stateStores/map/mapView";
 import { useAnimationActions } from "@/stateStores/map/animation";
 
 import MapOptions from "@/components/map/controls/MapOptions";
@@ -49,17 +40,8 @@ import { Volcanoes } from "@/components/map/layers/data/Volcanoes";
 export default function WxMap() {
   // global state store subscriptions
   const loadingState = useLayersLoading().length > 0;
-  const projection = useProjection();
   const animation = useAnimationActions();
   const baseMap = useBaseMap();
-
-  const viewState: Partial<ViewState> = {
-    latitude: useLatitude(),
-    longitude: useLongitude(),
-    zoom: useZoom(),
-    bearing: useBearing(),
-    pitch: usePitch(),
-  };
 
   useEffect(() => {
     // on mount, make sure the animation is paused
@@ -86,12 +68,7 @@ export default function WxMap() {
 
   return (
     <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height) text-sm">
-      <WeatherMap
-        viewState={viewState}
-        mapProjection={projection}
-        basemap={mapStyle}
-        interactiveLayers={interactiveLayers}
-      >
+      <WeatherMap basemap={mapStyle} interactiveLayers={interactiveLayers}>
         <ScaleControl
           position="bottom-left"
           unit="nautical"

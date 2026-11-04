@@ -7,7 +7,7 @@ import { LightningDataLayer } from "../map/layers/data/LightningDataLayer";
 import { PublicRegionsOverlay } from "../map/layers/overlays/PublicRegionsOverlay";
 import type { MapLibreEvent } from "maplibre-gl";
 import { useEffect, useState } from "react";
-import { useLatitude, useLongitude, useMapStateActions, useZoom } from "@/stateStores/map/mapView";
+import { useViewState, useMapStateActions } from "@/stateStores/map/mapView";
 import { useAnimationActions } from "@/stateStores/map/animation";
 import { Loader2, LocateFixed, Search } from "lucide-react";
 import { useDisplayTime } from "@/hooks/useDisplayTime";
@@ -19,7 +19,7 @@ import Button from "../ui/Button";
 import type { FetchStatus } from "@tanstack/react-query";
 import * as turf from "@turf/turf";
 import { SurfaceDataLayer } from "../map/layers/data/SurfaceDataLayer";
-import { useUpdateMapViewstate } from "@/hooks/useUpdateMapViewstate";
+
 import { AlertsLayer } from "../map/layers/data/AlertsLayer";
 import { SelectedFxPoint } from "../map/layers/overlays/SelectedFxPoint";
 import { useRegisterMaplibreWorker } from "@/hooks/useRegisterMaplibreWorker";
@@ -35,13 +35,10 @@ interface Props {
 
 export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }: Props) => {
   useRegisterMaplibreWorker();
-  const mapState = useMapStateActions();
+  const { setViewState } = useMapStateActions();
   const displayTime = useDisplayTime();
   const coords = useCoords();
-  const latitude = useLatitude();
-  const longitude = useLongitude();
-  const zoom = useZoom();
-  const { updateFromMapEvent } = useUpdateMapViewstate();
+  const viewState = useViewState();
   const { setIsStatic } = useAnimationActions();
   const { setCoords } = usePublicActions();
 
@@ -58,7 +55,6 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
     setIsStatic(true);
 
     return () => {
-      mapState.setMapRef(null);
       setIsStatic(false);
     };
     // oxlint-disable-next-line react-hooks/exhaustive-deps
@@ -66,7 +62,6 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
 
   const onMapLoad = (e: MapLibreEvent) => {
     // Store map reference in mapState
-    mapState.setMapRef(e.target);
 
     // Set base layers
     setBaseMapLayers(e.target.getLayersOrder());
@@ -75,7 +70,7 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
 
   const onMapMove = (e: ViewStateChangeEvent) => {
     setCoords([e.viewState.longitude, e.viewState.latitude]);
-    updateFromMapEvent(e.target, e.viewState);
+    setViewState(e.viewState);
   };
 
   const currentLocationGeoJSON = turf.featureCollection([
@@ -86,9 +81,9 @@ export const PointForecastMap = ({ searchCoords, setSearchCoords, fetchStatus }:
     <div className="w-full rounded-md overflow-clip min-h-96 h-[calc(100dvh/3)]">
       <Map
         initialViewState={{
-          longitude,
-          latitude,
-          zoom,
+          longitude: viewState.longitude,
+          latitude: viewState.latitude,
+          zoom: viewState.zoom,
         }}
         pitch={0}
         bearing={0}
