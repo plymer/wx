@@ -17,6 +17,31 @@ import { outlookOfficeSchema, outlookRegionSchema } from "./validation.js";
 import { getTimes } from "suncalc";
 import type { HurricaneData, HurricaneDataResponse, HurricaneDataType, StormType } from "./hurricanes.types.js";
 
+const timezoneOffsets: Record<string, string> = {
+  MDT: "-06:00",
+  MST: "-07:00",
+  HST: "-10:00",
+  PDT: "-07:00",
+  PST: "-08:00",
+  CDT: "-05:00",
+  CST: "-06:00",
+  EDT: "-04:00",
+  EST: "-05:00",
+};
+
+export function parseHurricaneDate(input: string): Date {
+  const match = input.match(/^(\d{1,2}:\d{2}\s[AP]M)\s+([A-Z]{3})\s+(.+)$/);
+
+  if (!match) throw new Error(`Invalid date format: ${input}`);
+
+  const [, time, timezone, date] = match;
+  const offset = timezoneOffsets[timezone];
+
+  if (!offset) throw new Error(`Unknown timezone: ${timezone}`);
+
+  return new Date(`${date} ${time} ${offset}`);
+}
+
 /**
  *
  * @param input the number that needs to have zeroes prepended to it

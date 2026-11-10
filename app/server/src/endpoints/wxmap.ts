@@ -11,6 +11,7 @@ import {
   generateStormNamePoint,
   getStormClass,
   limitResultsByKeys,
+  parseHurricaneDate,
   transformHurricaneMetobject,
 } from "../lib/utils.js";
 
@@ -413,8 +414,7 @@ export const wxmapRouter = router({
               (f) => f.geometry.type === "LineString" && f.geometry.coordinates.length > 1,
             ) as Feature<LineString, NhcTrackLineProps>[]
           ).find((f) => f.properties.fcstpd === "120") as
-            | Feature<LineString, { type: "track"; storm_name: string }>
-            | undefined; // we're going to overwrite the properties
+            Feature<LineString, { type: "track"; storm_name: string }> | undefined; // we're going to overwrite the properties
 
           if (trackLine) {
             trackLine.geometry.coordinates = trackLine.geometry.coordinates
@@ -443,7 +443,7 @@ export const wxmapRouter = router({
 
               if (trackLine && name !== undefined) trackLine.properties.storm_name = name;
 
-              const validTime = new Date(baseDescription[6].split("Valid at:")[1].trim());
+              const validTime = parseHurricaneDate(baseDescription[6].split("Valid at:")[1].trim());
 
               return {
                 ...feature,
