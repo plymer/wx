@@ -31,6 +31,14 @@
     "y": 0,
     "sdf": true
   },
+  "label-badge": {
+    "height": 30,
+    "pixelRatio": 1,
+    "width": 30,
+    "x": 152,
+    "y": 91,
+    "sdf": true
+  },
   "post-tropical-storm": {
     "height": 61,
     "pixelRatio": 1,
@@ -51,8 +59,8 @@
     "height": 30,
     "pixelRatio": 1,
     "width": 30,
-    "x": 152,
-    "y": 91,
+    "x": 182,
+    "y": 61,
     "sdf": true
   },
   "stn-auto": {
@@ -60,15 +68,15 @@
     "pixelRatio": 1,
     "width": 30,
     "x": 182,
-    "y": 61,
+    "y": 91,
     "sdf": true
   },
   "stn-hwos": {
     "height": 30,
     "pixelRatio": 1,
     "width": 30,
-    "x": 182,
-    "y": 91,
+    "x": 183,
+    "y": 0,
     "sdf": true
   },
   "tornado": {
@@ -76,7 +84,7 @@
     "pixelRatio": 1,
     "width": 30,
     "x": 183,
-    "y": 0,
+    "y": 30,
     "sdf": true
   },
   "tropical-storm": {
@@ -99,8 +107,8 @@
     "height": 30,
     "pixelRatio": 1,
     "width": 30,
-    "x": 183,
-    "y": 30,
+    "x": 212,
+    "y": 60,
     "sdf": true
   }
 }

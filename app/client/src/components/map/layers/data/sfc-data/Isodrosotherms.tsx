@@ -39,6 +39,9 @@ export const Isodrosotherms = () => {
         source-layer="td"
         filter={filter}
         layout={{
+          "icon-image": "icons:label-badge",
+          "icon-text-fit": "both",
+          "icon-text-fit-padding": [6, 12, 0, 12],
           "symbol-placement": "line",
           "symbol-spacing": 800,
           "text-field": ["to-string", ["round", ["get", "value"]]],
@@ -49,8 +52,7 @@ export const Isodrosotherms = () => {
         }}
         paint={{
           "text-color": "#0f0",
-          "text-halo-color": "#000",
-          "text-halo-width": 12,
+          "icon-color": "black",
         }}
       />
     </>

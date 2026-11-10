@@ -42,6 +42,9 @@ export const Isotherms = () => {
         source-layer="tt"
         filter={filter}
         layout={{
+          "icon-image": "icons:label-badge",
+          "icon-text-fit": "both",
+          "icon-text-fit-padding": [6, 12, 0, 12],
           "symbol-placement": "line",
           "symbol-spacing": 800,
           "text-field": ["to-string", ["round", ["get", "value"]]],
@@ -57,8 +60,7 @@ export const Isotherms = () => {
             "#f0f",
             ["case", ["<", ["get", "value"], 0], "#00f", "#f00"],
           ],
-          "text-halo-color": "#000",
-          "text-halo-width": 12,
+          "icon-color": "black",
         }}
       />
     </>

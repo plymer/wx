@@ -52,6 +52,9 @@ export const Isobars = () => {
         filter={filter}
         type="symbol"
         layout={{
+          "icon-image": "icons:label-badge",
+          "icon-text-fit": "both",
+          "icon-text-fit-padding": [6, 14, 0, 14],
           "symbol-placement": "line",
           "symbol-spacing": 600,
           "text-field": ["to-string", ["round", ["get", "value"]]],
@@ -62,8 +65,7 @@ export const Isobars = () => {
         }}
         paint={{
           "text-color": "#fff",
-          "text-halo-color": "#000",
-          "text-halo-width": 12,
+          "icon-color": "black",
         }}
       />
       <Layer

@@ -149,10 +149,12 @@ export const Hurricanes = () => {
         filter={["==", ["get", "type"], "name_point"]}
         paint={{
           "text-color": "black",
-          "text-halo-color": "white",
-          "text-halo-width": 12,
+          "icon-color": "white",
         }}
         layout={{
+          "icon-image": "icons:label-badge",
+          "icon-text-fit": "both",
+          "icon-text-fit-padding": [8, 20, 8, 20],
           "text-field": ["get", "storm_name"],
           "text-variable-anchor": ["bottom-left", "top-left", "top-right", "bottom-right"],
           "text-radial-offset": ["interpolate", ["linear"], ["zoom"], 2, 1.5, 4, 2, 5, 4],
