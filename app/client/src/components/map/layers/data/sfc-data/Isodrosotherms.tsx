@@ -42,6 +42,7 @@ export const Isodrosotherms = () => {
           "icon-image": "icons:label-badge",
           "icon-text-fit": "both",
           "icon-text-fit-padding": [6, 12, 0, 12],
+          "icon-rotation-alignment": "viewport",
           "symbol-placement": "line",
           "symbol-spacing": 800,
           "text-field": ["to-string", ["round", ["get", "value"]]],

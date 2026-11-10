@@ -55,6 +55,7 @@ export const Isobars = () => {
           "icon-image": "icons:label-badge",
           "icon-text-fit": "both",
           "icon-text-fit-padding": [6, 14, 0, 14],
+          "icon-rotation-alignment": "viewport",
           "symbol-placement": "line",
           "symbol-spacing": 600,
           "text-field": ["to-string", ["round", ["get", "value"]]],
