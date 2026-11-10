@@ -43,6 +43,7 @@ export const Isodrosotherms = () => {
           "icon-text-fit": "both",
           "icon-text-fit-padding": [6, 12, 0, 12],
           "icon-rotation-alignment": "viewport",
+          "icon-allow-overlap": true,
           "symbol-placement": "line",
           "symbol-spacing": 800,
           "text-field": ["to-string", ["round", ["get", "value"]]],
