@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { OFFICE_REGION_MAP, OUTLOOK_OFFICES } from "../config/charts.config.js";
+import type { WmoDirection } from "./types.js";
+import { cardinalToDegrees } from "./utils.js";
 
 const stringOrNumber = () =>
   z.preprocess((val) => {
@@ -232,31 +234,52 @@ export const pirepSchema = z.object({
     .transform((val) => (val === undefined ? null : val)),
 });
 
-export const airSigmetsSchema = z.object({
-  rawText: z.string(),
+export const awcSigmetsSchema = z.object({
+  rawText: z.string().transform((text) => text.replace("<![CDATA[", "").replace("]]>", "").trim()),
   validTimeFrom: z.coerce.date(),
   validTimeTo: z.coerce.date(),
+  seriesId: z.coerce.string(),
+  fir: z.string(),
+  firName: z.string(),
+  movementSpdKt: z.number().optional(),
+  movementDir: z.union([
+    z
+      .string()
+      .optional()
+      .transform((dir) => {
+        const dirString: WmoDirection = dir === undefined ? "-" : (dir as WmoDirection);
+        return cardinalToDegrees(dirString);
+      }),
+    z.number(),
+  ]),
+  change: z.enum(["NC", "INTSF", "WKN"]).optional(),
   hazard: z.object({
     type: z.string(),
-    severity: z.string(),
+    severity: z.string().optional(),
+    qualifier: z.string().optional(),
   }),
-  altitude: z.object({
-    minFtMsl: z.coerce
-      .number()
-      .optional()
-      .transform((val) => (val === undefined ? null : val)),
-    maxFtMsl: z.coerce
-      .number()
-      .optional()
-      .transform((val) => (val === undefined ? null : val)),
-  }),
-  area: z.object({
-    point: z.array(z.object({ latitude: z.number(), longitude: z.number() })),
-    numPoints: z.coerce
-      .number()
-      .optional()
-      .transform((val) => (val === undefined ? null : val)),
-  }),
+  altitude: z.union([
+    z.object({
+      baseFtMsl: z.coerce
+        .number()
+        .optional()
+        .transform((val) => (val === undefined ? null : val)),
+      topFtMsl: z.coerce
+        .number()
+        .optional()
+        .transform((val) => (val === undefined ? null : val)),
+    }),
+    z.string(),
+  ]),
+  area: z
+    .object({
+      point: z.array(z.object({ latitude: z.number(), longitude: z.number() })),
+      numPoints: z.coerce
+        .number()
+        .optional()
+        .transform((val) => (val === undefined ? null : val)),
+    })
+    .optional(),
 });
 
 export const outlookOfficeSchema = z.string().trim().toLowerCase().pipe(z.enum(OUTLOOK_OFFICES));

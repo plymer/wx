@@ -3,7 +3,7 @@ import type { FeatureCollection, MultiPolygon, Point } from "geojson";
 
 import { metars, aqData, sigmets, stations, tafs } from "../db/schemas.drizzle.js";
 import { z } from "zod";
-import { airSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation.js";
+import { awcSigmetsSchema, aqSchema, metarSchema, pirepSchema, stationSchema, tafSchema } from "./validation.js";
 
 import { XMET_TYPES } from "../config/alphanumeric.config.js";
 import type { OUTLOOK_OFFICES } from "../config/charts.config.js";
@@ -112,7 +112,7 @@ export type CacheStationData = z.infer<typeof stationSchema>;
 export type CacheMetarData = z.infer<typeof metarSchema>;
 export type CacheTafData = z.infer<typeof tafSchema>;
 export type CachePirepData = z.infer<typeof pirepSchema>;
-export type CacheAirSigmetsData = z.infer<typeof airSigmetsSchema>;
+export type CacheSigmetsData = z.infer<typeof awcSigmetsSchema>;
 
 // database schema-derived types
 export type AQData = InferSelectModel<typeof aqData>;
