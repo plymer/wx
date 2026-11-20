@@ -41,7 +41,7 @@ import { sql } from "drizzle-orm";
 import { pgDb as db } from "../services/database.js";
 import { DATA_TYPES as ISOLINE_FIELDS } from "../data/isolines.js";
 
-const DATETIME_COLUMNS = new Set<string>(["valid_time", "start_time", "expiry_time"]);
+const DATETIME_COLUMNS = new Set<string>(["valid_time", "start_time", "expiry_time", "datetime"]);
 const VECTOR_TILE_EXTENT = 4096;
 const VECTOR_TILE_BUFFER = 64;
 const MIN_ZOOM = 2;
@@ -61,14 +61,13 @@ const TABLES = [
     name: "lightning",
     columns: ["start_time", "expiry_time"],
   },
+  { name: "volcano_codes", columns: ["name", "alert_level", "colour"] },
+  { name: "volcano_fv_message_geometries", columns: ["volcano_name", "valid_time_string"] },
   // { name: "pireps", columns: [valid_time, "rawText"] },
 ] as const;
 
 /*
 function pirepQuery(t: number, z: number) {
-  
-
-  
 
   if (z > CLUSTER_MAX_ZOOM) {
     return sql`
@@ -99,10 +98,60 @@ function pirepQuery(t: number, z: number) {
   }
 
   return sql`
-       
+
       `;
 }
 */
+
+function volcanicAshAreaQuery() {
+  return sql`
+    volcano_fv_message_times AS (
+      SELECT
+        message_times.id,
+        message_times.volcano_name,
+        message_times.datetime,
+        LEAD(
+          message_times.datetime,
+          1,
+          message_times.datetime + INTERVAL '12 hours'
+        ) OVER (
+          PARTITION BY message_times.volcano_name
+          ORDER BY message_times.datetime
+        ) AS expiry_time
+      FROM (
+        SELECT DISTINCT
+          fv.id,
+          fv.volcano_name,
+          fv.datetime
+        FROM volcano_fv_message_geometries AS fv
+      ) AS message_times
+    ),
+
+    volcano_fv_message_geometries_layer AS (
+      SELECT
+        ST_AsMVTGeom(
+          fv.geometry,
+          bounds.geom,
+          extent => ${VECTOR_TILE_EXTENT},
+          buffer => ${VECTOR_TILE_BUFFER}
+        ) AS geometry,
+       fv.volcano_name,
+       fv.valid_time_string,
+       fv.fl_base,
+       fv.fl_top,
+       fv.geo_index,
+       (EXTRACT(EPOCH FROM fv.datetime) * 1000)::bigint AS start_time,
+       (EXTRACT(EPOCH FROM message_times.expiry_time) * 1000)::bigint AS expiry_time
+      FROM volcano_fv_message_geometries AS fv
+      JOIN volcano_fv_message_times AS message_times
+        ON message_times.id = fv.id
+       AND message_times.volcano_name = fv.volcano_name
+       AND message_times.datetime = fv.datetime
+      CROSS JOIN bounds
+      WHERE fv.geometry && bounds.query_geom
+    )
+    `;
+}
 
 function isolinesQuery(z: number) {
   const dataTypes = ["mslp", "tt", "td"];
@@ -141,7 +190,6 @@ function isolinesQuery(z: number) {
 
 function lightningQuery(z: number) {
   return sql`
-  
         -- for zooms 2-8 use the pre-clustered strikes we created
         clustered_strikes AS (
           SELECT
@@ -171,7 +219,6 @@ function lightningQuery(z: number) {
             AND (dumped).geom && bounds.query_geom
             AND l.start_time >= NOW() - INTERVAL '4 hours'
         ),
-        
 
         -- combine the clustered and raw strikes into a single set of features for the requested tile
         lightning_features AS (
@@ -183,7 +230,7 @@ function lightningQuery(z: number) {
 
           UNION ALL
 
-          SELECT 
+          SELECT
             raw_strikes.geometry,
             raw_strikes.start_time,
             raw_strikes.expiry_time
@@ -261,16 +308,18 @@ export async function getTile(t: number, z: number, x: number, y: number) {
 
     switch (name) {
       case "isolines":
+        // uses pre-computed isoline geometries and simplifies them based on zoom level
         return isolinesQuery(z);
       // case "pireps":
       //   // special case that requires clustering of PIREPs at low zoom levels
       //   return pirepQuery(t, z);
+      case "volcano_fv_message_geometries":
+        return volcanicAshAreaQuery();
       case "metars":
-        // special case that requires doing a LEAD window function to
-        // compute expiry_time on the fly for each observation
+        // uses the materialized view "metars_temporal" as its data source
         return stationPlotQuery(z);
       case "lightning":
-        // special case that requires clustering of lightning strikes at low zoom levels
+        // uses the pre-clustered lightning data for low zoom levels, or raw strikes for high zooms
         return lightningQuery(z);
       default:
         // if any other tables we don't have a special case for

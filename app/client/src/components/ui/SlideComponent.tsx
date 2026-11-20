@@ -1,3 +1,5 @@
+/* oxlint-disable react/set-state-in-effect */
+
 import { useEffect, useRef, useState } from "react";
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {

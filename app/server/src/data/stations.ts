@@ -7,7 +7,7 @@ import { stations } from "../db/schemas.drizzle.js";
 import { FEET_PER_METRE } from "../lib/constants.js";
 import type { CacheStationData, DataProcessResult, StationData } from "../lib/types.js";
 import { stationSchema } from "../lib/validation.js";
-import { scrapeWiki } from "./canada-airports.js";
+// import { scrapeWiki } from "./canada-airports.js";
 import { pgDb as db } from "../services/database.js";
 
 const RESOURCE_URL = "https://aviationweather.gov/data/cache/stations.cache.json.gz";
@@ -82,12 +82,12 @@ export async function buildStationCatalog(): Promise<DataProcessResult> {
     wasError = true;
   }
 
-  try {
-    await scrapeWiki();
-  } catch (error) {
-    console.error(`[STATION] Error scraping Canadian Sites from Wikipedia: ${(error as Error).message}`);
-    wasError = true;
-  }
+  // try {
+  //   await scrapeWiki();
+  // } catch (error) {
+  //   console.error(`[STATION] Error scraping Canadian Sites from Wikipedia: ${(error as Error).message}`);
+  //   wasError = true;
+  // }
 
   if (wasError) {
     return { result: "error" };

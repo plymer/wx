@@ -5,19 +5,10 @@ import WeatherMap from "@/components/map/WeatherMap";
 
 import { positronWxMap } from "@/assets/map-styles/positron-wxmap.js";
 
-import { AttributionControl, ScaleControl, type ViewState } from "react-map-gl/maplibre";
+import { AttributionControl, ScaleControl } from "react-map-gl/maplibre";
 import MapLoadingIndicator from "@/components/map/MapLoadingIndicator";
 import { GeoLocation } from "@/components/map/controls/GeoLocation";
-import {
-  useProjection,
-  useLatitude,
-  useLongitude,
-  useZoom,
-  useBearing,
-  usePitch,
-  useLayersLoading,
-  useBaseMap,
-} from "@/stateStores/map/mapView";
+import { useLayersLoading, useBaseMap } from "@/stateStores/map/mapView";
 import { useAnimationActions } from "@/stateStores/map/animation";
 
 import MapOptions from "@/components/map/controls/MapOptions";
@@ -26,6 +17,7 @@ import { RadarLayer } from "@/components/map/layers/data/RadarLayer";
 import { TAFOverlay } from "@/components/map/layers/overlays/TAFOverlay";
 import { BedpostOverlay } from "@/components/map/layers/overlays/BedpostOverlay";
 import { FIROverlay } from "@/components/map/layers/overlays/FIROverlay";
+import { VAACOverlay } from "@/components/map/layers/overlays/VAACOverlay";
 import { GFAOverlay } from "@/components/map/layers/overlays/GFAOverlay";
 import { LGFOverlay } from "@/components/map/layers/overlays/LGFOverlay";
 import { PublicRegionsOverlay } from "@/components/map/layers/overlays/PublicRegionsOverlay";
@@ -42,43 +34,43 @@ import { HillshadeLayer } from "@/components/map/layers/base/Hillshade";
 import { AerialImageryLayer } from "@/components/map/layers/base/Aerial";
 import { libertyWxMap } from "@/assets/map-styles/liberty-wxmap";
 import { Hurricanes } from "@/components/map/layers/data/Hurricanes";
+import { TSOutlooks } from "@/components/map/layers/data/TSOutlooks";
+import { Volcanoes } from "@/components/map/layers/data/Volcanoes";
 
 export default function WxMap() {
   // global state store subscriptions
   const loadingState = useLayersLoading().length > 0;
-  const projection = useProjection();
   const animation = useAnimationActions();
   const baseMap = useBaseMap();
-
-  const viewState: Partial<ViewState> = {
-    latitude: useLatitude(),
-    longitude: useLongitude(),
-    zoom: useZoom(),
-    bearing: useBearing(),
-    pitch: usePitch(),
-  };
 
   useEffect(() => {
     // on mount, make sure the animation is paused
     // and set to the first frame
     animation.firstFrame();
     animation.pause();
+
+    return () => {
+      animation.firstFrame();
+      animation.pause();
+    };
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const mapStyle = baseMap === "aerial" || baseMap === "hillshade" ? positronWxMap : libertyWxMap;
 
-  const interactiveLayers = ["layer-sfc-obs-dot", "layer-sigmet", "layer-wxo-alerts"];
+  const interactiveLayers = [
+    "layer-sfc-obs-dot",
+    "layer-sigmet",
+    "layer-wxo-alerts",
+    "layer-hurricanes-position",
+    // "layer-volcano-codes-data-icon",
+  ];
 
   return (
     <div className="bg-neutral-800 pt-2 md:h-(--md-map-height) max-md:h-(--max-md-map-height) text-sm">
-      <WeatherMap
-        viewState={viewState}
-        mapProjection={projection}
-        basemap={mapStyle}
-        interactiveLayers={interactiveLayers}
-      >
+      <WeatherMap basemap={mapStyle} interactiveLayers={interactiveLayers}>
         <ScaleControl
-          position="bottom-right"
+          position="bottom-left"
           unit="nautical"
           style={{
             backgroundColor: "rgba(0,0,0,0.25)",
@@ -89,7 +81,7 @@ export default function WxMap() {
         />
         <AttributionControl
           compact
-          position="bottom-right"
+          position="bottom-left"
           style={{ backgroundColor: "var(--accent)", color: "var(--secondary)", border: "1px solid var(--primary)" }}
         />
 
@@ -114,6 +106,7 @@ export default function WxMap() {
 
         <TAFOverlay />
         <BedpostOverlay />
+        <VAACOverlay />
         <FIROverlay />
         <GFAOverlay />
         <LGFOverlay />
@@ -123,12 +116,14 @@ export default function WxMap() {
         <AlertsLayer />
 
         <LightningDataLayer />
+        <Volcanoes />
 
         <Hurricanes />
+        <TSOutlooks />
 
         <DataPopup />
 
-        <div key="map-options" className="absolute bottom-0 left-0 m-2 gap-2 flex flex-col">
+        <div key="map-options" className="absolute bottom-0 right-0 m-2 gap-2 flex flex-col">
           <MapOptions />
           <GeoLocation />
           {/* <SiteSearch /> */}

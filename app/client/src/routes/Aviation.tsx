@@ -21,7 +21,11 @@ export default function Aviation() {
     const newProduct = AVIATION_PRODUCTS[p][0];
 
     // if we don't have a domain for the new product, we can't switch to it
-    if (!newProduct) return;
+    // this should be an error
+    if (!newProduct) {
+      console.error("No new product available for the selected product:", p);
+      return;
+    }
 
     const hasCurrentTimeStep = newProduct.timeSteps > timeStep;
 
@@ -33,13 +37,13 @@ export default function Aviation() {
   return (
     <>
       <div className="bg-neutral-800 text-white min-h-(--max-avn-height) max-md:min-h-(--md-avn-height)">
-        <nav className="md:p-2 max-md:pt-2">
+        <nav className="md:p-2 max-md:pt-2 max-md:grid max-md:grid-cols-4">
           <label className="me-2 max-md:hidden">Product:</label>
           {PRODUCTS.map((c, i) => (
             <Button
               className={`${
                 product === c ? "active" : ""
-              } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md max-md:w-1/5`}
+              } rounded-none md:first-of-type:rounded-s-md md:last-of-type:rounded-e-md`}
               key={i}
               onClick={() => handleChangeProduct(c)}
             >
@@ -49,11 +53,8 @@ export default function Aviation() {
         </nav>
 
         {product === "gfa" && <AvChartsGFA product={product} data={gfaData} />}
-
         {product === "lgf" && <AvChartsOther product={product} data={lgfData} />}
-
         {product === "hlt" && <AvChartsOther product={product} data={hltData} />}
-
         {product === "sigwx" && <AvChartsOther product={product} data={sigwxData} />}
       </div>
     </>

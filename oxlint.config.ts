@@ -1,14 +1,15 @@
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript"],
-  "categories": {
-    "correctness": "off"
+import { defineConfig } from "oxlint";
+
+export default defineConfig({
+  plugins: ["typescript", "react"],
+  categories: {
+    correctness: "warn",
   },
-  "env": {
-    "builtin": true
+  env: {
+    builtin: true,
   },
-  "ignorePatterns": ["dist", "*.config.cjs"],
-  "rules": {
+  ignorePatterns: ["dist", "*.config.cjs"],
+  rules: {
     "constructor-super": "error",
     "for-direction": "error",
     "getter-return": "error",
@@ -87,12 +88,12 @@
     "typescript/no-wrapper-object-types": "error",
     "typescript/prefer-as-const": "error",
     "typescript/prefer-namespace-keyword": "error",
-    "typescript/triple-slash-reference": "error"
+    "typescript/triple-slash-reference": "error",
   },
-  "overrides": [
+  overrides: [
     {
-      "files": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
-      "rules": {
+      files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+      rules: {
         "constructor-super": "off",
         "getter-return": "off",
         "no-class-assign": "off",
@@ -112,38 +113,38 @@
         "no-with": "off",
         "prefer-const": "error",
         "prefer-rest-params": "error",
-        "prefer-spread": "error"
-      }
+        "prefer-spread": "error",
+      },
     },
     {
-      "files": ["**/*.{ts,tsx}"],
-      "rules": {
+      files: ["**/*.{ts,tsx}"],
+      rules: {
         "no-case-declarations": "off",
         "no-fallthrough": "off",
         "preserve-caught-error": "off",
         "no-unused-vars": [
           "error",
           {
-            "argsIgnorePattern": "^_",
-            "varsIgnorePattern": "^_",
-            "destructuredArrayIgnorePattern": "^_"
-          }
+            argsIgnorePattern: "^_",
+            varsIgnorePattern: "^_",
+            destructuredArrayIgnorePattern: "^_",
+          },
         ],
         "react/only-export-components": [
           "warn",
           {
-            "allowConstantExport": true
-          }
+            allowConstantExport: true,
+          },
         ],
         "typescript/no-explicit-any": "off",
         "typescript/no-empty-object-type": "off",
-        "typescript/prefer-as-const": "off"
+        "typescript/prefer-as-const": "off",
       },
-      "env": {
-        "es2020": true,
-        "browser": true
+      env: {
+        es2020: true,
+        browser: true,
       },
-      "plugins": ["react"]
-    }
-  ]
-}
+      plugins: ["react"],
+    },
+  ],
+});

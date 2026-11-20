@@ -21,6 +21,8 @@ export const VECTOR_DATA_TYPES = [
   "aq",
   "publicAlerts",
   "hurricanes",
+  "tsOutlooks",
+  "volcanoes",
 ] as const;
 
 export const XMET_TYPES = ["airmet", "sigmet"] as const;

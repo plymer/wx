@@ -1,0 +1,26 @@
+export type TSOutlookFeatureProps = {
+  amendment: number;
+  domain: "MSC";
+  expiration_datetime: Date;
+  file_id: string;
+  id: string;
+  "metobject.confidence.value": number;
+  "metobject.gust.unit": "km/h";
+  "metobject.gust.value": number | [number, number];
+  "metobject.hail.unit": "cm";
+  "metobject.hail.value": number | [number, number];
+  "metobject.impact.value": number;
+  "metobject.rain.unit": "mm";
+  "metobject.rain.value": number | [number, number];
+  "metobject.risk_swo.value": number;
+  "metobject.sub_type": number;
+  "metobject.thunderstorm.value": string;
+  "metobject.tornado_risk.value": boolean;
+  product_class: "Thunderstorm";
+  product_sub_type: string;
+  product_type: string;
+  publication_datetime: Date;
+  status: string;
+  type: "metattrarea";
+  validity_datetime: Date;
+};

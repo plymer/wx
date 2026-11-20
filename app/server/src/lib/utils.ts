@@ -3,7 +3,7 @@ import path from "path";
 
 import * as turf from "@turf/turf";
 import { XMLParser } from "fast-xml-parser";
-import type { Position } from "geojson";
+import type { Feature, Position } from "geojson";
 
 import "dotenv/config";
 
@@ -15,7 +15,32 @@ import type { OutlookData, Panel, RegionData, TextDirection, WmoDirection } from
 import { OFFICE_REGION_MAP } from "../config/charts.config.js";
 import { outlookOfficeSchema, outlookRegionSchema } from "./validation.js";
 import { getTimes } from "suncalc";
-import type { HurricaneData, HurricaneDataResponse, HurricaneDataType } from "./hurricanes.types.js";
+import type { HurricaneData, HurricaneDataResponse, HurricaneDataType, StormType } from "./hurricanes.types.js";
+
+const timezoneOffsets: Record<string, string> = {
+  MDT: "-06:00",
+  MST: "-07:00",
+  HST: "-10:00",
+  PDT: "-07:00",
+  PST: "-08:00",
+  CDT: "-05:00",
+  CST: "-06:00",
+  EDT: "-04:00",
+  EST: "-05:00",
+};
+
+export function parseHurricaneDate(input: string): Date {
+  const match = input.match(/^(\d{1,2}:\d{2}\s[AP]M)\s+([A-Z]{3})\s+(.+)$/);
+
+  if (!match) throw new Error(`Invalid date format: ${input}`);
+
+  const [, time, timezone, date] = match;
+  const offset = timezoneOffsets[timezone];
+
+  if (!offset) throw new Error(`Unknown timezone: ${timezone}`);
+
+  return new Date(`${date} ${time} ${offset}`);
+}
 
 /**
  *
@@ -24,14 +49,7 @@ import type { HurricaneData, HurricaneDataResponse, HurricaneDataType } from "./
  * @returns a string of the minimum length that represents the input prepended with a number of zeroes
  */
 export function leadZero(input: number, minLength: number): string {
-  const inputString: string = input.toString();
-  let leader: string = "";
-
-  for (let i = 0; i < minLength - inputString.length; i++) {
-    leader += "0";
-  }
-
-  return leader + inputString;
+  return input.toString().padStart(minLength, "0");
 }
 
 export function makeISOTimeStamp(time: number, mode: "display" | "data" = "data") {
@@ -529,6 +547,7 @@ export function transformHurricaneMetobject<TData extends HurricaneDataType>(
 
         const newProps = {
           type: "cyclone",
+          dataType: "hurricane",
           active: props.active,
           amendment: props.amendment,
           basin: props.basin,
@@ -567,9 +586,8 @@ export function transformHurricaneMetobject<TData extends HurricaneDataType>(
           storm_origin_year: props.storm_origin_year,
           status: props.status,
           validity_datetime: props.validity_datetime,
+          category: computeHurricaneCategory(props["metobject.max_wind.value"]),
         };
-
-        console.log("Cyclone properties transformed:", newProps);
 
         return { ...feature, properties: newProps } as HurricaneData["cyclone"]["features"][number];
       }
@@ -613,4 +631,75 @@ export function transformHurricaneMetobject<TData extends HurricaneDataType>(
         throw new Error(`Unknown hurricane data type: ${type}`);
     }
   }) as HurricaneData[TData]["features"];
+}
+
+export function generateStormNamePoint(trackData: HurricaneData["track"]["features"][number]): Feature {
+  const { storm_name, validity_datetime } = trackData.properties;
+
+  const coords = turf.centerOfMass(trackData);
+  return turf.point([...coords.geometry.coordinates], {
+    type: "name_point",
+    storm_name,
+    validity_datetime,
+  });
+}
+
+export function getStormClass(
+  stormCode: string,
+  text: string,
+  windSpeed: number,
+): { name: string | undefined; stormType: StormType | undefined; category: number | undefined } {
+  const name = text.replace(`(${stormCode})`, "").trim().split(" ").pop()?.toUpperCase();
+
+  if (!name) return { name: undefined, stormType: undefined, category: undefined };
+
+  if (windSpeed < 35) {
+    return {
+      name,
+      stormType: "DEPRESSION",
+      category: undefined,
+    };
+  }
+  if (windSpeed >= 35 && windSpeed < 64) {
+    return {
+      name,
+      stormType: text.includes("Post-Tropical Cyclone") ? "POST-TROPICAL" : "STORM",
+      category: undefined,
+    };
+  }
+
+  if (windSpeed >= 64)
+    return {
+      name,
+      stormType: "HURRICANE",
+      category: windSpeed < 82 ? 1 : windSpeed < 95 ? 2 : windSpeed < 112 ? 3 : windSpeed < 136 ? 4 : 5,
+    };
+
+  return { name, stormType: "REMNANT", category: undefined };
+}
+
+export function ensure2DPosition(coordinates: Position) {
+  return [coordinates[0], coordinates[1]];
+}
+
+export function computeHurricaneCategory(windSpeed: number) {
+  if (windSpeed < 64) return undefined;
+
+  return windSpeed < 82 ? 1 : windSpeed < 95 ? 2 : windSpeed < 112 ? 3 : windSpeed < 136 ? 4 : 5;
+}
+
+export function fixAntimeridianCrossings(coordinates: [number, number][]) {
+  const hasWestCoords = coordinates.some((p) => p[0] < 0);
+  const hasEastCoords = coordinates.some((p) => p[0] >= 0);
+
+  // need to normalize the coordinates into the sign of one side of the antimeridian (west)
+  if (hasWestCoords && hasEastCoords) {
+    return coordinates.map((p) => {
+      const lat = p[1];
+      const lng = p[0] >= 0 ? -180 - (-1 * p[0] + 180) : p[0];
+      return [lng, lat];
+    });
+  } else {
+    return coordinates;
+  }
 }

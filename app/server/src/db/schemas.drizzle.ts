@@ -11,6 +11,7 @@ import {
   primaryKey,
   snakeCase,
   smallint,
+  bigint,
 } from "drizzle-orm/pg-core";
 
 type GeometryType = "point" | "MultiPoint" | "LineString" | "MultiLineString" | "polygon" | "MultiPolygon";
@@ -248,6 +249,60 @@ export const publicAlerts = snakeCase.table(
 //     index("pireps_valid_time_index").using("btree", t.validTime),
 //   ],
 // );
+
+export const volcanoCodes = snakeCase.table(
+  "volcano_codes",
+  {
+    name: text(),
+    geometry: geometry({ srid: 3857, type: "point" }).notNull(),
+    colour: text({ enum: ["unassigned", "green", "yellow", "orange", "red"] }),
+    alertLevel: text({ enum: ["unassigned", "normal", "advisory", "watch", "warning"] }),
+  },
+  (t) => [primaryKey({ columns: [t.name] }), index("volcano_codes_spatial_index").using("gist", t.geometry)],
+);
+
+export const volcanoFVMessageGeometries = snakeCase.table(
+  "volcano_fv_message_geometries",
+  {
+    id: text().notNull(),
+    datetime: timestamp({ mode: "date" }).notNull(),
+    volcanoName: text().notNull(),
+    volcanoNumber: bigint({ mode: "number" }).notNull(),
+    validTimeString: varchar({ length: 8 }),
+    flBase: text(),
+    flTop: text(),
+    geoIndex: smallint(),
+    geometry: geometry({ type: "polygon" }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.id, t.validTimeString] }),
+    index("volcano_fv_message_geometries_time_index").using("btree", t.datetime),
+    index("volcano_fv_message_geometries_volcname_index").using("btree", t.volcanoName),
+    index("volcano_fv_message_geometries_spatial_index").using("gist", t.geometry),
+  ],
+);
+
+export const volcanoFVMessages = snakeCase.table(
+  "volcano_fv_messages",
+  {
+    id: text().notNull(),
+    datetime: timestamp({ mode: "date" }).notNull(),
+    volcanoName: text().notNull(),
+    volcanoNumber: bigint({ mode: "number" }).notNull(),
+    bulletin: varchar({ length: 6 }).notNull(),
+    infoSource: text(),
+    vaac: text(),
+    area: text(),
+    eruptionDetails: text(),
+    rmk: text(),
+    nextAdvisory: text(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.id] }),
+    index("volcano_fv_message_volcname_index").using("btree", t.volcanoName),
+    index("volcano_fv_message_time_index").using("btree", t.datetime),
+  ],
+);
 
 export const metarsTemporalView = snakeCase.materializedView("metars_temporal").as((qb) =>
   qb

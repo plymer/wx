@@ -1,7 +1,7 @@
 import { Layer } from "react-map-gl/maplibre";
 
 import { useShowLightning } from "@/stateStores/map/vectorData";
-import { useDisplayTime } from "@/hooks/useDisplayTime";
+
 import { MINUTE } from "@shared/lib/constants";
 
 interface Props {
@@ -10,8 +10,6 @@ interface Props {
 
 export const LightningDataLayer = ({ belowLayer }: Props) => {
   const enabled = useShowLightning();
-
-  const displayTime = useDisplayTime();
 
   if (!enabled) return;
 
@@ -23,8 +21,8 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
       beforeId={belowLayer}
       filter={[
         "all",
-        ["<=", ["get", "start_time"], ["to-number", displayTime]],
-        [">", ["get", "expiry_time"], ["to-number", displayTime - 24 * MINUTE]],
+        ["<=", ["get", "start_time"], ["global-state", "time"]],
+        [">", ["get", "expiry_time"], ["-", ["global-state", "time"], 24 * MINUTE]],
       ]}
       type="symbol"
       id="lightning-data"
@@ -38,7 +36,7 @@ export const LightningDataLayer = ({ belowLayer }: Props) => {
         "text-color": "rgb(255,0,155)",
         "text-halo-color": "rgb(255,255,255)",
         "text-halo-width": 1,
-        "text-opacity": ["case", ["<", ["get", "expiry_time"], ["to-number", displayTime - 12 * MINUTE]], 0.5, 1],
+        "text-opacity": ["case", ["<", ["get", "expiry_time"], ["-", ["global-state", "time"], 12 * MINUTE]], 0.5, 1],
       }}
     />
   );

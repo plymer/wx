@@ -2,17 +2,13 @@ import { useShowIsodrosotherms } from "@/stateStores/map/vectorData";
 import type { FilterSpecification } from "maplibre-gl";
 import { Layer } from "react-map-gl/maplibre";
 
-interface Props {
-  displayTime: number;
-}
-
-export const Isodrosotherms = ({ displayTime }: Props) => {
+export const Isodrosotherms = () => {
   const enabled = useShowIsodrosotherms();
 
   const filter: FilterSpecification = [
     "all",
-    ["<=", ["get", "start_time"], ["to-number", displayTime]],
-    [">", ["get", "expiry_time"], ["to-number", displayTime]],
+    ["<=", ["get", "start_time"], ["global-state", "time"]],
+    [">", ["get", "expiry_time"], ["global-state", "time"]],
     [">", ["get", "value"], 0],
   ];
 
@@ -43,6 +39,11 @@ export const Isodrosotherms = ({ displayTime }: Props) => {
         source-layer="td"
         filter={filter}
         layout={{
+          "icon-image": "icons:label-badge",
+          "icon-text-fit": "both",
+          "icon-text-fit-padding": [6, 12, 0, 12],
+          "icon-rotation-alignment": "viewport",
+          "icon-allow-overlap": true,
           "symbol-placement": "line",
           "symbol-spacing": 800,
           "text-field": ["to-string", ["round", ["get", "value"]]],
@@ -53,8 +54,7 @@ export const Isodrosotherms = ({ displayTime }: Props) => {
         }}
         paint={{
           "text-color": "#0f0",
-          "text-halo-color": "#000",
-          "text-halo-width": 12,
+          "icon-color": "black",
         }}
       />
     </>

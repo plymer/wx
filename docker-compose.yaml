@@ -4,7 +4,7 @@ services:
     container_name: redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
 
   db:
     container_name: db
@@ -35,7 +35,7 @@ services:
       - MAX_DB_CONNECTIONS=5
       - ADMIN_USERS=${DB_USER},dbuser
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     depends_on:
       - db
     healthcheck:

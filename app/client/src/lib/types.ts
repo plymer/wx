@@ -1,7 +1,6 @@
 // custom type definitions
 
 import { ANIM_CONTROLS, ANIMATION_STATES } from "../config/animation";
-import { API_CONFIG } from "../config/api";
 import { AVIATION_PRODUCTS } from "../config/aviationProducts";
 import { BASEMAP_TYPES, LAYER_TABS, MAP_LINES, MAP_PROJECTIONS, ZOOM_THRESHOLDS } from "../config/map";
 import { APP_MODES_LIST } from "../config/modes";
@@ -10,20 +9,13 @@ import { RADAR_PRODUCTS, RASTER_DATA_TYPES, SATELLITE_CHANNELS, SATELLITES } fro
 import { VECTOR_DATA_TYPES, XMET_TYPES } from "../config/vectorData";
 
 import type { FeatureCollection, MultiPoint, MultiPolygon } from "geojson";
-
 import type { InferSelectModel } from "drizzle-orm";
-
 import { LngLat, type MapGeoJSONFeature } from "maplibre-gl";
-import type { aqData } from "@shared/db/schemas.drizzle";
-import type React from "react";
+import { aqData } from "@shared/db/schemas.drizzle";
 
 export type AppMode = keyof typeof APP_MODES_LIST;
 export type AnimationState = (typeof ANIMATION_STATES)[number];
 export type AnimationControlsList = (typeof ANIM_CONTROLS)[number];
-
-// general helper types
-export type Nullable<T> = T | null;
-export type HexColor = `#${string}`;
 
 export type Units = "metric" | "aviation";
 
@@ -31,33 +23,6 @@ export type Units = "metric" | "aviation";
  * Prettify is a utility type that makes an object type more readable by removing excess nesting.
  */
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
-/**
- * IIMT (Immediately Indexed Mapped Type) is a utility type that creates a mapped type where each key is immediately indexed.
- * T is the type of the object to be indexed, and D is a string that will be used as a key in the resulting type.
- *
- * (ref: https://youtu.be/lraHlXpuhKs?si=LqZmyhNY0jlBoVha&t=723)
- */
-export type IIMT<T, D extends string> = {
-  [K in keyof T]: Prettify<{ [P in D]: K } & T[K]>;
-}[keyof T];
-
-// helper types for API configuration
-export type EndpointParams = keyof (typeof API_CONFIG)["endpoints"][number];
-export type EndpointUrls = (typeof API_CONFIG)["endpoints"][number]["url"];
-
-// use this to build the IIMT for API responses
-type ApiReponses<TData> = {
-  success: {
-    data: TData;
-  };
-  error: {
-    message: any;
-  };
-  noData: {};
-};
-
-// create an immediately indexed mapped type for API responses
-export type APIResponse<TData> = IIMT<ApiReponses<TData>, "status">;
 
 export type XmetTypes = (typeof XMET_TYPES)[number];
 
@@ -170,15 +135,6 @@ export type OutlookOffice = keyof typeof OUTLOOK_CONFIG;
 
 export type VectorDataTypes = (typeof VECTOR_DATA_TYPES)[number];
 
-export type VectorConfig = {
-  paint: object;
-  type: "circle" | "fill";
-};
-
-export type VectorDisplayConfig = {
-  [K in VectorDataTypes]: VectorConfig;
-};
-
 export type RasterDataTypes = (typeof RASTER_DATA_TYPES)[number];
 
 // helper types for satellite
@@ -186,8 +142,6 @@ export type SatelliteList = (typeof SATELLITES)[number];
 export type SatelliteChannelsList = keyof typeof SATELLITE_CHANNELS;
 export type SatelliteChannelsWMSName = (typeof SATELLITE_CHANNELS)[keyof typeof SATELLITE_CHANNELS]["wms"];
 export type SatelliteChannelsMenuName = (typeof SATELLITE_CHANNELS)[keyof typeof SATELLITE_CHANNELS]["menuName"];
-
-export type SatelliteChannels = IIMT<typeof SATELLITE_CHANNELS, "channel">;
 
 // helper types for radar
 export type RadarProducts = typeof RADAR_PRODUCTS;
@@ -216,7 +170,7 @@ type AviationProducts = typeof AVIATION_PRODUCTS;
 export type Products = keyof AviationProducts;
 
 // helper 'type function' to extract all of the domains from the full product list without needing to manually extract the domains in an intermediate step
-type ExtractDomains<T extends Products> = Prettify<AviationProducts[T][number]>;
+type ExtractDomains<TProduct extends Products> = Prettify<AviationProducts[TProduct][number]>;
 
 // export all of the product domains using our 'type function' from above
 export type ProductDomains = ExtractDomains<Products>["domain"];
@@ -225,8 +179,6 @@ export type ProductDomains = ExtractDomains<Products>["domain"];
 export type AviationProductList = {
   [K in Products]: SingleAviationProduct[];
 };
-
-export type AviationProductListM = IIMT<AviationProducts, "product">;
 
 export type MapPopupData = {
   features: MapGeoJSONFeature[];

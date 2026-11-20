@@ -5,7 +5,7 @@ import { Source, Layer } from "react-map-gl/maplibre";
 export const HillshadeLayer = () => {
   const baseMap = useBaseMap();
   const showSatellite = useShowSatellite();
-  const enabled = !showSatellite && (baseMap === "hillshade" || baseMap === "liberty");
+  const enabled = (baseMap === "hillshade" && !showSatellite) || baseMap === "liberty";
 
   if (!enabled) return null;
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
 import { useMap } from "react-map-gl/maplibre";
-import { Loader2, Navigation } from "lucide-react";
+import { CircleX, Loader2, Navigation } from "lucide-react";
 import LocationMarker from "@/components/map/LocationMarker";
 
 export const GeoLocation = () => {
@@ -9,6 +9,7 @@ export const GeoLocation = () => {
   const [loading, setLoading] = useState(false);
   const [currentPos, setCurrentPos] = useState<GeolocationPosition | null>(null);
   const [tracking, setTracking] = useState(false);
+  const [trackingError, setTrackingError] = useState(false);
   const watchIdRef = useRef<number | null>(null);
   const hasCenteredRef = useRef(false);
 
@@ -22,6 +23,7 @@ export const GeoLocation = () => {
       (pos) => {
         setLoading(false);
         setTracking(true);
+        setTrackingError(false);
         setCurrentPos(pos);
         // center once on first fix to avoid constant recentering
         if (!hasCenteredRef.current && map) {
@@ -32,6 +34,7 @@ export const GeoLocation = () => {
       (err) => {
         setLoading(false);
         setTracking(false);
+        setTrackingError(true);
         setCurrentPos(null);
         console.error("Geolocation error:", err);
       },
@@ -67,18 +70,16 @@ export const GeoLocation = () => {
         size="icon"
         variant="floating"
         onClick={geolocateTrigger}
-        aria-label={tracking ? "Stop location tracking" : "Start location tracking"}
-        title={tracking ? "Stop location tracking" : "Start location tracking"}
-        disabled={loading}
-        // className={`${tracking ? "bg-secondary border-secondary-foreground" : ""}`}
+        aria-label={tracking ? "Stop location tracking" : trackingError ? "Tracking Error" : "Start location tracking"}
+        title={tracking ? "Stop location tracking" : trackingError ? "Tracking Error" : "Start location tracking"}
       >
-        {loading ? (
-          <Loader2 className="animate-spin" />
-        ) : (
+        {loading && <Loader2 className="animate-spin" />}
+        {!loading && !trackingError && (
           <Navigation
             className={`${tracking ? "animate-[pulse_2s_ease-in-out_infinite] fill-primary-foreground" : ""}`}
           />
         )}
+        {trackingError && <CircleX />}
       </Button>
       {tracking && currentPos && <LocationMarker position={currentPos} />}
     </>

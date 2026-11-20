@@ -19,6 +19,8 @@ import {
   AlertTriangle,
   Plane,
   Grid3X3,
+  Tornado,
+  Mountain,
 } from "lucide-react";
 
 import { SATELLITE_CHANNELS } from "@/config/rasterData";
@@ -44,6 +46,8 @@ import {
   useShowIsodrosotherms,
   usePublicAlertsFilterLevel,
   useShowHurricanes,
+  useShowTSOutlooks,
+  useShowVolcanoes,
 } from "@/stateStores/map/vectorData";
 import type { SatelliteChannelsList, SatelliteChannelsWMSName, ToggleDataOption } from "@/lib/types";
 import { useLayersTab, useUIActions } from "@/stateStores/map/ui";
@@ -62,6 +66,7 @@ import {
   usePublicRegionsOverlay,
   useMarineRegionsOverlay,
   useVectorOverlayActions,
+  useVAACOverlay,
 } from "@/stateStores/map/overlays";
 import { BASEMAP_TYPES } from "@/config/map";
 import { TropicalCycloneIcon } from "@/components/ui/TropicalCycloneIcon";
@@ -83,7 +88,9 @@ export default function MapOptions({ ...props }: ButtonProps) {
     showAIRMETs: useShowAIRMETs(),
     showPublicAlerts: useShowPublicAlerts(),
     showHurricanes: useShowHurricanes(),
+    showTSOutlooks: useShowTSOutlooks(),
     alertsFilterLevel: usePublicAlertsFilterLevel(),
+    showVolcanoes: useShowVolcanoes(),
   };
 
   const raster = {
@@ -97,6 +104,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
     showGFA: useGFAOverlay(),
     showLGF: useLGFOverlay(),
     showFIR: useFIROverlay(),
+    showVAAC: useVAACOverlay(),
     showTAFs: useTAFsOverlay(),
     showBedposts: useBedpostsOverlay(),
     showPublicRegions: usePublicRegionsOverlay(),
@@ -150,6 +158,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
       state: vector.showIsotherms,
       toggle: vectorActions.toggleIsotherms,
     },
+
     // {
     //   icon: <Rss className="shrink-0" />,
     //   type: "isodrosotherms",
@@ -167,18 +176,32 @@ export default function MapOptions({ ...props }: ButtonProps) {
 
   const SIGWX_DATA_OPTIONS: ToggleDataOption[] = [
     {
-      icon: <TropicalCycloneIcon className="shrink-0 fill-black" />,
-      type: "hurricanes",
-      name: "Atlantic Basin TCs",
-      state: vector.showHurricanes,
-      toggle: vectorActions.toggleHurricanes,
-    },
-    {
       icon: <Plane className="shrink-0" />,
       type: "sigmet",
       name: "SIGMETs",
       state: vector.showSIGMETs,
       toggle: vectorActions.toggleSIGMETs,
+    },
+    {
+      icon: <Tornado className="shrink-0" />,
+      type: "tsOutlooks",
+      name: "Thunderstorm Outlooks",
+      state: vector.showTSOutlooks,
+      toggle: vectorActions.toggleTSOutlooks,
+    },
+    {
+      icon: <TropicalCycloneIcon className="shrink-0 fill-black" />,
+      type: "hurricanes",
+      name: "Pacific/Atlantic TCs",
+      state: vector.showHurricanes,
+      toggle: vectorActions.toggleHurricanes,
+    },
+    {
+      icon: <Mountain className="shrink-0" />,
+      type: "volcanoes",
+      name: "Volcanoes",
+      state: vector.showVolcanoes,
+      toggle: vectorActions.toggleVolcanoes,
     },
     {
       icon: <TriangleAlert className="shrink-0" />,
@@ -222,6 +245,12 @@ export default function MapOptions({ ...props }: ButtonProps) {
       toggle: overlayActions.toggleBedposts,
     },
     {
+      type: "vaac",
+      name: "VAAC Boundaries",
+      state: overlays.showVAAC,
+      toggle: overlayActions.toggleVaac,
+    },
+    {
       type: "publicRegions",
       name: "Public Regions",
       state: overlays.showPublicRegions,
@@ -245,7 +274,7 @@ export default function MapOptions({ ...props }: ButtonProps) {
         </Button>
       </SheetTrigger>
       <SheetContent
-        side="left"
+        side="right"
         className="bg-transparent border-none text-white p-2 overflow-y-auto"
         showCloseButton={false}
         onClick={(e) => {

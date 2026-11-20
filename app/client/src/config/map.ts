@@ -7,7 +7,7 @@ export const MAP_PROJECTIONS = ["mercator", "globe"] as const;
 
 export const BASEMAP_TYPES = ["hillshade", "liberty", "aerial"] as const;
 
-export const MAP_LINES = ["gfa", "lgf", "fir", "tafs", "bedposts", "publicRegions", "marineRegions"] as const;
+export const MAP_LINES = ["gfa", "lgf", "fir", "tafs", "bedposts", "publicRegions", "marineRegions", "vaac"] as const;
 
 export const LAYER_TABS = ["alerts", "satellite", "radar", "wxdata", "projection", "geography"] as const;
 

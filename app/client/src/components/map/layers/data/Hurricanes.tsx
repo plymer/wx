@@ -2,16 +2,64 @@ import { api } from "@/lib/trpc";
 import { useShowHurricanes } from "@/stateStores/map/vectorData";
 import { MINUTE } from "@shared/lib/constants";
 import { useQuery } from "@tanstack/react-query";
+import type { FeatureCollection } from "geojson";
+import { useMemo } from "react";
 import { Source, Layer } from "react-map-gl/maplibre";
 export const Hurricanes = () => {
   const enabled = useShowHurricanes();
   // types: track, error_cone, cyclone, wind_radii
-  const data = useQuery(api.wxmap.hurricanes.queryOptions(undefined, { enabled, refetchInterval: 10 * MINUTE }));
+  const { data: atlanticData } = useQuery(
+    api.wxmap.hurricanesAtlantic.queryOptions(undefined, { enabled, refetchInterval: 10 * MINUTE }),
+  );
 
-  if (!enabled || !data.data) return null;
+  const { data: pacificData } = useQuery(
+    api.wxmap.hurricanesPacific.queryOptions(undefined, { enabled, refetchInterval: 10 * MINUTE }),
+  );
+
+  const data = useMemo(
+    () => [...(atlanticData ? atlanticData.features : []), ...(pacificData ? pacificData.features : [])],
+    [atlanticData, pacificData],
+  );
+
+  const fc: FeatureCollection = { type: "FeatureCollection", features: data };
+  if (!enabled || data.length === 0) return null;
 
   return (
-    <Source id="hurricanes" key="hurricanes" type="geojson" data={data.data}>
+    <Source
+      id="hurricanes"
+      key="hurricanes"
+      type="geojson"
+      data={fc}
+      attribution={"<a href='https://nhc.noaa.gov'>NOAA NHC</a>"}
+    >
+      <Layer
+        id="layer-hurricanes-error-fill"
+        key="layer-hurricanes-error-fill"
+        type="fill"
+        source="hurricanes"
+        filter={["==", ["get", "type"], "error_cone"]}
+        paint={{
+          "fill-color": "white",
+          "fill-opacity": 0.2,
+        }}
+      />
+
+      <Layer
+        id="layer-hurricanes-radii-fill"
+        key="layer-hurricanes-radii-fill"
+        type="fill"
+        source="hurricanes"
+        filter={["==", ["get", "type"], "wind_radii"]}
+        paint={{
+          "fill-color": [
+            "let",
+            "speed",
+            ["at", 3, ["split", ["get", "id"], "_"]],
+            ["match", ["var", "speed"], "34", "yellow", "50", "orange", "red"],
+          ],
+          "fill-layer-opacity": 0.15,
+        }}
+      />
       <Layer
         id="layer-hurricanes-track"
         key="layer-hurricanes-track"
@@ -22,6 +70,18 @@ export const Hurricanes = () => {
           "line-color": "white",
           "line-dasharray": [4, 4],
           "line-width": 2,
+        }}
+      />
+      <Layer
+        id="layer-hurricanes-error-outline-underlay"
+        key="layer-hurricanes-error-outline-underlay"
+        type="line"
+        source="hurricanes"
+        filter={["==", ["get", "type"], "error_cone"]}
+        paint={{
+          "line-color": "black",
+          "line-width": 6,
+          "line-opacity": 0.5,
         }}
       />
       <Layer
@@ -37,14 +97,14 @@ export const Hurricanes = () => {
         }}
       />
       <Layer
-        id="layer-hurricanes-error-fill"
-        key="layer-hurricanes-error-fill"
-        type="fill"
+        id="layer-hurricanes-radii-underlay"
+        key="layer-hurricanes-radii-underlay"
+        type="line"
         source="hurricanes"
-        filter={["==", ["get", "type"], "error_cone"]}
+        filter={["==", ["get", "type"], "wind_radii"]}
         paint={{
-          "fill-color": "white",
-          "fill-opacity": 0.2,
+          "line-color": "black",
+          "line-width": 6,
         }}
       />
       <Layer
@@ -58,38 +118,95 @@ export const Hurricanes = () => {
             "let",
             "speed",
             ["at", 3, ["split", ["get", "id"], "_"]],
-            ["match", ["var", "speed"], "34", "yellow", "48", "orange", "red"],
+            ["match", ["var", "speed"], "34", "yellow", "50", "orange", "red"],
           ],
           "line-width": 2,
         }}
       />
       <Layer
-        id="layer-hurricanes-radii-label"
-        key="layer-hurricanes-radii-label"
-        type="fill"
+        id="layer-hurricanes-radii-speed"
+        key="layer-hurricanes-radii-speed"
+        type="symbol"
         source="hurricanes"
         filter={["==", ["get", "type"], "wind_radii"]}
         paint={{
-          "fill-color": [
-            "let",
-            "speed",
-            ["at", 3, ["split", ["get", "id"], "_"]],
-            ["match", ["var", "speed"], "34", "yellow", "48", "orange", "red"],
-          ],
-          "fill-opacity": 0.2,
+          "text-color": "black",
+          "text-halo-color": "white",
+          "text-halo-width": 2,
+        }}
+        layout={{
+          "text-size": 10,
+          "text-field": ["concat", ["to-string", ["at", 3, ["split", ["get", "id"], "_"]]], " KT"],
+          "symbol-placement": "line",
+          "symbol-spacing": 500,
+        }}
+      />
+      <Layer
+        id="layer-hurricanes-name"
+        key="layer-hurricanes-name"
+        type="symbol"
+        source="hurricanes"
+        filter={["==", ["get", "type"], "name_point"]}
+        paint={{
+          "text-color": "black",
+          "icon-color": "white",
+        }}
+        layout={{
+          "icon-image": "icons:label-badge",
+          "icon-text-fit": "both",
+          "icon-text-fit-padding": [8, 20, 8, 20],
+          "text-field": ["get", "storm_name"],
+          "text-variable-anchor": ["bottom-left", "top-left", "top-right", "bottom-right"],
+          "text-radial-offset": ["interpolate", ["linear"], ["zoom"], 2, 1.5, 4, 2, 5, 4],
         }}
       />
       <Layer
         id="layer-hurricanes-position"
         key="layer-hurricanes-position"
-        type="circle"
+        type="symbol"
         source="hurricanes"
         filter={["==", ["get", "type"], "cyclone"]}
         paint={{
-          "circle-radius": 6,
-          "circle-color": "red",
-          "circle-stroke-color": "black",
-          "circle-stroke-width": 2,
+          "icon-color": "red",
+          "icon-halo-color": "black",
+          "icon-halo-width": 1,
+
+          "text-color": "black",
+          "text-halo-color": "white",
+          "text-halo-width": 1,
+        }}
+        layout={{
+          "text-field": [
+            "case",
+            ["==", ["get", "sub_type", ["get", "metobject"]], "HURRICANE"],
+            ["get", "category"],
+            "",
+          ],
+          "text-size": 14,
+          "icon-image": [
+            "match",
+            ["get", "sub_type", ["get", "metobject"]],
+            "HURRICANE",
+            "icons:hurricane",
+            "STORM",
+            "icons:tropical-storm",
+            "POST_TROPICAL_STORM",
+            "icons:post-tropical-storm",
+            "icons:pressure-centre",
+          ],
+          "icon-size": [
+            "case",
+            [
+              "all",
+              ["!=", ["get", "sub_type", ["get", "metobject"]], "STORM"],
+              ["!=", ["get", "sub_type", ["get", "metobject"]], "HURRICANE"],
+              ["!=", ["get", "sub_type", ["get", "metobject"]], "POST_TROPICAL_STORM"],
+            ],
+            0.3,
+            0.5,
+          ],
+          "icon-allow-overlap": true,
+          "text-allow-overlap": true,
         }}
       />
       <Layer
@@ -97,45 +214,43 @@ export const Hurricanes = () => {
         key="layer-hurricanes-pos-label"
         type="symbol"
         source="hurricanes"
-        minzoom={4}
+        minzoom={5}
         filter={["==", ["get", "type"], "cyclone"]}
         paint={{ "text-color": "white", "text-halo-color": "black", "text-halo-width": 2 }}
         layout={{
           "text-size": 12,
+          "text-anchor": "top",
+          "text-offset": [0, 1.25],
           "text-field": [
             "step",
             ["zoom"],
             [
               "concat",
-              '"',
-              ["get", "storm_name"],
-              '"\n',
+              ["at", 2, ["split", ["at", 0, ["split", ["get", "forecast_datetime"], "T"]], "-"]],
+              "/",
               ["at", 0, ["split", ["at", 1, ["split", ["get", "forecast_datetime"], "T"]], ":"]],
               ":",
               ["at", 1, ["split", ["at", 1, ["split", ["get", "forecast_datetime"], "T"]], ":"]],
               "Z",
             ],
-            8,
+            7,
             [
               "let",
-              "class",
-              ["get", "classification", ["get", "metobject"]],
+              "subType",
+              ["get", "sub_type", ["get", "metobject"]],
               [
                 "concat",
                 [
                   "case",
-                  ["!=", ["var", "class"], "POST_TROPICAL"],
-                  ["join", ["split", ["var", "class"], "_"], "\n"],
-                  "",
+                  ["!=", ["var", "subType"], "STORM"],
+                  ["join", ["split", ["var", "subType"], "_"], " "],
+                  "TROPICAL STORM",
                 ],
-                " ",
-                ["join", ["split", ["get", "sub_type", ["get", "metobject"]], "_"], " "],
-                '\n"',
-
-                ["get", "storm_name"],
-                '"\nMAX ',
-                ["concat", ["get", "value", ["get", "max_wind", ["get", "metobject"]]], "KT"],
                 "\n",
+                ["concat", ["get", "value", ["get", "max_wind", ["get", "metobject"]]], "KT"],
+                " @ ",
+                ["at", 2, ["split", ["at", 0, ["split", ["get", "forecast_datetime"], "T"]], "-"]],
+                "/",
                 ["at", 0, ["split", ["at", 1, ["split", ["get", "forecast_datetime"], "T"]], ":"]],
                 ":",
                 ["at", 1, ["split", ["at", 1, ["split", ["get", "forecast_datetime"], "T"]], ":"]],

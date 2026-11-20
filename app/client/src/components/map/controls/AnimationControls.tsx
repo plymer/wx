@@ -92,7 +92,8 @@ const AnimationControls = ({ ...props }: Props) => {
     }
 
     return () => clearTimeout(animation.loopId);
-  }, [animation.state, animation.frame]);
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [animation.state, animation.frame, animation.frameRate, animationActions, maxFrame]);
 
   return (
     <div {...props}>
@@ -113,6 +114,7 @@ const AnimationControls = ({ ...props }: Props) => {
               animationActions.setFrame((e[0] - animation.startTime) / animation.deltaTime);
             }}
             className="my-2"
+            showTicks
           />
           <div className="ms-2 text-xs">{makeISOTimeStamp(animation.endTime, "display", true)}</div>
         </div>

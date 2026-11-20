@@ -1,6 +1,5 @@
 import type { StyleSpecification } from "react-map-gl/maplibre";
-
-export const PUBLIC_URL = new URL(import.meta.url).origin;
+import { PUBLIC_URL, ATTRIBUTION } from "./common";
 
 const ROAD_COLOUR_FAR = "rgb(160,160,160)";
 const ROAD_COLOUR_CLOSE = "rgb(40,40,40)";
@@ -18,6 +17,7 @@ export const positronWxMap: StyleSpecification = {
     openmaptiles: {
       type: "vector",
       url: "https://tiles.openfreemap.org/planet",
+      attribution: ATTRIBUTION,
     },
   },
   sprite: [
@@ -48,6 +48,7 @@ export const positronWxMap: StyleSpecification = {
       "source-layer": "water",
       layout: { visibility: "none" },
     },
+
     {
       id: "wateroutline-casing",
       type: "line",
@@ -62,6 +63,13 @@ export const positronWxMap: StyleSpecification = {
       source: "openmaptiles",
       "source-layer": "water",
       paint: { "line-color": WATER_OUTLINE, "line-width": 1 },
+    },
+    {
+      id: "outlooks-target",
+      type: "line",
+      source: "openmaptiles",
+      "source-layer": "water",
+      layout: { visibility: "none" },
     },
     {
       id: "tunnel_motorway_casing",
@@ -133,17 +141,36 @@ export const positronWxMap: StyleSpecification = {
       type: "line",
       source: "openmaptiles",
       "source-layer": "aeroway",
-      minzoom: 8,
+      minzoom: 7,
       filter: ["all", ["in", "class", "runway"], ["==", "$type", "LineString"]],
       layout: {
-        "line-cap": "round",
+        "line-cap": "square",
         "line-join": "round",
         visibility: "visible",
       },
       paint: {
         "line-color": "rgba(255, 255, 255, 1)",
-        "line-opacity": 1,
-        "line-width": ["interpolate", ["exponential", 1.5], ["zoom"], 8, 4, 17, 50],
+        "line-width": ["interpolate", ["exponential", 1.5], ["zoom"], 7, 4, 17, 50],
+      },
+    },
+    {
+      id: "aeroway-runway-numbers",
+      type: "symbol",
+      source: "openmaptiles",
+      "source-layer": "aeroway",
+      minzoom: 9,
+      filter: ["all", ["in", "class", "runway"], ["==", "$type", "LineString"]],
+      layout: {
+        "text-field": ["get", "ref"],
+        "symbol-placement": "line-center",
+        "text-offset": [1, 0],
+        "text-allow-overlap": true,
+        "text-size": 12,
+      },
+      paint: {
+        "text-color": "black",
+        "text-halo-color": "white",
+        "text-halo-width": 2,
       },
     },
     {

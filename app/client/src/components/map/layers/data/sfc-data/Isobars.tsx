@@ -2,23 +2,34 @@ import { useShowIsobars } from "@/stateStores/map/vectorData";
 import { Layer } from "react-map-gl/maplibre";
 import type { FilterSpecification } from "maplibre-gl";
 
-interface Props {
-  displayTime: number;
-}
-
-export const Isobars = ({ displayTime }: Props) => {
+export const Isobars = () => {
   const enabled = useShowIsobars();
 
   const filter: FilterSpecification = [
     "all",
-    ["<=", ["get", "start_time"], ["to-number", displayTime]],
-    [">", ["get", "expiry_time"], ["to-number", displayTime]],
+    ["<=", ["get", "start_time"], ["global-state", "time"]],
+    [">", ["get", "expiry_time"], ["global-state", "time"]],
   ];
 
   if (!enabled) return null;
 
   return (
     <>
+      <Layer
+        id={`layer-sfc-obs-isobars-casing`}
+        source="vector-tile-source"
+        source-layer="mslp"
+        filter={filter}
+        type="line"
+        layout={{
+          "line-join": "round",
+          "line-cap": "round",
+        }}
+        paint={{
+          "line-color": "#fff",
+          "line-width": ["case", ["==", ["%", ["-", ["to-number", ["get", "value"]], 1000], 24], 0], 5, 3],
+        }}
+      />
       <Layer
         id={`layer-sfc-obs-isobars`}
         source="vector-tile-source"
@@ -31,7 +42,7 @@ export const Isobars = ({ displayTime }: Props) => {
         }}
         paint={{
           "line-color": "#111",
-          "line-width": ["case", ["==", ["%", ["-", ["to-number", ["get", "value"]], 1000], 24], 0], 6, 3],
+          "line-width": ["case", ["==", ["%", ["-", ["to-number", ["get", "value"]], 1000], 24], 0], 4, 2],
         }}
       />
       <Layer
@@ -41,6 +52,11 @@ export const Isobars = ({ displayTime }: Props) => {
         filter={filter}
         type="symbol"
         layout={{
+          "icon-image": "icons:label-badge",
+          "icon-text-fit": "both",
+          "icon-text-fit-padding": [6, 14, 0, 14],
+          "icon-rotation-alignment": "viewport",
+          "icon-allow-overlap": true,
           "symbol-placement": "line",
           "symbol-spacing": 600,
           "text-field": ["to-string", ["round", ["get", "value"]]],
@@ -51,8 +67,7 @@ export const Isobars = ({ displayTime }: Props) => {
         }}
         paint={{
           "text-color": "#fff",
-          "text-halo-color": "#000",
-          "text-halo-width": 12,
+          "icon-color": "black",
         }}
       />
       <Layer

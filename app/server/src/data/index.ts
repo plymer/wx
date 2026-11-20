@@ -14,7 +14,9 @@ import { stations } from "../db/schemas.drizzle.js";
 import { createIsolines } from "./isolines.js";
 import { sql } from "drizzle-orm";
 import type { DataProcessResult } from "../lib/types.js";
-import { getHurricaneData } from "./hurricanes.js";
+import { cacheClient } from "../services/redis.js";
+import { ETAG_CACHE_KEY } from "../config/cache-keys.config.js";
+import { getVolcanoStatus } from "./volcanoes.js";
 
 /**
  * This function orchestrates the running of all data fetches such that we don't overwhelm the server's resources and crash due to OOM errors. We will have a max concurrency of 2 processes, adding a new fetch once the queue is down to 1.
@@ -51,6 +53,8 @@ async function main() {
   const stationCatalogCount = await db.select().from(stations).limit(1);
   if (stationCatalogCount.length === 0) {
     console.log("[DATA] Station catalog is empty, building station catalog...");
+    // also empty the etag cache key for the stations data just to be certain we can populate it
+    await cacheClient.del(`${ETAG_CACHE_KEY}:station`);
     await buildStationCatalog();
     await updateStationVisTable();
   }
@@ -70,9 +74,9 @@ async function main() {
     { name: "Public-Alerts", run: () => getPublicAlerts(), schedule: "* * * * *" },
     { name: "AQ-Data", run: () => getAqData(), schedule: "*/10 * * * *" },
     { name: "Isolines", run: () => createIsolines(), schedule: "*/10 * * * *" },
-    { name: "Hurricane-Data", run: () => getHurricaneData(), schedule: "*/30 * * * *" },
     { name: "Station-Catalog", run: () => buildStationCatalog(), schedule: "0 0 * * *" },
     { name: "Station-Visibility", run: () => updateStationVisTable(), schedule: "0 0 * * *" },
+    { name: "Volcano-Codes", run: () => getVolcanoStatus(), schedule: "0 * * * *" },
   ].filter((task) => runFromCron(task.schedule, currentMinute, currentHour));
 
   console.log(
