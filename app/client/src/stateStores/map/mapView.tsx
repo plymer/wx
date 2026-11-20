@@ -68,6 +68,7 @@ const useMapViewState = create<MapStateStore>()(
 
 export const useMapRef = () => {
   const mapRef = useMap();
+  // eslint-disable-next-line react/refs
   return mapRef.current?.getMap();
 };
 export const useViewState = () => useMapViewState((state) => state.viewState);
