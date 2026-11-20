@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, statSync } from "fs";
 import path from "path";
+import type { Context } from "hono";
 
 import * as turf from "@turf/turf";
 import { XMLParser } from "fast-xml-parser";
@@ -702,4 +703,21 @@ export function fixAntimeridianCrossings(coordinates: [number, number][]) {
   } else {
     return coordinates;
   }
+}
+
+export function readRequestParams(c: Context) {
+  // @ts-expect-error -- validated path params depend on the shape of the validator (which this middleware does not know about)
+  const validatedPathParams = c.req.valid?.("param") as Record<string, unknown> | undefined;
+
+  // @ts-expect-error -- validated query params depend on the shape of the validator (which this middleware does not know about)
+  const validatedQueryParams = c.req.valid?.("query") as Record<string, unknown> | undefined;
+
+  const allParams: Record<string, unknown> = {
+    ...c.req.param(),
+    ...c.req.query(),
+    ...(validatedPathParams || {}),
+    ...(validatedQueryParams || {}),
+  };
+
+  return allParams;
 }

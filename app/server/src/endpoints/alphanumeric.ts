@@ -17,6 +17,8 @@ import { publicProcedure, router } from "../services/trpc.js";
 import type { PointForecastData, WxOAPIResponse, XmetGeoJSON } from "../lib/types.js";
 import { pgDb as db } from "../services/database.js";
 
+import { updateRequestStats, updateRequestStatsByTime } from "../lib/updateRequestStats.js";
+
 export const alphanumericRouter = router({
   metars: publicProcedure.input(metarSchema).query(async ({ input }) => {
     if (!db) {
@@ -25,6 +27,9 @@ export const alphanumericRouter = router({
 
     const { site, hrs } = input;
     const siteId = site === "CYEU" ? "CWEU" : site;
+
+    updateRequestStatsByTime({ siteId }); // may need to make this awaited
+    updateRequestStats({ hours: hrs });
 
     console.log("[API] Requesting METARs for:", siteId, "for the last", hrs, "hours");
 

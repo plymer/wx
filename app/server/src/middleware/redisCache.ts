@@ -1,6 +1,7 @@
 import { createMiddleware } from "hono/factory";
 import { gunzipSync, gzipSync } from "zlib";
 import { cacheClient } from "../services/redis.js";
+import { readRequestParams } from "../lib/utils.js";
 
 export const redisCache = (ttlMs: number, contentType: "json" | "text" | "mvt") =>
   createMiddleware(async (c, next) => {
@@ -9,23 +10,11 @@ export const redisCache = (ttlMs: number, contentType: "json" | "text" | "mvt") 
       return next();
     }
 
-    // @ts-expect-error -- validated path params depend on the shape of the validator (which this middleware does not know about)
-    const validatedPathParams = c.req.valid?.("param") as Record<string, unknown> | undefined;
+    const params = readRequestParams(c);
 
-    // @ts-expect-error -- validated query params depend on the shape of the validator (which this middleware does not know about)
-    const validatedQueryParams = c.req.valid?.("query") as Record<string, unknown> | undefined;
+    const sortedKeys = Object.keys(params).sort();
 
-    const allParams: Record<string, unknown> = {
-      ...c.req.param(),
-      ...c.req.query(),
-      ...(validatedPathParams || {}),
-      ...(validatedQueryParams || {}),
-    };
-
-    const sortedKeys = Object.keys(allParams).sort();
-
-    const paramString =
-      sortedKeys.length > 0 ? ":" + sortedKeys.map((key) => `${key}=${allParams[key]}`).join(":") : "";
+    const paramString = sortedKeys.length > 0 ? ":" + sortedKeys.map((key) => `${key}=${params[key]}`).join(":") : "";
 
     const key = `cache:${c.req.path}:${contentType}:${paramString}`;
 
@@ -48,7 +37,7 @@ export const redisCache = (ttlMs: number, contentType: "json" | "text" | "mvt") 
         });
       }
     } catch (error) {
-      console.error("[REDIS CACHE] Error retrieving from cache:", error);
+      console.error("[REDIS CACHE] Error retrieving from cache", key, (error as Error).message);
     }
 
     await next();
